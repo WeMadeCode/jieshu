@@ -1,0 +1,45 @@
+# Codex 项目工作流
+
+## 仓库概览
+
+- 本仓库是 pnpm workspace + Lerna 管理的微前端 monorepo。
+- 框架核心在 `packages/wujie-core`；框架适配包在 `packages/wujie-react`、`packages/wujie-vue2`、`packages/wujie-vue3`。
+- `examples/*` 是各框架示例，`docs/` 是 VitePress 文档站点。
+- 以根目录 `package.json` 的 `packageManager` 字段为准，使用 pnpm 10.33.0；不要混用 npm 或 yarn 安装依赖。
+- `.codex/config.toml` 提供受信任仓库的共享 Codex 默认权限；不要在其中放置密钥、个人账号或机器专属路径。
+
+## 开发约定
+
+1. 先阅读与任务有关的实现、测试、文档和已有 CI；保持修改范围最小。
+2. 工作区可能包含其他人未提交的改动。不得覆盖、还原或格式化无关文件。
+3. 修改核心行为时，同步更新或新增 `packages/wujie-core/__test__` 下的测试；修改公开 API 时，同步更新 `docs/`。
+4. 不提交构建产物、`node_modules`、测试覆盖率、Puppeteer 下载的浏览器或本地密钥。
+5. 不修改发布、标签、npm 发布和 GitHub Release 配置，除非任务明确要求。
+
+## 常用命令
+
+```bash
+pnpm install
+pnpm test
+pnpm --filter wujie test:unit
+pnpm --filter wujie test:integration
+pnpm --filter wujie-docs docs:build
+pnpm start
+```
+
+- 核心测试和旧版构建依赖 `NODE_OPTIONS=--openssl-legacy-provider`；根测试脚本已设置该选项。
+- 集成测试会下载/使用 Chromium 并启动多个示例服务，优先先运行单元测试；仅在改动影响集成行为或任务明确要求时运行集成测试。
+- 根目录没有只读 lint 脚本；`packages/wujie-core` 的 `lint` 会带 `--fix`，除非用户要求，不要把它当作无副作用检查执行。
+
+## 完成前检查
+
+1. 检查 `git diff --check` 与 `git status --short`，确认只包含本任务的改动。
+2. 运行与改动相称的最小验证，并在交付时说明运行结果和未运行项。
+3. 提交信息遵循 `CONTRIBUTING.md` 中的 Conventional Commits 规则；不要自行创建提交，除非用户明确要求。
+4. 提交 Pull Request 前，使用 Codex `/review` 审查未提交变更或相对 `master` 的分支差异；审查只报告问题，不应改动工作树。
+
+## Code Review Rules
+
+- 优先指出会导致隔离失效、跨应用状态泄漏、生命周期顺序错误、路由/资源加载回归或兼容性破坏的问题。
+- 审查公开接口变更时，检查类型声明、框架适配包和文档是否保持一致。
+- 对测试、文档和仅重构的改动，避免提出与行为无关的格式化意见。

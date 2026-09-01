@@ -1,0 +1,15 @@
+# Shared Codex defaults for this trusted repository.
+# CLI flags and user-level configuration can override these values.
+
+# Keep command execution constrained to the checked-out workspace and request
+# confirmation before operations that need broader access.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Prefer OpenAI's indexed cache for project research; use live search only when
+# a task explicitly requires current external information.
+web_search = "cached"
+
+# Do not forward values whose names commonly contain credentials to subprocesses.
+[shell_environment_policy]
+ignore_default_excludes = false
