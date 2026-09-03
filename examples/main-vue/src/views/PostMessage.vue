@@ -1,5 +1,5 @@
 <template>
-  <!--单例模式，name相同则复用一个无界实例，改变url则子应用重新渲染实例到对应路由 -->
+  <!--单例模式，name相同则复用一个界枢实例，改变url则子应用重新渲染实例到对应路由 -->
   <div>
     <div class="title">主应用</div>
     <div class="main-content">
@@ -8,7 +8,7 @@
       <button @click="() => postMessageToVue3()">发送消息给vue2子应用的iframe</button>
     </div>
     <div class="sub-content">
-      <WujieVue width="100%" height="100%" name="vue2" :url="vue2Url" :sync="true"></WujieVue>
+      <JieshuVue width="100%" height="100%" name="vue2" :url="vue2Url" :sync="true"></JieshuVue>
     </div>
   </div>
 </template>
@@ -31,7 +31,7 @@ export default {
     },
     postMessageToVue3(message) {
       const iframeWindow = window.document
-        .querySelector("wujie-app[data-wujie-id='vue2']")
+        .querySelector("jieshu-app[data-jieshu-id='vue2']")
         .shadowRoot.querySelector('iframe').contentWindow;
       const data = message || { type: 'vue3', message: "hello, i'm main app" };
       iframeWindow.postMessage(JSON.stringify(data), '*');

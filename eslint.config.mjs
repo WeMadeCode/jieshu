@@ -17,7 +17,7 @@ const unusedVariablesRule = [
 
 export default [
   {
-    name: 'wujie/ignores',
+    name: 'jieshu/ignores',
     ignores: [
       '.pnpm-store/**',
       '**/node_modules/**',
@@ -26,6 +26,7 @@ export default [
       '**/esm/**',
       '**/lib/**',
       '**/dist/**',
+      'site/**',
       'docs/.vitepress/cache/**',
       'docs/public/**',
       'examples/vue2/public/tinymce/**',
@@ -33,7 +34,7 @@ export default [
     ],
   },
   {
-    name: 'wujie/base',
+    name: 'jieshu/base',
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}'],
     languageOptions: {
       ecmaVersion: 'latest',
@@ -58,7 +59,7 @@ export default [
     },
   },
   {
-    name: 'wujie/typescript',
+    name: 'jieshu/typescript',
     files: typescriptFiles,
     languageOptions: {
       parser: tseslint.parser,
@@ -78,15 +79,15 @@ export default [
   },
   ...vue.configs['flat/essential'].map((config) => ({
     ...config,
-    files: ['docs/**/*.vue', 'examples/{main-vue,vite,vue3}/**/*.vue', 'packages/wujie-vue3/**/*.vue'],
+    files: ['docs/**/*.vue', 'examples/{main-vue,vite,vue3}/**/*.vue', 'packages/jieshu-vue3/**/*.vue'],
   })),
   ...vue.configs['flat/vue2-essential'].map((config) => ({
     ...config,
     files: ['examples/vue2/**/*.vue'],
   })),
   {
-    name: 'wujie/vue-typescript',
-    files: ['docs/**/*.vue', 'examples/**/*.vue', 'packages/wujie-vue3/**/*.vue'],
+    name: 'jieshu/vue-typescript',
+    files: ['docs/**/*.vue', 'examples/**/*.vue', 'packages/jieshu-vue3/**/*.vue'],
     languageOptions: {
       parserOptions: {
         parser: tseslint.parser,
@@ -103,22 +104,22 @@ export default [
     },
   },
   {
-    name: 'wujie/unit-tests',
+    name: 'jieshu/unit-tests',
     files: unitTestFiles,
     languageOptions: {
       globals: globals.vitest,
     },
   },
   {
-    name: 'wujie/core-compatibility',
-    files: ['packages/wujie-core/**/*.ts'],
+    name: 'jieshu/core-compatibility',
+    files: ['packages/jieshu-core/**/*.ts'],
     rules: {
       'no-prototype-builtins': 'off',
       'no-self-assign': 'off',
     },
   },
   {
-    name: 'wujie/examples-javascript-compatibility',
+    name: 'jieshu/examples-javascript-compatibility',
     files: ['examples/**/*.{js,jsx,cjs,mjs}'],
     languageOptions: {
       globals: globals.jest,
@@ -129,7 +130,7 @@ export default [
     },
   },
   {
-    name: 'wujie/examples-vue-compatibility',
+    name: 'jieshu/examples-vue-compatibility',
     files: ['examples/**/*.vue'],
     rules: {
       'vue/multi-word-component-names': 'off',

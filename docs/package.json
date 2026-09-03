@@ -1,5 +1,5 @@
 {
-  "name": "wujie-docs",
+  "name": "jieshu-docs",
   "version": "2.1.0",
   "description": "",
   "main": "index.js",
@@ -22,6 +22,6 @@
     "@documate/documate": "^0.2.0",
     "@vue/theme": "^1.2.2",
     "vue": "^3.2.38",
-    "wujie-vue3": "workspace:*"
+    "jieshu-vue3": "workspace:*"
   }
 }

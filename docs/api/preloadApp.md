@@ -175,7 +175,7 @@ type preOptions  {
 
 - **详情：**
 
-  主动降级设置，无界方案采用了`proxy`和`webcomponent`等技术，在有些浏览器上可能出现不兼容的情况，此时无界会自动进行降级，采用一个的`iframe`替换`webcomponent`，用`Object.defineProperty`替换`proxy`，理论上可以兼容到 IE 9，但是用户也可以将`degrade`设置为`true`来主动降级
+  主动降级设置，界枢方案采用了`proxy`和`webcomponent`等技术，在有些浏览器上可能出现不兼容的情况，此时界枢会自动进行降级，采用一个的`iframe`替换`webcomponent`，用`Object.defineProperty`替换`proxy`，理论上可以兼容到 IE 9，但是用户也可以将`degrade`设置为`true`来主动降级
 
   ::: warning 警告
   一旦采用降级方案，弹窗由于在 iframe 内部将无法覆盖整个应用
@@ -259,7 +259,7 @@ interface plugin {
 }
 ```
 
-- **详情：** 无界插件，在运行时动态的修改子应用代理，具体使用详见 [示例](/guide/plugin.html)
+- **详情：** 界枢插件，在运行时动态的修改子应用代理，具体使用详见 [示例](/guide/plugin.html)
 
 ## beforeLoad
 

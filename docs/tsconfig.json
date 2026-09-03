@@ -11,8 +11,8 @@
     "./env.d.ts",
     "./.vitepress/**/*.ts",
     "./.vitepress/**/*.vue",
-    "./wujie/**/*.ts",
-    "./wujie/**/*.vue",
+    "./jieshu/**/*.ts",
+    "./jieshu/**/*.vue",
     "./vite.config.ts"
   ]
 }

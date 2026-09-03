@@ -2,7 +2,7 @@
 
 一个微前端系统可能同时运行多个子应用，不同子应用之间可能存在相同的包依赖，那么这个依赖就会在不同子应用中重复打包、重复执行造成性能和内存的浪费
 
-这里提供一种工程上的策略结合无界的插件能力，可以有效的解决这个问题
+这里提供一种工程上的策略结合界枢的插件能力，可以有效的解决这个问题
 
 以这个场景举例：主应用使用到了`lodash`，子应用 A 也使用到了相同版本的`lodash`
 
@@ -27,11 +27,11 @@ window.lodash = lodash;
 2. 加载子应用时注入插件，将主应用的`lodash`赋值到子应用的`window`对象上
 
 ```vue
-<WujieVue
+<JieshuVue
   name="A"
   url="xxxxx"
   :plugins="[{ jsBeforeLoaders: [{ content: 'window.lodash = window.parent.lodash' }] }]"
-></WujieVue>
+></JieshuVue>
 ```
 
 子应用: `webpack` 设置 `externals`
@@ -63,14 +63,14 @@ module.exports = {
 <head>
 ```
 
-由于添加了`ignore`标志，无界执行子应用的这个标签时会忽略，但子应用单独运行时不受`ignore`影响会执行，当然也可以不添加`ignore`标志而采用无界的插件将这个脚本排除在外：
+由于添加了`ignore`标志，界枢执行子应用的这个标签时会忽略，但子应用单独运行时不受`ignore`影响会执行，当然也可以不添加`ignore`标志而采用界枢的插件将这个脚本排除在外：
 
 ```vue
-<WujieVue
+<JieshuVue
   name="A"
   url="xxxxx"
   :plugins="[
     { jsExcludes: ['xxxx/A.bundle.js'], jsBeforeLoaders: [{ content: 'window.lodash = window.parent.lodash' }] },
   ]"
-></WujieVue>
+></JieshuVue>
 ```

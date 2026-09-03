@@ -1,5 +1,5 @@
 <template>
-  <!--单例模式，name相同则复用一个无界实例，改变url则子应用重新渲染实例到对应路由 -->
+  <!--单例模式，name相同则复用一个界枢实例，改变url则子应用重新渲染实例到对应路由 -->
   <div>
     <div class="title">vue3-iframe</div>
     <div style="padding-bottom: 10px">接收的消息：{{ message }}</div>

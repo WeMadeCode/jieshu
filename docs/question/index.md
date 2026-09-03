@@ -26,7 +26,7 @@ ctx.set('Access-Control-Allow-Origin', ctx.headers.origin);
 
 ## 2、第三方包已经引入，使用时报错
 
-**原因：** 脚本本来在全局执行，此时第三方包定义的全局变量（比如`var xxx`）会直接挂载到`window`上。但是`wujie`将所有的脚本都包裹在一个闭包内运行方便劫持修改`location`，所以这些全局变量会留在闭包内，无法挂载到`window`上，子应用的异步脚本会在另一个闭包内运行，所以拿不到这些全局变量。
+**原因：** 脚本本来在全局执行，此时第三方包定义的全局变量（比如`var xxx`）会直接挂载到`window`上。但是`jieshu`将所有的脚本都包裹在一个闭包内运行方便劫持修改`location`，所以这些全局变量会留在闭包内，无法挂载到`window`上，子应用的异步脚本会在另一个闭包内运行，所以拿不到这些全局变量。
 
 **解决方案：**
 
@@ -46,7 +46,7 @@ ctx.set('Access-Control-Allow-Origin', ctx.headers.origin);
 
 **解决方案：** 将子应用将`body`设置为`position: relative`即可
 
-## 5、子应用处理异步处理事件时，e.target 变成了 wujie-app
+## 5、子应用处理异步处理事件时，e.target 变成了 jieshu-app
 
 **原因：** 这个问题是浏览器原生的处理，[详见](https://stackoverflow.com/questions/63607966/event-target-changed-in-settimeout-in-shadow-dom)
 
@@ -69,7 +69,7 @@ ctx.set('Access-Control-Allow-Origin', ctx.headers.origin);
 
 ## 8、子应用 iframe 初始化时加载、执行了主应用的资源
 
-**原因：** 原因详见[issue](https://github.com/Tencent/wujie/issues/54)
+**原因：** 该行为源自主应用文档在 iframe 初始化阶段被加载（上游历史 issue `#54`）。
 
 **解决方案：**
 
@@ -78,11 +78,11 @@ ctx.set('Access-Control-Allow-Origin', ctx.headers.origin);
 
 ## 9、子应用 window 是一个代理对象，如何获取子应用的真实对象
 
-**原因：** 为何采用代理，原因详见[issue](https://github.com/Tencent/wujie/issues/63)
+**原因：** 框架通过代理连接脚本执行环境与渲染环境（上游历史 issue `#63`）。
 
 **解决方案：**
 
-- 采用 `window.__WUJIE_RAW_WINDOW__` 获取真实的 window 对象，[详见](/guide/variable.html#wujie-raw-window)
+- 采用 `window.__JIESHU_RAW_WINDOW__` 获取真实的 window 对象，[详见](/guide/variable.html#jieshu-raw-window)
 
 ## 10、DOMException: Blocked a frame with origin from accessing a cross-origin frame 报错
 
@@ -95,8 +95,8 @@ ctx.set('Access-Control-Allow-Origin', ctx.headers.origin);
 **解决方案：**
 
 1. 主应用提供一个路径比如说 `https://host/empty` ，这个路径返回不包含任何内容也不会跳转，子应用设置 [attr](/api/startApp.html#attrs) 为 `{src:'https://host/empty'}`，这样 `iframe` 的 `src` 就是 `https://host/empty`
-2. `vite` 子应用所有的 `location` 操作都必须采用 `window.$wujie.location`
-3. `jsIgnores` 对应的 `js` 文件所有的 `location` 操作都必须采用 `window.$wujie.location`
+2. `vite` 子应用所有的 `location` 操作都必须采用 `window.$jieshu.location`
+3. `jsIgnores` 对应的 `js` 文件所有的 `location` 操作都必须采用 `window.$jieshu.location`
 
 ## 11、子应用的相对地址图片没有替换成绝对地址
 
@@ -105,12 +105,12 @@ ctx.set('Access-Control-Allow-Origin', ctx.headers.origin);
 **解决办法：** 在子应用入口`main`文件最上面 `import "./config"`，`config`具体代码：
 
 ```javascript
-if (window.__POWERED_BY_WUJIE__) {
+if (window.__POWERED_BY_JIESHU__) {
   // eslint-disable-next-line
-  window.__webpack_public_path__ = window.__WUJIE_PUBLIC_PATH__;
+  window.__webpack_public_path__ = window.__JIESHU_PUBLIC_PATH__;
 }
 ```
 
 ## 12、vite4 子应用样式切换丢失
 
-具体原因和解决办法详见[issue](https://github.com/Tencent/wujie/issues/434#issuecomment-1614089196)
+该问题的排查记录见上游历史 issue `#434`；处理时应确保 Vite 动态样式始终插入当前子应用的渲染容器。

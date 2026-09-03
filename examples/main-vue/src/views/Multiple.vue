@@ -1,11 +1,11 @@
 <template>
   <div style="height: 100%; width: 100%">
-    <WujieVue class="item" name="react16" :url="react16Url" :sync="true"></WujieVue>
-    <WujieVue class="item" name="react17" :url="react17Url" :sync="true"></WujieVue>
-    <WujieVue class="item" name="vue2" :url="vue2Url" :sync="true"></WujieVue>
-    <WujieVue class="item" name="vue3" :url="vue3Url" :sync="true"></WujieVue>
-    <WujieVue class="item" name="vite" :url="vite" :sync="true"></WujieVue>
-    <WujieVue class="item" name="angular12" :url="angular12Url" :sync="true"></WujieVue>
+    <JieshuVue class="item" name="react16" :url="react16Url" :sync="true"></JieshuVue>
+    <JieshuVue class="item" name="react17" :url="react17Url" :sync="true"></JieshuVue>
+    <JieshuVue class="item" name="vue2" :url="vue2Url" :sync="true"></JieshuVue>
+    <JieshuVue class="item" name="vue3" :url="vue3Url" :sync="true"></JieshuVue>
+    <JieshuVue class="item" name="vite" :url="vite" :sync="true"></JieshuVue>
+    <JieshuVue class="item" name="angular12" :url="angular12Url" :sync="true"></JieshuVue>
   </div>
 </template>
 

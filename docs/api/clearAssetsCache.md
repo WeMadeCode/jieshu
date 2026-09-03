@@ -6,7 +6,7 @@
 
 - **返回值：** `void`
 
-清空无界模块级资源缓存，包括 `styleCache`、`scriptCache`、`embedHTMLCache`。子应用卸载（`destroyApp`）时不会自动清理这些缓存；多 host 子应用切换或热更新场景下，旧资源可能继续被命中，可调用此 API 主动失效。
+清空界枢模块级资源缓存，包括 `styleCache`、`scriptCache`、`embedHTMLCache`。子应用卸载（`destroyApp`）时不会自动清理这些缓存；多 host 子应用切换或热更新场景下，旧资源可能继续被命中，可调用此 API 主动失效。
 
 ::: tip 使用场景
 
@@ -29,7 +29,7 @@
 ## 示例
 
 ```javascript
-import { clearAssetsCache } from 'wujie-core';
+import { clearAssetsCache } from 'jieshu-core';
 
 // 清空全部缓存
 clearAssetsCache();
@@ -43,6 +43,6 @@ clearAssetsCache(['https://a.com', 'https://b.com']);
 
 ::: warning 注意
 
-此 API 仅清理无界内部的资源加载缓存，不会销毁子应用实例。若需全量重建子应用，请使用 [refreshApp](/api/refreshApp.html) 或 [destroyApp](/api/destroyApp.html) + [startApp](/api/startApp.html)。
+此 API 仅清理界枢内部的资源加载缓存，不会销毁子应用实例。若需全量重建子应用，请使用 [refreshApp](/api/refreshApp.html) 或 [destroyApp](/api/destroyApp.html) + [startApp](/api/startApp.html)。
 
 :::

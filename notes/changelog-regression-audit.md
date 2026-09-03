@@ -14,18 +14,17 @@
 
 核心运行时的高风险历史问题——销毁泄漏、刷新竞态、异步 unmount、动态脚本/CSS 顺序、事件反向解绑、路由编码——在新实现中都有明确的状态机、清理注册表或专项回归测试。审计时 core 单元测试 45 个文件、322 项全部通过。
 
-但审计确认了下列当前问题：
+当前复核中，仓库内九个 example 的生产构建均已通过；核心 Chromium 集成测试也已完整通过 React 主应用 48 项与 Vue 主应用 49 项，共 97/97。审计仍确认下列当前问题：
 
-| 级别 | 当前问题                                               | 结论                                                                                                                                                                               |
-| ---- | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P0   | React 16 example 无法消费重构后的 ESM 产物             | **确认存在**。React 16/CRA Webpack 把 wujie-core/esm 下的 mjs 二次转译后注入无扩展名的 Babel runtime helper，Webpack strict ESM 解析失败；浏览器集成测试中 React 16 用例连续超时。 |
-| P0   | 原 core 包名 wujie 改为 wujie-core，但仍使用 2.1.0     | **确认存在**。这是无法原位升级的包名和分发变更，应在新 major 或迁移说明中明示。                                                                                                    |
-| P0   | wujie-vue2 适配包已从 workspace 删除                   | **确认存在**。历史 Vue 2 适配器修复无法由当前代码继续保证；Vue 2 子应用 demo 仍在，不等于 Vue 2 主应用适配包仍在。                                                                 |
-| P1   | wujie-react peer 从 >=16.0.0 提高到 >=17.0.2           | **确认存在**。与 changelog 中 React 16 相关兼容历史不再一致。                                                                                                                      |
-| P1   | IE9/IE11 承诺与当前构建不一致                          | **确认存在**。当前 TypeScript/Vite target 是 ES2018，也没有 legacy build；文档仍写“理论上兼容到 IE9”。                                                                             |
-| P1   | 富文本兼容只能判定为部分验证                           | #1084 的 realm、ownerDocument、延迟 CSS 核心链路有测试，但多款真实编辑器交互、Safari 和 OnlyOffice 未自动化验收。                                                                  |
-| P2   | 老 Element UI Popper 特定组合仍有偏移边界              | **已知局限**。appendToBody、禁用 GPU、absolute top/left 的组合不能由 Shadow DOM 代理完全透明兼容。                                                                                 |
-| P2   | Safari、Chrome 85 以下、Vite legacy 缺少当前浏览器矩阵 | 代码中仍有兼容分支，但 Playwright 仅运行 Chromium，不能宣称真机回归已排除。                                                                                                        |
+| 级别 | 当前问题                                               | 结论                                                                                                               |
+| ---- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| P0   | core 包名已迁移为 jieshu-core，但仍使用 2.1.0          | **确认存在**。这是无法原位升级的包名和分发变更，应在新 major 或迁移说明中明示。                                    |
+| P0   | Vue 2 适配包已从 workspace 删除                        | **确认存在**。历史 Vue 2 适配器修复无法由当前代码继续保证；Vue 2 子应用 demo 仍在，不等于 Vue 2 主应用适配包仍在。 |
+| P1   | React 适配包 peer 下限从 >=16.0.0 提高到 >=17.0.2      | **确认存在**。与 changelog 中 React 16 相关兼容历史不再一致。                                                      |
+| P1   | IE9/IE11 承诺与当前构建不一致                          | **确认存在**。当前 TypeScript/Vite target 是 ES2018，也没有 legacy build；文档仍写“理论上兼容到 IE9”。             |
+| P1   | 富文本兼容只能判定为部分验证                           | #1084 的 realm、ownerDocument、延迟 CSS 核心链路有测试，但多款真实编辑器交互、Safari 和 OnlyOffice 未自动化验收。  |
+| P2   | 老 Element UI Popper 特定组合仍有偏移边界              | **已知局限**。appendToBody、禁用 GPU、absolute top/left 的组合不能由 Shadow DOM 代理完全透明兼容。                 |
+| P2   | Safari、Chrome 85 以下、Vite legacy 缺少当前浏览器矩阵 | 代码中仍有兼容分支，但 Playwright 仅运行 Chromium，不能宣称真机回归已排除。                                        |
 
 ## 2. 判定口径
 
@@ -53,12 +52,12 @@
 
 直接证据：
 
-- `packages/wujie-core/__test__/unit/destroy-order.test.ts`
-- `packages/wujie-core/__test__/unit/sandbox-lifecycle-race.test.ts`
-- `packages/wujie-core/__test__/unit/public-operation-race.test.ts`
-- `packages/wujie-core/__test__/unit/controller.test.ts`
-- `packages/wujie-core/__test__/unit/destroy-cleanup-e2e.test.ts`
-- `packages/wujie-core/__test__/unit` 下的各类 leak 测试
+- `packages/jieshu-core/__test__/unit/destroy-order.test.ts`
+- `packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts`
+- `packages/jieshu-core/__test__/unit/public-operation-race.test.ts`
+- `packages/jieshu-core/__test__/unit/controller.test.ts`
+- `packages/jieshu-core/__test__/unit/destroy-cleanup-e2e.test.ts`
+- `packages/jieshu-core/__test__/unit` 下的各类 leak 测试
 
 边界：alive 保活模式本来就会保留 iframe 和运行上下文，只有 destroy 才承诺完整释放。不能把“保活后内存不下降”当作 destroy 泄漏已经解决。
 
@@ -80,7 +79,7 @@
 
 **历史问题：** #1093、#434、#970、#861、#839、#648、#643、#470、#465、#472、#374、#469、#453、#363、#339、#481、#211、#210、#188、#184、#173、#166、#174、#172、#163、#161、#164、#160、#95、#80、#18。
 
-**结论：core 管线已验证；React 16 对重构产物的消费是当前确认回归。**
+**结论：core 管线及 React 16 example 对当前产物的消费均已验证。**
 
 - 入口 HTML/CSS/JS 使用可退出的 cache scope，失败请求会驱逐以允许重试。
 - 静态 CSS 保持源顺序；动态 CSS 和 script 使用沙箱内调度器，取消的上一代不能复活。
@@ -89,7 +88,7 @@
 
 直接证据：entry-pipeline、dynamic-script-sequence、iframe-script、dynamic-stylesheet-failure、stylesheet-patch、defer-style-href 测试。
 
-React 16 失败不是 core 单元逻辑失败，而是发布产物与老消费端构建链的兼容回归。它会阻断依赖 React 16 demo 的降级、字体、href、生命周期等集成验证，应先修复消费链，再重跑历史用例。
+此前出现过的 React 16/CRA 严格 ESM helper 解析失败已不再重现：React 16 example 的生产构建通过，相关 degrade、font、href 与生命周期场景也包含在本次完整 Chromium 集成结果中。
 
 ### 3.4 URL、路由、baseURI 和资源地址
 
@@ -111,19 +110,19 @@ React 16 失败不是 core 单元逻辑失败，而是发布产物与老消费�
 **结论：通用样式管线已验证，Popper 和真实 Web Component 库矩阵为部分解决。**
 
 - :root 转 :host、不可读 stylesheet 容错、adopted 资源 URL 固化、字体外提和销毁清理均有实现。
-- Chromium 集成测试包含 :host 和字体场景，但 React 16 字体用例被上述 ESM 消费错误阻断。
+- Chromium 集成测试包含 :host、字体和 React 16 消费场景，相关用例均已通过。
 - 标准 Popper/Floating 的几何补丁仍在；老 Element UI 的特定组合仍需要业务侧关闭 append-to-body 等配置。
 
 ### 3.6 React/Vue 适配器
 
 **历史问题：** #1089、#971、#840、#689、#599、#393、#394、#382、#147、#62、#42、#34。
 
-**结论：React 17+ 和 Vue 3 的公开行为有测试；React 16/Vue 2 适配兼容已回归或移除。**
+**结论：React 17+ 和 Vue 3 适配器公开行为有测试；React 16 与 Vue 2 子应用 example 的 Chromium 集成链路也已通过，但 Vue 2 主应用适配包仍已移除。**
 
 - React/Vue 3 使用 RuntimeAppController，覆盖挂载、identity 变化、refresh、destroy、bus 转发、异常和 SSR 导入。
 - 两个适配器的单元测试配置了 statements、branches、functions、lines 全部 100% 的阈值。
-- wujie-vue2 代码和测试已删除，不能把 Vue 3 的覆盖率作为 Vue 2 已验证的证据。
-- wujie-react peer 不再允许 React 16，同时 React 16 子应用 demo 的构建消费链已失败。
+- Vue 2 适配代码和测试已删除，不能把 Vue 3 的覆盖率作为 Vue 2 已验证的证据。
+- jieshu-react peer 不再允许 React 16；React 16 子应用 example 的生产构建和集成通过并不等于 React 16 主应用适配器重新获得支持。
 
 ### 3.7 低版浏览器和降级模式
 
@@ -138,7 +137,7 @@ React 16 失败不是 core 单元逻辑失败，而是发布产物与老消费�
 - docs 仍写降级模式“理论上可以兼容到 IE9”。
 - Playwright 只配置 Chromium，不包含 WebKit、Firefox 或历史 Chromium。
 
-如果项目已正式放弃 IE、React 16 和 Vue 2，应删除旧承诺并写入 breaking changes；如果没有放弃，这些就是发布阻断问题。
+如果项目已正式放弃 IE、React 16 主应用适配和 Vue 2 主应用适配，应删除旧承诺并写入 breaking changes；如果没有放弃，这些就是发布阻断问题。React 16 / Vue 2 子应用 example 已通过不代表对应主应用适配包仍受支持。
 
 ### 3.8 工具链、类型和文档类记录
 
@@ -162,14 +161,14 @@ React 16 失败不是 core 单元逻辑失败，而是发布产物与老消费�
 | iframe 自定义事件                             | 保留            | sandbox policy 与 iframe event policy 测试              |
 | React 容器 style 和 ref refresh/destroy       | 保留，React 17+ | adapter API 与单元测试                                  |
 | Vue 3 容器 style 和 exposed refresh/destroy   | 保留            | adapter 类型与单元测试                                  |
-| Vue 2 主应用适配包                            | 已移除          | packages/wujie-vue2 不在 workspace                      |
+| Vue 2 主应用适配包                            | 已移除          | workspace 中已无 Vue 2 主应用适配包                     |
 | IE11/IE9 可执行产物                           | 未保留          | ES2018 target，无 legacy build                          |
 
 ## 5. 实际验证结果
 
 ### Core 单元测试
 
-    pnpm --filter wujie-core test:unit
+    pnpm --filter jieshu-core test:unit
     45 test files passed
     322 tests passed
     Statements 73.44% | Branches 65.43% | Functions 78.63% | Lines 76.70%
@@ -178,24 +177,20 @@ React 16 失败不是 core 单元逻辑失败，而是发布产物与老消费�
 
 ### Chromium 集成测试
 
-    pnpm --filter wujie-core test:integration
-    20 passed
-    5 failed (all React 16 consumer path)
-    1 interrupted
-    71 did not run (after the repeated root cause was confirmed)
+    pnpm --filter jieshu-core test:integration
+    React 主应用：48 passed
+    Vue 主应用：49 passed
+    合计：97 passed，0 failed
 
-失败页面是 React 16 dev server 编译 overlay：
+Vue 主应用复核时因默认端口被占用改用临时端口 18000；未修改代码语义。两套主应用下的 React 16、React 17、Vue 2、Vue 3、Vite、Angular 12，以及 degrade、font、href、head、:host 等场景均完成执行。
 
-    Module not found: Can't resolve '@babel/runtime/helpers/esm/asyncToGenerator'
-    Did you mean 'asyncToGenerator.js'?
-    The extension in the request is mandatory for strict EcmaScript Module.
+### Examples 生产构建
 
-已失败场景包括两套主应用下的 React 16 degrade、font 和 href。在同一轮中，已执行的 React 17、Vue 2、Vue 3、Vite、Angular 12 降级用例，以及 head、:host 用例通过。
+仓库内九个 example 的生产构建均已通过，包括 React 16/17、Vue 2/3、Vite、Angular 12 与两套主应用。
 
 ## 6. 修复优先级建议
 
-1. 先修 React 16/CRA 消费 mjs 的构建兼容，然后重跑 97 项 Chromium 集成测试。
-2. 决定包名、Vue 2、React 16 和 IE 的正式支持策略；保留则恢复实现和测试，放弃则写入 breaking changes 和迁移指南。
-3. 增加发布产物消费矩阵：现代 Vite、Webpack 5、老 CRA/Webpack、CJS require、ESM import 和 script-tag UMD。
-4. 为 Safari/WebKit、Firefox 和富文本真实交互增加集成测试。
-5. 增加 start/destroy N 轮的真实浏览器内存基准；单元测试只能证明断链动作发生，不能证明 iframe realm 已被 GC。
+1. 决定包名、Vue 2 主应用适配、React 16 主应用适配和 IE 的正式支持策略；保留则恢复实现和测试，放弃则写入 breaking changes 和迁移指南。
+2. 增加发布产物消费矩阵：现代 Vite、Webpack 5、老 CRA/Webpack、CJS require、ESM import 和 script-tag UMD。
+3. 为 Safari/WebKit、Firefox 和富文本真实交互增加集成测试。
+4. 增加 start/destroy N 轮的真实浏览器内存基准；单元测试只能证明断链动作发生，不能证明 iframe realm 已被 GC。

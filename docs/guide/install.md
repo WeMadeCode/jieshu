@@ -2,14 +2,12 @@
 
 ### 介绍
 
-`create-wujie` 用来帮助快速启动示例项目，方便开发者快速上手。
+仓库内置多套主、子应用示例，方便开发者快速上手。
 
 - 支持选择一个或多个子应用来创建一个新的项目，便于针对特定框架进行开发测试。
 - 支持主,子应用路由模式(`hash`, `history`)选择。
 
-后续会支持更多功能以及其他框架，版本的支持, 便于快速上手 `wujie`。
-
-如在使用过程中遇到任何问题, 请在 [issues](https://github.com/wujie-micro/create-wujie/issues) 进行说明。
+后续会支持更多功能及框架版本，便于快速上手 `jieshu`。如遇问题，请在[当前仓库 Issues](https://github.com/WeMadeCode/jieshu/issues)反馈。
 
 ### 快速开始
 
@@ -35,11 +33,13 @@ nvm use 16
 
 ### 安装
 
-打开一个终端并使用以下命令创建一个新的`wujie demo` 示例：
+克隆当前仓库并安装依赖：
 
 ```bash
-# Install wujie Cursor skill
-npx skills add wujie-micro/wujie-skill
+git clone https://github.com/WeMadeCode/jieshu.git
+cd jieshu
+pnpm install
+pnpm start
 ```
 
 ### 模版列表

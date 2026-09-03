@@ -5,26 +5,26 @@ collapsable: false
 
 # React 组件封装
 
-无界基于`react`的组件封装，查看 [demo](https://wujie-micro.github.io/demo-main-react/)，查看 [demo github](https://github.com/Tencent/wujie/tree/master/examples/main-react/)
+界枢提供 React 组件封装，示例源码位于 [examples/main-react](https://github.com/WeMadeCode/jieshu/tree/master/examples/main-react)。
 
 ## 安装
 
 ```bash
-npm i wujie-react -S
+npm i jieshu-react -S
 ```
 
 ## 引入
 
 ```javascript
-import WujieReact from 'wujie-react';
+import JieshuReact from 'jieshu-react';
 
-const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = WujieReact;
+const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = JieshuReact;
 ```
 
 ## 使用
 
 ```jsx
-<WujieReact
+<JieshuReact
   width="100%"
   height="100%"
   name="xxx"
@@ -37,7 +37,7 @@ const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = 
   afterMount={afterMount}
   beforeUnmount={beforeUnmount}
   afterUnmount={afterUnmount}
-></WujieReact>
+></JieshuReact>
 ```
 
 ### bus
@@ -70,16 +70,16 @@ const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = 
 
 ```javascript
 // 直接调用，不需要传递任何参数
-await this.wujieRef.current.refresh();
+await this.jieshuRef.current.refresh();
 ```
 
 ## 原理
 
 ```javascript
 import React from 'react';
-import { bus, setupApp, preloadApp, startApp, destroyApp } from 'wujie-core';
+import { bus, setupApp, preloadApp, startApp, destroyApp } from 'jieshu-core';
 
-export default class WujieReact extends React.PureComponent {
+export default class JieshuReact extends React.PureComponent {
   static bus = bus;
   static setupApp = setupApp;
   static preloadApp = preloadApp;

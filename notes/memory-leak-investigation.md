@@ -1,16 +1,16 @@
-# wujie-core 内存泄露专项排查报告
+# jieshu-core 内存泄露专项排查报告
 
-> 本文针对 `Tencent/wujie` 主仓库 `packages/wujie-core` 的源码（HEAD），系统盘点导致内存泄露 / 不释放的代码点位，并把每个点位与社区已知 issue 一一对应，便于后续修复或在评论区作为线索贴出。
+> 本文针对当前仓库 `packages/jieshu-core` 的源码（HEAD），系统盘点导致内存泄露 / 不释放的代码点位，并把每个点位与上游历史 issue 一一对应，便于后续修复或追踪。
 >
 > 涉及 issue：
-> [#529](https://github.com/Tencent/wujie/issues/529)、
-> [#581](https://github.com/Tencent/wujie/issues/581)、
-> [#593](https://github.com/Tencent/wujie/issues/593)、
-> [#700](https://github.com/Tencent/wujie/issues/700)、
-> [#732](https://github.com/Tencent/wujie/issues/732)、
-> [#880](https://github.com/Tencent/wujie/issues/880)、
-> [#881](https://github.com/Tencent/wujie/issues/881)、
-> [#890](https://github.com/Tencent/wujie/issues/890)。
+> `#529`（上游历史 issue）、
+> `#581`（上游历史 issue）、
+> `#593`（上游历史 issue）、
+> `#700`（上游历史 issue）、
+> `#732`（上游历史 issue）、
+> `#880`（上游历史 issue）、
+> `#881`（上游历史 issue）、
+> `#890`（上游历史 issue）。
 
 ---
 
@@ -22,7 +22,7 @@
    - 子应用 `window.onXXX = handler` 的 setter 被改写成「直接写到主应用 `window` 上」，`destroy()` 也没有还原。
    - `embedHTMLCache / scriptCache / styleCache / appEventObjMap` 是模块级常驻 Map，没有失效策略，也没有清理 API。
 3. 保活 (`alive: true`) 模式从设计上就 **完全不释放任何资源**，子应用内部的 `<video>`、WebGL、`setInterval` 仍在运行，是 #700 / #880 / #881 等"长时间累积"的根因。
-4. `deleteWujieById` 实现存在 bug：本意是 destroy 后保留 `setupApp` 的缓存 options，结果两行代码相互抵消，options 一并被删；该 bug 与 #732 现象密切相关。
+4. `deleteJieshuById` 实现存在 bug：本意是 destroy 后保留 `setupApp` 的缓存 options，结果两行代码相互抵消，options 一并被删；该 bug 与 #732 现象密切相关。
 5. 源码内已有两处 `// TODO 内存泄露` / `// this may lead memory leak risk` 注释，与本文点位 §2 一致——属于已知未修。
 
 ---
@@ -33,24 +33,24 @@
 
 WebComponent 的 `disconnectedCallback` 只触发 `unmount`，并且 `unmount` 内部仅清空 `head/body` 子节点，不释放 iframe 自身：
 
-```43:54:packages/wujie-core/src/shadow.ts
-class WujieApp extends HTMLElement {
+```43:54:packages/jieshu-core/src/shadow.ts
+class JieshuApp extends HTMLElement {
   connectedCallback(): void {
     if (this.shadowRoot) return;
     const shadowRoot = this.attachShadow({ mode: "open" });
-    const sandbox = getWujieById(this.getAttribute(WUJIE_APP_ID));
+    const sandbox = getJieshuById(this.getAttribute(JIESHU_APP_ID));
     patchElementEffect(shadowRoot, sandbox.iframe.contentWindow);
     sandbox.shadowRoot = shadowRoot;
   }
 
   disconnectedCallback(): void {
-    const sandbox = getWujieById(this.getAttribute(WUJIE_APP_ID));
+    const sandbox = getJieshuById(this.getAttribute(JIESHU_APP_ID));
     sandbox?.unmount();
   }
 }
 ```
 
-```370:394:packages/wujie-core/src/sandbox.ts
+```370:394:packages/jieshu-core/src/sandbox.ts
 public async unmount(): Promise<void> {
   this.activeFlag = false;
   clearInactiveAppUrl();
@@ -58,9 +58,9 @@ public async unmount(): Promise<void> {
     this.lifecycles?.deactivated?.(this.iframe.contentWindow);
   }
   if (!this.mountFlag) return;
-  if (isFunction(this.iframe.contentWindow.__WUJIE_UNMOUNT) && !this.alive && !this.hrefFlag) {
+  if (isFunction(this.iframe.contentWindow.__JIESHU_UNMOUNT) && !this.alive && !this.hrefFlag) {
     this.lifecycles?.beforeUnmount?.(this.iframe.contentWindow);
-    await this.iframe.contentWindow.__WUJIE_UNMOUNT();
+    await this.iframe.contentWindow.__JIESHU_UNMOUNT();
     this.lifecycles?.afterUnmount?.(this.iframe.contentWindow);
     this.mountFlag = false;
     this.bus?.$clear();
@@ -75,11 +75,11 @@ public async unmount(): Promise<void> {
 }
 ```
 
-注意：`unmount` 完成后 **`iframe`、`shadowRoot`、`proxy*`、`styleSheetElements`、`__WUJIE_EVENTLISTENER__`、`elementToSandboxMap`、`appEventObjMap` 中的条目** 全部 **原样保留**。这是设计上的「快速复用」策略。
+注意：`unmount` 完成后 **`iframe`、`shadowRoot`、`proxy*`、`styleSheetElements`、`__JIESHU_EVENTLISTENER__`、`elementToSandboxMap`、`appEventObjMap` 中的条目** 全部 **原样保留**。这是设计上的「快速复用」策略。
 
 ### 与 issue 的对应
 
-- **#890**：路由切换 → WujieVue 卸载 → `disconnectedCallback` → `unmount`。框架按设计不释放 iframe，所以子应用 contentWindow 内部的 V8 堆完全不下降。
+- **#890**：路由切换 → JieshuVue 卸载 → `disconnectedCallback` → `unmount`。框架按设计不释放 iframe，所以子应用 contentWindow 内部的 V8 堆完全不下降。
 - **#581**：单例/重建模式下，开发者在 chrome memory profile 里看到 `shadow` 对象长期不释放——同上。
 
 ### 为什么 DOM 节点也会增长（而不仅仅是堆不下降）
@@ -88,7 +88,7 @@ public async unmount(): Promise<void> {
 
 1. **多个 `name` 不同的子应用**：每个 `name` 都会 `iframeGenerator()` 创建一个新的 `<iframe display:none>` 并 `appendChild` 到 `window.document.body`，且永远不被移除（`unmount` 不删 iframe，只有 `destroy` 才删）。这直接体现为主应用 document 的 `<iframe>` 节点单调递增。
 2. **iframe.contentDocument.head 内的 `<script>` 持续累积**：每次 `start()` 都会向 iframe 的 head 注入大量 `scriptElement` 与一个"shift execQueue"的 `nextScriptElement`，并且 `unmount` 不清理 iframe 自身的 head。
-   ```789:870:packages/wujie-core/src/iframe.ts
+   ```789:870:packages/jieshu-core/src/iframe.ts
    export function insertScriptToIframe(...) {
      ...
      const container = rawDocumentQuerySelector.call(iframeWindow.document, "head");
@@ -97,9 +97,9 @@ public async unmount(): Promise<void> {
      ...
    }
    ```
-   非 alive 模式下，框架的复用走的是 `__WUJIE_MOUNT()` 而不是再次 `start()`，所以单一 sandbox **正常情况下不会重复 `start`**；但只要触发了下方第 6 节的 "deleteWujieById bug → 必须新建 sandbox → 老 iframe 没删 + 新 iframe 又来一份" 链路，DOM 就会以子应用启动数 × 子应用模板规模的速率累积。
+   非 alive 模式下，框架的复用走的是 `__JIESHU_MOUNT()` 而不是再次 `start()`，所以单一 sandbox **正常情况下不会重复 `start`**；但只要触发了下方第 6 节的 "deleteJieshuById bug → 必须新建 sandbox → 老 iframe 没删 + 新 iframe 又来一份" 链路，DOM 就会以子应用启动数 × 子应用模板规模的速率累积。
 3. **`styleSheetElements` 数组永不出栈**：动态插入的 `<style>` / `<link>` 都会 `push` 进数组：
-   ```256:268:packages/wujie-core/src/effect.ts
+   ```256:268:packages/jieshu-core/src/effect.ts
    case "STYLE": {
      const stylesheetElement: HTMLStyleElement = newChild as any;
      styleSheetElements.push(stylesheetElement);
@@ -107,11 +107,11 @@ public async unmount(): Promise<void> {
    }
    ```
    `unmount` 不会清空数组，`rebuildStyleSheets` 直接整体重新挂回 `shadowRoot.head`。如果子应用每次 mount 都会**新建** `<style>` 节点（典型场景：CSS-in-JS、scoped style 哈希变化、或动态主题），数组会单调增长，shadowRoot.head 内的 `<style>` 数也跟着累积。
-4. **新老 sandbox 同时存在的中间态**：详见第 6 节 deleteWujieById bug。
+4. **新老 sandbox 同时存在的中间态**：详见第 6 节 deleteJieshuById bug。
 
 ### 修复方向
 
-- 给 `WujieVue / WujieReact` 容器组件提供 `destroyOnUnmount` 配置，让用户能选择 disconnected 时直接 `destroy` 而不是仅 `unmount`。
+- 给 `JieshuVue / JieshuReact` 容器组件提供 `destroyOnUnmount` 配置，让用户能选择 disconnected 时直接 `destroy` 而不是仅 `unmount`。
 - 若维持当前默认行为，应至少在 `unmount` 时 `splice` 掉非缓存模板的 `styleSheetElements`，并对 iframe.contentDocument.head 做受控清理。
 
 ---
@@ -122,7 +122,7 @@ public async unmount(): Promise<void> {
 
 子应用通过 `document.addEventListener('keydown', ...)` 这类事件，被 `patchDocumentEffect` 转发到主应用 `window.document`：
 
-```432:438:packages/wujie-core/src/iframe.ts
+```432:438:packages/jieshu-core/src/iframe.ts
 if (mainDocumentAddEventListenerEvents.includes(type))
   return window.document.addEventListener(type, callback, options);
 if (mainAndAppAddEventListenerEvents.includes(type)) {
@@ -132,7 +132,7 @@ if (mainAndAppAddEventListenerEvents.includes(type)) {
 }
 ```
 
-```161:174:packages/wujie-core/src/common.ts
+```161:174:packages/jieshu-core/src/common.ts
 export const mainDocumentAddEventListenerEvents = [
   "fullscreenchange", "fullscreenerror", "selectionchange", "visibilitychange",
   "wheel", "keydown", "keypress", "keyup",
@@ -142,13 +142,13 @@ export const mainDocumentAddEventListenerEvents = [
 export const mainAndAppAddEventListenerEvents = ["gotpointercapture", "lostpointercapture"];
 ```
 
-`destroy()` 只清理了 `iframe.contentWindow.__WUJIE_EVENTLISTENER__`（即 `iframeWindow.addEventListener` 走的那条），**没有任何一段代码** 清理 `window.document.addEventListener` 注册的回调：
+`destroy()` 只清理了 `iframe.contentWindow.__JIESHU_EVENTLISTENER__`（即 `iframeWindow.addEventListener` 走的那条），**没有任何一段代码** 清理 `window.document.addEventListener` 注册的回调：
 
-```432:441:packages/wujie-core/src/sandbox.ts
+```432:441:packages/jieshu-core/src/sandbox.ts
 if (this.iframe) {
   const iframeWindow = this.iframe.contentWindow;
-  if (iframeWindow?.__WUJIE_EVENTLISTENER__) {
-    iframeWindow.__WUJIE_EVENTLISTENER__.forEach((o) => {
+  if (iframeWindow?.__JIESHU_EVENTLISTENER__) {
+    iframeWindow.__JIESHU_EVENTLISTENER__.forEach((o) => {
       iframeWindow.removeEventListener(o.type, o.listener, o.options);
     });
   }
@@ -161,7 +161,7 @@ if (this.iframe) {
 
 源码自己也明确标注了：
 
-```221:227:packages/wujie-core/src/sandbox.ts
+```221:227:packages/jieshu-core/src/sandbox.ts
 /*
  document.addEventListener was transfer to shadowRoot.addEventListener
  react 16 SyntheticEvent will remember document event for avoid repeat listen
@@ -170,7 +170,7 @@ if (this.iframe) {
 */
 ```
 
-```529:531:packages/wujie-core/src/iframe.ts
+```529:531:packages/jieshu-core/src/iframe.ts
 // 处理document专属事件
 // TODO 内存泄露
 documentEvents.forEach((propKey) => {
@@ -190,7 +190,7 @@ documentEvents.forEach((propKey) => {
 
 ## 3. `destroy()` 残留：`window.onXXX` 被持续污染（命中 #881 长时间累积）
 
-```272:286:packages/wujie-core/src/iframe.ts
+```272:286:packages/jieshu-core/src/iframe.ts
 Object.defineProperty(iframeWindow, e, {
   enumerable: descriptor.enumerable,
   configurable: true,
@@ -218,13 +218,13 @@ Object.defineProperty(iframeWindow, e, {
 
 ## 4. 模块级缓存只增不减（命中 #631 #881）
 
-```39:41:packages/wujie-core/src/entry.ts
+```39:41:packages/jieshu-core/src/entry.ts
 const styleCache = {};
 const scriptCache = {};
 const embedHTMLCache = {};
 ```
 
-```108:140:packages/wujie-core/src/entry.ts
+```108:140:packages/jieshu-core/src/entry.ts
 const fetchAssets = (
   src: string,
   cache: Object,
@@ -249,7 +249,7 @@ const fetchAssets = (
 
 ## 5. `appEventObjMap` 条目永久驻留（命中 #881）
 
-```22:29:packages/wujie-core/src/event.ts
+```22:29:packages/jieshu-core/src/event.ts
 constructor(id: string) {
   this.id = id;
   this.$clear();
@@ -268,12 +268,12 @@ constructor(id: string) {
 
 ---
 
-## 6. `deleteWujieById` 写错了（命中 #732）
+## 6. `deleteJieshuById` 写错了（命中 #732）
 
-```37:41:packages/wujie-core/src/common.ts
-export function deleteWujieById(id: string) {
-  const wujieCache = idToSandboxCacheMap.get(id);
-  if (wujieCache?.options) idToSandboxCacheMap.set(id, { options: wujieCache.options });
+```37:41:packages/jieshu-core/src/common.ts
+export function deleteJieshuById(id: string) {
+  const jieshuCache = idToSandboxCacheMap.get(id);
+  if (jieshuCache?.options) idToSandboxCacheMap.set(id, { options: jieshuCache.options });
   idToSandboxCacheMap.delete(id);
 }
 ```
@@ -287,10 +287,10 @@ export function deleteWujieById(id: string) {
 ### 修复方向
 
 ```ts
-export function deleteWujieById(id: string) {
-  const wujieCache = idToSandboxCacheMap.get(id);
-  if (wujieCache?.options) {
-    idToSandboxCacheMap.set(id, { options: wujieCache.options });
+export function deleteJieshuById(id: string) {
+  const jieshuCache = idToSandboxCacheMap.get(id);
+  if (jieshuCache?.options) {
+    idToSandboxCacheMap.set(id, { options: jieshuCache.options });
   } else {
     idToSandboxCacheMap.delete(id);
   }
@@ -301,14 +301,14 @@ export function deleteWujieById(id: string) {
 
 ## 7. 保活模式从设计上就不释放任何资源（命中 #700 #880 #881）
 
-```370:394:packages/wujie-core/src/sandbox.ts
+```370:394:packages/jieshu-core/src/sandbox.ts
 public async unmount(): Promise<void> {
   ...
   if (this.alive) {
     this.lifecycles?.deactivated?.(this.iframe.contentWindow);
   }
   if (!this.mountFlag) return;
-  if (isFunction(this.iframe.contentWindow.__WUJIE_UNMOUNT) && !this.alive && !this.hrefFlag) {
+  if (isFunction(this.iframe.contentWindow.__JIESHU_UNMOUNT) && !this.alive && !this.hrefFlag) {
     // ...真正的清理逻辑都包在 !this.alive 里
   }
 }
@@ -357,7 +357,7 @@ public async unmount(): Promise<void> {
 ## 建议补充的回归测试
 
 - `__test__/integration/memory.test.ts`：起 5 次 `startApp` / `destroyApp`，调用 `Memory.getDOMCounters` 验证 `nodes` 与 `jsHeapSize` 应回到基线 ±N% 之内；可作为回归基准。
-- `__test__/unit/common.test.ts`：补 `deleteWujieById` 应在有 options 时保留条目、无 options 时整体删除的双向用例。
+- `__test__/unit/common.test.ts`：补 `deleteJieshuById` 应在有 options 时保留条目、无 options 时整体删除的双向用例。
 
 ---
 
@@ -371,7 +371,7 @@ public async unmount(): Promise<void> {
 
 | 项                         | 测试                                         | 修复点                            | 修复前                                                                            | 修复后                                                                             |
 | -------------------------- | -------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| §6 `deleteWujieById`       | `__test__/unit/common.test.ts` (3 cases)     | `src/common.ts`                   | destroy 后 `setupApp` 缓存的 options 被同步删除，下一次 startApp 必须新建 sandbox | options 在有 `setupApp` 时正确保留，sandbox 引用清除；无 setupApp 时整体删除 entry |
+| §6 `deleteJieshuById`      | `__test__/unit/common.test.ts` (3 cases)     | `src/common.ts`                   | destroy 后 `setupApp` 缓存的 options 被同步删除，下一次 startApp 必须新建 sandbox | options 在有 `setupApp` 时正确保留，sandbox 引用清除；无 setupApp 时整体删除 entry |
 | §5 `appEventObjMap.delete` | `__test__/unit/event-leak.test.ts` (3 cases) | `src/event.ts` + `src/sandbox.ts` | EventBus 没有 `$destroy`，`sandbox.destroy()` 仅 `$clear()`，map entry 永久驻留   | 新增 `EventBus.$destroy()`，`sandbox.destroy()` 调用，map 条目随 destroy 释放      |
 
 测试结果：单元测试由 22 → 28 通过（+6 项新增，全部 GREEN）。
@@ -395,7 +395,7 @@ public async unmount(): Promise<void> {
 | 项                                | 测试                                              | 修复点                                                                                                                                              | 修复前                                                                                                                                                                                  | 修复后                                                                                                                                                           |
 | --------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | §4 模块级缓存永驻                 | `__test__/unit/asset-cache.test.ts` (4 cases)     | `src/entry.ts` 暴露 `clearAssetsCache(host?)` 并从 `src/index.ts` re-export                                                                         | `styleCache / scriptCache / embedHTMLCache` 是 module-private 普通对象，destroyApp 不会清；多 host 子应用切换或热更新场景持续累积                                                       | 公共 API：`clearAssetsCache()` 全清 / `clearAssetsCache(host)` 按 url 前缀清 / 支持数组批量。`src/entry.ts` 同时把三个 cache 改为 `export`，便于上层做 telemetry |
-| §1.2 styleSheetElements 单调增长  | `__test__/unit/stylesheet-leak.test.ts` (4 cases) | `src/sandbox.ts` 新增 `clearStyleSheetsForUnmount()` + `unmount()` 调用                                                                             | unmount 只 clearChild(head/body)，`styleSheetElements` 数组不清；非保活子应用反复进出，rebuildStyleSheets 时旧引用一并 reattach，DOM 中 style 节点 N 倍累积，废弃 style 节点也无法被 GC | 非保活时 `styleSheetElements.length = 0`（保留数组引用），保活时保持原值用于 rebuildStyleSheets。next mount 由子应用 `__WUJIE_MOUNT` 自然重建                    |
+| §1.2 styleSheetElements 单调增长  | `__test__/unit/stylesheet-leak.test.ts` (4 cases) | `src/sandbox.ts` 新增 `clearStyleSheetsForUnmount()` + `unmount()` 调用                                                                             | unmount 只 clearChild(head/body)，`styleSheetElements` 数组不清；非保活子应用反复进出，rebuildStyleSheets 时旧引用一并 reattach，DOM 中 style 节点 N 倍累积，废弃 style 节点也无法被 GC | 非保活时 `styleSheetElements.length = 0`（保留数组引用），保活时保持原值用于 rebuildStyleSheets。next mount 由子应用 `__JIESHU_MOUNT` 自然重建                   |
 | §1.3 iframe head 动态 script 累积 | `__test__/unit/script-leak.test.ts` (5 cases)     | `src/sandbox.ts` 新增 `dynamicScriptElements` 字段 + `clearDynamicScriptsForUnmount()`，`src/iframe.ts insertScriptToIframe` 在带 rawElement 时登记 | 子应用 `document.head.appendChild(<script>)` 触发的脚本，每个保留完整 textContent（数 KB ~ 几十 KB）；非保活反复 mount/unmount 在同一 iframe 上累积，体积持续上涨                       | 仅登记 effect.ts 转发的动态脚本（带 rawElement），unmount（非保活）时从 iframe head 安全 removeChild 并清空数组；初始 sandbox.start 的脚本不登记，避免误删       |
 
 测试结果：9 suites / 50 tests，全部 GREEN。
@@ -404,24 +404,24 @@ public async unmount(): Promise<void> {
 
 > 早期方案曾引入 `destroyOnUnmount` 配置，让业务在 `setupApp/startApp` 显式传 `true` 才在 disconnect 时 destroy。但「重建模式本就该销毁」这件事属于框架职责，不应外包给业务配置；已废弃该配置，改为按运行模式自动判定。
 
-| 项                                      | 测试                                                       | 修复点          | 修复前                                                                                                                                                                                                                                            | 修复后                                                                                                                                                                                                                                                                                                                                                  |
-| --------------------------------------- | ---------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| §1.1 disconnect 仅 unmount 累积 sandbox | `__test__/unit/handleWujieAppDisconnect.test.ts` (5 cases) | `src/shadow.ts` | wujie-app webcomponent 的 `disconnectedCallback` 无论何种模式都只 `unmount`；对**重建模式**（非保活、未做生命周期改造）而言 `unmount()` 因没有 `mountFlag` / `__WUJIE_UNMOUNT` 基本是空操作，sandbox / iframe / iframeWindow 一直驻留累积（#890） | `shadow.ts` 抽出独立可测的 `handleWujieAppDisconnect(sandbox)` helper，按运行模式自动判定（与 `startApp` 复用分支同一信号）：① 保活（`alive`）→ `unmount`；② 单例（非保活 + 存在 `__WUJIE_MOUNT`，做了生命周期改造）→ `unmount`；③ 重建（非保活 + 无 `__WUJIE_MOUNT`）→ 直接 `destroy`。`WujieApp.disconnectedCallback` 调用该 helper，无需任何业务配置 |
+| 项                                      | 测试                                                        | 修复点          | 修复前                                                                                                                                                                                                                                              | 修复后                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------------- | ----------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §1.1 disconnect 仅 unmount 累积 sandbox | `__test__/unit/handleJieshuAppDisconnect.test.ts` (5 cases) | `src/shadow.ts` | jieshu-app webcomponent 的 `disconnectedCallback` 无论何种模式都只 `unmount`；对**重建模式**（非保活、未做生命周期改造）而言 `unmount()` 因没有 `mountFlag` / `__JIESHU_UNMOUNT` 基本是空操作，sandbox / iframe / iframeWindow 一直驻留累积（#890） | `shadow.ts` 抽出独立可测的 `handleJieshuAppDisconnect(sandbox)` helper，按运行模式自动判定（与 `startApp` 复用分支同一信号）：① 保活（`alive`）→ `unmount`；② 单例（非保活 + 存在 `__JIESHU_MOUNT`，做了生命周期改造）→ `unmount`；③ 重建（非保活 + 无 `__JIESHU_MOUNT`）→ 直接 `destroy`。`JieshuApp.disconnectedCallback` 调用该 helper，无需任何业务配置 |
 
-> 注：该批一度涉及 `src/sandbox.ts`、`src/index.ts`、`src/utils.ts`、`packages/wujie-vue2,3/index.js`、`packages/wujie-react/index.js,.d.ts` 透传 `destroyOnUnmount`；废弃配置后这些透传已全部回收，最终落点只剩 `src/shadow.ts` 一处。
+> 注：该批一度涉及 core 的 `sandbox.ts`、`index.ts`、`utils.ts`，以及 Vue 2、Vue 3、React 适配层入口透传 `destroyOnUnmount`；废弃配置后这些透传已全部回收，最终落点只剩 core 的 `shadow.ts` 一处。
 
 测试结果：10 suites / 55 tests，全部 GREEN。
 
 ### ✅ 批 E · `Object.defineProperty` 隐患（§9 §10）
 
-| 项                                              | 测试                                                   | 修复点                                                         | 修复前                                                                                                                                                                                                                                                                                                                                                                           | 修复后                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| §9 `documentEvents` setter 多重 bug             | `__test__/unit/document-events-leak.test.ts` (4 cases) | `src/iframe.ts patchDocumentEffect`                            | 1) `addEventListener` 与 `handlerCallbackMap.set` 各自独立 `handler.bind()` → 两个不同 bound，下次 set 永远 remove 不掉真正注册的；2) 直接调原生 `document.addEventListener`，绕开批 B 的 `eventCleanupTracker`，destroy 不解绑；3) `handler = null` 进入 `.bind()` 直接抛 `TypeError`；4) bound 闭包持有 `iframeWindow.document`，永久挂在主 document 上 → iframeWindow GC 不掉 | 维护 `propKeyToActiveListener: Map<propKey, bound>`，每次 set 时先按 propKey 取出旧 bound 解绑、untrack，再生成新 bound 并接入 `eventCleanupTracker.trackMainDocumentListener`；handler 为 null/非函数时只解绑不重绑（与原生 onXXX = null 语义一致）；事件名由 `propKey.slice(2)` 推导避免再次绕过劫持                                                                        |
-| §10 `patchElementEffect` 跨边界闭包持有 sandbox | `__test__/unit/element-patch-leak.test.ts` (3 cases)   | `src/iframe.ts patchElementEffect`, `src/sandbox.ts destroy()` | 1) `proxyLocation` 在函数开头从 `iframeWindow.__WUJIE.proxyLocation` 抽取为闭包变量 → element 永久强持 proxyLocation 对象；2) `ownerDocument` getter 直接闭包持有 `iframeWindow`，element 一旦被 portal/弹窗/拖拽搬到主应用 DOM 下，destroy 之后仍把 iframeWindow 钉死；3) destroy 流程不解链 `iframeWindow.__WUJIE`，残留 element 通过 getter 仍可拿到 sandbox                  | 1) 用 `WeakRef<Window>` 间接持有 iframeWindow，闭包不再有强引用；2) baseURI / ownerDocument getter 通过 `weakRef.deref()?.__WUJIE?.proxyLocation` 动态访问，拿不到时降级到主 `document.baseURI` / 主 `document`；3) `sandbox.destroy()` 在 removeChild iframe 之前主动 `iframeWindow.__WUJIE = null`，让残留 getter 立即降级；同时旧环境无 `WeakRef` 时降级为强引用，保持兼容 |
+| 项                                              | 测试                                                   | 修复点                                                         | 修复前                                                                                                                                                                                                                                                                                                                                                                           | 修复后                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §9 `documentEvents` setter 多重 bug             | `__test__/unit/document-events-leak.test.ts` (4 cases) | `src/iframe.ts patchDocumentEffect`                            | 1) `addEventListener` 与 `handlerCallbackMap.set` 各自独立 `handler.bind()` → 两个不同 bound，下次 set 永远 remove 不掉真正注册的；2) 直接调原生 `document.addEventListener`，绕开批 B 的 `eventCleanupTracker`，destroy 不解绑；3) `handler = null` 进入 `.bind()` 直接抛 `TypeError`；4) bound 闭包持有 `iframeWindow.document`，永久挂在主 document 上 → iframeWindow GC 不掉 | 维护 `propKeyToActiveListener: Map<propKey, bound>`，每次 set 时先按 propKey 取出旧 bound 解绑、untrack，再生成新 bound 并接入 `eventCleanupTracker.trackMainDocumentListener`；handler 为 null/非函数时只解绑不重绑（与原生 onXXX = null 语义一致）；事件名由 `propKey.slice(2)` 推导避免再次绕过劫持                                                                          |
+| §10 `patchElementEffect` 跨边界闭包持有 sandbox | `__test__/unit/element-patch-leak.test.ts` (3 cases)   | `src/iframe.ts patchElementEffect`, `src/sandbox.ts destroy()` | 1) `proxyLocation` 在函数开头从 `iframeWindow.__JIESHU.proxyLocation` 抽取为闭包变量 → element 永久强持 proxyLocation 对象；2) `ownerDocument` getter 直接闭包持有 `iframeWindow`，element 一旦被 portal/弹窗/拖拽搬到主应用 DOM 下，destroy 之后仍把 iframeWindow 钉死；3) destroy 流程不解链 `iframeWindow.__JIESHU`，残留 element 通过 getter 仍可拿到 sandbox                | 1) 用 `WeakRef<Window>` 间接持有 iframeWindow，闭包不再有强引用；2) baseURI / ownerDocument getter 通过 `weakRef.deref()?.__JIESHU?.proxyLocation` 动态访问，拿不到时降级到主 `document.baseURI` / 主 `document`；3) `sandbox.destroy()` 在 removeChild iframe 之前主动 `iframeWindow.__JIESHU = null`，让残留 getter 立即降级；同时旧环境无 `WeakRef` 时降级为强引用，保持兼容 |
 
 附带：
 
-- `src/sandbox.ts:575`：`window.__WUJIE.inject` 加显式 `as Wujie["inject"]` 类型断言，绕开 TS incremental 把 `__WUJIE_INJECT` spread 字面量推断错误传染到 `__WUJIE.inject` 的预先存在编译错（与本批改动无直接因果，但触发 cache 重新编译时暴露，顺手修掉）。
+- `src/sandbox.ts:575`：`window.__JIESHU.inject` 加显式 `as Jieshu["inject"]` 类型断言，绕开 TS incremental 把 `__JIESHU_INJECT` spread 字面量推断错误传染到 `__JIESHU.inject` 的预先存在编译错（与本批改动无直接因果，但触发 cache 重新编译时暴露，顺手修掉）。
 
 测试结果：12 suites / 62 tests，全部 GREEN。
 

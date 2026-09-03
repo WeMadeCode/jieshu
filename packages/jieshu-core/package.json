@@ -1,0 +1,49 @@
+{
+  "name": "jieshu-core",
+  "version": "2.1.0",
+  "description": "极致的微前端框架",
+  "main": "./lib/index.umd.js",
+  "module": "./esm/index.mjs",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./esm/index.mjs",
+      "require": "./lib/index.umd.js",
+      "default": "./esm/index.mjs"
+    }
+  },
+  "unpkg": "./lib/index.umd.js",
+  "jsdelivr": "./lib/index.umd.js",
+  "files": [
+    "lib",
+    "esm",
+    "types"
+  ],
+  "scripts": {
+    "clean": "rimraf lib esm types",
+    "build": "pnpm run clean && pnpm run build:esm && pnpm run build:umd && pnpm run build:types",
+    "build:esm": "vite build --mode esm",
+    "build:umd": "vite build --mode umd",
+    "build:types": "tsc --emitDeclarationOnly",
+    "lib": "pnpm run build:umd",
+    "esm": "pnpm run build:esm && pnpm run build:types",
+    "start": "pnpm run build:types && vite build --mode esm --watch",
+    "typecheck": "tsc --project tsconfig.json --noEmit --emitDeclarationOnly false && tsc --project __test__/unit/tsconfig.json --noEmit && tsc --project __test__/integration/tsconfig.json --noEmit",
+    "lint": "eslint src",
+    "lint:fix": "pnpm run lint --fix",
+    "test": "pnpm run test:unit && pnpm run test:integration",
+    "test:unit": "vitest run --config __test__/unit/vitest.config.mts --coverage",
+    "install-playwright-browser": "playwright install chromium",
+    "test:integration": "pnpm run install-playwright-browser && NODE_OPTIONS=--openssl-legacy-provider playwright test --config __test__/integration/playwright.config.mts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMadeCode/jieshu.git"
+  },
+  "author": "yiludege",
+  "license": "MIT",
+  "eslintIgnore": [
+    "*.js"
+  ]
+}

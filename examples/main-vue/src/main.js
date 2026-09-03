@@ -4,7 +4,7 @@ import 'custom-event-polyfill';
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
-import WujieVue from 'wujie-vue3';
+import JieshuVue from 'jieshu-vue3';
 import hostMap from './hostMap';
 import credentialsFetch from './fetch';
 import { Button, Switch, Tooltip } from 'ant-design-vue';
@@ -14,7 +14,7 @@ import plugins from './plugin';
 import { wangEditorPlugin } from './plugins/wangEditor';
 
 const isProduction = import.meta.env.PROD;
-const { setupApp, preloadApp, bus } = WujieVue;
+const { setupApp, preloadApp, bus } = JieshuVue;
 
 bus.$on('click', (msg) => window.alert(msg));
 
@@ -143,4 +143,4 @@ if (window.localStorage.getItem('preload') !== 'false') {
   }
 }
 
-createApp(App).use(router).use(WujieVue).use(Switch).use(Tooltip).use(Button).mount('#app');
+createApp(App).use(router).use(JieshuVue).use(Switch).use(Tooltip).use(Button).mount('#app');

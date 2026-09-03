@@ -1,10 +1,10 @@
 ![Untitled Diagram.jpeg](https://vfiles.gtimg.cn/wuji_dashboard/wupload/xy/test_wuji_damy/50LRt2ig.jpeg)
 
-无界的插件体系主要是方便用户在运行时去修改子应用代码从而避免去改动仓库代码，详见[API](/api/startApp.html#plugins)
+界枢的插件体系主要是方便用户在运行时去修改子应用代码从而避免去改动仓库代码，详见[API](/api/startApp.html#plugins)
 
 ## html-loader
 
-无界提供插件在运行时对子应用的 html 文本进行修改
+界枢提供插件在运行时对子应用的 html 文本进行修改
 
 - **示例**
 
@@ -50,7 +50,7 @@ const plugins = [
 ```
 
 ::: warning 警告
-jsIgnores 中的 js 文件由于是子应用自行加载没有对 location 进行劫持，如果有对 window.location.href 进行操作复制请务必替换成 window.$wujie.location.href 的操作，否则子应用的沙箱会被取代掉
+jsIgnores 中的 js 文件由于是子应用自行加载没有对 location 进行劫持，如果有对 window.location.href 进行操作复制请务必替换成 window.$jieshu.location.href 的操作，否则子应用的沙箱会被取代掉
 :::
 
 ## js-before-loaders
@@ -77,7 +77,7 @@ const plugins = [
       // 执行一个回调，打印子应用名字
       {
         callback(appWindow) {
-          console.log('js-before-loader-callback', appWindow.__WUJIE.id);
+          console.log('js-before-loader-callback', appWindow.__JIESHU.id);
         },
       },
     ],
@@ -132,7 +132,7 @@ const plugins = [
       // 执行一个回调，打印子应用名字
       {
         callback(appWindow) {
-          console.log('js-after-loader-callback', appWindow.__WUJIE.id);
+          console.log('js-after-loader-callback', appWindow.__JIESHU.id);
         },
       },
     ],
@@ -197,7 +197,7 @@ const plugins = [
 
 ## css-loader
 
-无界提供插件在运行时对子应用的`css`文本进行修改
+界枢提供插件在运行时对子应用的`css`文本进行修改
 
 - **示例**
 
@@ -244,7 +244,7 @@ const plugins = [
 
 - **示例**
 
-无界子应用的`dom`渲染在`webcomponent`中，`js`在`iframe`中运行，往往子应用在外部的容器滚动，所以监听`window`的`scroll`事件是无效的，可以将处理`window`的`scroll`事件绑定在滚动容器中
+界枢子应用的`dom`渲染在`webcomponent`中，`js`在`iframe`中运行，往往子应用在外部的容器滚动，所以监听`window`的`scroll`事件是无效的，可以将处理`window`的`scroll`事件绑定在滚动容器中
 
 ```javascript
 const plugins = [
@@ -281,7 +281,7 @@ const plugins = [
 
 - **示例**
 
-无界子应用的`dom`渲染在`webcomponent`中，`js`在`iframe`中运行，往往子应用在外部的容器滚动，所以监听`document`的`scroll`事件是无效的，可以将处理`document`的`scroll`事件绑定在滚动容器中
+界枢子应用的`dom`渲染在`webcomponent`中，`js`在`iframe`中运行，往往子应用在外部的容器滚动，所以监听`document`的`scroll`事件是无效的，可以将处理`document`的`scroll`事件绑定在滚动容器中
 
 ```javascript
 const plugins = [

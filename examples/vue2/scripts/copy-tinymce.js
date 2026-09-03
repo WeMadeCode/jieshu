@@ -1,7 +1,7 @@
 // 将本地 node_modules/tinymce 的静态资源拷贝到 public/tinymce，
 // 供 dev server / 构建产物以 /tinymce 路径静态托管。
 // 这样 TinyMCE 可在运行时通过 base_url 用动态 <link> 加载 skin.min.css，
-// 用于验证无界对“先 appendChild 再 setAttribute href”这类 link 的修复。
+// 用于验证界枢对“先 appendChild 再 setAttribute href”这类 link 的修复。
 const fs = require('fs');
 const path = require('path');
 

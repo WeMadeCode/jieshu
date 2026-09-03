@@ -120,8 +120,8 @@ export default {
               focusOffset: selection.focusOffset,
               rangeCollapsed: range.collapsed,
               collapsedByOffset,
-              inWujie: Boolean(window.__POWERED_BY_WUJIE__),
-              degrade: Boolean(window.__WUJIE?.degrade),
+              inJieshu: Boolean(window.__POWERED_BY_JIESHU__),
+              degrade: Boolean(window.__JIESHU?.degrade),
             },
             null,
             2,
@@ -147,7 +147,7 @@ export default {
         const view = sel?.anchorNode && NO(sel.anchorNode);
         return Boolean(view && sel instanceof view.Selection);
       };
-      const renderDoc = window.__WUJIE?.document;
+      const renderDoc = window.__JIESHU?.document;
       const anchor = selection.anchorNode;
       const focus = selection.focusNode;
       this.loRoOk = RO(selection) && LO(anchor) && LO(focus);
@@ -158,8 +158,8 @@ export default {
           LO_focus: LO(focus),
           anchorOwnerIsRenderDoc: Boolean(renderDoc && anchor?.ownerDocument === renderDoc),
           focusOwnerIsRenderDoc: Boolean(renderDoc && focus?.ownerDocument === renderDoc),
-          degrade: Boolean(window.__WUJIE?.degrade),
-          inWujie: Boolean(window.__POWERED_BY_WUJIE__),
+          degrade: Boolean(window.__JIESHU?.degrade),
+          inJieshu: Boolean(window.__POWERED_BY_JIESHU__),
         },
         null,
         2,

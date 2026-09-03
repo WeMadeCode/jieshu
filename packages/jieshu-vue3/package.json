@@ -1,0 +1,63 @@
+{
+  "name": "jieshu-vue3",
+  "version": "2.1.0",
+  "description": "界枢微前端Vue3组件封装",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WeMadeCode/jieshu.git"
+  },
+  "main": "./lib/index.umd.js",
+  "module": "./esm/index.mjs",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./esm/index.mjs",
+      "require": "./lib/index.umd.js",
+      "default": "./esm/index.mjs"
+    }
+  },
+  "unpkg": "./lib/index.umd.js",
+  "jsdelivr": "./lib/index.umd.js",
+  "files": [
+    "esm",
+    "lib",
+    "types"
+  ],
+  "scripts": {
+    "clean": "rimraf lib esm types",
+    "build": "pnpm run clean && pnpm run build:esm && pnpm run build:umd && pnpm run build:types",
+    "build:esm": "vite build --mode esm",
+    "build:umd": "vite build --mode umd",
+    "build:types": "vue-tsc --project tsconfig.json",
+    "lib": "pnpm run build:umd",
+    "esm": "pnpm run build:esm",
+    "start": "pnpm run build:types && vite build --mode esm --watch",
+    "prepare:consumer": "node __test__/consumer/prepare.mjs",
+    "typecheck:source": "vue-tsc -p tsconfig.json --noEmit && vue-tsc -p __test__/unit/tsconfig.json --noEmit && vue-tsc -p __test__/ui/tsconfig.json --noEmit",
+    "typecheck:public:built": "pnpm run prepare:consumer && vue-tsc -p tsconfig.type-test.json",
+    "typecheck:public": "pnpm run build && pnpm run typecheck:public:built",
+    "typecheck": "pnpm run typecheck:source && pnpm run typecheck:public",
+    "lint": "eslint src __test__",
+    "lint:fix": "pnpm run lint --fix",
+    "test:unit": "vitest run --config __test__/unit/vitest.config.mts --coverage",
+    "test:ui:built": "pnpm run prepare:consumer && vitest run --config __test__/ui/vitest.config.mts",
+    "test:ui": "pnpm run build && pnpm run test:ui:built",
+    "test": "pnpm run build && pnpm run lint && pnpm run typecheck:source && pnpm run typecheck:public:built && pnpm run test:unit && pnpm run test:ui:built"
+  },
+  "author": "yiludege",
+  "peerDependencies": {
+    "vue": ">=3.0.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jieshu-core": "workspace:2.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "6.0.8",
+    "@vue/compiler-sfc": "^3.5.22",
+    "csstype": "^3.1.1",
+    "vue": "^3.0.0",
+    "vue-tsc": "3.3.11"
+  }
+}

@@ -100,7 +100,7 @@ type startOption  {
 
 - **类型：** `HTMLElement | string`
 
-- **详情：** 子应用渲染容器，子应用渲染容器的最好设置好宽高防止渲染问题，在`webcomponent`元素上无界还设置了`wujie_iframe`的`class`方便用户自定义样式
+- **详情：** 子应用渲染容器，子应用渲染容器的最好设置好宽高防止渲染问题，在`webcomponent`元素上界枢还设置了`jieshu_iframe`的`class`方便用户自定义样式
 
 ## loading
 
@@ -114,7 +114,7 @@ type startOption  {
 
 - **类型：** `Boolean`
 
-- **详情：** 路由同步模式，开启后无界会将子应用的`name`作为一个`url`查询参数，实时同步子应用的路径作为这个查询参数的值，这样分享 URL 或者刷新浏览器子应用路由都不会丢失。
+- **详情：** 路由同步模式，开启后界枢会将子应用的`name`作为一个`url`查询参数，实时同步子应用的路径作为这个查询参数的值，这样分享 URL 或者刷新浏览器子应用路由都不会丢失。
 
   ::: warning 警告
   这个同步是单向的，只有打开 URL 或者刷新浏览器的时候，子应用才会从 URL 中读回路由，假如关闭路由同步模式，浏览器前进后退可以正常作用到子应用，但是浏览器刷新后子应用的路由会丢失
@@ -176,7 +176,7 @@ type startOption  {
 
 - **详情：**
 
-  主动降级设置，无界方案采用了`proxy`和`webcomponent`等技术，在有些浏览器上可能出现不兼容的情况，此时无界会自动进行降级，采用一个的`iframe`替换`webcomponent`，用`Object.defineProperty`替换`proxy`，理论上可以兼容到 IE 9，但是用户也可以将`degrade`设置为`true`来主动降级
+  主动降级设置，界枢方案采用了`proxy`和`webcomponent`等技术，在有些浏览器上可能出现不兼容的情况，此时界枢会自动进行降级，采用一个的`iframe`替换`webcomponent`，用`Object.defineProperty`替换`proxy`，理论上可以兼容到 IE 9，但是用户也可以将`degrade`设置为`true`来主动降级
 
   ::: warning 警告
   一旦采用降级方案，弹窗由于在 iframe 内部将无法覆盖整个应用
@@ -299,7 +299,7 @@ interface plugin {
 }
 ```
 
-- **详情：** 无界插件，在运行时动态的修改子应用代理，具体使用详见 [示例](/guide/plugin.html)
+- **详情：** 界枢插件，在运行时动态的修改子应用代理，具体使用详见 [示例](/guide/plugin.html)
 
 ## beforeLoad
 

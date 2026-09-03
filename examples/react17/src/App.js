@@ -31,7 +31,7 @@ const Home = () => (
       </Tag>
     </p>
     <p>
-      <Button onClick={() => window.open('https://github.com/Tencent/wujie/tree/master/examples/react17')}>
+      <Button onClick={() => window.open('https://github.com/WeMadeCode/jieshu/tree/master/examples/react17')}>
         仓库地址
       </Button>
     </p>
@@ -43,13 +43,13 @@ function Nav() {
   const routerJump = (path) => history.push(path);
   // 主应用告诉子应用跳转路由
   useEffect(() => {
-    window.$wujie?.bus.$on('react17-router-change', routerJump);
+    window.$jieshu?.bus.$on('react17-router-change', routerJump);
   }, []);
 
   // 在 react17-sub 路由下主动告知主应用路由跳转，主应用也跳到相应路由高亮菜单栏
   const location = useLocation();
   useEffect(() => {
-    window.$wujie?.bus.$emit('sub-route-change', 'react17', location.pathname);
+    window.$jieshu?.bus.$emit('sub-route-change', 'react17', location.pathname);
   }, [location]);
 
   return (

@@ -51,7 +51,7 @@ export default defineConfig((_env, argv) => {
         __BASE_URL__: JSON.stringify(publicPath),
         __PRODUCTION__: JSON.stringify(!isDevelopment),
       }),
-      new rspack.HtmlRspackPlugin({ template: './index.html' }),
+      new rspack.HtmlRspackPlugin({ favicon: './favicon.ico', template: './index.html' }),
       isDevelopment && new ReactRefreshRspackPlugin(),
     ],
     resolve: {

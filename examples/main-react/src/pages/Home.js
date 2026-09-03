@@ -3,6 +3,7 @@ import Switch from 'antd/es/switch';
 import Tooltip from 'antd/es/tooltip';
 import Button from 'antd/es/button';
 import { UnorderedListOutlined } from '@ant-design/icons';
+import hostMap from '../hostMap';
 
 export default class Home extends React.Component {
   state = {
@@ -49,19 +50,14 @@ export default class Home extends React.Component {
               ></Switch>
             </Tooltip>
             <Tooltip title="主应用为history模式">
-              <a
-                href="https://wujie-micro.github.io/demo-main-vue/"
-                target="_blank"
-                className="docs button-gap"
-                rel="noreferrer"
-              >
+              <a href={hostMap('//localhost:8000/')} target="_blank" className="docs button-gap" rel="noreferrer">
                 vue主应用
               </a>
             </Tooltip>
-            <a href="https://github.com/Tencent/wujie" target="_blank" className="docs button-gap" rel="noreferrer">
+            <a href="https://github.com/WeMadeCode/jieshu" target="_blank" className="docs button-gap" rel="noreferrer">
               仓库
             </a>
-            <a href="https://wujie-micro.github.io/doc/" target="_blank" className="docs button-gap" rel="noreferrer">
+            <a href={hostMap('//localhost:5173/doc/')} target="_blank" className="docs button-gap" rel="noreferrer">
               文档
             </a>
           </div>
@@ -72,7 +68,7 @@ export default class Home extends React.Component {
             style={{ width: '70px', height: '70px', marginRight: '15px' }}
             src="https://vfiles.gtimg.cn/wuji_dashboard/xy/test_wuji_damy/XC5WMbxE.svg"
           />
-          <span className="bland">无界</span>
+          <span className="bland">界枢</span>
         </h1>
         <h2 className="subtitle">—极致的微前端框架</h2>
 

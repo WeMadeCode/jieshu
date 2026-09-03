@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["./__test__/consumer/**/*.ts"],
+  "exclude": ["./__test__/consumer/node_modules"],
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "./__test__/consumer",
+    "sourceMap": false
+  }
+}

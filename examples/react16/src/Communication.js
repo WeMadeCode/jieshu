@@ -5,7 +5,7 @@ export default class Communication extends React.Component {
   state = { visible: false };
 
   jump = () => {
-    window.$wujie && window.$wujie.props.jump('vue3');
+    window.$jieshu && window.$jieshu.props.jump('vue3');
   };
 
   handleAlert = () => {
@@ -13,7 +13,7 @@ export default class Communication extends React.Component {
   };
 
   handleEmit = () => {
-    window.$wujie && window.$wujie.bus.$emit('click', 'react16');
+    window.$jieshu && window.$jieshu.bus.$emit('click', 'react16');
   };
   render() {
     return (
@@ -22,7 +22,7 @@ export default class Communication extends React.Component {
         <div className="content">
           <p>应用可以有三种方式进行通信</p>
           <h3>1、主应用通过 props 属性注入的方法</h3>
-          <p>主应用通过 props 注入 jump（跳转页面）方法，子应用通过 $wujie.props.jump(xxx) 来使用</p>
+          <p>主应用通过 props 注入 jump（跳转页面）方法，子应用通过 $jieshu.props.jump(xxx) 来使用</p>
           <p>
             <Button onClick={this.jump}>点击跳转vue3</Button>
           </p>
@@ -33,7 +33,7 @@ export default class Communication extends React.Component {
           </p>
           <h3>3、通过 bus 方法发送去中心化的事件</h3>
           <p>主应用 bus.$on("click", (msg) ={'>'} window.alert(msg)) 监听子应用的 click 事件</p>
-          <p>子应用点击按钮 $wujie.bus.$emit('click', 'react16') 发送 click 事件</p>
+          <p>子应用点击按钮 $jieshu.bus.$emit('click', 'react16') 发送 click 事件</p>
           <p>
             <Button onClick={this.handleEmit}>显示alert</Button>
           </p>

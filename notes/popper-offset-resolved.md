@@ -1,10 +1,10 @@
 弹出层偏移问题
 
-# Popper / Floating UI 在无界 Shadow DOM 中的定位问题
+# Popper / Floating UI 在界枢 Shadow DOM 中的定位问题
 
 ## 背景
 
-在无界 `webcomponent + shadowRoot` 模式下，子应用 DOM 被渲染到主应用页面中的 `shadowRoot` 内。此时浏览器真实 DOM 树、子应用感知到的 `window/document`、滚动容器、弹层挂载容器不再完全等价于普通页面。
+在界枢 `webcomponent + shadowRoot` 模式下，子应用 DOM 被渲染到主应用页面中的 `shadowRoot` 内。此时浏览器真实 DOM 树、子应用感知到的 `window/document`、滚动容器、弹层挂载容器不再完全等价于普通页面。
 
 这会影响依赖 DOM 几何信息的弹层库。典型表现包括：
 
@@ -18,12 +18,12 @@
 - `getBoundingClientRect()` 返回 viewport 坐标。
 - `position: absolute` 的 `top/left` 依赖 containing block。
 - `position: fixed` 依赖 viewport 或 fixed 上下文。
-- `documentElement/body/window` 在无界中经过代理。
+- `documentElement/body/window` 在界枢中经过代理。
 - 弹层库可能把弹层 append 到 `document.body`，但 reference 位于 shadowRoot 内的其他滚动上下文。
 
 ## 原理：为什么标准弹层库会出现偏移
 
-无界为了让子应用在 shadowRoot 中仍然保留类似普通 document 的访问语义，会将子应用的 `document.documentElement` 代理到 shadowRoot 内部的 `<html>`：
+界枢为了让子应用在 shadowRoot 中仍然保留类似普通 document 的访问语义，会将子应用的 `document.documentElement` 代理到 shadowRoot 内部的 `<html>`：
 
 ```ts
 document.documentElement -> shadowRoot.firstElementChild
@@ -58,14 +58,14 @@ if (propKey === 'scrollingElement') return iframe.contentDocument.scrollingEleme
 
 它带来的问题：
 
-- 破坏了无界现有 document 代理语义。
+- 破坏了界枢现有 document 代理语义。
 - `document.documentElement` 不再指向 shadowRoot 内真实渲染的 `<html>`。
 - 路由、DOM 查询、样式、滚动等依赖 documentElement 的逻辑可能出现异常。
 - 实际验证中出现过页面死循环。
 
 结论：
 
-不推荐。`documentElement` 这个对象本身是无界运行模型的一部分，不能为了弹层库整体替换。
+不推荐。`documentElement` 这个对象本身是界枢运行模型的一部分，不能为了弹层库整体替换。
 
 ## 方案二：只修正 shadowRoot 内 html 的几何读数
 
@@ -82,14 +82,14 @@ Object.defineProperty(shadowRoot.firstElementChild, 'getBoundingClientRect', {
   enumerable: true,
   configurable: true,
   value: () =>
-    iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, 'html').getBoundingClientRect(),
+    iframeWindow.__JIESHU_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, 'html').getBoundingClientRect(),
 });
 ```
 
 这个方案的思路是：
 
 - 不替换 `documentElement` 对象。
-- 不破坏无界对 shadowRoot 内 `<html>` 的代理语义。
+- 不破坏界枢对 shadowRoot 内 `<html>` 的代理语义。
 - 只让弹层库读取 `documentElement.getBoundingClientRect()` 时拿到一个接近普通 document 的 0 基准 rect。
 
 它解决的问题：
@@ -203,7 +203,7 @@ Element UI 还常见以下组合：
 - 自己封装 scroll parent 发现逻辑
 - 使用 `top/left` 写入最终位置
 
-在普通 document 中，这组假设通常成立。但在无界 shadowRoot 中：
+在普通 document 中，这组假设通常成立。但在界枢 shadowRoot 中：
 
 - `document.body` 是代理后的 shadow body。
 - `documentElement` 是 shadowRoot 内 `<html>`。
@@ -221,7 +221,7 @@ Element UI 还常见以下组合：
 - 使用 middleware / modifier 重新计算位置。
 - 通过 `transform: translate3d(...)` 写入最终位置。
 
-这类库只要计算基准正确，滚动时重新计算也正确，就能在无界 shadowRoot 中正常工作。
+这类库只要计算基准正确，滚动时重新计算也正确，就能在界枢 shadowRoot 中正常工作。
 
 但这不代表所有基于 Popper 的组件库封装都能正常。组件库可能改掉默认配置、关闭 transform、改变 append 目标、屏蔽 update，导致行为和原始库不同。
 
@@ -262,7 +262,7 @@ Element UI 还常见以下组合：
 
 ## 总结
 
-无界中弹层问题可以拆成两类：
+界枢中弹层问题可以拆成两类：
 
 1. 计算基准问题：`documentElement.getBoundingClientRect()` 带宿主偏移。  
    适合用 `shadowRoot.firstElementChild.getBoundingClientRect` 窄补丁修复。
@@ -276,11 +276,11 @@ Element UI 还常见以下组合：
 - 业务侧适配老组件库弹层策略。
 - 不在 core 中做大范围 document/body/offsetParent 魔改，避免在普通页面、fixed 弹窗、内部滚动、外部滚动之间互相破坏。
 
-# Popper / Floating UI 在无界 Shadow DOM 中的支持排查记录
+# Popper / Floating UI 在界枢 Shadow DOM 中的支持排查记录
 
 ## 背景
 
-本次排查目标是确认无界 `webcomponent + shadowRoot` 场景下，常见弹层库的定位表现：
+本次排查目标是确认界枢 `webcomponent + shadowRoot` 场景下，常见弹层库的定位表现：
 
 - `Popper.js 1.x`
 - `Popper.js 2.x / @popperjs/core`
@@ -290,7 +290,7 @@ Element UI 还常见以下组合：
 调试页面包含两类环境：
 
 - 主应用独立页面：内容被 Web Component 包裹，运行在原生 `shadowRoot` 内。
-- Vue2 子应用页面：不额外套 Web Component，直接在无界子应用的 `shadowRoot` 内渲染普通 Vue 内容。
+- Vue2 子应用页面：不额外套 Web Component，直接在界枢子应用的 `shadowRoot` 内渲染普通 Vue 内容。
 
 页面和 dialog 场景都做了对比，并尽量移除了会干扰定位调试的 `position: relative`。
 
@@ -299,12 +299,12 @@ Element UI 还常见以下组合：
 初始现象：
 
 - 主应用 Web Component 中定位正常。
-- 无界 Vue2 子应用中，`Popper.js 1.x`、`Popper.js 2.x`、`Floating UI` 都出现过弹层偏移。
+- 界枢 Vue2 子应用中，`Popper.js 1.x`、`Popper.js 2.x`、`Floating UI` 都出现过弹层偏移。
 - dialog 场景中表现更容易正常，因为 fixed 容器改变了定位参照。
 
 根因链路：
 
-- 无界中 `document.documentElement` 被代理为 `shadowRoot.firstElementChild`。
+- 界枢中 `document.documentElement` 被代理为 `shadowRoot.firstElementChild`。
 - 这个 `<html>` 真实存在于主应用 DOM 的 shadowRoot 内。
 - 它的 `getBoundingClientRect()` 会带上宿主容器相对 viewport 的偏移。
 - Popper/Floating 会读取 `element.ownerDocument.documentElement.getBoundingClientRect()` 作为计算基准。
@@ -312,7 +312,7 @@ Element UI 还常见以下组合：
 
 ## 可行的 Core 窄补丁
 
-不要替换 `document.documentElement` 返回的对象，否则会破坏无界现有 document 代理语义。
+不要替换 `document.documentElement` 返回的对象，否则会破坏界枢现有 document 代理语义。
 
 不推荐：
 
@@ -323,21 +323,21 @@ if (propKey === 'scrollingElement') return iframe.contentDocument.scrollingEleme
 
 这个方向验证时会导致页面死循环或路由/查询链路异常。
 
-更安全的补丁是在 `packages/wujie-core/src/shadow.ts` 中，仅修正 `shadowRoot.firstElementChild` 的几何读数：
+更安全的补丁是在 `packages/jieshu-core/src/shadow.ts` 中，仅修正 `shadowRoot.firstElementChild` 的几何读数：
 
 ```ts
 Object.defineProperty(shadowRoot.firstElementChild, 'getBoundingClientRect', {
   enumerable: true,
   configurable: true,
   value: () =>
-    iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, 'html').getBoundingClientRect(),
+    iframeWindow.__JIESHU_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, 'html').getBoundingClientRect(),
 });
 ```
 
 这个补丁保持：
 
 - `document.documentElement === shadowRoot.firstElementChild`
-- `document.documentElement` 仍然是无界 shadowRoot 内的 `<html>`
+- `document.documentElement` 仍然是界枢 shadowRoot 内的 `<html>`
 - 只有 `documentElement.getBoundingClientRect()` 改为使用 iframe 原生空白文档 `<html>` 的 0 基准 rect
 
 验证结果：
@@ -352,7 +352,7 @@ Object.defineProperty(shadowRoot.firstElementChild, 'getBoundingClientRect', {
 
 ### 直接替换 documentElement / scrollingElement
 
-直接在 `proxy.ts` 中返回 iframe 原生 `documentElement` 或 `scrollingElement` 会破坏无界内部对 document 的代理假设，验证时出现过页面死循环。
+直接在 `proxy.ts` 中返回 iframe 原生 `documentElement` 或 `scrollingElement` 会破坏界枢内部对 document 的代理假设，验证时出现过页面死循环。
 
 ### 取消 getBoundingClientRect 补丁并给 body 加 position: relative
 
@@ -402,7 +402,7 @@ transform: translate3d(...);
 
 这让它高度依赖普通 document 中的 `absolute + body/document` 滚动语义。
 
-在无界 shadowRoot 中，`document.body`、`document.documentElement`、`window`、真实滚动容器、弹层 append 目标之间存在代理关系，不一定等价于浏览器原生 document。于是 Element UI 这种组合很容易出现：
+在界枢 shadowRoot 中，`document.body`、`document.documentElement`、`window`、真实滚动容器、弹层 append 目标之间存在代理关系，不一定等价于浏览器原生 document。于是 Element UI 这种组合很容易出现：
 
 - 初始位置能算对。
 - 滚动后不更新。
@@ -425,7 +425,7 @@ Element UI 的老封装则常见组合是：
 - `top/left`
 - 自己封装的 scroll parent 发现逻辑
 
-这组组合在无界 shadowRoot 内很难做到完全透明兼容。
+这组组合在界枢 shadowRoot 内很难做到完全透明兼容。
 
 ## 推荐落地策略
 
@@ -463,7 +463,7 @@ Element UI 的老封装则常见组合是：
 
 ## 结论
 
-无界 core 可以稳定修复的是标准库依赖 `documentElement.getBoundingClientRect()` 导致的初始坐标偏移。
+界枢 core 可以稳定修复的是标准库依赖 `documentElement.getBoundingClientRect()` 导致的初始坐标偏移。
 
 但 Element UI 老 Popper 的 `appendToBody + gpuAcceleration:false + absolute top/left` 组合，本质依赖普通 document 的滚动和 containing block 语义。在 shadowRoot 微前端环境中，很难由框架层做到 100% 透明兼容。
 

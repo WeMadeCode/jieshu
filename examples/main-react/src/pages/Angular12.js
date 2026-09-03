@@ -1,6 +1,6 @@
 import React from 'react';
 import hostMap from '../hostMap';
-import WujieReact from 'wujie-react';
+import JieshuReact from 'jieshu-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Angular12() {
@@ -12,6 +12,6 @@ export default function Angular12() {
     },
   };
   return (
-    <WujieReact width="100%" height="100%" name="angular12" url={angular12Url} sync={true} props={props}></WujieReact>
+    <JieshuReact width="100%" height="100%" name="angular12" url={angular12Url} sync={true} props={props}></JieshuReact>
   );
 }

@@ -1,30 +1,47 @@
-import { defineConfig } from 'vitepress';
-import { version } from '../../packages/wujie-core/package.json';
-const ogDescription = '极致的微前端框架';
-const ogImage = 'https://wujie-micro.github.io/doc/wujie.png';
-const ogTitle = '无界';
-const ogUrl = 'https://wujie-micro.github.io/doc/';
+import { defineConfig, type HeadConfig } from 'vitepress';
+import { version } from '../../packages/jieshu-core/package.json';
 const base = '/doc/';
+const ogDescription = '极致的微前端框架';
+const ogTitle = '界枢';
+const docsOrigin = process.env['JIESHU_DOCS_ORIGIN'];
+const ogHead: HeadConfig[] = docsOrigin
+  ? [
+      ['meta', { property: 'og:image', content: new URL(`${base}jieshu.png`, docsOrigin).toString() }],
+      ['meta', { property: 'og:url', content: new URL(base, docsOrigin).toString() }],
+    ]
+  : [];
+const docSearchAppId = process.env['JIESHU_DOCSEARCH_APP_ID'];
+const docSearchApiKey = process.env['JIESHU_DOCSEARCH_API_KEY'];
+const docSearchIndexName = process.env['JIESHU_DOCSEARCH_INDEX_NAME'];
+const algolia =
+  docSearchAppId && docSearchApiKey && docSearchIndexName
+    ? { appId: docSearchAppId, apiKey: docSearchApiKey, indexName: docSearchIndexName }
+    : undefined;
+const gtagId = process.env['JIESHU_GTAG_ID'];
+const gtagHead: HeadConfig[] = gtagId
+  ? [
+      ['script', { async: '', src: `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gtagId)}` }],
+      [
+        'script',
+        {},
+        `window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', ${JSON.stringify(gtagId)});`,
+      ],
+    ]
+  : [];
 
 export default defineConfig({
   title: ogTitle,
   description: ogDescription,
   base,
   head: [
-    ['link', { rel: 'icon', href: `${base}/favicon.ico` }],
+    ['link', { rel: 'icon', href: `${base}favicon.ico` }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: ogTitle }],
-    ['meta', { property: 'og:image', content: ogImage }],
-    ['meta', { property: 'og:url', content: ogUrl }],
-    ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-22P9VKHL8B' }],
-    [
-      'script',
-      {},
-      `window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-22P9VKHL8B');`,
-    ],
+    ...ogHead,
+    ...gtagHead,
   ],
 
   vue: {
@@ -32,18 +49,14 @@ export default defineConfig({
   },
   lastUpdated: true,
   themeConfig: {
-    logo: '/wujie.svg',
+    logo: '/jieshu.svg',
     editLink: {
-      pattern: 'https://github.com/Tencent/wujie/tree/master/docs/:path',
+      pattern: 'https://github.com/WeMadeCode/jieshu/edit/master/docs/:path',
       text: '编辑本页',
     },
     lastUpdatedText: '最近更新时间',
-    socialLinks: [{ icon: 'github', link: 'https://github.com/Tencent/wujie' }],
-    algolia: {
-      appId: 'QMIAJMDLL1',
-      apiKey: '4eaef57a0122ce0454d3aed08f822178',
-      indexName: 'wujie-microio',
-    },
+    socialLinks: [{ icon: 'github', link: 'https://github.com/WeMadeCode/jieshu' }],
+    ...(algolia ? { algolia } : {}),
 
     nav: [
       { text: '指南', link: '/guide/', activeMatch: '/guide/' },
@@ -59,7 +72,7 @@ export default defineConfig({
         items: [
           {
             text: '更新日志',
-            link: 'https://github.com/Tencent/wujie/blob/master/CHANGELOG.md',
+            link: 'https://github.com/WeMadeCode/jieshu/commits/master/',
           },
         ],
       },
@@ -68,15 +81,15 @@ export default defineConfig({
         items: [
           {
             text: 'Vue主应用',
-            link: 'https://wujie-micro.github.io/demo-main-vue/home',
+            link: 'https://github.com/WeMadeCode/jieshu/tree/master/examples/main-vue',
           },
           {
             text: 'React主应用',
-            link: 'https://wujie-micro.github.io/demo-main-react/',
+            link: 'https://github.com/WeMadeCode/jieshu/tree/master/examples/main-react',
           },
         ],
       },
-      { text: '在线体验无界', link: '/wujie/', activeMatch: '/wujie/' },
+      { text: '在线体验界枢', link: '/jieshu/', activeMatch: '/jieshu/' },
       { text: 'fluth', link: 'https://fluthjs.github.io/fluth-doc/cn/index.html' },
     ],
 
@@ -156,21 +169,11 @@ export default defineConfig({
           items: [
             {
               text: 'vue主应用',
-              link: 'https://github.com/Tencent/wujie/tree/master/examples/main-vue',
+              link: 'https://github.com/WeMadeCode/jieshu/tree/master/examples/main-vue',
             },
             {
               text: 'react主应用',
-              link: 'https://github.com/Tencent/wujie/tree/master/examples/main-react',
-            },
-          ],
-        },
-        {
-          text: '插件推荐',
-          collapsed: true,
-          items: [
-            {
-              text: 'wujie-polyfill',
-              link: 'https://github.com/jardenliu/wujie-polyfill',
+              link: 'https://github.com/WeMadeCode/jieshu/tree/master/examples/main-react',
             },
           ],
         },
@@ -215,8 +218,8 @@ export default defineConfig({
           collapsed: true,
           items: [
             {
-              text: 'wujie',
-              link: '/api/wujie',
+              text: 'jieshu',
+              link: '/api/jieshu',
             },
           ],
         },

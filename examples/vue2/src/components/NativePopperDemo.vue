@@ -2,7 +2,7 @@
   <div class="native-popper-demo">
     <h4>{{ context }}：原生定位库弹出层</h4>
     <p class="native-popper-demo__desc">
-      点击按钮打开 append 到 document.body 的原生弹出层，用于观察无界子应用内是否发生漂移。
+      点击按钮打开 append 到 document.body 的原生弹出层，用于观察界枢子应用内是否发生漂移。
     </p>
     <div class="native-popper-demo__grid">
       <div v-for="item in demoCases" :key="item.key" class="native-popper-demo__item">

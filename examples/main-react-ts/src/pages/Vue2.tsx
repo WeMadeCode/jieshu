@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import hostMap from '../hostMap';
-import WujieReact from '../wujieReact';
+import JieshuReact from '../jieshuReact';
 
 export default function Vue2() {
   const location = useLocation();
@@ -14,5 +14,5 @@ export default function Vue2() {
     },
   };
 
-  return <WujieReact width="100%" height="100%" name="vue2" url={vue2Url} sync={!path} props={props} />;
+  return <JieshuReact width="100%" height="100%" name="vue2" url={vue2Url} sync={!path} props={props} />;
 }

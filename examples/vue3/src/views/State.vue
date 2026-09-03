@@ -19,7 +19,7 @@ export default {
     HelloWorld,
   },
   mounted() {
-    window?.$wujie?.bus.$on('add', () => (this.count += 1));
+    window?.$jieshu?.bus.$on('add', () => (this.count += 1));
     console.log('vue3 state mounted');
   },
   data() {
@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     handleClick() {
-      window?.$wujie.props.jump('react17');
+      window?.$jieshu.props.jump('react17');
     },
   },
 };

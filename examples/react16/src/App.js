@@ -30,7 +30,7 @@ const Home = () => (
       </Tag>
     </p>
     <p>
-      <Button onClick={() => window.open('https://github.com/Tencent/wujie/tree/master/examples/react16')}>
+      <Button onClick={() => window.open('https://github.com/WeMadeCode/jieshu/tree/master/examples/react16')}>
         仓库地址
       </Button>
     </p>
@@ -41,7 +41,7 @@ export default function App() {
   // 在 react16-sub 路由下主动告知主应用路由跳转，主应用也跳到相应路由高亮菜单栏
   const location = useLocation();
   useEffect(() => {
-    window.$wujie?.bus.$emit('sub-route-change', 'react16', location.pathname);
+    window.$jieshu?.bus.$emit('sub-route-change', 'react16', location.pathname);
   }, [location]);
 
   return (

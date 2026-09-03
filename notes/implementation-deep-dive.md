@@ -1,8 +1,8 @@
-# Wujie 实现原理与核心源码导读
+# Jieshu 实现原理与核心源码导读
 
-本文面向希望深入理解 Wujie 内部实现的开发者。阅读完本文后，你应该能够回答下面几个问题：
+本文面向希望深入理解 Jieshu 内部实现的开发者。阅读完本文后，你应该能够回答下面几个问题：
 
-- Wujie 为什么同时使用 iframe、Web Component 和 Shadow DOM？
+- Jieshu 为什么同时使用 iframe、Web Component 和 Shadow DOM？
 - 子应用 JavaScript 在哪里运行，DOM 又渲染在哪里？
 - `document.querySelector` 为什么能够查询到 iframe 外面的 ShadowRoot？
 - 子应用的动态脚本、动态样式和路由是如何接管的？
@@ -13,16 +13,16 @@
 
 ---
 
-## 1. Wujie 的核心模型
+## 1. Jieshu 的核心模型
 
-一句话概括 Wujie：
+一句话概括 Jieshu：
 
-> 子应用 JavaScript 运行在隐藏的同源 iframe 中；子应用 DOM 和大部分 CSS 渲染在主应用页面中的 ShadowRoot；Wujie 再代理 document、location、history 和动态资源操作，把两个环境连接起来。
+> 子应用 JavaScript 运行在隐藏的同源 iframe 中；子应用 DOM 和大部分 CSS 渲染在主应用页面中的 ShadowRoot；Jieshu 再代理 document、location、history 和动态资源操作，把两个环境连接起来。
 
 可以把它理解为：
 
 ```text
-Wujie
+Jieshu
 ├── iframe
 │   ├── 子应用 JavaScript
 │   ├── 独立 window
@@ -30,7 +30,7 @@ Wujie
 │   ├── history
 │   └── location
 │
-├── <wujie-app>
+├── <jieshu-app>
 │   └── ShadowRoot
 │       ├── 子应用 HTML
 │       ├── 子应用 head
@@ -52,7 +52,7 @@ Wujie
 flowchart LR
     Start[主应用调用 startApp] --> Load[加载并解析入口 HTML]
     Load --> Sandbox[创建隐藏 iframe 沙箱]
-    Sandbox --> WC[创建 wujie-app]
+    Sandbox --> WC[创建 jieshu-app]
     WC --> Shadow[创建 ShadowRoot]
     Load --> DOM[HTML 和 CSS 注入 ShadowRoot]
     Load --> JS[JavaScript 注入 iframe 执行]
@@ -69,7 +69,7 @@ flowchart LR
 渲染环境：ShadowRoot
 ```
 
-Wujie 最重要的工作，就是让子应用误以为这两个环境仍然是同一个页面。
+Jieshu 最重要的工作，就是让子应用误以为这两个环境仍然是同一个页面。
 
 ---
 
@@ -93,7 +93,7 @@ Wujie 最重要的工作，就是让子应用误以为这两个环境仍然是�
 
 子应用弹窗通常只能覆盖 iframe 自己的区域，难以自然融入主应用布局。iframe 的尺寸、滚动、路由持久化、通信和白屏问题也需要额外处理。
 
-Wujie 的选择是：
+Jieshu 的选择是：
 
 ```text
 保留 iframe 的 JavaScript Realm
@@ -113,14 +113,14 @@ Wujie 的选择是：
 
 ## 3. Web Component 基础
 
-Web Component 是一组浏览器原生组件技术。Wujie 主要使用其中两部分：
+Web Component 是一组浏览器原生组件技术。Jieshu 主要使用其中两部分：
 
 ```text
 Custom Elements
-    定义浏览器原本不存在的 <wujie-app> 标签
+    定义浏览器原本不存在的 <jieshu-app> 标签
 
 Shadow DOM
-    在 <wujie-app> 内创建隔离的 DOM 和 CSS 边界
+    在 <jieshu-app> 内创建隔离的 DOM 和 CSS 边界
 ```
 
 ### 3.1 最小 Custom Element
@@ -205,62 +205,62 @@ Shadow DOM
 
 ---
 
-## 4. Wujie 如何使用 Web Component
+## 4. Jieshu 如何使用 Web Component
 
 相关源码：
 
 ```text
-packages/wujie-core/src/shadow.ts
+packages/jieshu-core/src/shadow.ts
 ```
 
 核心实现可以整理为：
 
 ```ts
-export function defineWujieWebComponent() {
+export function defineJieshuWebComponent() {
   // 同一个 Custom Element 名称不能重复注册
-  if (customElements.get('wujie-app')) return;
+  if (customElements.get('jieshu-app')) return;
 
-  class WujieApp extends HTMLElement {
+  class JieshuApp extends HTMLElement {
     connectedCallback() {
       /*
-       * 保活模式下，同一个 <wujie-app> 会被移出页面再插回来。
+       * 保活模式下，同一个 <jieshu-app> 会被移出页面再插回来。
        * ShadowRoot 只能 attach 一次，因此已经存在时直接复用。
        */
       if (this.shadowRoot) return;
 
       const shadowRoot = this.attachShadow({ mode: 'open' });
-      const appId = this.getAttribute('data-wujie-id');
-      const sandbox = getWujieById(appId);
+      const appId = this.getAttribute('data-jieshu-id');
+      const sandbox = getJieshuById(appId);
 
       // 修复 ShadowRoot 与 iframe Realm 之间的 DOM 语义
       patchElementEffect(shadowRoot, sandbox.iframe.contentWindow);
 
-      // 让 Wujie 实例持有可见 DOM 的根节点
+      // 让 Jieshu 实例持有可见 DOM 的根节点
       sandbox.shadowRoot = shadowRoot;
     }
 
     disconnectedCallback() {
-      const appId = this.getAttribute('data-wujie-id');
-      const sandbox = getWujieById(appId);
+      const appId = this.getAttribute('data-jieshu-id');
+      const sandbox = getJieshuById(appId);
 
       // 根据保活、单例或重建模式选择 unmount/destroy
-      handleWujieAppDisconnect(sandbox);
+      handleJieshuAppDisconnect(sandbox);
     }
   }
 
-  customElements.define('wujie-app', WujieApp);
+  customElements.define('jieshu-app', JieshuApp);
 }
 ```
 
-Wujie 运行时会创建这个元素：
+Jieshu 运行时会创建这个元素：
 
 ```ts
-export function createWujieWebComponent(id: string): HTMLElement {
-  const element = document.createElement('wujie-app');
+export function createJieshuWebComponent(id: string): HTMLElement {
+  const element = document.createElement('jieshu-app');
 
-  // 用应用 name 关联对应的 Wujie 实例
-  element.setAttribute('data-wujie-id', id);
-  element.classList.add('wujie_iframe');
+  // 用应用 name 关联对应的 Jieshu 实例
+  element.setAttribute('data-jieshu-id', id);
+  element.classList.add('jieshu_iframe');
 
   return element;
 }
@@ -269,7 +269,7 @@ export function createWujieWebComponent(id: string): HTMLElement {
 插入主应用容器后，浏览器自动执行 `connectedCallback`：
 
 ```ts
-const webComponent = createWujieWebComponent('orders');
+const webComponent = createJieshuWebComponent('orders');
 const container = document.querySelector('#micro-app-container');
 
 container.appendChild(webComponent);
@@ -280,7 +280,7 @@ container.appendChild(webComponent);
 ```text
 主应用 document
 └── #micro-app-container
-    └── <wujie-app data-wujie-id="orders">
+    └── <jieshu-app data-jieshu-id="orders">
         └── #shadow-root
             └── <html>
                 ├── <head>
@@ -289,7 +289,7 @@ container.appendChild(webComponent);
                     └── 子应用页面
 ```
 
-Web Component 在 Wujie 中负责：
+Web Component 在 Jieshu 中负责：
 
 ```text
 1. 作为子应用 DOM 容器
@@ -306,10 +306,10 @@ Web Component 在 Wujie 中负责：
 核心源码集中在：
 
 ```text
-packages/wujie-core/src/
+packages/jieshu-core/src/
 
 index.ts       对外入口：startApp、preloadApp、destroyApp
-sandbox.ts     Wujie 实例，统筹 iframe、ShadowRoot 和生命周期
+sandbox.ts     Jieshu 实例，统筹 iframe、ShadowRoot 和生命周期
 iframe.ts      iframe 创建、脚本执行、window/document/history 补丁
 proxy.ts       proxyWindow、proxyDocument、proxyLocation
 shadow.ts      Web Component、ShadowRoot 和 HTML 渲染
@@ -342,7 +342,7 @@ sandbox.ts
 相关源码：
 
 ```text
-packages/wujie-core/src/index.ts
+packages/jieshu-core/src/index.ts
 ```
 
 精简后的关键控制流如下：
@@ -350,7 +350,7 @@ packages/wujie-core/src/index.ts
 ```ts
 export async function startApp(startOptions: StartOptions) {
   // 尝试获取已存在的实例
-  const oldSandbox = getWujieById(startOptions.name);
+  const oldSandbox = getJieshuById(startOptions.name);
 
   // 合并 setupApp 缓存配置和本次 startApp 配置
   const options = mergeOptions(startOptions, getOptionsById(startOptions.name));
@@ -361,7 +361,7 @@ export async function startApp(startOptions: StartOptions) {
    * 已存在实例优先复用：
    *
    * alive=true             → 保活模式
-   * 存在 __WUJIE_MOUNT     → 单例模式
+   * 存在 __JIESHU_MOUNT     → 单例模式
    * 两者都不满足           → 销毁后重建
    */
   if (oldSandbox) {
@@ -397,7 +397,7 @@ export async function startApp(startOptions: StartOptions) {
       return () => oldSandbox.destroy();
     }
 
-    if (typeof iframeWindow.__WUJIE_MOUNT === 'function') {
+    if (typeof iframeWindow.__JIESHU_MOUNT === 'function') {
       await oldSandbox.unmount();
 
       await oldSandbox.active({
@@ -414,7 +414,7 @@ export async function startApp(startOptions: StartOptions) {
       // JavaScript 不重新执行，恢复上次登记的动态样式
       oldSandbox.rebuildStyleSheets();
 
-      iframeWindow.__WUJIE_MOUNT();
+      iframeWindow.__JIESHU_MOUNT();
       oldSandbox.mountFlag = true;
 
       return () => oldSandbox.destroy();
@@ -425,7 +425,7 @@ export async function startApp(startOptions: StartOptions) {
   }
 
   // 创建 iframe 沙箱和各种代理
-  const sandbox = new Wujie({
+  const sandbox = new Jieshu({
     name,
     url,
     fiber,
@@ -474,25 +474,25 @@ export async function startApp(startOptions: StartOptions) {
   → 创建 iframe 沙箱
   → 加载入口 HTML
   → 分离 JavaScript 和 CSS
-  → 创建 wujie-app 和 ShadowRoot
+  → 创建 jieshu-app 和 ShadowRoot
   → 渲染 DOM 和 CSS
   → 在 iframe 中执行 JavaScript
 ```
 
 ---
 
-## 7. `Wujie` 实例的职责
+## 7. `Jieshu` 实例的职责
 
 相关源码：
 
 ```text
-packages/wujie-core/src/sandbox.ts
+packages/jieshu-core/src/sandbox.ts
 ```
 
-一个 `Wujie` 实例代表一个子应用运行环境，主要持有：
+一个 `Jieshu` 实例代表一个子应用运行环境，主要持有：
 
 ```ts
-class Wujie {
+class Jieshu {
   id: string;
   url: string;
 
@@ -534,7 +534,7 @@ class Wujie {
 构造函数的主干逻辑：
 
 ```ts
-constructor(options: WujieOptions) {
+constructor(options: JieshuOptions) {
   const {
     name,
     url,
@@ -548,7 +548,7 @@ constructor(options: WujieOptions) {
   this.id = name;
   this.url = url;
   this.fiber = fiber;
-  this.degrade = degrade || !wujieSupport;
+  this.degrade = degrade || !jieshuSupport;
 
   this.execQueue = [];
   this.styleSheetElements = [];
@@ -601,7 +601,7 @@ constructor(options: WujieOptions) {
   this.provide.location = proxyLocation;
 
   // 以子应用 name 为 key 注册实例
-  addSandboxCacheWithWujie(this.id, this);
+  addSandboxCacheWithJieshu(this.id, this);
 }
 ```
 
@@ -612,7 +612,7 @@ constructor(options: WujieOptions) {
 相关源码：
 
 ```text
-packages/wujie-core/src/iframe.ts
+packages/jieshu-core/src/iframe.ts
 ```
 
 iframe 的主要用途是提供一个完整、独立的浏览器 Realm：
@@ -634,7 +634,7 @@ iframe window
 const EMPTY_DOCUMENT = '<!DOCTYPE html><html><head></head><body></body></html>';
 
 export function iframeGenerator(
-  sandbox: Wujie,
+  sandbox: Jieshu,
   attrs: Record<string, unknown>,
   mainHostPath: string,
   appHostPath: string,
@@ -660,11 +660,11 @@ export function iframeGenerator(
 
   const iframeWindow = iframe.contentWindow;
 
-  // 在 iframe 初始化早期注入 Wujie 上下文
-  iframeWindow.__WUJIE = sandbox;
-  iframeWindow.__WUJIE_PUBLIC_PATH__ = appHostPath + '/';
-  iframeWindow.__WUJIE_RAW_WINDOW__ = iframeWindow;
-  iframeWindow.$wujie = sandbox.provide;
+  // 在 iframe 初始化早期注入 Jieshu 上下文
+  iframeWindow.__JIESHU = sandbox;
+  iframeWindow.__JIESHU_PUBLIC_PATH__ = appHostPath + '/';
+  iframeWindow.__JIESHU_RAW_WINDOW__ = iframeWindow;
+  iframeWindow.$jieshu = sandbox.provide;
 
   sandbox.iframeReady = stopIframeLoading(iframe).then(() => {
     /*
@@ -702,7 +702,7 @@ proxyLocation 展现的 origin：子应用 origin
 相关源码：
 
 ```text
-packages/wujie-core/src/proxy.ts
+packages/jieshu-core/src/proxy.ts
 ```
 
 精简实现：
@@ -712,12 +712,12 @@ const { proxy: proxyWindow, revoke: revokeWindow } = Proxy.revocable(iframe.cont
   get(target, key) {
     // location 必须返回子应用视角的代理对象
     if (key === 'location') {
-      return target.__WUJIE.proxyLocation;
+      return target.__JIESHU.proxyLocation;
     }
 
     // 保持 window.window === window 和 window.self === window
     if (key === 'window' || key === 'self') {
-      return target.__WUJIE.proxy;
+      return target.__JIESHU.proxy;
     }
 
     const value = target[key];
@@ -761,7 +761,7 @@ JavaScript 隔离的根本来源是独立 iframe window，而不是 Proxy 自己
 
 ## 10. `proxyLocation`：伪装子应用地址
 
-真实 iframe 与主应用同源，子应用却应当认为自己运行在原来的域名和路径下，因此 Wujie 提供 `proxyLocation`。
+真实 iframe 与主应用同源，子应用却应当认为自己运行在原来的域名和路径下，因此 Jieshu 提供 `proxyLocation`。
 
 ```ts
 const { proxy: proxyLocation, revoke: revokeLocation } = Proxy.revocable(
@@ -782,7 +782,7 @@ const { proxy: proxyLocation, revoke: revokeLocation } = Proxy.revocable(
 
       if (key === 'reload') {
         return () => {
-          console.warn('Wujie 中 location.reload 被接管');
+          console.warn('Jieshu 中 location.reload 被接管');
         };
       }
 
@@ -819,8 +819,8 @@ location.href = newUrl
 相关源码：
 
 ```text
-packages/wujie-core/src/entry.ts
-packages/wujie-core/src/template.ts
+packages/jieshu-core/src/entry.ts
+packages/jieshu-core/src/template.ts
 ```
 
 入口 HTML 会被拆成：
@@ -856,7 +856,7 @@ function processTpl(html: string, baseURI: string) {
       styles.push({ src: href });
 
       // 原位置保留注释，CSS 下载后会重新嵌入
-      return `<!-- stylesheet ${href} replaced by wujie -->`;
+      return `<!-- stylesheet ${href} replaced by jieshu -->`;
     })
     .replace(STYLE_TAG_REGEX, (styleTag) => {
       styles.push({
@@ -864,12 +864,12 @@ function processTpl(html: string, baseURI: string) {
         content: getInlineCode(styleTag),
       });
 
-      return '<!-- inline style replaced by wujie -->';
+      return '<!-- inline style replaced by jieshu -->';
     })
     .replace(SCRIPT_TAG_REGEX, (scriptTag) => {
       scripts.push(parseScript(scriptTag, baseURI));
 
-      return '<!-- script replaced by wujie -->';
+      return '<!-- script replaced by jieshu -->';
     });
 
   return {
@@ -896,7 +896,7 @@ async function embedStyles(template, styleResults) {
 }
 ```
 
-这样 Wujie 就能在 CSS 进入 ShadowRoot 前统一处理相对路径、插件 loader 和特殊规则。
+这样 Jieshu 就能在 CSS 进入 ShadowRoot 前统一处理相对路径、插件 loader 和特殊规则。
 
 ---
 
@@ -905,7 +905,7 @@ async function embedStyles(template, styleResults) {
 相关源码：
 
 ```text
-packages/wujie-core/src/shadow.ts
+packages/jieshu-core/src/shadow.ts
 ```
 
 ```ts
@@ -916,20 +916,20 @@ export async function renderTemplateToShadowRoot(shadowRoot: ShadowRoot, iframeW
    */
   const html = renderTemplateToHtml(iframeWindow, template);
 
-  const processedHtml = await processCssLoaderForTemplate(iframeWindow.__WUJIE, html);
+  const processedHtml = await processCssLoaderForTemplate(iframeWindow.__JIESHU, html);
 
   // 可见 DOM 实际进入主页面中的 ShadowRoot
   shadowRoot.appendChild(processedHtml);
 
   /*
    * ShadowRoot 原生没有 head/body 属性。
-   * Wujie 手动保存引用，供 proxyDocument 使用。
+   * Jieshu 手动保存引用，供 proxyDocument 使用。
    */
   shadowRoot.head = shadowRoot.querySelector('head');
   shadowRoot.body = shadowRoot.querySelector('body');
 
   // 劫持后续动态插入的 script/link/style
-  patchRenderEffect(shadowRoot, iframeWindow.__WUJIE.id, false);
+  patchRenderEffect(shadowRoot, iframeWindow.__JIESHU.id, false);
 }
 ```
 
@@ -967,11 +967,11 @@ function renderTemplateToHtml(iframeWindow: Window, template: string) {
 相关源码：
 
 ```text
-packages/wujie-core/src/proxy.ts
-packages/wujie-core/src/iframe.ts
+packages/jieshu-core/src/proxy.ts
+packages/jieshu-core/src/iframe.ts
 ```
 
-这是整个 Wujie 架构中最关键的部分。
+这是整个 Jieshu 架构中最关键的部分。
 
 子应用执行：
 
@@ -989,7 +989,7 @@ const { proxy: proxyDocument, revoke: revokeDocument } = Proxy.revocable(
   {},
   {
     get(_target, key) {
-      const sandbox = iframe.contentWindow.__WUJIE;
+      const sandbox = iframe.contentWindow.__JIESHU;
       const shadowRoot = sandbox.shadowRoot;
       const iframeDocument = iframe.contentDocument;
 
@@ -1050,11 +1050,11 @@ const { proxy: proxyDocument, revoke: revokeDocument } = Proxy.revocable(
 );
 ```
 
-但只有 `proxyDocument` 还不够。子应用中的裸变量 `document` 首先指向 iframe 真实 document，因此 Wujie 还要修改 iframe Realm 的 `Document.prototype`：
+但只有 `proxyDocument` 还不够。子应用中的裸变量 `document` 首先指向 iframe 真实 document，因此 Jieshu 还要修改 iframe Realm 的 `Document.prototype`：
 
 ```ts
 export function patchDocumentEffect(iframeWindow: Window) {
-  const sandbox = iframeWindow.__WUJIE;
+  const sandbox = iframeWindow.__JIESHU;
 
   const proxyKeys = [
     'head',
@@ -1093,7 +1093,7 @@ shadowRoot.querySelector
 找到可见 DOM
 ```
 
-这条链就是 Wujie “JavaScript 与 DOM 分离”能够成立的核心。
+这条链就是 Jieshu “JavaScript 与 DOM 分离”能够成立的核心。
 
 ---
 
@@ -1102,8 +1102,8 @@ shadowRoot.querySelector
 相关源码：
 
 ```text
-packages/wujie-core/src/iframe.ts
-packages/wujie-core/src/sandbox.ts
+packages/jieshu-core/src/iframe.ts
+packages/jieshu-core/src/sandbox.ts
 ```
 
 普通脚本会被包装后插入 iframe：
@@ -1126,11 +1126,11 @@ export function insertScriptToIframe(scriptResult: ScriptResult, iframeWindow: W
     code = `
       (function(window, self, global, location) {
         ${code}
-      }).bind(window.__WUJIE.proxy)(
-        window.__WUJIE.proxy,
-        window.__WUJIE.proxy,
-        window.__WUJIE.proxy,
-        window.__WUJIE.proxyLocation
+      }).bind(window.__JIESHU.proxy)(
+        window.__JIESHU.proxy,
+        window.__JIESHU.proxy,
+        window.__JIESHU.proxy,
+        window.__JIESHU.proxyLocation
       );
     `;
   }
@@ -1151,12 +1151,12 @@ export function insertScriptToIframe(scriptResult: ScriptResult, iframeWindow: W
   head.appendChild(script);
 
   if (!async) {
-    iframeWindow.__WUJIE.execQueue.shift()?.();
+    iframeWindow.__JIESHU.execQueue.shift()?.();
   }
 }
 ```
 
-Wujie 没有简单地把所有代码都交给 `eval`，而是尽量使用浏览器的脚本执行机制。这样可以保留 iframe Realm、模块行为、原型链以及更接近原生的异常堆栈。
+Jieshu 没有简单地把所有代码都交给 `eval`，而是尽量使用浏览器的脚本执行机制。这样可以保留 iframe Realm、模块行为、原型链以及更接近原生的异常堆栈。
 
 ### 14.1 执行顺序
 
@@ -1256,7 +1256,7 @@ load
 相关源码：
 
 ```text
-packages/wujie-core/src/effect.ts
+packages/jieshu-core/src/effect.ts
 ```
 
 仅处理入口 HTML 中的静态资源还不够。运行中的应用会执行：
@@ -1276,12 +1276,12 @@ document.head.appendChild(style);
 - UI 框架运行时样式；
 - 第三方组件按需加载资源。
 
-Wujie 会改写 ShadowRoot 中 `head/body` 的 `appendChild` 和 `insertBefore`：
+Jieshu 会改写 ShadowRoot 中 `head/body` 的 `appendChild` 和 `insertBefore`：
 
 ```ts
 function rewriteAppendChild(sandboxId: string, rawAppendChild: typeof Node.prototype.appendChild) {
   return function appendChild(this: HTMLHeadElement, node: Node) {
-    const sandbox = getWujieById(sandboxId);
+    const sandbox = getJieshuById(sandboxId);
     const element = node as HTMLElement;
 
     switch (element.tagName) {
@@ -1305,7 +1305,7 @@ function rewriteAppendChild(sandboxId: string, rawAppendChild: typeof Node.proto
           );
         });
 
-        return rawAppendChild.call(this, document.createComment('dynamic script replaced by wujie'));
+        return rawAppendChild.call(this, document.createComment('dynamic script replaced by jieshu'));
       }
 
       case 'LINK': {
@@ -1325,7 +1325,7 @@ function rewriteAppendChild(sandboxId: string, rawAppendChild: typeof Node.proto
           rawAppendChild.call(this, style);
         });
 
-        return rawAppendChild.call(this, document.createComment('dynamic stylesheet replaced by wujie'));
+        return rawAppendChild.call(this, document.createComment('dynamic stylesheet replaced by jieshu'));
       }
 
       case 'STYLE': {
@@ -1379,7 +1379,7 @@ Shadow DOM 提供主要 CSS 隔离，但仍有需要补丁的情况。
 }
 ```
 
-在 ShadowRoot 中，Wujie 会将需要的 `:root` 规则复制并改写为 `:host`：
+在 ShadowRoot 中，Jieshu 会将需要的 `:root` 规则复制并改写为 `:host`：
 
 ```css
 :host {
@@ -1389,7 +1389,7 @@ Shadow DOM 提供主要 CSS 隔离，但仍有需要补丁的情况。
 
 ### 16.2 `@font-face`
 
-字体规则在 Shadow DOM 和嵌套子应用中存在特殊传播问题。Wujie 会提取 `@font-face`，放入最外层 document 的专用 style 容器，并登记所属应用，销毁时再移除。
+字体规则在 Shadow DOM 和嵌套子应用中存在特殊传播问题。Jieshu 会提取 `@font-face`，放入最外层 document 的专用 style 容器，并登记所属应用，销毁时再移除。
 
 核心处理可以理解为：
 
@@ -1419,7 +1419,7 @@ function getPatchStyleElements(styleSheets: CSSStyleSheet[]) {
 
 因此，准确的说法不是“用了 Shadow DOM 就什么都不用处理”，而是：
 
-> Shadow DOM 提供基础隔离，Wujie 再处理 `:root`、`@font-face`、动态样式、CSS 相对路径和 HMR 等兼容问题。
+> Shadow DOM 提供基础隔离，Jieshu 再处理 `:root`、`@font-face`、动态样式、CSS 相对路径和 HMR 等兼容问题。
 
 ---
 
@@ -1428,13 +1428,13 @@ function getPatchStyleElements(styleSheets: CSSStyleSheet[]) {
 相关源码：
 
 ```text
-packages/wujie-core/src/iframe.ts
-packages/wujie-core/src/sync.ts
+packages/jieshu-core/src/iframe.ts
+packages/jieshu-core/src/sync.ts
 ```
 
 iframe 自己拥有 history，因此子应用 SPA 路由天然与主应用路由分开。问题是刷新主页面后，iframe 内存中的路由会丢失。
 
-Wujie 的处理方式是把子应用路由写入主应用 query：
+Jieshu 的处理方式是把子应用路由写入主应用 query：
 
 ```text
 子应用 name：orders
@@ -1473,7 +1473,7 @@ function patchIframeHistory(iframeWindow: Window, appHostPath: string, mainHostP
 
 ```ts
 export function syncUrlToWindow(iframeWindow: Window) {
-  const { id, sync } = iframeWindow.__WUJIE;
+  const { id, sync } = iframeWindow.__JIESHU;
 
   if (!sync) return;
 
@@ -1491,7 +1491,7 @@ export function syncUrlToWindow(iframeWindow: Window) {
 
 ```ts
 export function syncUrlToIframe(iframeWindow: Window) {
-  const { id, sync, url } = iframeWindow.__WUJIE;
+  const { id, sync, url } = iframeWindow.__JIESHU;
   let targetUrl = url;
 
   if (sync) {
@@ -1505,7 +1505,7 @@ export function syncUrlToIframe(iframeWindow: Window) {
 
   const route = parseAppRoute(targetUrl);
 
-  iframeWindow.history.replaceState(null, '', iframeWindow.__WUJIE.inject.mainHostPath + route);
+  iframeWindow.history.replaceState(null, '', iframeWindow.__JIESHU.inject.mainHostPath + route);
 }
 ```
 
@@ -1531,7 +1531,7 @@ export function syncUrlToIframe(iframeWindow: Window) {
 document.addEventListener('click', handler);
 ```
 
-这个监听不能一律注册到 iframe document，因为用户点击的是 ShadowRoot 中的可见 DOM。Wujie 会按事件类型决定注册位置：
+这个监听不能一律注册到 iframe document，因为用户点击的是 ShadowRoot 中的可见 DOM。Jieshu 会按事件类型决定注册位置：
 
 ```text
 某些事件 → iframe document
@@ -1587,14 +1587,14 @@ Object.defineProperty(TargetConstructor, Symbol.hasInstance, {
 
 ### 18.3 `ownerDocument` 和 `baseURI`
 
-Wujie 会给元素补充访问器：
+Jieshu 会给元素补充访问器：
 
 ```ts
 Object.defineProperties(element, {
   baseURI: {
     configurable: true,
     get() {
-      const location = iframeWindow.__WUJIE.proxyLocation;
+      const location = iframeWindow.__JIESHU.proxyLocation;
 
       return location.protocol + '//' + location.host + location.pathname;
     },
@@ -1615,13 +1615,13 @@ Object.defineProperties(element, {
 
 ## 19. 三种运行模式
 
-Wujie 根据 `alive` 和子应用生命周期函数决定运行模式。
+Jieshu 根据 `alive` 和子应用生命周期函数决定运行模式。
 
 ```mermaid
 flowchart TD
-    Remove[wujie-app 离开页面] --> Alive{alive 是否为 true}
+    Remove[jieshu-app 离开页面] --> Alive{alive 是否为 true}
     Alive -->|是| Keep[保活模式：保留实例、iframe 和 ShadowRoot]
-    Alive -->|否| Mount{是否存在 __WUJIE_MOUNT}
+    Alive -->|否| Mount{是否存在 __JIESHU_MOUNT}
     Mount -->|是| Single[单例模式：卸载业务实例，保留 iframe]
     Mount -->|否| Rebuild[重建模式：完整销毁]
 ```
@@ -1634,23 +1634,23 @@ alive = true
 
 离开页面时：
 
-- `<wujie-app>` 从 document 中移除；
+- `<jieshu-app>` 从 document 中移除；
 - ShadowRoot 对象仍保留；
 - iframe 保留；
 - 子应用业务实例和状态保留；
 - 路由状态保留。
 
-重新进入时，只需要把同一个 `<wujie-app>` 插回容器。
+重新进入时，只需要把同一个 `<jieshu-app>` 插回容器。
 
 ### 19.2 单例模式
 
 ```text
 alive = false
-存在 window.__WUJIE_MOUNT
-存在 window.__WUJIE_UNMOUNT
+存在 window.__JIESHU_MOUNT
+存在 window.__JIESHU_UNMOUNT
 ```
 
-离开时调用 `__WUJIE_UNMOUNT`，重新进入时恢复 DOM/CSS 并调用 `__WUJIE_MOUNT`。iframe 和已经加载的 JavaScript 模块继续复用。
+离开时调用 `__JIESHU_UNMOUNT`，重新进入时恢复 DOM/CSS 并调用 `__JIESHU_MOUNT`。iframe 和已经加载的 JavaScript 模块继续复用。
 
 ### 19.3 重建模式
 
@@ -1664,17 +1664,17 @@ alive = false
 - Web Component；
 - ShadowRoot；
 - iframe；
-- Wujie 实例；
+- Jieshu 实例；
 - 子应用业务实例；
 - 代理和动态副作用。
 
 核心判断：
 
 ```ts
-function handleWujieAppDisconnect(sandbox: Wujie) {
+function handleJieshuAppDisconnect(sandbox: Jieshu) {
   const iframeWindow = sandbox.iframe.contentWindow;
 
-  const hasLifecycle = typeof iframeWindow.__WUJIE_MOUNT === 'function';
+  const hasLifecycle = typeof iframeWindow.__JIESHU_MOUNT === 'function';
 
   const rebuildMode = !sandbox.alive && !hasLifecycle;
 
@@ -1698,10 +1698,10 @@ function handleWujieAppDisconnect(sandbox: Wujie) {
 
 ## 20. 通信机制
 
-Wujie 提供三种主要通信方式：
+Jieshu 提供三种主要通信方式：
 
 ```text
-主应用 ── props ──> window.$wujie.props
+主应用 ── props ──> window.$jieshu.props
 
 主应用 <── window.parent/contentWindow ──> 子应用
 
@@ -1711,7 +1711,7 @@ Wujie 提供三种主要通信方式：
 iframe 初始化时会注入：
 
 ```ts
-iframeWindow.$wujie = sandbox.provide;
+iframeWindow.$jieshu = sandbox.provide;
 ```
 
 `provide` 大致包含：
@@ -1736,11 +1736,11 @@ EventBus 使用一份跨实例共享的事件表。`$emit` 会遍历所有应用
 相关源码：
 
 ```text
-packages/wujie-core/src/sandbox.ts
-packages/wujie-core/src/tracker.ts
+packages/jieshu-core/src/sandbox.ts
+packages/jieshu-core/src/tracker.ts
 ```
 
-Wujie 会把部分行为转发到主应用环境，例如：
+Jieshu 会把部分行为转发到主应用环境，例如：
 
 - 注册到主 `window` 的事件；
 - 注册到主 `document` 的事件；
@@ -1768,7 +1768,7 @@ public async destroy() {
   this.destroyed = true;
 
   // 提前从全局实例表移除，阻止并发重复销毁
-  deleteWujieById(this.id);
+  deleteJieshuById(this.id);
 
   await this.unmount();
 
@@ -1785,8 +1785,8 @@ public async destroy() {
 
   if (iframeWindow) {
     // 断开残留 DOM getter 到 sandbox 的引用链
-    iframeWindow.__WUJIE = null;
-    iframeWindow.$wujie = null;
+    iframeWindow.__JIESHU = null;
+    iframeWindow.$jieshu = null;
   }
 
   // 移除隐藏 iframe
@@ -1820,7 +1820,7 @@ JavaScript → 隐藏 iframe
 DOM/CSS    → ShadowRoot
 ```
 
-当浏览器不支持所需能力，或者显式启用 `degrade` 时，Wujie 会使用额外的渲染 iframe：
+当浏览器不支持所需能力，或者显式启用 `degrade` 时，Jieshu 会使用额外的渲染 iframe：
 
 ```text
 隐藏执行 iframe
@@ -1845,11 +1845,11 @@ DOM/CSS    → ShadowRoot
 
 ## 23. 边界与风险
 
-### 23.1 Wujie 不是安全沙箱
+### 23.1 Jieshu 不是安全沙箱
 
-隐藏 iframe 与主应用同源，子应用可以通过 `window.parent` 访问主应用。因此 Wujie 提供的是工程隔离，而不是恶意代码隔离。
+隐藏 iframe 与主应用同源，子应用可以通过 `window.parent` 访问主应用。因此 Jieshu 提供的是工程隔离，而不是恶意代码隔离。
 
-不要把不可信的第三方代码仅依靠 Wujie 进行安全隔离。
+不要把不可信的第三方代码仅依靠 Jieshu 进行安全隔离。
 
 ### 23.2 Shadow DOM 隔离不是绝对隔离
 
@@ -1885,7 +1885,7 @@ DOM/CSS    → ShadowRoot
 ```text
 startApp
   ↓
-new Wujie
+new Jieshu
   ↓
 iframeGenerator
   ↓
@@ -1897,7 +1897,7 @@ processTpl
   ↓
 sandbox.active
   ↓
-createWujieWebComponent
+createJieshuWebComponent
   ↓
 renderTemplateToShadowRoot
   ↓
@@ -1924,8 +1924,8 @@ sandbox.provide;
 
 ```js
 const div = document.createElement('div');
-div.id = 'wujie-debug-node';
-div.textContent = 'Wujie DOM bridge';
+div.id = 'jieshu-debug-node';
+div.textContent = 'Jieshu DOM bridge';
 
 document.body.appendChild(div);
 ```
@@ -1961,7 +1961,7 @@ rewriteAppendOrInsertChild
 ```js
 const style = document.createElement('style');
 style.textContent = `
-  #wujie-debug-node {
+  #jieshu-debug-node {
     color: red;
   }
 `;
@@ -2021,13 +2021,13 @@ iframe 真实地址
 6. 子应用离开后，这个对象需要保留还是清理？
 7. 是否有闭包把 iframe window 持有在主环境中？
 
-大多数 Wujie 兼容代码，都是在回答这七个问题。
+大多数 Jieshu 兼容代码，都是在回答这七个问题。
 
 ---
 
 ## 26. 最终总结
 
-Wujie 的实现可以压缩成下面这组公式：
+Jieshu 的实现可以压缩成下面这组公式：
 
 ```text
 JavaScript 隔离
@@ -2052,12 +2052,12 @@ DOM 连接
     = DOM 清理 + 事件清理 + 资源清理 + Proxy revoke + 引用断开
 ```
 
-最值得记住的核心不是某一个 Proxy 或某一次 DOM 劫持，而是 Wujie 的整体分工：
+最值得记住的核心不是某一个 Proxy 或某一次 DOM 劫持，而是 Jieshu 的整体分工：
 
 ```text
 iframe 是子应用的运行进程
 
-<wujie-app> 和 ShadowRoot 是子应用的显示窗口
+<jieshu-app> 和 ShadowRoot 是子应用的显示窗口
 
 proxyDocument 是连接运行进程和显示窗口的桥梁
 ```

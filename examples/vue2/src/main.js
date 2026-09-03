@@ -50,14 +50,14 @@ Vue.use(VueRouter);
 
 Vue.config.productionTip = false;
 
-if (window.__POWERED_BY_WUJIE__) {
+if (window.__POWERED_BY_JIESHU__) {
   let instance;
   let router;
-  window.__WUJIE_MOUNT = () => {
+  window.__JIESHU_MOUNT = () => {
     router = new VueRouter({ base, routes });
     instance = new Vue({ router, render: (h) => h(App) }).$mount('#app');
   };
-  window.__WUJIE_UNMOUNT = () => {
+  window.__JIESHU_UNMOUNT = () => {
     instance.$destroy();
     router?.options?.history?.destroy?.();
     window.__VUE_DEVTOOLS_PLUGINS__ = [];

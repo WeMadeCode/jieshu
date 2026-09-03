@@ -1,12 +1,12 @@
 # 降级处理
 
-无界提供无感知的降级方案
+界枢提供无感知的降级方案
 
 在非降级场景下，子应用的`dom`在`webcomponent`中，运行环境在`iframe`中，`iframe`对`dom`的操作通过`proxy`来代理到`webcomponent`上，而`webcomponent`和`proxy` `IE`都无法支持，这里采用另一个的`iframe`替换`webcomponent`，用`Object.defineProperty`替换`proxy`来做代理的方案
 
 ::: warning 注意
 
-无界并没有对 es6 代码进行 polyfill，因为每个用户对浏览器的兼容程度是不一样的引入的 polyfill 也不一致，如果需要在较低版本的浏览器中运行，需要用户自行 通过 babel 来添加 polyfill。
+界枢并没有对 es6 代码进行 polyfill，因为每个用户对浏览器的兼容程度是不一样的引入的 polyfill 也不一致，如果需要在较低版本的浏览器中运行，需要用户自行 通过 babel 来添加 polyfill。
 
 :::
 
@@ -24,4 +24,4 @@
 
 1. 弹窗只能在子应用内部
 
-2. 由于无法使用`proxy`，无法劫持子应用的`location`，导致访问`window.location.host`的时候拿到的是主应用的`host`，子应用可以从 [$wujie.location](/api/wujie.html#wujie-location) 中拿到子应用正确的`host`
+2. 由于无法使用`proxy`，无法劫持子应用的`location`，导致访问`window.location.host`的时候拿到的是主应用的`host`，子应用可以从 [$jieshu.location](/api/jieshu.html#jieshu-location) 中拿到子应用正确的`host`

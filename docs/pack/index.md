@@ -5,29 +5,29 @@ collapsable: false
 
 # Vue 组件封装
 
-无界提供 Vue 3 组件封装，查看 [demo](https://wujie-micro.github.io/demo-main-vue/)，查看 [demo github](https://github.com/Tencent/wujie/tree/master/examples/main-vue/)
+界枢提供 Vue 3 组件封装，示例源码位于 [examples/main-vue](https://github.com/WeMadeCode/jieshu/tree/master/examples/main-vue)。
 
 ## 安装
 
 ```bash
-npm i wujie-vue3 -S
+npm i jieshu-vue3 -S
 
 ```
 
 ## 引入
 
 ```javascript
-import WujieVue from 'wujie-vue3';
+import JieshuVue from 'jieshu-vue3';
 
-const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = WujieVue;
+const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = JieshuVue;
 
-app.use(WujieVue);
+app.use(JieshuVue);
 ```
 
 ## 使用
 
 ```js
-<WujieVue
+<JieshuVue
   width="100%"
   height="100%"
   name="xxx"
@@ -40,10 +40,10 @@ app.use(WujieVue);
   :afterMount="afterMount"
   :beforeUnmount="beforeUnmount"
   :afterUnmount="afterUnmount"
-></WujieVue>
+></JieshuVue>
 ```
 
-子应用通过[$wujie.bus.$emit](/api/wujie.html#wujie-bus)`(event, args)`出来的事件都可以直接`@event`来监听
+子应用通过[$jieshu.bus.$emit](/api/jieshu.html#jieshu-bus)`(event, args)`出来的事件都可以直接`@event`来监听
 
 ### bus
 
@@ -75,19 +75,19 @@ app.use(WujieVue);
 
 ```javascript
 // 直接调用，不需要传递任何参数
-await this.$refs.wujie.refresh();
+await this.$refs.jieshu.refresh();
 ```
 
 ## 原理
 
 ```javascript
 import Vue from 'vue';
-import { bus, setupApp, preloadApp, startApp, destroyApp } from 'wujie-core';
+import { bus, setupApp, preloadApp, startApp, destroyApp } from 'jieshu-core';
 import { createApp, h, defineComponent } from 'vue';
 const vue3Flag = !!createApp;
 
-const wujieVueOptions = {
-  name: 'WujieVue',
+const jieshuVueOptions = {
+  name: 'JieshuVue',
   props: {
     width: { type: String, default: '' },
     height: { type: String, default: '' },
@@ -138,7 +138,7 @@ const wujieVueOptions = {
           this.destroy = await startApp({
             name: this.name,
             url: this.url,
-            el: this.$refs.wujie,
+            el: this.$refs.jieshu,
             loading: this.loading,
             alive: this.alive,
             fetch: this.fetch,
@@ -176,20 +176,20 @@ const wujieVueOptions = {
         width: this.height,
         height: this.height,
       },
-      ref: 'wujie',
+      ref: 'jieshu',
     });
   },
 };
 
-const WujieVue = vue3Flag ? defineComponent(wujieVueOptions) : Vue.extend(wujieVueOptions);
+const JieshuVue = vue3Flag ? defineComponent(jieshuVueOptions) : Vue.extend(jieshuVueOptions);
 
-WujieVue.setupApp = setupApp;
-WujieVue.preloadApp = preloadApp;
-WujieVue.bus = bus;
-WujieVue.destroyApp = destroyApp;
-WujieVue.install = function (Vue) {
-  Vue.component('WujieVue', WujieVue);
+JieshuVue.setupApp = setupApp;
+JieshuVue.preloadApp = preloadApp;
+JieshuVue.bus = bus;
+JieshuVue.destroyApp = destroyApp;
+JieshuVue.install = function (Vue) {
+  Vue.component('JieshuVue', JieshuVue);
 };
 
-export default WujieVue;
+export default JieshuVue;
 ```

@@ -1,7 +1,7 @@
 # 生命周期
 
 ::: tip 提示
-无界提供一整套的生命周期钩子供开发者调用
+界枢提供一整套的生命周期钩子供开发者调用
 :::
 
 ::: warning 警告
@@ -18,25 +18,25 @@
 
 - 类型： `type lifecycle = (appWindow: Window) => any;`
 
-子应用渲染（调用`window.__WUJIE_MOUNT`）前触发
+子应用渲染（调用`window.__JIESHU_MOUNT`）前触发
 
 ## afterMount
 
 - 类型： `type lifecycle = (appWindow: Window) => any;`
 
-子应用渲染（调用`window.__WUJIE_MOUNT`）后触发
+子应用渲染（调用`window.__JIESHU_MOUNT`）后触发
 
 ## beforeUnmount
 
 - 类型： `type lifecycle = (appWindow: Window) => any;`
 
-子应用卸载（调用`window.__WUJIE_UNMOUNT`）前触发
+子应用卸载（调用`window.__JIESHU_UNMOUNT`）前触发
 
 ## afterUnmount
 
 - 类型： `type lifecycle = (appWindow: Window) => any;`
 
-子应用卸载（调用`window.__WUJIE_UNMOUNT`）后触发
+子应用卸载（调用`window.__JIESHU_UNMOUNT`）后触发
 
 ## activated
 

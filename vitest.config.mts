@@ -3,28 +3,28 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     projects: [
-      'packages/wujie-core/__test__/unit/vitest.config.mts',
-      'packages/wujie-react/__test__/unit/vitest.config.mts',
-      'packages/wujie-vue3/__test__/unit/vitest.config.mts',
+      'packages/jieshu-core/__test__/unit/vitest.config.mts',
+      'packages/jieshu-react/__test__/unit/vitest.config.mts',
+      'packages/jieshu-vue3/__test__/unit/vitest.config.mts',
     ],
     coverage: {
       provider: 'istanbul',
       reportsDirectory: 'coverage/unit',
       reporter: ['text', 'text-summary'],
       thresholds: {
-        'packages/wujie-react/src/index.tsx': {
+        'packages/jieshu-react/src/index.tsx': {
           statements: 100,
           branches: 100,
           functions: 100,
           lines: 100,
         },
-        'packages/wujie-vue3/src/index.ts': {
+        'packages/jieshu-vue3/src/index.ts': {
           statements: 100,
           branches: 100,
           functions: 100,
           lines: 100,
         },
-        'packages/wujie-vue3/src/WujieVue.vue': {
+        'packages/jieshu-vue3/src/JieshuVue.vue': {
           statements: 100,
           branches: 100,
           functions: 100,

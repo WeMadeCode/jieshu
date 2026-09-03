@@ -1,7 +1,7 @@
 <template>
   <div class="inline-event-demo">
     <h2>内联事件处理器测试</h2>
-    <p>测试 wujie 双沙箱架构中内联事件处理器的作用域绑定功能</p>
+    <p>测试 jieshu 双沙箱架构中内联事件处理器的作用域绑定功能</p>
 
     <div class="test-section">
       <h3>测试场景</h3>
@@ -64,7 +64,7 @@
     <div class="test-section">
       <h3>实现原理</h3>
       <p>编译前：<code>&lt;button onclick="greet()"&gt;</code></p>
-      <p>编译后：<code>&lt;button onclick='with(window.__getWujieWindow__("appId")){ greet() }'&gt;</code></p>
+      <p>编译后：<code>&lt;button onclick='with(window.__getJieshuWindow__("appId")){ greet() }'&gt;</code></p>
     </div>
   </div>
 </template>

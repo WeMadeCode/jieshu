@@ -24,12 +24,10 @@
         </a-tooltip>
         <a-tooltip placement="top">
           <template #title>主应用为hash模式</template>
-          <a href="https://wujie-micro.github.io/demo-main-react/" target="_blank" class="docs button-gap"
-            >react主应用</a
-          >
+          <a :href="mainReactUrl" target="_blank" class="docs button-gap">react主应用</a>
         </a-tooltip>
-        <a href="https://github.com/Tencent/wujie" target="_blank" class="docs button-gap">仓库</a>
-        <a href="https://wujie-micro.github.io/doc/" target="_blank" class="docs button-gap">文档</a>
+        <a href="https://github.com/WeMadeCode/jieshu" target="_blank" class="docs button-gap">仓库</a>
+        <a :href="docsUrl" target="_blank" class="docs button-gap">文档</a>
       </div>
     </div>
     <h1 class="header">
@@ -37,7 +35,7 @@
         :style="{ width: '70px', height: '70px', 'margin-right': '15px' }"
         src="https://vfiles.gtimg.cn/wuji_dashboard/xy/test_wuji_damy/XC5WMbxE.svg"
       />
-      <span class="bland">无界</span>
+      <span class="bland">界枢</span>
     </h1>
     <h2 class="subtitle">—极致的微前端框架</h2>
 
@@ -77,6 +75,8 @@
 </template>
 
 <script>
+import hostMap from '../hostMap';
+
 export default {
   name: 'HomeView',
   data() {
@@ -84,6 +84,8 @@ export default {
       preload: window.localStorage.getItem('preload') !== 'false',
       degrade: window.localStorage.getItem('degrade') === 'true' || !window.Proxy || !window.CustomElementRegistry,
       disable: !window.Proxy || !window.CustomElementRegistry,
+      mainReactUrl: hostMap('//localhost:7700/'),
+      docsUrl: hostMap('//localhost:5173/doc/'),
     };
   },
   watch: {

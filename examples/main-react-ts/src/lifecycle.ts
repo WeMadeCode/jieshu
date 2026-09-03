@@ -1,11 +1,11 @@
-interface WujieRuntimeWindow extends Window {
-  __WUJIE: {
+interface JieshuRuntimeWindow extends Window {
+  __JIESHU: {
     id: string;
   };
 }
 
 function getAppId(appWindow: Window): string {
-  return (appWindow as WujieRuntimeWindow).__WUJIE.id;
+  return (appWindow as JieshuRuntimeWindow).__JIESHU.id;
 }
 
 const lifecycles = {

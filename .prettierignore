@@ -6,6 +6,7 @@ node_modules/
 **/esm/
 **/lib/
 **/dist/
+site/
 docs/.vitepress/cache/
 docs/public/
 examples/vue2/public/tinymce/

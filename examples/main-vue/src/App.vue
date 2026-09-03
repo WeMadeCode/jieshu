@@ -183,7 +183,7 @@ body {
   }
 }
 
-.wujie_iframe {
+.jieshu_iframe {
   width: 100%;
   height: 100%;
 }

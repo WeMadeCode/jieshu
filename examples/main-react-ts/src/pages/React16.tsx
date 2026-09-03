@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import hostMap from '../hostMap';
-import WujieReact from '../wujieReact';
+import JieshuReact from '../jieshuReact';
 
 export default function React16() {
   const location = useLocation();
@@ -14,5 +14,5 @@ export default function React16() {
     },
   };
 
-  return <WujieReact width="100%" height="100%" name="react16" url={react16Url} sync={!path} props={props} />;
+  return <JieshuReact width="100%" height="100%" name="react16" url={react16Url} sync={!path} props={props} />;
 }

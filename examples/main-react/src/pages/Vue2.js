@@ -1,6 +1,6 @@
 import React from 'react';
 import hostMap from '../hostMap';
-import WujieReact from 'wujie-react';
+import JieshuReact from 'jieshu-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Vue2() {
@@ -14,7 +14,7 @@ export default function Vue2() {
     },
   };
   return (
-    // 单例模式，name相同则复用一个无界实例，改变url则子应用重新渲染实例到对应路由
-    <WujieReact width="100%" height="100%" name="vue2" url={vue2Url} sync={!path} props={props}></WujieReact>
+    // 单例模式，name相同则复用一个界枢实例，改变url则子应用重新渲染实例到对应路由
+    <JieshuReact width="100%" height="100%" name="vue2" url={vue2Url} sync={!path} props={props}></JieshuReact>
   );
 }

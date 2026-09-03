@@ -1,5 +1,5 @@
 import { HashRouter as Router, Route, Routes, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import WujieReact from 'wujie-react';
+import JieshuReact from 'jieshu-react';
 import React, { useState } from 'react';
 import Home from './pages/Home';
 import React16 from './pages/React16';
@@ -12,7 +12,7 @@ import All from './pages/All';
 import Button from 'antd/es/button';
 import { UnorderedListOutlined, CaretUpOutlined } from '@ant-design/icons';
 
-const { bus } = WujieReact;
+const { bus } = JieshuReact;
 
 const subMap = {
   react16: ['home', 'dialog', 'location', 'communication', 'nest', 'font'],

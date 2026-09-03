@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import hostMap from '../hostMap';
-import WujieReact from '../wujieReact';
+import JieshuReact from '../jieshuReact';
 
 export default function Angular12() {
   const navigate = useNavigate();
@@ -12,6 +12,6 @@ export default function Angular12() {
   };
 
   return (
-    <WujieReact width="100%" height="100%" name="angular12" url={hostMap('//localhost:7400/')} sync props={props} />
+    <JieshuReact width="100%" height="100%" name="angular12" url={hostMap('//localhost:7400/')} sync props={props} />
   );
 }

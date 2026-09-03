@@ -10,11 +10,11 @@ collapsable: false
 ### 引入
 
 ```javascript
-import { bus, setupApp, preloadApp, startApp, destroyApp, refreshApp, clearAssetsCache } from 'wujie-core';
+import { bus, setupApp, preloadApp, startApp, destroyApp, refreshApp, clearAssetsCache } from 'jieshu-core';
 ```
 
 ::: tip 提示
-如果主应用是`vue`框架可直接使用 [wujie-vue](/pack/)，`react`框架可直接使用 [wujie-react](/pack/react.html)
+如果主应用是`vue`框架可直接使用 [jieshu-vue3](/pack/)，`react`框架可直接使用 [jieshu-react](/pack/react.html)
 :::
 
 ### 设置子应用
@@ -39,7 +39,7 @@ startApp({ name: '唯一id' });
 
 ## 子应用改造
 
-无界对子应用的侵入非常小，在满足跨域条件下子应用可以不用改造。
+界枢对子应用的侵入非常小，在满足跨域条件下子应用可以不用改造。
 
 ### 前提
 
@@ -67,7 +67,7 @@ app.use((req, res, next) => {
 
 ### 运行模式
 
-无界有三种运行模式：[单例模式](/guide/mode.html#单例模式)、[保活模式](/guide/mode.html#保活模式)、[重建模式](/guide/mode.html#重建模式)
+界枢有三种运行模式：[单例模式](/guide/mode.html#单例模式)、[保活模式](/guide/mode.html#保活模式)、[重建模式](/guide/mode.html#重建模式)
 
 其中[保活模式](/guide/mode.html#保活模式)、[重建模式](/guide/mode.html#重建模式)子应用无需做任何改造工作，[单例模式](/guide/mode.html#单例模式)需要做生命周期改造
 
@@ -75,22 +75,22 @@ app.use((req, res, next) => {
 
 改造入口函数：
 
-- 将子应用路由的创建、实例的创建渲染挂载到`window.__WUJIE_MOUNT`函数上
-- 将实例的销毁挂载到`window.__WUJIE_UNMOUNT`上
-- 如果子应用的实例化是在异步函数中进行的，在定义完生命周期函数后，请务必主动调用无界的渲染函数 `window.__WUJIE.mount()`（见 vite 示例）
+- 将子应用路由的创建、实例的创建渲染挂载到`window.__JIESHU_MOUNT`函数上
+- 将实例的销毁挂载到`window.__JIESHU_UNMOUNT`上
+- 如果子应用的实例化是在异步函数中进行的，在定义完生命周期函数后，请务必主动调用界枢的渲染函数 `window.__JIESHU.mount()`（见 vite 示例）
 
 具体操作可以参考下面示例
 
 ::: details vue2
 
 ```javascript
-if (window.__POWERED_BY_WUJIE__) {
+if (window.__POWERED_BY_JIESHU__) {
   let instance;
-  window.__WUJIE_MOUNT = () => {
+  window.__JIESHU_MOUNT = () => {
     const router = new VueRouter({ routes });
     instance = new Vue({ router, render: (h) => h(App) }).$mount('#app');
   };
-  window.__WUJIE_UNMOUNT = () => {
+  window.__JIESHU_UNMOUNT = () => {
     instance.$destroy();
   };
 } else {
@@ -102,15 +102,15 @@ if (window.__POWERED_BY_WUJIE__) {
 ::: details vue3
 
 ```javascript
-if (window.__POWERED_BY_WUJIE__) {
+if (window.__POWERED_BY_JIESHU__) {
   let instance;
-  window.__WUJIE_MOUNT = () => {
+  window.__JIESHU_MOUNT = () => {
     const router = createRouter({ history: createWebHistory(), routes });
     instance = createApp(App);
     instance.use(router);
     instance.mount('#app');
   };
-  window.__WUJIE_UNMOUNT = () => {
+  window.__JIESHU_UNMOUNT = () => {
     instance.unmount();
   };
 } else {
@@ -126,35 +126,35 @@ if (window.__POWERED_BY_WUJIE__) {
 ```javascript
 declare global {
   interface Window {
-    // 是否存在无界
-    __POWERED_BY_WUJIE__?: boolean;
+    // 是否存在界枢
+    __POWERED_BY_JIESHU__?: boolean;
     // 子应用mount函数
-    __WUJIE_MOUNT: () => void;
+    __JIESHU_MOUNT: () => void;
     // 子应用unmount函数
-    __WUJIE_UNMOUNT: () => void | Promise<void>;
-    // 子应用无界实例
-    __WUJIE: { mount: () => void };
+    __JIESHU_UNMOUNT: () => void | Promise<void>;
+    // 子应用界枢实例
+    __JIESHU: { mount: () => void };
   }
 }
 
-if (window.__POWERED_BY_WUJIE__) {
+if (window.__POWERED_BY_JIESHU__) {
   let instance: any;
-  window.__WUJIE_MOUNT = () => {
+  window.__JIESHU_MOUNT = () => {
     const router = createRouter({ history: createWebHistory(), routes });
     instance = createApp(App)
     instance.use(router);
     instance.mount("#app");
   };
-  window.__WUJIE_UNMOUNT = () => {
+  window.__JIESHU_UNMOUNT = () => {
     instance.unmount();
   };
   /*
-    由于vite是异步加载，而无界可能采用fiber执行机制
+    由于vite是异步加载，而界枢可能采用fiber执行机制
     所以mount的调用时机无法确认，框架调用时可能vite
     还没有加载回来，这里采用主动调用防止用没有mount
-    无界mount函数内置标记，不用担心重复mount
+    界枢mount函数内置标记，不用担心重复mount
   */
-  window.__WUJIE.mount()
+  window.__JIESHU.mount()
 } else {
   createApp(App).use(createRouter({ history: createWebHistory(), routes })).mount("#app");
 }
@@ -165,8 +165,8 @@ if (window.__POWERED_BY_WUJIE__) {
 ::: details react
 
 ```javascript
-if (window.__POWERED_BY_WUJIE__) {
-  window.__WUJIE_MOUNT = () => {
+if (window.__POWERED_BY_JIESHU__) {
+  window.__JIESHU_MOUNT = () => {
     ReactDOM.render(
       <React.StrictMode>
         <App />
@@ -174,7 +174,7 @@ if (window.__POWERED_BY_WUJIE__) {
       document.getElementById('root'),
     );
   };
-  window.__WUJIE_UNMOUNT = () => {
+  window.__JIESHU_UNMOUNT = () => {
     ReactDOM.unmountComponentAtNode(document.getElementById('root'));
   };
 } else {
@@ -193,21 +193,21 @@ if (window.__POWERED_BY_WUJIE__) {
 ```typescript
 declare global {
   interface Window {
-    // 是否存在无界
-    __POWERED_BY_WUJIE__?: boolean;
+    // 是否存在界枢
+    __POWERED_BY_JIESHU__?: boolean;
     // 子应用mount函数
-    __WUJIE_MOUNT: () => void;
+    __JIESHU_MOUNT: () => void;
     // 子应用unmount函数
-    __WUJIE_UNMOUNT: () => void | Promise<void>;
+    __JIESHU_UNMOUNT: () => void | Promise<void>;
   }
 }
 
-if (window.__POWERED_BY_WUJIE__) {
+if (window.__POWERED_BY_JIESHU__) {
   let instance: any;
-  window.__WUJIE_MOUNT = async () => {
+  window.__JIESHU_MOUNT = async () => {
     instance = await platformBrowserDynamic().bootstrapModule(AppModule);
   };
-  window.__WUJIE_UNMOUNT = () => {
+  window.__JIESHU_UNMOUNT = () => {
     instance.destroy?.();
   };
 } else {

@@ -11,9 +11,9 @@ import React17 from './pages/React17';
 import Vite from './pages/Vite';
 import Vue2 from './pages/Vue2';
 import Vue3 from './pages/Vue3';
-import WujieReact from './wujieReact';
+import JieshuReact from './jieshuReact';
 
-const { bus } = WujieReact;
+const { bus } = JieshuReact;
 
 const subRoutes = {
   react16: ['home', 'dialog', 'location', 'communication', 'nest', 'font'],

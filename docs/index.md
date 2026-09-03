@@ -1,17 +1,17 @@
 ---
 layout: home
 
-title: 无界
+title: 界枢
 titleTemplate: 极致的微前端框架
 
 hero:
-  name: 无界
+  name: 界枢
   text: 极致的微前端框架
   tagline: 基于 WebComponent 容器 + iframe 沙箱
   image:
-    src: /wujie.png
-    alt: Wu Jie
-  Introduction: 无界微前端方案基于 WebComponent 容器 + iframe
+    src: /jieshu.png
+    alt: Jieshu
+  Introduction: 界枢微前端方案基于 WebComponent 容器 + iframe
     沙箱 | 能够完善的解决适配成本、样式隔离、运行性能、页面白屏、子应用通信、子应用保活、多应用激活、vite
     框架支持、应用共享等
   actions:
@@ -19,10 +19,11 @@ hero:
       text: 快速开始
       link: /guide/start.html
     - theme: alt
-      text: npx skills add wujie-micro/wujie-skill
+      text: 查看示例
+      link: https://github.com/WeMadeCode/jieshu/tree/master/examples
     - theme: brand
       text: 在线体验
-      link: /wujie/
+      link: /jieshu/
 
 features:
   - icon: 🚀

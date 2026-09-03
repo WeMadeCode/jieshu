@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     handleOpen() {
-      window.open('https://github.com/Tencent/wujie/tree/master/examples/vite');
+      window.open('https://github.com/WeMadeCode/jieshu/tree/master/examples/vite');
     },
   },
 };

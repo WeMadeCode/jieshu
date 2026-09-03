@@ -9,8 +9,8 @@ import './styles.css';
 
 const basename = process.env.NODE_ENV === 'production' ? '/demo-react16/' : '';
 
-if (window.__POWERED_BY_WUJIE__) {
-  window.__WUJIE_MOUNT = () => {
+if (window.__POWERED_BY_JIESHU__) {
+  window.__JIESHU_MOUNT = () => {
     ReactDOM.render(
       <BrowserRouter basename={basename}>
         <App />
@@ -18,7 +18,7 @@ if (window.__POWERED_BY_WUJIE__) {
       document.getElementById('root'),
     );
   };
-  window.__WUJIE_UNMOUNT = () => {
+  window.__JIESHU_UNMOUNT = () => {
     ReactDOM.unmountComponentAtNode(document.getElementById('root'));
     window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = null;
   };

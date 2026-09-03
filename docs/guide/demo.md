@@ -2,27 +2,28 @@
 sidebarDepth: 2
 ---
 
-# 定制化 WujieDemo
+# 定制化 Jieshu Demo
 
 ## 快速开始
 
 :::tip
-wujie 可以通过脚手架来定制需要的主子应用框架的 Demo，以及其他特性
+jieshu 仓库内置多套主、子应用示例，可按需选择框架和路由模式进行调试。
 :::
 
-### 安装 wujie-skill
+### 获取示例
 
-```js
-npx skills add wujie-micro/wujie-skill
+```bash
+git clone https://github.com/WeMadeCode/jieshu.git
+cd jieshu
+pnpm install
+pnpm start
 ```
 
 ### 支持包管理器
 
-WujieDemo 采用 TurboRepo 进行管理 支持多种包管理器
+本仓库采用 pnpm workspace + Lerna 管理，请使用 pnpm：
 
-- npm
 - pnpm
-- yarn
 
 ### 支持路由定制
 

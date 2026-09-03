@@ -17,21 +17,21 @@ collapsable: false
 
   - 子应用`shadowRoot`、`iframe`、`instance`都保留
 
-  - 当组件重新渲染，无界则将`shadowRoot`重新插入组件容器即可，相当于一个`shadowRoot`的插拔动作
+  - 当组件重新渲染，界枢则将`shadowRoot`重新插入组件容器即可，相当于一个`shadowRoot`的插拔动作
 
 - 当子应用采用**非保活模式**时主应用切换路由，组件被销毁
 
-  - 子应用会调用`window.__WUJIE_UNMOUNT`销毁`instance`并清空`shadowRoot`内部所有元素，但是`shadowRoot`、`iframe`都保留
+  - 子应用会调用`window.__JIESHU_UNMOUNT`销毁`instance`并清空`shadowRoot`内部所有元素，但是`shadowRoot`、`iframe`都保留
 
   - 当子应用重新渲染
 
-    - 无界将调用`window.__WUJIE_MOUNT`创建新`instance`
-    - 无界将子应用的`html`重新填充到`shadowRoot`内
+    - 界枢将调用`window.__JIESHU_MOUNT`创建新`instance`
+    - 界枢将子应用的`html`重新填充到`shadowRoot`内
     - 新`instance`会`mount`到`shadowRoot`上。
 
-  - 如果用户没有定义`window.__WUJIE_UNMOUNT`和`window.__WUJIE_MOUNT`，那么每次组件重新渲染，都会将`wujie`实例包括`shadowRoot`、`iframe`全部销毁，然后重新创建`wujie`实例，这样会有白屏时间
+  - 如果用户没有定义`window.__JIESHU_UNMOUNT`和`window.__JIESHU_MOUNT`，那么每次组件重新渲染，都会将`jieshu`实例包括`shadowRoot`、`iframe`全部销毁，然后重新创建`jieshu`实例，这样会有白屏时间
 
-思考：为什么要定义`window.__WUJIE_UNMOUNT`和`window.__WUJIE_MOUNT`这两个生命周期?
+思考：为什么要定义`window.__JIESHU_UNMOUNT`和`window.__JIESHU_MOUNT`这两个生命周期?
 
 ## 内部接口
 
@@ -39,20 +39,20 @@ collapsable: false
 
 ```typescript
 interface Window {
-  // 是否存在无界
-  __POWERED_BY_WUJIE__?: boolean;
+  // 是否存在界枢
+  __POWERED_BY_JIESHU__?: boolean;
   // 子应用公共加载路径
-  __WUJIE_PUBLIC_PATH__: string;
+  __JIESHU_PUBLIC_PATH__: string;
   // 子应用沙盒实例
-  __WUJIE: WuJie;
+  __JIESHU: Jieshu;
   // 子应用mount函数
-  __WUJIE_MOUNT: () => void;
+  __JIESHU_MOUNT: () => void;
   // 子应用unmount函数
-  __WUJIE_UNMOUNT: () => void | Promise<void>;
+  __JIESHU_UNMOUNT: () => void | Promise<void>;
 }
 ```
 
-### 无界沙箱 sandbox
+### 界枢沙箱 sandbox
 
 ```typescript
 /**
@@ -60,7 +60,7 @@ interface Window {
  * @author damyxu
  * @since 2021-07-14
  */
-export default class Wujie {
+export default class Jieshu {
   id: string;
   /** 激活时路由地址 */
   url: string;
@@ -104,7 +104,7 @@ export default class Wujie {
   fiber: boolean;
   /** 子应用styleSheet元素 */
   styleSheetElements: Array<HTMLLinkElement | HTMLStyleElement>;
-  /** $wujie对象，提供给子应用的接口 */
+  /** $jieshu对象，提供给子应用的接口 */
   provide: {
     bus: EventBus;
     shadowRoot?: ShadowRoot;
@@ -181,7 +181,7 @@ export default class Wujie {
  */
 // TODO: 更加准确抓取停止时机
 function stopIframeLoading(iframeWindow: Window) {
-  iframeWindow.__WUJIE.iframeReady = new Promise<void>((resolve) => {
+  iframeWindow.__JIESHU.iframeReady = new Promise<void>((resolve) => {
     function loop() {
       setTimeout(() => {
         // location ready
@@ -203,16 +203,16 @@ function stopIframeLoading(iframeWindow: Window) {
 
 子应用的代码 `code` 在 `iframe` 内部访问 `window`、`location` 都被劫持到相应的 `proxy`，注意这个闭包只是为了修改`location`而`window`和`document`对象和原型已经被直接修改
 
-当采用`script`的`type`为`module`时会去除这个闭包，需要访问`$wujie.location`来获取修改后的`location`
+当采用`script`的`type`为`module`时会去除这个闭包，需要访问`$jieshu.location`来获取修改后的`location`
 
 ```typescript
 const script = `(function(window, self, global, location) {
     ${code}\n
-  }).bind(window.__WUJIE.proxy)(
-    window.__WUJIE.proxy,
-    window.__WUJIE.proxy,
-    window.__WUJIE.proxy,
-    window.__WUJIE.proxy.location,
+  }).bind(window.__JIESHU.proxy)(
+    window.__JIESHU.proxy,
+    window.__JIESHU.proxy,
+    window.__JIESHU.proxy,
+    window.__JIESHU.proxy.location,
   );`;
 ```
 
@@ -289,7 +289,7 @@ new Proxy(
   {
     get: function (_fakeDocument, propKey) {
       const document = window.document;
-      const shadowRoot = iframe.contentWindow.__WUJIE.shadowRoot;
+      const shadowRoot = iframe.contentWindow.__JIESHU.shadowRoot;
       // need fix
       if (propKey === 'createElement' || propKey === 'createTextNode') {
         return new Proxy(document[propKey], {
@@ -301,7 +301,7 @@ new Proxy(
         });
       }
       if (propKey === 'documentURI' || propKey === 'URL') {
-        return (iframe.contentWindow.__WUJIE.proxyLocation as Location).href;
+        return (iframe.contentWindow.__JIESHU.proxyLocation as Location).href;
       }
 
       // from shadowRoot
@@ -376,14 +376,14 @@ new Proxy(
     set: function (location, propKey, value, receiver) {
       // 如果是跳转链接的话重开一个iframe
       if (propKey === 'href') {
-        const { shadowRoot, id } = target.__WUJIE;
+        const { shadowRoot, id } = target.__JIESHU;
         let url = value;
         if (!/^http/.test(url)) {
           let hrefElement = anchorElementGenerator(url);
           url = appPublicPath + hrefElement.pathname + hrefElement.search + hrefElement.hash;
           hrefElement = null;
         }
-        target.__WUJIE.hrefFlag = true;
+        target.__JIESHU.hrefFlag = true;
         renderIframeReplaceShadowRoot(url, shadowRoot);
         pushUrlToWindow(id, url);
         return true;

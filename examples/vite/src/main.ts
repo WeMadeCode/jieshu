@@ -26,14 +26,14 @@ import './index.css';
 const basename = process.env.NODE_ENV === 'production' ? '/demo-vite/' : '';
 declare global {
   interface Window {
-    // 是否存在无界
-    __POWERED_BY_WUJIE__?: boolean;
+    // 是否存在界枢
+    __POWERED_BY_JIESHU__?: boolean;
     // 子应用mount函数
-    __WUJIE_MOUNT: () => void;
+    __JIESHU_MOUNT: () => void;
     // 子应用unmount函数
-    __WUJIE_UNMOUNT: () => void | Promise<void>;
-    // 子应用无界实例
-    __WUJIE: { mount: () => void };
+    __JIESHU_UNMOUNT: () => void | Promise<void>;
+    // 子应用界枢实例
+    __JIESHU: { mount: () => void };
     // vue devtools plugins
     __VUE_DEVTOOLS_PLUGINS__: any[];
     // vue instance setters
@@ -41,10 +41,10 @@ declare global {
   }
 }
 
-if (window.__POWERED_BY_WUJIE__) {
+if (window.__POWERED_BY_JIESHU__) {
   let instance: any;
   let router: any;
-  window.__WUJIE_MOUNT = () => {
+  window.__JIESHU_MOUNT = () => {
     router = createRouter({ history: createWebHistory(basename), routes });
     instance = createApp(App)
       .use(Tag)
@@ -59,7 +59,7 @@ if (window.__POWERED_BY_WUJIE__) {
       .use(router);
     instance.mount('#app');
   };
-  window.__WUJIE_UNMOUNT = () => {
+  window.__JIESHU_UNMOUNT = () => {
     instance?.unmount();
     router?.options?.history?.destroy?.();
     window.__VUE_DEVTOOLS_PLUGINS__ = [];
@@ -68,7 +68,7 @@ if (window.__POWERED_BY_WUJIE__) {
     router = null;
   };
   // module脚本异步加载，应用主动调用生命周期
-  window.__WUJIE.mount();
+  window.__JIESHU.mount();
 } else {
   createApp(App)
     .use(Tag)

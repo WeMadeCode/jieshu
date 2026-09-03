@@ -7,9 +7,9 @@ import credentialsFetch from './fetch';
 import hostMap from './hostMap';
 import lifecycles from './lifecycle';
 import plugins from './plugin';
-import WujieReact from './wujieReact';
+import JieshuReact from './jieshuReact';
 
-const { setupApp, preloadApp, bus } = WujieReact;
+const { setupApp, preloadApp, bus } = JieshuReact;
 const degrade =
   window.localStorage.getItem('degrade') === 'true' ||
   typeof Proxy === 'undefined' ||

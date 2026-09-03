@@ -11,31 +11,31 @@
 历史 changelog 由 Lerna 独立包模式生成，同一次提交会被写入根目录、核心包、适配包、文档和多个 example。当前工作区正在移除 Lerna，但这不会改变旧记录的重复来源。直接拼接会产生大量重复，所以这里采用“根时间轴 + 包独有记录”的方式归并：
 
 - 根 CHANGELOG.md 作为 workspace 发布主时间轴。
-- packages/wujie-core/CHANGELOG.md 用于核心运行时问题。
-- packages/wujie-react 和 packages/wujie-vue3 只提取适配器独有变化。
+- 核心包的 CHANGELOG.md 用于核心运行时问题。
+- React 与 Vue 3 适配包的 CHANGELOG.md 只提取适配器独有变化。
 - docs 和 examples 只提取文档、demo 或集成验证特有变化。
 - 原始 changelog 已在完成归并和问题审计后删除；本文档是后续查阅历史版本的统一入口。
 
 ## 2. 文件清单
 
-删除前，项目自有 changelog 共 13 份；另有 1 份 TinyMCE 上游 changelog。下表记录其原路径和归并前状态。
+删除前，项目自有 changelog 共 13 份；另有 1 份 TinyMCE 上游 changelog。为避免把升级后的包名伪装成历史路径，下表只记录来源范围和归并前状态。
 
-| 文件                                      | 行数 | 最新记录         | 当前 package 版本    | 定位                                  |
-| ----------------------------------------- | ---: | ---------------- | -------------------- | ------------------------------------- |
-| CHANGELOG.md                              |  491 | 2.1.0            | workspace 0.0.0      | workspace 总记录                      |
-| packages/wujie-core/CHANGELOG.md          |  451 | 2.1.0            | 2.1.0                | 核心运行时                            |
-| packages/wujie-react/CHANGELOG.md         |  264 | 2.1.0            | 2.1.0                | React 适配器                          |
-| packages/wujie-vue3/CHANGELOG.md          |  258 | 2.1.0            | 2.1.0                | Vue 3 适配器                          |
-| docs/CHANGELOG.md                         |  215 | 2.1.0            | 2.1.0                | 文档站                                |
-| examples/main-react/CHANGELOG.md          |  243 | 2.1.0            | 2.1.0                | React 主应用 demo                     |
-| examples/main-vue/CHANGELOG.md            |  250 | 2.1.0            | 2.1.0                | Vue 主应用 demo                       |
-| examples/react16/CHANGELOG.md             |  224 | 2.1.0            | 2.1.0                | React 16 子应用 demo                  |
-| examples/react17/CHANGELOG.md             |   46 | 1.0.26           | 2.0.0                | 记录滞后                              |
-| examples/vite/CHANGELOG.md                |   40 | 1.0.23           | 2.0.0                | 记录滞后                              |
-| examples/vue2/CHANGELOG.md                |   48 | 2.0.1            | 2.0.1                | Vue 2 子应用 demo                     |
-| examples/vue3/CHANGELOG.md                |   40 | 2.1.0            | 2.1.0                | Vue 3 子应用 demo                     |
-| examples/angular12/CHANGELOG.md           |   22 | 1.0.23           | 2.0.0                | 记录滞后                              |
-| examples/vue2/public/tinymce/CHANGELOG.md | 3453 | TinyMCE 上游版本 | 非 workspace package | 第三方静态资源，不并入 Wujie 发布历史 |
+| 来源范围                                  | 行数 | 最新记录         | 当时的 package 版本  | 定位                                   |
+| ----------------------------------------- | ---: | ---------------- | -------------------- | -------------------------------------- |
+| 根 CHANGELOG.md                           |  491 | 2.1.0            | workspace 0.0.0      | workspace 总记录                       |
+| 核心包 CHANGELOG.md                       |  451 | 2.1.0            | 2.1.0                | 核心运行时                             |
+| React 适配包 CHANGELOG.md                 |  264 | 2.1.0            | 2.1.0                | React 适配器                           |
+| Vue 3 适配包 CHANGELOG.md                 |  258 | 2.1.0            | 2.1.0                | Vue 3 适配器                           |
+| docs/CHANGELOG.md                         |  215 | 2.1.0            | 2.1.0                | 文档站                                 |
+| examples/main-react/CHANGELOG.md          |  243 | 2.1.0            | 2.1.0                | React 主应用 demo                      |
+| examples/main-vue/CHANGELOG.md            |  250 | 2.1.0            | 2.1.0                | Vue 主应用 demo                        |
+| examples/react16/CHANGELOG.md             |  224 | 2.1.0            | 2.1.0                | React 16 子应用 demo                   |
+| examples/react17/CHANGELOG.md             |   46 | 1.0.26           | 2.0.0                | 记录滞后                               |
+| examples/vite/CHANGELOG.md                |   40 | 1.0.23           | 2.0.0                | 记录滞后                               |
+| examples/vue2/CHANGELOG.md                |   48 | 2.0.1            | 2.0.1                | Vue 2 子应用 demo                      |
+| examples/vue3/CHANGELOG.md                |   40 | 2.1.0            | 2.1.0                | Vue 3 子应用 demo                      |
+| examples/angular12/CHANGELOG.md           |   22 | 1.0.23           | 2.0.0                | 记录滞后                               |
+| examples/vue2/public/tinymce/CHANGELOG.md | 3453 | TinyMCE 上游版本 | 非 workspace package | 第三方静态资源，不并入 Jieshu 发布历史 |
 
 根 changelog 包含 57 个版本段、116 条 Bug Fixes、36 条 Features。全部项目自有 changelog 合计引用 169 个去重后的 GitHub issue；其中 #34、#62 和 #42 只出现在适配包 changelog。
 
@@ -51,7 +51,7 @@
 ### 2.0.x：沙箱重构与内存治理
 
 - 重写 iframe 沙箱，使用空白同源 iframe 作为 JavaScript realm。
-- 补齐 destroy 引用断链、$wujie 清理、适配器队列清理。
+- 补齐 destroy 引用断链、$jieshu 清理、适配器队列清理。
 - 修复降级 iframe 的 base URL、富文本跨 realm 与动态皮肤 CSS。
 - 处理 Popper 坐标偏移；老 Element UI 的特定 absolute 组合仍有边界，见 [popper-offset-resolved.md](./popper-offset-resolved.md)。
 
@@ -59,7 +59,7 @@
 
 - 动态 style 链式 patch、URL 解码、import map、iframe ready deadline。
 - 快速切换与异步 unmount 并发安全。
-- 嵌套路由 query、重复引入 Wujie 的注入上下文。
+- 嵌套路由 query、重复引入 Jieshu 的注入上下文。
 - error/unhandledrejection、HTML 根属性、CSS URL、adopted stylesheets 和动态脚本移除。
 
 ### 1.0.9–1.0.22：代理、事件与执行顺序
@@ -86,9 +86,9 @@
 
 | 范围                  | 去重后的独有信息                                                                      |
 | --------------------- | ------------------------------------------------------------------------------------- |
-| wujie-react           | #34 props 声明、#62 React 类型、props 变化重启、重复渲染保活、容器 style、refresh API |
-| wujie-vue3            | #42 width 处理、Vue 注册类型、容器 style、refresh API                                 |
-| docs                  | 搜索、实时体验页、create-wujie/自定义 demo 文档；少量 core 提交被误分到 docs          |
+| React 适配包          | #34 props 声明、#62 React 类型、props 变化重启、重复渲染保活、容器 style、refresh API |
+| Vue 3 适配包          | #42 width 处理、Vue 注册类型、容器 style、refresh API                                 |
+| docs                  | 搜索、实时体验页、脚手架/自定义 demo 文档；少量 core 提交被误分到 docs                |
 | main-react / main-vue | 通信、路由、富文本、主应用运行错误的演示与修复                                        |
 | 子应用 examples       | 配合 core 验证字体、CSS 变量、生命周期、message 和富文本                              |
 

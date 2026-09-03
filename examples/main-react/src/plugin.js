@@ -7,7 +7,7 @@ const plugins = [
     jsBeforeLoaders: [
       {
         callback(appWindow) {
-          console.log('js-before-loader-callback', appWindow.__WUJIE.id);
+          console.log('js-before-loader-callback', appWindow.__JIESHU.id);
         },
       },
     ],
@@ -18,7 +18,7 @@ const plugins = [
     jsAfterLoaders: [
       {
         callback(appWindow) {
-          console.log('js-after-loader-callback', appWindow.__WUJIE.id);
+          console.log('js-after-loader-callback', appWindow.__JIESHU.id);
         },
       },
     ],

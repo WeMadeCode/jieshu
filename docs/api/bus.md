@@ -95,5 +95,5 @@ export declare class EventBus {
 ::: warning 警告
 
 - 子应用在被销毁或者重新渲染（非保活状态）时框架会自动调用清空上次渲染所有的订阅事件
-- 子应用内部组件的渲染可能导致反复订阅（比如在`mounted`生命周期调用`$wujie.bus.$on`），需要用户在`unmount`生命周期内手动调用`$wujie.bus.$off`来取消订阅
+- 子应用内部组件的渲染可能导致反复订阅（比如在`mounted`生命周期调用`$jieshu.bus.$on`），需要用户在`unmount`生命周期内手动调用`$jieshu.bus.$off`来取消订阅
   :::

@@ -1,26 +1,26 @@
 <p align="center">
-  <a href="https://wujie-micro.github.io/doc/" target="_blank">
+  <a href="./docs/">
     <img src="https://vfiles.gtimg.cn/wuji_dashboard/xy/test_wuji_damy/phFSuhUC.png" width="100" height="100" alt="logo">
   </a>
 </p>
 
-# wujie（无界）
+# jieshu（界枢）
 
-无界微前端是一款基于 Web Components + iframe 微前端框架，具备成本低、速度快、原生隔离、功能强等一系列优点。
+界枢微前端是一款基于 Web Components + iframe 微前端框架，具备成本低、速度快、原生隔离、功能强等一系列优点。
 
 ## 文档
 
 动机：[动机](https://zhuanlan.zhihu.com/p/551206945)
 
-文档详见：[文档](https://wujie-micro.github.io/doc/)
+文档详见：[文档](./docs/)
 
-演示详见：[demo](https://wujie-micro.github.io/demo-main-vue/home)
+演示详见：[examples](./examples/)
 
 ## 背景
 
 微前端已经是一个非常成熟的领域了，但开发者不管采用哪个现有方案，在适配成本、样式隔离、运行性能、页面白屏、子应用通信、子应用保活、多应用激活、vite 框架支持、应用共享等用户核心诉求都或存在问题、或无法提供支持。
 
-Web Components 是一个浏览器原生支持的组件封装技术，可以有效隔离元素之间的样式，iframe 可以给子应用提供一个原生隔离的运行环境，相比自行构造的沙箱 iframe 提供了独立的 window、document、history、location，可以更好的和外部解耦。无界微前端采用 webcomponent + iframe 的沙箱模式，在实现原生隔离的前提下比较完善的解决了上述问题。
+Web Components 是一个浏览器原生支持的组件封装技术，可以有效隔离元素之间的样式，iframe 可以给子应用提供一个原生隔离的运行环境，相比自行构造的沙箱 iframe 提供了独立的 window、document、history、location，可以更好的和外部解耦。界枢微前端采用 webcomponent + iframe 的沙箱模式，在实现原生隔离的前提下比较完善的解决了上述问题。
 
 ## 特性
 
@@ -50,13 +50,13 @@ Web Components 是一个浏览器原生支持的组件封装技术，可以有�
 - 安装
 
 ```bash
-npm install wujie-core -S
+npm install jieshu-core -S
 ```
 
 - 使用
 
 ```javascript
-import { startApp } from 'wujie-core';
+import { startApp } from 'jieshu-core';
 
 startApp({ name: '唯一id', url: '子应用路径', el: '容器', sync: true });
 ```
@@ -66,22 +66,22 @@ startApp({ name: '唯一id', url: '子应用路径', el: '容器', sync: true })
 - 安装
 
 ```bash
-npm i wujie-vue3 -S
+npm i jieshu-vue3 -S
 
 ```
 
 - 引入
 
 ```javascript
-import WujieVue from 'wujie-vue3';
-app.use(WujieVue);
+import JieshuVue from 'jieshu-vue3';
+app.use(JieshuVue);
 ```
 
 - 使用
 
 ```js
 
-<WujieVue
+<JieshuVue
   width="100%"
   height="100%"
   name="xxx"
@@ -94,7 +94,7 @@ app.use(WujieVue);
   :afterMount="afterMount"
   :beforeUnmount="beforeUnmount"
   :afterUnmount="afterUnmount"
-></WujieVue>
+></JieshuVue>
 
 ```
 
@@ -103,20 +103,20 @@ app.use(WujieVue);
 - 安装
 
 ```bash
-npm i wujie-react -S
+npm i jieshu-react -S
 
 ```
 
 - 引入
 
 ```javascript
-import WujieReact from 'wujie-react';
+import JieshuReact from 'jieshu-react';
 ```
 
 - 使用
 
 ```html
-<WujieReact
+<JieshuReact
   width="100%"
   height="100%"
   name="xxx"
@@ -129,16 +129,16 @@ import WujieReact from 'wujie-react';
   afterMount="{afterMount}"
   beforeUnmount="{beforeUnmount}"
   afterUnmount="{afterUnmount}"
-></WujieReact>
+></JieshuReact>
 ```
 
 ## 常见问题
 
-[详见文档](https://wujie-micro.github.io/doc/question/#_1%E3%80%81%E8%AF%B7%E6%B1%82%E8%B5%84%E6%BA%90%E6%8A%A5%E9%94%99)
+[详见文档](./docs/question/)
 
 ## 本地开发
 
-运行以下脚本，可以本地开发无界微前端框架，支持实时编译调试开发。
+运行以下脚本，可以本地开发界枢微前端框架，支持实时编译调试开发。
 
 ```bash
 nvm use 24               # 使用 Node.js 24
@@ -158,4 +158,4 @@ pnpm run build:packages
 
 ## One more thing
 
-无界微前端解决方案来源于团队的[**无极低代码平台**](https://wujicode.cn)。无极是专注于高效实现企业 B 端应用、专业的一站式低代码解决方案，是腾讯内部应用最广泛的低代码平台，360 度覆盖全企业应用场景。通过无界微前端，存量页面和低代码页面可以丝滑的互相内嵌，闭环新老系统的连接。欢迎体验[【腾讯无极低代码】](https://wujicode.cn)，感受智能而高效的研发模式！
+界枢微前端解决方案来源于团队的[**无极低代码平台**](https://wujicode.cn)。无极是专注于高效实现企业 B 端应用、专业的一站式低代码解决方案，是腾讯内部应用最广泛的低代码平台，360 度覆盖全企业应用场景。通过界枢微前端，存量页面和低代码页面可以丝滑的互相内嵌，闭环新老系统的连接。欢迎体验[【腾讯无极低代码】](https://wujicode.cn)，感受智能而高效的研发模式！

@@ -1,5 +1,5 @@
 <template>
-  <WujieVue class="angular-container" name="angular12" :url="url" :attrs="attrs" :sync="true"></WujieVue>
+  <JieshuVue class="angular-container" name="angular12" :url="url" :attrs="attrs" :sync="true"></JieshuVue>
 </template>
 
 <script>

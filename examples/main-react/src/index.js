@@ -3,7 +3,7 @@ import 'react-app-polyfill/ie11';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import WujieReact from 'wujie-react';
+import JieshuReact from 'jieshu-react';
 import 'antd/es/switch/style/css.js';
 import 'antd/es/tooltip/style/css.js';
 import 'antd/es/button/style/css.js';
@@ -15,7 +15,7 @@ import credentialsFetch from './fetch';
 import lifecycles from './lifecycle';
 import plugins from './plugin';
 
-const { setupApp, preloadApp, bus } = WujieReact;
+const { setupApp, preloadApp, bus } = JieshuReact;
 const isProduction = process.env.NODE_ENV === 'production';
 bus.$on('click', (msg) => window.alert(msg));
 

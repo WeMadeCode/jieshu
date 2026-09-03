@@ -26,8 +26,8 @@ export default class Location extends React.Component {
             <Button
               className="app-jump"
               onClick={() => {
-                window?.$wujie.bus.$emit('add');
-                window?.$wujie.props.jump('vue3');
+                window?.$jieshu.bus.$emit('add');
+                window?.$jieshu.props.jump('vue3');
               }}
             >
               vue3 state+1 跳回

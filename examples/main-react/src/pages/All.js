@@ -1,6 +1,6 @@
 import React from 'react';
 import hostMap from '../hostMap';
-import WujieReact from 'wujie-react';
+import JieshuReact from 'jieshu-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function React16() {
@@ -21,10 +21,10 @@ export default function React16() {
   return (
     <div style={{ height: '100%', width: '100%' }}>
       <div className="all-item">
-        <WujieReact height="100%" width="100%" name="react16" url={react16Url} sync={true} props={props}></WujieReact>
+        <JieshuReact height="100%" width="100%" name="react16" url={react16Url} sync={true} props={props}></JieshuReact>
       </div>
       <div className="all-item">
-        <WujieReact
+        <JieshuReact
           height="100%"
           width="100%"
           name="react17"
@@ -32,14 +32,14 @@ export default function React16() {
           sync={true}
           props={props}
           alive={true}
-        ></WujieReact>
+        ></JieshuReact>
       </div>
       <div className="all-item">
-        <WujieReact height="100%" width="100%" name="vue2" url={vue2Url} sync={true} props={props}></WujieReact>
+        <JieshuReact height="100%" width="100%" name="vue2" url={vue2Url} sync={true} props={props}></JieshuReact>
       </div>
       {degrade && (
         <div className="all-item">
-          <WujieReact
+          <JieshuReact
             height="100%"
             width="100%"
             name="vue3"
@@ -47,23 +47,23 @@ export default function React16() {
             sync={true}
             props={props}
             alive={true}
-          ></WujieReact>
+          ></JieshuReact>
         </div>
       )}
       {degrade && (
         <div className="all-item">
-          <WujieReact height="100%" width="100%" name="vite" url={vite} sync={true} props={props}></WujieReact>
+          <JieshuReact height="100%" width="100%" name="vite" url={vite} sync={true} props={props}></JieshuReact>
         </div>
       )}
       <div className="all-item">
-        <WujieReact
+        <JieshuReact
           height="100%"
           width="100%"
           name="angular12"
           url={angular12Url}
           sync={true}
           props={props}
-        ></WujieReact>
+        ></JieshuReact>
       </div>
     </div>
   );

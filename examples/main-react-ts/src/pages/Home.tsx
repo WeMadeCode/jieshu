@@ -3,6 +3,8 @@ import Button from 'antd/es/button';
 import Switch from 'antd/es/switch';
 import Tooltip from 'antd/es/tooltip';
 
+import hostMap from '../hostMap';
+
 export default function Home() {
   const preloadEnabled = window.localStorage.getItem('preload') !== 'false';
   const degradeDisabled = typeof Proxy === 'undefined' || typeof CustomElementRegistry === 'undefined';
@@ -44,30 +46,25 @@ export default function Home() {
             />
           </Tooltip>
           <Tooltip title="主应用为 history 模式">
-            <a
-              href="https://wujie-micro.github.io/demo-main-vue/"
-              target="_blank"
-              className="docs button-gap"
-              rel="noreferrer"
-            >
+            <a href={hostMap('//localhost:8000/')} target="_blank" className="docs button-gap" rel="noreferrer">
               vue 主应用
             </a>
           </Tooltip>
-          <a href="https://github.com/Tencent/wujie" target="_blank" className="docs button-gap" rel="noreferrer">
+          <a href="https://github.com/WeMadeCode/jieshu" target="_blank" className="docs button-gap" rel="noreferrer">
             仓库
           </a>
-          <a href="https://wujie-micro.github.io/doc/" target="_blank" className="docs button-gap" rel="noreferrer">
+          <a href={hostMap('//localhost:5173/doc/')} target="_blank" className="docs button-gap" rel="noreferrer">
             文档
           </a>
         </div>
       </div>
       <h1 className="header">
         <img
-          alt="无界"
+          alt="界枢"
           className="brand-logo"
           src="https://vfiles.gtimg.cn/wuji_dashboard/xy/test_wuji_damy/XC5WMbxE.svg"
         />
-        <span className="brand">无界</span>
+        <span className="brand">界枢</span>
       </h1>
       <h2 className="subtitle">—极致的微前端框架</h2>
 

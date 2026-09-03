@@ -1,5 +1,5 @@
 import React from 'react';
-import WujieReact from 'wujie-react';
+import JieshuReact from 'jieshu-react';
 import lifecycles from './lifecycle';
 import hostMap from './hostMap';
 
@@ -13,14 +13,14 @@ export default function React17() {
   const degrade = window.localStorage.getItem('degrade') === 'true';
   const props = {
     jump: (name) => {
-      window?.$wujie.props.jump(name);
+      window?.$jieshu.props.jump(name);
     },
   };
   return (
     <div>
       <h2>子应用嵌套</h2>
       <div className="content" style={{ border: '1px dashed #ccc', overflow: 'auto' }}>
-        <WujieReact
+        <JieshuReact
           width="100%"
           height="500px"
           name="react17"
@@ -35,7 +35,7 @@ export default function React17() {
           afterMount={lifecycles.afterMount}
           beforeUnmount={lifecycles.beforeUnmount}
           afterUnmount={lifecycles.afterUnmount}
-        ></WujieReact>
+        ></JieshuReact>
       </div>
     </div>
   );

@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["./**/*.ts"],
+  "compilerOptions": {
+    "outDir": "../../.test-build-ui",
+    "rootDir": "../..",
+    "sourceMap": true,
+    "types": ["vitest/globals", "node"]
+  }
+}

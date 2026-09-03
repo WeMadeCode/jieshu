@@ -118,9 +118,9 @@ Techniques, strategies and recipes for building a modern web app with multiple t
 - 无法支持 `vite` 等 `ESM` 脚本运行
   :::
 
-## 无界方案
+## 界枢方案
 
-在乾坤的`issue`中一个[议题](https://github.com/umijs/qiankun/issues/286)非常有意思，有个开发者提出能否利用`iframe`来实现`js`沙箱能力，这个`idea`启发了无界方案，下面详细介绍
+在乾坤的`issue`中一个[议题](https://github.com/umijs/qiankun/issues/286)非常有意思，有个开发者提出能否利用`iframe`来实现`js`沙箱能力，这个`idea`启发了界枢方案，下面详细介绍
 
 ### 应用加载机制和 js 沙箱机制
 
@@ -131,7 +131,7 @@ Techniques, strategies and recipes for building a modern web app with multiple t
 
 - **组件方式来使用微前端**
 
-  不用注册，不用改造路由，直接使用无界组件，化繁为简
+  不用注册，不用改造路由，直接使用界枢组件，化繁为简
 
 - **一个页面可以同时激活多个子应用**
 
@@ -164,7 +164,7 @@ Techniques, strategies and recipes for building a modern web app with multiple t
 
 ### iframe 连接机制和 css 沙箱机制
 
-无界采用[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)来实现页面的样式隔离，无界会创建一个`wujie`自定义元素，然后将子应用的完整结构渲染在内部
+界枢采用[webcomponent](https://developer.mozilla.org/en-US/docs/Web/Web_Components)来实现页面的样式隔离，界枢会创建一个`jieshu-app`自定义元素，然后将子应用的完整结构渲染在内部
 
 子应用的实例`instance`在`iframe`内运行，`dom`在主应用容器下的`webcomponent`内，通过代理 `iframe`的`document`到`webcomponent`，可以实现两者的互联。
 
@@ -195,11 +195,11 @@ Techniques, strategies and recipes for building a modern web app with multiple t
 
 ### 通信机制
 
-承载子应用的`iframe`和主应用是同域的，所以主、子应用天然就可以很好的进行通信，在无界我们提供三种通信方式
+承载子应用的`iframe`和主应用是同域的，所以主、子应用天然就可以很好的进行通信，在界枢我们提供三种通信方式
 
 - **props 注入机制**
 
-子应用通过`$wujie.props`可以轻松拿到主应用注入的数据
+子应用通过`$jieshu.props`可以轻松拿到主应用注入的数据
 
 - **window.parent 通信机制**
 
@@ -207,11 +207,11 @@ Techniques, strategies and recipes for building a modern web app with multiple t
 
 - **去中心化的通信机制**
 
-无界提供了`EventBus`实例，注入到主应用和子应用，所有的应用可以去中心化的进行通信
+界枢提供了`EventBus`实例，注入到主应用和子应用，所有的应用可以去中心化的进行通信
 
 ### 优势
 
-通过上面原理的阐述，我们可以得出无界微前端框架的几点优势：
+通过上面原理的阐述，我们可以得出界枢微前端框架的几点优势：
 ::: tip 优势
 
 - **多应用同时激活在线**
@@ -228,7 +228,7 @@ Techniques, strategies and recipes for building a modern web app with multiple t
 
 - **纯净无污染**
 
-  - 无界利用`iframe`和`webcomponent`来搭建天然的`js`隔离沙箱和`css`隔离沙箱
+  - 界枢利用`iframe`和`webcomponent`来搭建天然的`js`隔离沙箱和`css`隔离沙箱
   - 利用`iframe`的`history`和主应用的`history`在同一个[top-level browsing context](https://html.spec.whatwg.org/multipage/browsers.html#top-level-browsing-context)来搭建天然的路由同步机制
   - 副作用局限在沙箱内部，子应用切换无需任何清理工作，没有额外的切换成本
 

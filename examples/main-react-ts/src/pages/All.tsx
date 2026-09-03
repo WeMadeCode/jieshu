@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import hostMap from '../hostMap';
-import WujieReact from '../wujieReact';
+import JieshuReact from '../jieshuReact';
 
 export default function All() {
   const navigate = useNavigate();
@@ -15,10 +15,10 @@ export default function All() {
   return (
     <div className="all-apps">
       <div className="all-item">
-        <WujieReact height="100%" width="100%" name="react16" url={hostMap('//localhost:7600/')} sync props={props} />
+        <JieshuReact height="100%" width="100%" name="react16" url={hostMap('//localhost:7600/')} sync props={props} />
       </div>
       <div className="all-item">
-        <WujieReact
+        <JieshuReact
           height="100%"
           width="100%"
           name="react17"
@@ -29,11 +29,11 @@ export default function All() {
         />
       </div>
       <div className="all-item">
-        <WujieReact height="100%" width="100%" name="vue2" url={hostMap('//localhost:7200/')} sync props={props} />
+        <JieshuReact height="100%" width="100%" name="vue2" url={hostMap('//localhost:7200/')} sync props={props} />
       </div>
       {supportsAdvancedMode && (
         <div className="all-item">
-          <WujieReact
+          <JieshuReact
             height="100%"
             width="100%"
             name="vue3"
@@ -46,11 +46,18 @@ export default function All() {
       )}
       {supportsAdvancedMode && (
         <div className="all-item">
-          <WujieReact height="100%" width="100%" name="vite" url={hostMap('//localhost:7500/')} sync props={props} />
+          <JieshuReact height="100%" width="100%" name="vite" url={hostMap('//localhost:7500/')} sync props={props} />
         </div>
       )}
       <div className="all-item">
-        <WujieReact height="100%" width="100%" name="angular12" url={hostMap('//localhost:7400/')} sync props={props} />
+        <JieshuReact
+          height="100%"
+          width="100%"
+          name="angular12"
+          url={hostMap('//localhost:7400/')}
+          sync
+          props={props}
+        />
       </div>
     </div>
   );

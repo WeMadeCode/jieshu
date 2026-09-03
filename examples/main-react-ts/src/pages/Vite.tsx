@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import hostMap from '../hostMap';
-import WujieReact from '../wujieReact';
+import JieshuReact from '../jieshuReact';
 
 export default function Vite() {
   const location = useLocation();
@@ -14,5 +14,5 @@ export default function Vite() {
     },
   };
 
-  return <WujieReact width="100%" height="100%" name="vite" url={viteUrl} sync={!path} props={props} />;
+  return <JieshuReact width="100%" height="100%" name="vite" url={viteUrl} sync={!path} props={props} />;
 }
