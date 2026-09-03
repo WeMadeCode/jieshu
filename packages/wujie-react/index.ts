@@ -10,7 +10,7 @@ import {
   type AppController,
   type DestroyHandler,
   type StartOptions,
-} from 'wujie';
+} from 'wujie-core';
 
 export type WujieReactProps = Omit<StartOptions, 'el'> & {
   width?: string;

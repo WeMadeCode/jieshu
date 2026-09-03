@@ -29,7 +29,7 @@
 ## 示例
 
 ```javascript
-import { refreshApp } from 'wujie';
+import { refreshApp } from 'wujie-core';
 
 await refreshApp({
   name: 'vue3',

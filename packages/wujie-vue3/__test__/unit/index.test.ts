@@ -1,6 +1,6 @@
 import { createApp, defineComponent, h, nextTick, reactive, ref, type App, type ComponentPublicInstance } from 'vue';
 import type { Mock, MockInstance } from 'vitest';
-import type { StartOptions } from 'wujie';
+import type { StartOptions } from 'wujie-core';
 import WujieVue, { type WujieVueExposed } from '../../index';
 
 interface MockController {
@@ -41,7 +41,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('wujie', () => ({
+vi.mock('wujie-core', () => ({
   bus: mocks.mockBus,
   setupApp: mocks.mockSetupApp,
   preloadApp: mocks.mockPreloadApp,

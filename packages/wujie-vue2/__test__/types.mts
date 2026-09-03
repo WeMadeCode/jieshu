@@ -1,6 +1,6 @@
 import type { Properties as StandardCssProperties } from 'csstype';
 import type { VueConstructor } from 'vue';
-import type { DestroyHandler } from 'wujie';
+import type { DestroyHandler } from 'wujie-core';
 import WujieVue, { type WujieVueInstance, type WujieVueProps, type WujieVueStyle } from 'wujie-vue2';
 
 const component: VueConstructor<WujieVueInstance> = WujieVue;

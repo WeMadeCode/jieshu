@@ -38,7 +38,7 @@ window.parent.xxx;
 
 ```javascript
 // 如果使用wujie
-import { bus } from "wujie";
+import { bus } from "wujie-core";
 
 // 如果使用wujie-vue
 import WujieVue from "wujie-vue";

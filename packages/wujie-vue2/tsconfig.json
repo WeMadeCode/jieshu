@@ -6,7 +6,8 @@
     "outDir": "./esm",
     "rootDir": ".",
     "declaration": true,
-    "sourceMap": true,
+    "emitDeclarationOnly": true,
+    "sourceMap": false,
     "isolatedModules": true,
     "skipLibCheck": true
   }

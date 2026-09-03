@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp, type DestroyHandler, type StartOptions } from 'wujie';
+import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp, type DestroyHandler, type StartOptions } from 'wujie-core';
 export type WujieReactProps = Omit<StartOptions, 'el'> & {
     width?: string;
     height?: string;

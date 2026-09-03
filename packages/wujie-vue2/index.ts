@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import type { CreateElement, PropOptions, PropType, VueConstructor, VNode, VNodeData } from 'vue';
-import type { AppController, DestroyHandler, StartOptions } from 'wujie';
-import { bus, clearAssetsCache, createAppController, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie';
+import type { AppController, DestroyHandler, StartOptions } from 'wujie-core';
+import { bus, clearAssetsCache, createAppController, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie-core';
 
 type WujieStyleValue = string | number | undefined;
 type StandardStyleProperty = {

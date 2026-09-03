@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import type { VueConstructor } from 'vue';
-import type { DestroyHandler, StartOptions } from 'wujie';
-import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie';
+import type { DestroyHandler, StartOptions } from 'wujie-core';
+import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie-core';
 type WujieStyleValue = string | number | undefined;
 type StandardStyleProperty = {
     [Property in keyof CSSStyleDeclaration]: CSSStyleDeclaration[Property] extends string ? Property : never;

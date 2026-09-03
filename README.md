@@ -50,13 +50,13 @@ Web Components 是一个浏览器原生支持的组件封装技术，可以有�
 - 安装
 
 ```bash
-npm install wujie -S
+npm install wujie-core -S
 ```
 
 - 使用
 
 ```javascript
-import { startApp } from 'wujie';
+import { startApp } from 'wujie-core';
 
 startApp({ name: '唯一id', url: '子应用路径', el: '容器', sync: true });
 ```

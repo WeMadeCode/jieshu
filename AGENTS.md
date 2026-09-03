@@ -30,8 +30,8 @@
 ```bash
 pnpm install
 pnpm test
-pnpm --filter wujie test:unit
-pnpm --filter wujie test:integration
+pnpm --filter wujie-core test:unit
+pnpm --filter wujie-core test:integration
 pnpm --filter wujie-react test
 pnpm --filter wujie-vue2 test
 pnpm --filter wujie-vue3 test
@@ -39,7 +39,7 @@ pnpm --filter wujie-docs docs:build
 pnpm start
 ```
 
-- 核心测试和旧版构建依赖 `NODE_OPTIONS=--openssl-legacy-provider`；根测试脚本已设置该选项。
+- 集成测试中的旧版 examples 构建依赖 `NODE_OPTIONS=--openssl-legacy-provider`；相关脚本已设置该选项。
 - 集成测试会下载/使用 Chromium 并启动多个示例服务，优先先运行单元测试；仅在改动影响集成行为或任务明确要求时运行集成测试。
 - 根目录没有只读 lint 脚本；`packages/wujie-core` 的 `lint` 会带 `--fix`，除非用户要求，不要把它当作无副作用检查执行。
 

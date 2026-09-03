@@ -77,7 +77,7 @@ await this.wujieRef.current.refresh();
 
 ```javascript
 import React from 'react';
-import { bus, setupApp, preloadApp, startApp, destroyApp } from 'wujie';
+import { bus, setupApp, preloadApp, startApp, destroyApp } from 'wujie-core';
 
 export default class WujieReact extends React.PureComponent {
   static bus = bus;

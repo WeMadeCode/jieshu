@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
 import type { Mock, MockInstance } from 'vitest';
-import type { StartOptions } from 'wujie';
+import type { StartOptions } from 'wujie-core';
 import WujieReact, { type WujieReactRef } from '../../index';
 
 interface MockController {
@@ -39,7 +39,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('wujie', () => ({
+vi.mock('wujie-core', () => ({
   bus: mocks.mockBus,
   setupApp: mocks.mockSetupApp,
   preloadApp: mocks.mockPreloadApp,

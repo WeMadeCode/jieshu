@@ -88,7 +88,7 @@ await this.$refs.wujie.refresh();
 
 ```javascript
 import Vue from 'vue';
-import { bus, setupApp, preloadApp, startApp, destroyApp } from 'wujie';
+import { bus, setupApp, preloadApp, startApp, destroyApp } from 'wujie-core';
 import { createApp, h, defineComponent } from 'vue';
 const vue3Flag = !!createApp;
 

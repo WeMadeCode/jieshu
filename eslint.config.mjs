@@ -24,6 +24,7 @@ export default [
       '**/node_modules/**',
       '**/coverage/**',
       '**/esm/**',
+      '**/esm-compat/**',
       '**/lib/**',
       '**/dist/**',
       'docs/.vitepress/cache/**',

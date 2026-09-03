@@ -29,7 +29,7 @@
 ## 示例
 
 ```javascript
-import { clearAssetsCache } from 'wujie';
+import { clearAssetsCache } from 'wujie-core';
 
 // 清空全部缓存
 clearAssetsCache();

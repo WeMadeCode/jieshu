@@ -1,7 +1,7 @@
 import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { App, ComponentPublicInstance, CSSProperties, DefineComponent, PropType } from 'vue';
-import { bus, clearAssetsCache, createAppController, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie';
-import type { DestroyHandler, StartOptions } from 'wujie';
+import { bus, clearAssetsCache, createAppController, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie-core';
+import type { DestroyHandler, StartOptions } from 'wujie-core';
 
 export type WujieVueProps = Omit<StartOptions, 'el'> & {
   width?: string;

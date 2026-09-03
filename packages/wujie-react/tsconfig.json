@@ -4,8 +4,8 @@
     "declaration": true,
     "declarationDir": "./types",
     "declarationMap": false,
-    "outDir": "./esm",
-    "sourceMap": true,
+    "emitDeclarationOnly": true,
+    "sourceMap": false,
     "skipLibCheck": false
   },
   "include": ["index.ts"]

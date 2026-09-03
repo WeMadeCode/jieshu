@@ -5,6 +5,7 @@ dist
 site
 lib
 esm
+esm-compat
 .DS_Store
 .vscode/*
 !.vscode/settings.json
