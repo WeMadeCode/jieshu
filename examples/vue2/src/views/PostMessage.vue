@@ -14,19 +14,19 @@
 </template>
 
 <script>
-import hostMap from "../hostMap";
+import hostMap from '../hostMap';
 export default {
   data() {
     return {
-      message: "",
-      url: hostMap("//localhost:7300/") + "postmessage",
+      message: '',
+      url: hostMap('//localhost:7300/') + 'postmessage',
     };
   },
   methods: {
     handleMessage(e) {
       try {
         let res = JSON.parse(e.data);
-        if (res.type === "vue2") {
+        if (res.type === 'vue2') {
           this.message = res.message;
         }
       } catch (err) {
@@ -35,20 +35,20 @@ export default {
     },
     postMessageToMain() {
       const mainWindow = window.parent;
-      const data = { type: "main", message: "hello, i'm sub app" };
-      mainWindow.postMessage(JSON.stringify(data), "*");
+      const data = { type: 'main', message: "hello, i'm sub app" };
+      mainWindow.postMessage(JSON.stringify(data), '*');
     },
     postMessageToIframe() {
-      const iframe = document.querySelector("iframe").contentWindow;
-      const data = { type: "vue3", message: "hello, i'm sub app" };
-      iframe.postMessage(JSON.stringify(data), "*");
+      const iframe = document.querySelector('iframe').contentWindow;
+      const data = { type: 'vue3', message: "hello, i'm sub app" };
+      iframe.postMessage(JSON.stringify(data), '*');
     },
   },
   mounted() {
-    window.addEventListener("message", this.handleMessage);
+    window.addEventListener('message', this.handleMessage);
   },
   onMounted() {
-    window.removeEventListener("message", this.handleMessage);
+    window.removeEventListener('message', this.handleMessage);
   },
 };
 </script>

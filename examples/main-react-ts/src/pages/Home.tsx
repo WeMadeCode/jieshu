@@ -1,14 +1,14 @@
-import { UnorderedListOutlined } from "@ant-design/icons";
-import Button from "antd/es/button";
-import Switch from "antd/es/switch";
-import Tooltip from "antd/es/tooltip";
+import { UnorderedListOutlined } from '@ant-design/icons';
+import Button from 'antd/es/button';
+import Switch from 'antd/es/switch';
+import Tooltip from 'antd/es/tooltip';
 
 export default function Home() {
-  const preloadEnabled = window.localStorage.getItem("preload") !== "false";
-  const degradeDisabled = typeof Proxy === "undefined" || typeof CustomElementRegistry === "undefined";
-  const degradeEnabled = window.localStorage.getItem("degrade") === "true" || degradeDisabled;
+  const preloadEnabled = window.localStorage.getItem('preload') !== 'false';
+  const degradeDisabled = typeof Proxy === 'undefined' || typeof CustomElementRegistry === 'undefined';
+  const degradeEnabled = window.localStorage.getItem('degrade') === 'true' || degradeDisabled;
 
-  const saveAndReload = (key: "preload" | "degrade", checked: boolean): void => {
+  const saveAndReload = (key: 'preload' | 'degrade', checked: boolean): void => {
     window.localStorage.setItem(key, String(checked));
     window.setTimeout(() => window.location.reload(), 1000);
   };
@@ -31,7 +31,7 @@ export default function Home() {
               unCheckedChildren="降级关"
               disabled={degradeDisabled}
               defaultChecked={degradeEnabled}
-              onChange={(checked) => saveAndReload("degrade", checked)}
+              onChange={(checked) => saveAndReload('degrade', checked)}
             />
           </Tooltip>
           <Tooltip title="预加载 + 预执行">
@@ -40,7 +40,7 @@ export default function Home() {
               checkedChildren="预加载开"
               unCheckedChildren="预加载关"
               defaultChecked={preloadEnabled}
-              onChange={(checked) => saveAndReload("preload", checked)}
+              onChange={(checked) => saveAndReload('preload', checked)}
             />
           </Tooltip>
           <Tooltip title="主应用为 history 模式">

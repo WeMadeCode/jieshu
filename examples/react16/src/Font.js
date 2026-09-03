@@ -1,9 +1,9 @@
-import React from "react";
-import { IconFont } from "tdesign-icons-react";
+import React from 'react';
+import { IconFont } from 'tdesign-icons-react';
 
 export default class Font extends React.Component {
   componentDidMount() {
-    console.log("react16 font mounted");
+    console.log('react16 font mounted');
   }
   render() {
     return (

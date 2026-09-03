@@ -1,8 +1,8 @@
-import React from "react";
-import Button from "antd/es/button";
-import Modal from "antd/es/modal";
-import Select from "antd/es/select";
-import Popover from "antd/es/popover";
+import React from 'react';
+import Button from 'antd/es/button';
+import Modal from 'antd/es/modal';
+import Select from 'antd/es/select';
+import Popover from 'antd/es/popover';
 
 const Option = Select.Option;
 
@@ -22,7 +22,7 @@ export default class Dialog extends React.Component {
   };
 
   componentDidMount() {
-    console.log("react16 dialog mounted")
+    console.log('react16 dialog mounted');
   }
 
   handleCancel = (e) => {
@@ -44,7 +44,7 @@ export default class Dialog extends React.Component {
       </div>
     );
     const scrollSpacer = <div style={{ height: 520 }} aria-hidden="true" />;
-    const modalScrollBodyStyle = { maxHeight: "60vh", overflow: "auto", paddingRight: 8 };
+    const modalScrollBodyStyle = { maxHeight: '60vh', overflow: 'auto', paddingRight: 8 };
     return (
       <div>
         <h2 className="css-after-flag">弹窗处理</h2>
@@ -54,7 +54,13 @@ export default class Dialog extends React.Component {
           <p>
             <Button onClick={this.showModal}>Open Modal</Button>
           </p>
-          <Modal title="Basic Modal" visible={this.state.visible} onOk={this.handleOk} onCancel={this.handleCancel} width={760}>
+          <Modal
+            title="Basic Modal"
+            visible={this.state.visible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            width={760}
+          >
             <div style={modalScrollBodyStyle}>
               <h4>弹窗内：antd 选择器</h4>
               <div className="p">
@@ -63,7 +69,9 @@ export default class Dialog extends React.Component {
                   style={{ width: 200 }}
                   placeholder="Select a person（弹窗内）"
                   optionFilterProp="children"
-                  filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                  filterOption={(input, option) =>
+                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
                 >
                   <Option value="jack">Jack</Option>
                   <Option value="lucy">Lucy</Option>

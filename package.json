@@ -5,27 +5,28 @@
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "scripts": {
+    "build:packages": "pnpm --recursive --filter './packages/*' run build",
     "start": "NODE_OPTIONS=--openssl-legacy-provider lerna run start --parallel",
     "doc": "lerna run docs:dev",
-    "clean": "rimraf node_modules **/*/node_modules packages/*/lib packages/*/esm packages/*/esm-compat",
+    "clean": "rimraf node_modules **/*/node_modules packages/*/lib packages/*/esm packages/*/types",
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm --filter wujie-core --filter wujie-react --filter wujie-vue2 --filter wujie-vue3 --filter wujie-docs run typecheck",
+    "typecheck": "pnpm --filter wujie-core --filter wujie-react --filter wujie-vue3 --filter wujie-docs run typecheck",
     "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck",
     "test": "NODE_OPTIONS=--openssl-legacy-provider lerna run test --scope wujie-core",
     "test:unit": "vitest run --config vitest.config.mts --coverage",
-    "test:adapters": "pnpm --filter wujie-react --filter wujie-vue2 --filter wujie-vue3 test",
+    "test:adapters": "pnpm --filter wujie-react --filter wujie-vue3 test",
     "prepare": "husky install"
   },
   "license": "MIT",
   "lint-staged": {
-    "{packages,docs}/**/*.{js,ts,mjs,cjs,mts,cts,vue}": [
+    "{packages,docs,examples}/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,vue}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "{packages,docs}/**/*.{json,md,yml,yaml,css,scss,less,html}": "prettier --write",
+    "{packages,docs,examples}/**/*.{json,md,yml,yaml,css,scss,less,html}": "prettier --write",
     "*.{js,ts,mjs,cjs,mts,cts}": [
       "eslint --fix",
       "prettier --write"

@@ -4,7 +4,7 @@ import vue from 'eslint-plugin-vue';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-const typescriptFiles = ['**/*.{ts,mts,cts}'];
+const typescriptFiles = ['**/*.{ts,tsx,mts,cts}'];
 const unitTestFiles = ['**/__test__/unit/**/*.{js,ts,mts,cts}'];
 const unusedVariablesRule = [
   'warn',
@@ -19,27 +19,30 @@ export default [
   {
     name: 'wujie/ignores',
     ignores: [
-      'examples/**',
       '.pnpm-store/**',
       '**/node_modules/**',
       '**/coverage/**',
+      '**/build/**',
       '**/esm/**',
-      '**/esm-compat/**',
       '**/lib/**',
       '**/dist/**',
       'docs/.vitepress/cache/**',
       'docs/public/**',
-      'packages/wujie-react/types/**',
-      'packages/wujie-vue2/index.d.ts',
-      'packages/wujie-vue3/index.d.ts',
+      'examples/vue2/public/tinymce/**',
+      'packages/*/types/**',
     ],
   },
   {
     name: 'wujie/base',
-    files: ['**/*.{js,mjs,cjs,ts,mts,cts,vue}'],
+    files: ['**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -75,11 +78,15 @@ export default [
   },
   ...vue.configs['flat/essential'].map((config) => ({
     ...config,
-    files: ['docs/**/*.vue'],
+    files: ['docs/**/*.vue', 'examples/{main-vue,vite,vue3}/**/*.vue', 'packages/wujie-vue3/**/*.vue'],
+  })),
+  ...vue.configs['flat/vue2-essential'].map((config) => ({
+    ...config,
+    files: ['examples/vue2/**/*.vue'],
   })),
   {
     name: 'wujie/vue-typescript',
-    files: ['docs/**/*.vue'],
+    files: ['docs/**/*.vue', 'examples/**/*.vue', 'packages/wujie-vue3/**/*.vue'],
     languageOptions: {
       parserOptions: {
         parser: tseslint.parser,
@@ -108,6 +115,24 @@ export default [
     rules: {
       'no-prototype-builtins': 'off',
       'no-self-assign': 'off',
+    },
+  },
+  {
+    name: 'wujie/examples-javascript-compatibility',
+    files: ['examples/**/*.{js,jsx,cjs,mjs}'],
+    languageOptions: {
+      globals: globals.jest,
+    },
+    rules: {
+      'no-unused-vars': unusedVariablesRule,
+      'preserve-caught-error': 'off',
+    },
+  },
+  {
+    name: 'wujie/examples-vue-compatibility',
+    files: ['examples/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
     },
   },
   prettier,

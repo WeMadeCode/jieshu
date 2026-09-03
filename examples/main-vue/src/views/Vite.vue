@@ -4,15 +4,16 @@
 </template>
 
 <script>
-import hostMap from "../hostMap";
+import hostMap from '../hostMap';
 
 export default {
+  name: 'ViteView',
   data() {
     return {
-      viteUrl: hostMap("//localhost:7500/"),
+      viteUrl: hostMap('//localhost:7500/'),
     };
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

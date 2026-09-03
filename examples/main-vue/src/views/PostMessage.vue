@@ -14,38 +14,38 @@
 </template>
 
 <script>
-import hostMap from "../hostMap";
+import hostMap from '../hostMap';
 
 export default {
   data() {
     return {
-      message: "",
-      vue2Url: hostMap("//localhost:7200/") + "#postmessage",
+      message: '',
+      vue2Url: hostMap('//localhost:7200/') + '#postmessage',
     };
   },
   methods: {
     postMessageToVue2(message) {
       const subAppWindow = window.document.querySelector('iframe[name="vue2"]').contentWindow;
-      const data = message || { type: "vue2", message: "hello, i'm main app" };
-      subAppWindow.postMessage(JSON.stringify(data), "*");
+      const data = message || { type: 'vue2', message: "hello, i'm main app" };
+      subAppWindow.postMessage(JSON.stringify(data), '*');
     },
     postMessageToVue3(message) {
       const iframeWindow = window.document
         .querySelector("wujie-app[data-wujie-id='vue2']")
-        .shadowRoot.querySelector("iframe").contentWindow;
-      const data = message || { type: "vue3", message: "hello, i'm main app" };
-      iframeWindow.postMessage(JSON.stringify(data), "*");
+        .shadowRoot.querySelector('iframe').contentWindow;
+      const data = message || { type: 'vue3', message: "hello, i'm main app" };
+      iframeWindow.postMessage(JSON.stringify(data), '*');
     },
     handleMessage(e) {
       try {
         let res = JSON.parse(e.data);
-        if (res.type === "main") {
+        if (res.type === 'main') {
           this.message = res.message;
         }
-        if (res.type === "vue2") {
+        if (res.type === 'vue2') {
           this.postMessageToVue2(res);
         }
-        if (res.type === "vue3") {
+        if (res.type === 'vue3') {
           this.postMessageToVue3(res);
         }
       } catch (err) {
@@ -54,10 +54,10 @@ export default {
     },
   },
   mounted() {
-    window.addEventListener("message", this.handleMessage);
+    window.addEventListener('message', this.handleMessage);
   },
   onMounted() {
-    window.removeEventListener("message", this.handleMessage);
+    window.removeEventListener('message', this.handleMessage);
   },
 };
 </script>

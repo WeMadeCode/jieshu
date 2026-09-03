@@ -38,6 +38,16 @@ const generateTest = (
     await page.click(allLinkSelector);
     // 所有预加载完成加载
     await Promise.all(mountedPromiseList);
+    await expect
+      .poll(() => getUrlSearchObject(page.url()))
+      .toEqual({
+        react16: AppInfoMap.react16.homeQueryParam,
+        react17: AppInfoMap.react17.homeQueryParam,
+        vue2: AppInfoMap.vue2.homeQueryParam,
+        vue3: AppInfoMap.vue3.homeQueryParam,
+        vite: '%2Fhome',
+        angular12: '%2F',
+      });
     const searchMap = getUrlSearchObject(page.url());
     // 查看当前路由
     expect(searchMap.react16).toBe(AppInfoMap.react16.homeQueryParam);
@@ -87,6 +97,16 @@ const generateTest = (
     // 刷新
     await page.reload();
     await Promise.all(newMountedPromiseList);
+    await expect
+      .poll(() => getUrlSearchObject(page.url()))
+      .toEqual({
+        react16: AppInfoMap.react16.dialogQueryParam,
+        react17: AppInfoMap.react17.dialogQueryParam,
+        vue2: AppInfoMap.vue2.dialogQueryParam,
+        vue3: AppInfoMap.vue3.dialogQueryParam,
+        vite: '%2Fhome',
+        angular12: '%2F',
+      });
     const newSearchMap = getUrlSearchObject(page.url());
     // 查看当前路由
     expect(newSearchMap.react16).toBe(AppInfoMap.react16.dialogQueryParam);

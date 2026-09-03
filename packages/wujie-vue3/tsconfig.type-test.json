@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["./index.ts", "./index.d.ts", "./__test__/types.ts"],
+  "include": ["./index.ts", "./__test__/types.ts"],
   "compilerOptions": {
     "paths": {
       "wujie-vue3": ["./index.ts"]

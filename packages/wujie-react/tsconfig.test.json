@@ -3,7 +3,7 @@
   "compilerOptions": {
     "noEmit": true,
     "paths": {
-      "wujie-react": ["./index.ts"]
+      "wujie-react": ["./index.tsx"]
     }
   },
   "include": ["__test__/public-api.ts"]

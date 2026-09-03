@@ -5,8 +5,9 @@
     "declarationDir": "./types",
     "declarationMap": false,
     "emitDeclarationOnly": true,
+    "jsx": "react",
     "sourceMap": false,
     "skipLibCheck": false
   },
-  "include": ["index.ts"]
+  "include": ["index.tsx"]
 }

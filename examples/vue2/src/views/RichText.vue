@@ -81,21 +81,18 @@
 </template>
 
 <script>
-import HelloWorld from "@/components/HelloWorld.vue";
-import WangEditorDemoBlock from "@/components/rich-text/WangEditorDemoBlock.vue";
-import TinyMceDemoBlock from "@/components/rich-text/TinyMceDemoBlock.vue";
+import HelloWorld from '@/components/HelloWorld.vue';
+import WangEditorDemoBlock from '@/components/rich-text/WangEditorDemoBlock.vue';
+import TinyMceDemoBlock from '@/components/rich-text/TinyMceDemoBlock.vue';
 
-const WANG_PREFILL_HTML =
-  "<p>这是<strong>预填内容</strong>，请尝试删除本段文字或在「预填」二字前插入新内容。</p>";
+const WANG_PREFILL_HTML = '<p>这是<strong>预填内容</strong>，请尝试删除本段文字或在「预填」二字前插入新内容。</p>';
 
-const WANG_SELECTION_HTML =
-  "<p>请<strong>拖选这段文字</strong>，观察上方 isCollapsed 从 true 变为 false。</p>";
+const WANG_SELECTION_HTML = '<p>请<strong>拖选这段文字</strong>，观察上方 isCollapsed 从 true 变为 false。</p>';
 
-const WANG_PASTE_HTML =
-  "<p>请选中本段文字并复制，再粘贴到下方空白处；或从外部复制文字后粘贴到此处。</p>";
+const WANG_PASTE_HTML = '<p>请选中本段文字并复制，再粘贴到下方空白处；或从外部复制文字后粘贴到此处。</p>';
 
 export default {
-  name: "RichText",
+  name: 'RichText',
   components: {
     HelloWorld,
     WangEditorDemoBlock,
@@ -103,7 +100,7 @@ export default {
   },
   data() {
     return {
-      activeTab: "wangEditor",
+      activeTab: 'wangEditor',
       wangPrefillHtml: WANG_PREFILL_HTML,
       wangSelectionHtml: WANG_SELECTION_HTML,
       wangPasteHtml: WANG_PASTE_HTML,

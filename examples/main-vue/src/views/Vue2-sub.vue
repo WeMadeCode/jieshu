@@ -4,12 +4,12 @@
 </template>
 
 <script>
-import hostMap from "../hostMap";
+import hostMap from '../hostMap';
 
 export default {
   computed: {
     vue2Url() {
-      return hostMap("//localhost:7200/") + `#/${this.$route.params.path}`;
+      return hostMap('//localhost:7200/') + `#/${this.$route.params.path}`;
     },
   },
   methods: {
@@ -20,4 +20,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

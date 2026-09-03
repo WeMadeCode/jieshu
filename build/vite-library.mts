@@ -1,8 +1,8 @@
 import { dirname } from 'node:path';
 
-import { defineConfig, type AliasOptions } from 'vite';
+import { defineConfig, type AliasOptions, type PluginOption } from 'vite';
 
-type LibraryBuildMode = 'esm' | 'esm-compat' | 'umd';
+type LibraryBuildMode = 'esm' | 'umd';
 
 interface LibraryBuildOptions {
   entry: string;
@@ -12,25 +12,26 @@ interface LibraryBuildOptions {
   umdGlobals?: Record<string, string>;
   umdAliases?: AliasOptions;
   umdExports?: 'default' | 'named';
+  plugins?: PluginOption[];
 }
 
 export function createLibraryConfig(options: LibraryBuildOptions) {
   return defineConfig(({ mode }) => {
-    if (mode !== 'esm' && mode !== 'esm-compat' && mode !== 'umd') {
+    if (mode !== 'esm' && mode !== 'umd') {
       throw new Error(`Unsupported library build mode: ${mode}`);
     }
 
     const buildMode: LibraryBuildMode = mode;
     const isUmd = buildMode === 'umd';
-    const isCompatEsm = buildMode === 'esm-compat';
 
     return {
+      plugins: options.plugins,
       resolve: {
         alias: isUmd ? options.umdAliases : undefined,
       },
       build: {
         target: 'es2018',
-        outDir: isUmd ? 'lib' : isCompatEsm ? 'esm-compat' : 'esm',
+        outDir: isUmd ? 'lib' : 'esm',
         emptyOutDir: true,
         copyPublicDir: false,
         sourcemap: true,
@@ -39,7 +40,7 @@ export function createLibraryConfig(options: LibraryBuildOptions) {
           entry: options.entry,
           name: options.globalName,
           formats: [isUmd ? 'umd' : 'es'],
-          fileName: () => (isUmd ? 'index.umd.js' : isCompatEsm ? 'index.js' : 'index.mjs'),
+          fileName: () => (isUmd ? 'index.umd.js' : 'index.mjs'),
         },
         rolldownOptions: {
           external: isUmd ? options.umdExternal : options.esmExternal,
@@ -49,8 +50,8 @@ export function createLibraryConfig(options: LibraryBuildOptions) {
                 globals: options.umdGlobals,
               }
             : {
-                entryFileNames: isCompatEsm ? '[name].js' : '[name].mjs',
-                chunkFileNames: isCompatEsm ? '[name]-[hash].js' : '[name]-[hash].mjs',
+                entryFileNames: '[name].mjs',
+                chunkFileNames: '[name]-[hash].mjs',
                 preserveModules: true,
                 preserveModulesRoot: dirname(options.entry),
               },

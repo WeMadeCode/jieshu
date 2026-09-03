@@ -1,15 +1,15 @@
-import React from "react";
-import Button from "antd/es/button";
+import React from 'react';
+import Button from 'antd/es/button';
 
 export default class Location extends React.Component {
   handleClick() {
     if (window.__WUJIE?.degrade || !window.Proxy || !window.CustomElementRegistry) {
-      window.$wujie.location.href = "https://v2.vuejs.org/";
-    } else window.location.href = "https://wujicode.cn/xy/app/prod/official/index";
+      window.$wujie.location.href = 'https://v2.vuejs.org/';
+    } else window.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
   }
-  
+
   componentDidMount() {
-    console.log("react17 location mounted")
+    console.log('react17 location mounted');
   }
 
   render() {

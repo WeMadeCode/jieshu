@@ -42,11 +42,11 @@
 </template>
 
 <script>
-import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
-import "@wangeditor/editor/dist/css/style.css";
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
+import '@wangeditor/editor/dist/css/style.css';
 
 export default {
-  name: "WangEditorDemoBlock",
+  name: 'WangEditorDemoBlock',
   components: { Editor, Toolbar },
   props: {
     title: { type: String, required: true },
@@ -54,24 +54,24 @@ export default {
     issueUrl: { type: String, required: true },
     description: { type: String, required: true },
     steps: { type: String, required: true },
-    initialHtml: { type: String, default: "" },
+    initialHtml: { type: String, default: '' },
     showSelectionPanel: { type: Boolean, default: false },
     showLoRoPanel: { type: Boolean, default: false },
-    editorHeight: { type: String, default: "220px" },
-    alertType: { type: String, default: "success" },
+    editorHeight: { type: String, default: '220px' },
+    alertType: { type: String, default: 'success' },
   },
   data() {
     return {
       editor: null,
       html: this.initialHtml,
-      mode: "default",
+      mode: 'default',
       toolbarConfig: {},
       editorConfig: {
-        placeholder: "请在此输入内容进行验证…",
+        placeholder: '请在此输入内容进行验证…',
       },
-      selectionDebug: "（尚未聚焦编辑器）",
+      selectionDebug: '（尚未聚焦编辑器）',
       selectionOk: false,
-      loRoDebug: "（尚未聚焦编辑器）",
+      loRoDebug: '（尚未聚焦编辑器）',
       loRoOk: false,
     };
   },
@@ -85,12 +85,12 @@ export default {
   mounted() {
     if (this.showSelectionPanel || this.showLoRoPanel) {
       this.onSelectionChange = () => this.refreshSelection();
-      document.addEventListener("selectionchange", this.onSelectionChange);
+      document.addEventListener('selectionchange', this.onSelectionChange);
     }
   },
   beforeDestroy() {
     if (this.onSelectionChange) {
-      document.removeEventListener("selectionchange", this.onSelectionChange);
+      document.removeEventListener('selectionchange', this.onSelectionChange);
       this.onSelectionChange = null;
     }
     if (this.editor) {
@@ -106,7 +106,7 @@ export default {
       const selection = window.getSelection();
       if (this.showSelectionPanel) {
         if (!selection || selection.rangeCount === 0) {
-          this.selectionDebug = "getSelection() 为空或 rangeCount = 0";
+          this.selectionDebug = 'getSelection() 为空或 rangeCount = 0';
           this.selectionOk = false;
         } else {
           const range = selection.getRangeAt(0);
@@ -124,7 +124,7 @@ export default {
               degrade: Boolean(window.__WUJIE?.degrade),
             },
             null,
-            2
+            2,
           );
         }
       }
@@ -134,7 +134,7 @@ export default {
     },
     refreshLoRo(selection) {
       if (!selection || selection.rangeCount === 0) {
-        this.loRoDebug = "getSelection() 为空或 rangeCount = 0";
+        this.loRoDebug = 'getSelection() 为空或 rangeCount = 0';
         this.loRoOk = false;
         return;
       }
@@ -162,7 +162,7 @@ export default {
           inWujie: Boolean(window.__POWERED_BY_WUJIE__),
         },
         null,
-        2
+        2,
       );
     },
   },

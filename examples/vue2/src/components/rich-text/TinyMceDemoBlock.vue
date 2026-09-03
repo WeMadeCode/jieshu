@@ -17,23 +17,23 @@
 </template>
 
 <script>
-import hostMap from "@/hostMap";
+import hostMap from '@/hostMap';
 
 export default {
-  name: "TinyMceDemoBlock",
+  name: 'TinyMceDemoBlock',
   props: {
     title: { type: String, required: true },
     issueLabel: { type: String, required: true },
     issueUrl: { type: String, required: true },
     description: { type: String, required: true },
     steps: { type: String, required: true },
-    alertType: { type: String, default: "info" },
+    alertType: { type: String, default: 'info' },
   },
   data() {
     return {
       editor: null,
       ready: false,
-      initError: "",
+      initError: '',
     };
   },
   mounted() {
@@ -47,10 +47,10 @@ export default {
       try {
         const tinymce = window.tinymce;
         if (!tinymce) {
-          throw new Error("未找到 window.tinymce，请确认 public/tinymce/tinymce.min.js 已正确加载");
+          throw new Error('未找到 window.tinymce，请确认 public/tinymce/tinymce.min.js 已正确加载');
         }
 
-        const host = hostMap("//localhost:7200/");
+        const host = hostMap('//localhost:7200/');
         const editors = await tinymce.init({
           target: this.$refs.editorHost,
           height: 320,
@@ -59,8 +59,8 @@ export default {
           promotion: false,
           skin_url: `${host}tinymce/skins/ui/oxide`,
           content_css: `${host}tinymce/skins/content/default/content.min.css`,
-          plugins: "lists link",
-          toolbar: "undo redo | bold italic | bullist numlist | link",
+          plugins: 'lists link',
+          toolbar: 'undo redo | bold italic | bullist numlist | link',
         });
         this.editor = Array.isArray(editors) ? editors[0] : editors;
         this.ready = true;

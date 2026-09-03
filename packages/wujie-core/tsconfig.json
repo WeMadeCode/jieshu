@@ -4,6 +4,7 @@
   "exclude": ["node_modules"],
   "compilerOptions": {
     "outDir": "./esm",
+    "declarationDir": "./types",
     "rootDir": "./src",
     "skipLibCheck": true,
     "declaration": true,

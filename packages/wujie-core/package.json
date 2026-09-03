@@ -3,12 +3,11 @@
   "version": "2.1.0",
   "description": "极致的微前端框架",
   "main": "./lib/index.umd.js",
-  "module": "./esm-compat/index.js",
-  "types": "./esm/index.d.ts",
+  "module": "./esm/index.mjs",
+  "types": "./types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./esm/index.d.ts",
-      "webpack": "./esm-compat/index.js",
+      "types": "./types/index.d.ts",
       "import": "./esm/index.mjs",
       "require": "./lib/index.umd.js",
       "default": "./esm/index.mjs"
@@ -19,17 +18,16 @@
   "files": [
     "lib",
     "esm",
-    "esm-compat"
+    "types"
   ],
   "scripts": {
-    "clean": "rimraf lib esm esm-compat",
+    "clean": "rimraf lib esm types",
     "build": "pnpm run clean && pnpm run build:esm && pnpm run build:umd && pnpm run build:types",
-    "build:esm": "vite build --mode esm && vite build --mode esm-compat",
+    "build:esm": "vite build --mode esm",
     "build:umd": "vite build --mode umd",
     "build:types": "tsc --emitDeclarationOnly",
     "lib": "pnpm run build:umd",
     "esm": "pnpm run build:esm && pnpm run build:types",
-    "prepack": "pnpm run build",
     "start": "pnpm run build:types && vite build --mode esm --watch",
     "typecheck": "tsc --project tsconfig.json --noEmit --emitDeclarationOnly false && tsc --project __test__/unit/tsconfig.json --noEmit && tsc --project __test__/integration/tsconfig.json --noEmit",
     "lint": "eslint src",
@@ -44,15 +42,8 @@
     "type": "git",
     "url": "https://github.com/Tencent/wujie.git"
   },
-  "config": {
-    "unsafe-perm": true,
-    "registry": "https://registry.npmjs.org/"
-  },
   "author": "yiludege",
   "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
   "eslintIgnore": [
     "*.js"
   ]

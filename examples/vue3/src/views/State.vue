@@ -13,14 +13,14 @@
 </template>
 
 <script>
-import HelloWorld from "@/components/HelloWorld.vue";
+import HelloWorld from '@/components/HelloWorld.vue';
 export default {
   components: {
     HelloWorld,
   },
   mounted() {
-    window?.$wujie?.bus.$on("add", () => (this.count += 1));
-    console.log("vue3 state mounted");
+    window?.$wujie?.bus.$on('add', () => (this.count += 1));
+    console.log('vue3 state mounted');
   },
   data() {
     return {
@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     handleClick() {
-      window?.$wujie.props.jump("react17");
+      window?.$wujie.props.jump('react17');
     },
   },
 };

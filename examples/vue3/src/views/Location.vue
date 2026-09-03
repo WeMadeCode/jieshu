@@ -21,11 +21,11 @@
 
 <script>
 // @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+import HelloWorld from '@/components/HelloWorld.vue';
 const host = location.host;
 const windowHost = window.location.host;
 export default {
-  name: "About",
+  name: 'About',
   components: {
     HelloWorld,
   },
@@ -36,13 +36,13 @@ export default {
     };
   },
   mounted() {
-    console.log("vue3 location mounted");
+    console.log('vue3 location mounted');
   },
   methods: {
     handleClick() {
       if (window.__WUJIE?.degrade || !window.Proxy || !window.CustomElementRegistry) {
-        window.$wujie.location.href = "https://wujicode.cn/xy/app/prod/official/index";
-      } else window.location.href = "https://wujicode.cn/xy/app/prod/official/index";
+        window.$wujie.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
+      } else window.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
     },
   },
 };

@@ -66,9 +66,6 @@ startApp({ name: '唯一id', url: '子应用路径', el: '容器', sync: true })
 - 安装
 
 ```bash
-# vue2 框架
-npm i wujie-vue2 -S
-# vue3 框架
 npm i wujie-vue3 -S
 
 ```
@@ -76,10 +73,6 @@ npm i wujie-vue3 -S
 - 引入
 
 ```javascript
-// vue2
-import WujieVue from 'wujie-vue2';
-Vue.use(WujieVue);
-// vue3
 import WujieVue from 'wujie-vue3';
 app.use(WujieVue);
 ```
@@ -148,10 +141,20 @@ import WujieReact from 'wujie-react';
 运行以下脚本，可以本地开发无界微前端框架，支持实时编译调试开发。
 
 ```bash
-nvm use v14.20.0         // 切换node版本到14版本，因为有些demo的node版本比较低
-pnpm i                  // 安装包依赖，务必使用pnpm
-npm run start           // 启动所有应用
+nvm use 24               # 使用 Node.js 24
+pnpm i                   # 安装包依赖，务必使用 pnpm
+pnpm start               # 启动所有应用
 ```
+
+## 子包打包
+
+本仓库不向公网 npm registry 发布包。需要构建子包时使用 pnpm：
+
+```bash
+pnpm run build:packages
+```
+
+每个子包的构建产物直接生成在自身目录：ESM 位于 `esm/`，UMD 位于 `lib/`，类型声明位于 `types/`。
 
 ## One more thing
 

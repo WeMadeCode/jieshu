@@ -13,7 +13,7 @@
 export default {
   data() {
     return {
-      message: "",
+      message: '',
     };
   },
   methods: {
@@ -23,7 +23,7 @@ export default {
     handleMessage(e) {
       try {
         let res = JSON.parse(e.data);
-        if (res.type === "vue3") {
+        if (res.type === 'vue3') {
           this.message = res.message;
         }
       } catch (err) {
@@ -32,25 +32,25 @@ export default {
     },
     postMessageToMain() {
       const mainWindow = window.parent;
-      const data = { type: "main", message: "hello, i'm sub app's iframe" };
-      mainWindow.postMessage(JSON.stringify(data), "*");
+      const data = { type: 'main', message: "hello, i'm sub app's iframe" };
+      mainWindow.postMessage(JSON.stringify(data), '*');
     },
     postMessageToSubApp() {
       const iframe = window.parent;
-      const data = { type: "vue2", message: "hello, i'm sub app's iframe" };
-      iframe.postMessage(JSON.stringify(data), "*");
+      const data = { type: 'vue2', message: "hello, i'm sub app's iframe" };
+      iframe.postMessage(JSON.stringify(data), '*');
     },
     postMessageToIframe() {
       const iframe = window.parent;
-      const data = { type: "vue3", message: "hello, i'm sub app's iframe" };
-      iframe.postMessage(JSON.stringify(data), "*");
+      const data = { type: 'vue3', message: "hello, i'm sub app's iframe" };
+      iframe.postMessage(JSON.stringify(data), '*');
     },
   },
   mounted() {
-    window.addEventListener("message", this.handleMessage);
+    window.addEventListener('message', this.handleMessage);
   },
   onMounted() {
-    window.removeEventListener("message", this.handleMessage);
+    window.removeEventListener('message', this.handleMessage);
   },
 };
 </script>

@@ -7,12 +7,11 @@
     "url": "https://github.com/Tencent/wujie.git"
   },
   "main": "./lib/index.umd.js",
-  "module": "./esm-compat/index.js",
+  "module": "./esm/index.mjs",
   "types": "./types/index.d.ts",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "webpack": "./esm-compat/index.js",
       "import": "./esm/index.mjs",
       "require": "./lib/index.umd.js",
       "default": "./esm/index.mjs"
@@ -22,14 +21,13 @@
   "jsdelivr": "./lib/index.umd.js",
   "files": [
     "esm",
-    "esm-compat",
     "lib",
     "types"
   ],
   "scripts": {
-    "clean": "rimraf lib esm esm-compat",
+    "clean": "rimraf lib esm types",
     "build": "pnpm run clean && pnpm run build:esm && pnpm run build:umd && pnpm run build:types",
-    "build:esm": "vite build --mode esm && vite build --mode esm-compat",
+    "build:esm": "vite build --mode esm",
     "build:umd": "vite build --mode umd",
     "build:types": "tsc --project tsconfig.json",
     "lib": "pnpm run build:umd",
@@ -37,23 +35,15 @@
     "types": "pnpm run build:types",
     "typecheck": "tsc --project tsconfig.json --noEmit && tsc --project __test__/unit/tsconfig.json --noEmit && pnpm run typecheck:public",
     "typecheck:public": "tsc --project tsconfig.test.json",
-    "lint": "eslint index.ts __test__",
+    "lint": "eslint index.tsx __test__",
     "lint:fix": "pnpm run lint --fix",
-    "prepack": "pnpm run build",
     "start": "pnpm run build:types && vite build --mode esm --watch",
     "test:unit": "vitest run --config __test__/unit/vitest.config.mts --coverage",
     "test:ui": "pnpm run test:unit",
     "test": "pnpm run lint && pnpm run typecheck && pnpm run typecheck:public && pnpm run test:unit && pnpm run test:ui"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "peerDependencies": {
     "react": ">=17.0.2"
-  },
-  "config": {
-    "unsafe-perm": true,
-    "registry": "https://registry.npmjs.org/"
   },
   "author": "yiludege",
   "license": "MIT",

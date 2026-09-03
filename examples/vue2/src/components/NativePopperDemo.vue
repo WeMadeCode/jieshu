@@ -21,34 +21,34 @@
 </template>
 
 <script>
-import PopperV1 from "popper.js";
-import { createPopper } from "@popperjs/core";
-import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
+import PopperV1 from 'popper.js';
+import { createPopper } from '@popperjs/core';
+import { autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom';
 
 const DEMO_CASES = [
   {
-    key: "popper1",
-    label: "打开 Popper.js 1.x",
-    title: "Popper.js 1.16.1",
+    key: 'popper1',
+    label: '打开 Popper.js 1.x',
+    title: 'Popper.js 1.16.1',
   },
   {
-    key: "popper2",
-    label: "打开 Popper.js 2.x",
-    title: "@popperjs/core 2.11.8",
+    key: 'popper2',
+    label: '打开 Popper.js 2.x',
+    title: '@popperjs/core 2.11.8',
   },
   {
-    key: "floating",
-    label: "打开 Floating UI",
-    title: "@floating-ui/dom 0.5.4",
+    key: 'floating',
+    label: '打开 Floating UI',
+    title: '@floating-ui/dom 0.5.4',
   },
 ];
 
 export default {
-  name: "NativePopperDemo",
+  name: 'NativePopperDemo',
   props: {
     context: {
       type: String,
-      default: "",
+      default: '',
     },
     visible: {
       type: Boolean,
@@ -57,7 +57,7 @@ export default {
   },
   data() {
     return {
-      activeKey: "",
+      activeKey: '',
       demoCases: DEMO_CASES,
       instances: {},
     };
@@ -94,7 +94,7 @@ export default {
         const referenceEl = this.getReferenceEl(key);
         const popperEl = this.getPopperEl(key);
         if (!referenceEl || !popperEl) return;
-        popperEl.style.display = "block";
+        popperEl.style.display = 'block';
         this.instances[key] = this.createInstance(key, referenceEl, popperEl);
         this.updateActive();
       });
@@ -104,52 +104,52 @@ export default {
       if (!key) return;
       this.destroyInstance(key);
       const popperEl = this.getPopperEl(key);
-      if (popperEl) popperEl.style.display = "none";
-      this.activeKey = "";
+      if (popperEl) popperEl.style.display = 'none';
+      this.activeKey = '';
     },
     updateActive() {
       const instance = this.instances[this.activeKey];
       if (instance && instance.update) instance.update();
     },
     createInstance(key, referenceEl, popperEl) {
-      if (key === "popper1") {
+      if (key === 'popper1') {
         return new PopperV1(referenceEl, popperEl, {
-          placement: "top",
+          placement: 'top',
           gpuAcceleration: true,
           modifiers: {
             offset: {
-              offset: "0, 8",
+              offset: '0, 8',
             },
             preventOverflow: {
-              boundariesElement: "viewport",
+              boundariesElement: 'viewport',
               padding: 8,
             },
           },
         });
       }
 
-      if (key === "popper2") {
+      if (key === 'popper2') {
         return createPopper(referenceEl, popperEl, {
-          placement: "top",
+          placement: 'top',
           modifiers: [
             {
-              name: "offset",
+              name: 'offset',
               options: {
                 offset: [0, 8],
               },
             },
             {
-              name: "flip",
+              name: 'flip',
             },
             {
-              name: "preventOverflow",
+              name: 'preventOverflow',
               options: {
-                boundary: "viewport",
+                boundary: 'viewport',
                 padding: 8,
               },
             },
             {
-              name: "computeStyles",
+              name: 'computeStyles',
               options: {
                 gpuAcceleration: true,
               },
@@ -163,16 +163,16 @@ export default {
     createFloatingInstance(referenceEl, popperEl) {
       const update = () => {
         computePosition(referenceEl, popperEl, {
-          placement: "top",
-          strategy: "absolute",
+          placement: 'top',
+          strategy: 'absolute',
           middleware: [offset(8), flip(), shift({ padding: 8 })],
         }).then(({ x, y, strategy }) => {
           Object.assign(popperEl.style, {
             position: strategy,
-            left: "0",
-            top: "0",
+            left: '0',
+            top: '0',
             transform: `translate3d(${x}px, ${y}px, 0)`,
-            willChange: "transform",
+            willChange: 'transform',
           });
         });
       };
@@ -294,12 +294,12 @@ export default {
 
 .native-popper-demo__arrow::before {
   visibility: visible;
-  content: "";
+  content: '';
   transform: rotate(45deg);
 }
 
-.native-popper-demo__popper[x-placement^="top"] .native-popper-demo__arrow,
-.native-popper-demo__popper[data-popper-placement^="top"] .native-popper-demo__arrow {
+.native-popper-demo__popper[x-placement^='top'] .native-popper-demo__arrow,
+.native-popper-demo__popper[data-popper-placement^='top'] .native-popper-demo__arrow {
   bottom: -4px;
 }
 </style>

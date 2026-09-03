@@ -5,14 +5,11 @@ collapsable: false
 
 # Vue 组件封装
 
-无界基于`vue2`和`vue3`框架的组件封装，，查看 [demo](https://wujie-micro.github.io/demo-main-vue/)，查看 [demo github](https://github.com/Tencent/wujie/tree/master/examples/main-vue/)
+无界提供 Vue 3 组件封装，查看 [demo](https://wujie-micro.github.io/demo-main-vue/)，查看 [demo github](https://github.com/Tencent/wujie/tree/master/examples/main-vue/)
 
 ## 安装
 
 ```bash
-# vue2 框架
-npm i wujie-vue2 -S
-# vue3 框架
 npm i wujie-vue3 -S
 
 ```
@@ -20,14 +17,11 @@ npm i wujie-vue3 -S
 ## 引入
 
 ```javascript
-// vue2
-import WujieVue from 'wujie-vue2';
-// vue3
 import WujieVue from 'wujie-vue3';
 
 const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = WujieVue;
 
-Vue.use(WujieVue);
+app.use(WujieVue);
 ```
 
 ## 使用

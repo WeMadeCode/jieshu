@@ -2,5 +2,5 @@
 // The repository itself is linted exclusively through eslint.config.mjs.
 module.exports = {
   root: true,
-  ignorePatterns: ['packages/*/esm/**', 'packages/*/esm-compat/**', 'packages/*/lib/**'],
+  ignorePatterns: ['packages/*/esm/**', 'packages/*/lib/**', 'packages/*/types/**'],
 };

@@ -4,12 +4,13 @@
 </template>
 
 <script>
-import hostMap from "../hostMap";
+import hostMap from '../hostMap';
 
 export default {
+  name: 'Vue2View',
   data() {
     return {
-      vue2Url: hostMap("//localhost:7200/"),
+      vue2Url: hostMap('//localhost:7200/'),
     };
   },
   methods: {
@@ -20,4 +21,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

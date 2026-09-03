@@ -3,31 +3,22 @@
   "version": "2.1.0",
   "private": true,
   "scripts": {
-    "start": "vue-cli-service serve",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "start": "vite --host 0.0.0.0 --port 8000",
+    "build": "vite build"
   },
   "dependencies": {
-    "ant-design-vue": "^1.7.8",
+    "ant-design-vue": "2.2.8",
     "core-js": "^3.6.5",
     "custom-event-polyfill": "^1.0.7",
-    "vue": "^2.6.11",
-    "vue-router": "^3.2.0",
+    "vue": "^3.0.0",
+    "vue-router": "4.1.6",
     "whatwg-fetch": "^3.6.2",
     "wujie-core": "workspace:^2.1.0",
-    "wujie-vue2": "workspace:^2.1.0"
+    "wujie-vue3": "workspace:^2.1.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/eslint-config-prettier": "^6.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "7.12.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-vue": "^6.2.2",
-    "prettier": "^2.2.1",
-    "vue-template-compiler": "^2.6.11"
+    "@vitejs/plugin-vue": "6.0.8",
+    "@vue/compiler-sfc": "^3.0.0",
+    "vite": "8.2.2"
   }
 }

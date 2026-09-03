@@ -4,18 +4,18 @@
 </template>
 
 <script>
-import hostMap from "../hostMap";
-import wujieVue from "wujie-vue2";
+import hostMap from '../hostMap';
+import wujieVue from 'wujie-vue3';
 export default {
   data() {
     return {
-      react17Url: hostMap("//localhost:7100/") + this.$route.params.path,
+      react17Url: hostMap('//localhost:7100/') + this.$route.params.path,
     };
   },
   watch: {
-    "$route.params.path": {
+    '$route.params.path': {
       handler: function () {
-        wujieVue.bus.$emit("react17-router-change", `/${this.$route.params.path}`);
+        wujieVue.bus.$emit('react17-router-change', `/${this.$route.params.path}`);
       },
       immediate: true,
     },
@@ -23,4 +23,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

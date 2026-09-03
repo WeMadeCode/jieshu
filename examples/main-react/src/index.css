@@ -197,9 +197,8 @@ h3 {
 }
 .docs:hover {
   color: rgb(241, 107, 95);
-  border: 1px solid rgb(241, 107, 95)
+  border: 1px solid rgb(241, 107, 95);
 }
-
 
 .detail-content {
   width: 900px;
@@ -220,13 +219,12 @@ h3 {
   border: 1px solid rgb(217, 217, 217);
   box-shadow: 0 2px #00000004;
   background: rgb(241, 107, 95);
-  color: rgb(44, 62, 80); 
+  color: rgb(44, 62, 80);
 }
 
 .switch .ant-switch-inner {
   font-size: 20px;
 }
-
 
 .switch .ant-switch-handle {
   top: 7px;

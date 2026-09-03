@@ -7,12 +7,11 @@
     "url": "https://github.com/Tencent/wujie.git"
   },
   "main": "./lib/index.umd.js",
-  "module": "./esm-compat/index.js",
-  "types": "./index.d.ts",
+  "module": "./esm/index.mjs",
+  "types": "./types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./index.d.ts",
-      "webpack": "./esm-compat/index.js",
+      "types": "./types/index.d.ts",
       "import": "./esm/index.mjs",
       "require": "./lib/index.umd.js",
       "default": "./esm/index.mjs"
@@ -22,44 +21,38 @@
   "jsdelivr": "./lib/index.umd.js",
   "files": [
     "esm",
-    "esm-compat",
     "lib",
-    "index.d.ts"
+    "types"
   ],
   "scripts": {
-    "clean": "rimraf lib esm esm-compat",
+    "clean": "rimraf lib esm types",
     "build": "pnpm run clean && pnpm run build:esm && pnpm run build:umd && pnpm run build:types",
-    "build:esm": "vite build --mode esm && vite build --mode esm-compat",
+    "build:esm": "vite build --mode esm",
     "build:umd": "vite build --mode umd",
-    "build:types": "tsc --project tsconfig.json",
+    "build:types": "vue-tsc --project tsconfig.json",
     "lib": "pnpm run build:umd",
     "esm": "pnpm run build:esm",
-    "prepack": "pnpm run build",
     "start": "pnpm run build:types && vite build --mode esm --watch",
-    "typecheck": "tsc -p tsconfig.type-test.json && tsc -p __test__/unit/tsconfig.json --noEmit",
-    "lint": "eslint index.ts __test__",
+    "typecheck": "vue-tsc -p tsconfig.type-test.json && vue-tsc -p __test__/unit/tsconfig.json --noEmit",
+    "lint": "eslint index.ts WujieVue.vue __test__",
     "lint:fix": "pnpm run lint --fix",
     "test:unit": "vitest run --config __test__/unit/vitest.config.mts --coverage",
     "test:ui": "pnpm run test:unit",
     "test": "pnpm run lint && pnpm run typecheck && pnpm run test:unit && pnpm run test:ui"
   },
   "author": "yiludege",
-  "publishConfig": {
-    "access": "public"
-  },
   "peerDependencies": {
     "vue": ">=3.0.0"
-  },
-  "config": {
-    "unsafe-perm": true,
-    "registry": "https://registry.npmjs.org/"
   },
   "license": "MIT",
   "dependencies": {
     "wujie-core": "workspace:2.1.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "6.0.8",
+    "@vue/compiler-sfc": "^3.5.22",
     "csstype": "^3.1.1",
-    "vue": "^3.0.0"
+    "vue": "^3.0.0",
+    "vue-tsc": "3.3.11"
   }
 }

@@ -1,11 +1,11 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["./index.ts"],
+  "include": ["./index.ts", "./WujieVue.vue"],
   "exclude": ["node_modules", "esm", "lib"],
   "compilerOptions": {
     "isolatedModules": true,
     "declaration": true,
-    "declarationDir": ".",
+    "declarationDir": "./types",
     "emitDeclarationOnly": true,
     "sourceMap": false,
     "skipLibCheck": true

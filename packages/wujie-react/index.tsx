@@ -160,10 +160,7 @@ const WujieReactView = React.forwardRef<WujieReactRef, WujieReactProps>(
     });
 
     const { width, height, style } = componentProps;
-    return React.createElement('div', {
-      ref: containerRef,
-      style: { width, height, ...style },
-    });
+    return <div ref={containerRef} style={{ width, height, ...style }} />;
   },
 );
 

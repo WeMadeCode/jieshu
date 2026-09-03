@@ -40,8 +40,11 @@
 
         <div class="test-case">
           <h4>场景 6: 多个内联事件</h4>
-          <button onclick="multiEvent('click')" onmouseover="multiEvent('mouseover')"
-            onmouseout="multiEvent('mouseout')">
+          <button
+            onclick="multiEvent('click')"
+            onmouseover="multiEvent('mouseover')"
+            onmouseout="multiEvent('mouseout')"
+          >
             多事件测试
           </button>
           <div class="result" id="result6">等待测试...</div>
@@ -68,42 +71,42 @@
 
 <script>
 export default {
-  name: "InlineEvent",
+  name: 'InlineEvent',
   mounted() {
     // 在子应用的全局作用域中定义测试函数
     window.basicTest = (msg) => {
-      document.getElementById("result1").textContent = `✅ 成功: ${msg}`;
-      document.getElementById("result1").style.color = "green";
+      document.getElementById('result1').textContent = `✅ 成功: ${msg}`;
+      document.getElementById('result1').style.color = 'green';
     };
 
     window.multiParams = (p1, p2, p3) => {
-      document.getElementById("result2").textContent = `✅ 成功: ${p1}, ${p2}, ${p3}`;
-      document.getElementById("result2").style.color = "green";
+      document.getElementById('result2').textContent = `✅ 成功: ${p1}, ${p2}, ${p3}`;
+      document.getElementById('result2').style.color = 'green';
     };
 
     // 定义全局变量
-    window.testGlobalVar = "我是全局变量";
+    window.testGlobalVar = '我是全局变量';
 
     window.accessGlobal = () => {
-      document.getElementById("result3").textContent = `✅ 成功: ${window.testGlobalVar}`;
-      document.getElementById("result3").style.color = "green";
+      document.getElementById('result3').textContent = `✅ 成功: ${window.testGlobalVar}`;
+      document.getElementById('result3').style.color = 'green';
     };
 
     window.complexExpression = (a, b) => {
       const result = a + b;
-      document.getElementById("result4").textContent = `✅ 成功: ${a} + ${b} = ${result}`;
-      document.getElementById("result4").style.color = "green";
+      document.getElementById('result4').textContent = `✅ 成功: ${a} + ${b} = ${result}`;
+      document.getElementById('result4').style.color = 'green';
     };
 
     window.eventObjectTest = (event) => {
-      document.getElementById("result5").textContent = `✅ 成功: 事件类型=${event.type}, 目标=${event.target.tagName}`;
-      document.getElementById("result5").style.color = "green";
+      document.getElementById('result5').textContent = `✅ 成功: 事件类型=${event.type}, 目标=${event.target.tagName}`;
+      document.getElementById('result5').style.color = 'green';
     };
 
     window.multiEvent = (eventType) => {
-      const resultEl = document.getElementById("result6");
+      const resultEl = document.getElementById('result6');
       resultEl.textContent = `✅ 成功: ${eventType} 事件触发`;
-      resultEl.style.color = "green";
+      resultEl.style.color = 'green';
     };
   },
 };

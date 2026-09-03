@@ -5,7 +5,7 @@
       <!-- react16相关路由 -->
       <router-link to="/react16">
         react16
-        <a-icon :class="['main-icon', { active: react16Flag }]" type="caret-up" @click.native="handleFlag('react16')" />
+        <span :class="['main-icon', { active: react16Flag }]" @click="handleFlag('react16')">▲</span>
       </router-link>
       <div class="sub-menu" v-show="react16Flag">
         <router-link to="/react16-sub/home">home</router-link>
@@ -19,7 +19,7 @@
       <router-link to="/react17">
         react17
         <span class="alive">保活</span>
-        <a-icon :class="['main-icon', { active: react17Flag }]" type="caret-up" @click.native="handleFlag('react17')" />
+        <span :class="['main-icon', { active: react17Flag }]" @click="handleFlag('react17')">▲</span>
       </router-link>
       <div class="sub-menu" v-show="react17Flag">
         <router-link to="/react17-sub/home">home</router-link>
@@ -31,7 +31,7 @@
       <!-- vue2相关路由 -->
       <router-link to="/vue2">
         vue2
-        <a-icon :class="['main-icon', { active: vue2Flag }]" type="caret-up" @click.native="handleFlag('vue2')" />
+        <span :class="['main-icon', { active: vue2Flag }]" @click="handleFlag('vue2')">▲</span>
       </router-link>
       <div class="sub-menu" v-show="vue2Flag">
         <router-link to="/vue2-sub/home">home</router-link>
@@ -44,7 +44,7 @@
       <router-link v-if="degrade" to="/vue3">
         vue3
         <span class="alive">保活</span>
-        <a-icon :class="['main-icon', { active: vue3Flag }]" type="caret-up" @click.native="handleFlag('vue3')" />
+        <span :class="['main-icon', { active: vue3Flag }]" @click="handleFlag('vue3')">▲</span>
       </router-link>
       <div class="sub-menu" v-show="vue3Flag">
         <router-link to="/vue3-sub/home">home</router-link>
@@ -54,8 +54,9 @@
         <router-link to="/vue3-sub/state">state</router-link>
         <router-link to="/vue3-sub/inline-event">inline-event</router-link>
       </div>
-      <router-link v-if="degrade" to="/vite">vite <a-icon :class="['main-icon', { active: viteFlag }]" type="caret-up"
-          @click.native="handleFlag('vite')" /></router-link>
+      <router-link v-if="degrade" to="/vite"
+        >vite <span :class="['main-icon', { active: viteFlag }]" @click="handleFlag('vite')">▲</span></router-link
+      >
       <div class="sub-menu" v-show="viteFlag">
         <router-link to="/vite-sub/home">home</router-link>
         <router-link to="/vite-sub/dialog">dialog</router-link>
@@ -65,7 +66,7 @@
       <router-link to="/angular12">angular12</router-link>
       <router-link to="/all">all</router-link>
       <router-link to="/postmessage">postmessage</router-link>
-      <a-button class="menu-icon" type="primary" icon="unordered-list" size="large" @click.stop="active = !active" />
+      <a-button class="menu-icon" type="primary" size="large" @click.stop="active = !active">☰</a-button>
     </div>
     <div class="content" @click="active = false">
       <router-view />
@@ -75,30 +76,30 @@
 
 <script>
 export default {
-  name: "App",
+  name: 'App',
   data() {
     return {
       active: false,
-      react16Flag: this.$route.name === "react16-sub",
-      react17Flag: this.$route.name === "react17-sub",
-      vue2Flag: this.$route.name === "vue2-sub",
-      vue3Flag: this.$route.name === "vue3-sub",
-      viteFlag: this.$route.name === "vite-sub",
+      react16Flag: this.$route.name === 'react16-sub',
+      react17Flag: this.$route.name === 'react17-sub',
+      vue2Flag: this.$route.name === 'vue2-sub',
+      vue3Flag: this.$route.name === 'vue3-sub',
+      viteFlag: this.$route.name === 'vite-sub',
       degrade: window.Proxy,
     };
   },
   mounted() {
-    window.addEventListener("message", this.handleMessage);
+    window.addEventListener('message', this.handleMessage);
   },
-  beforeDestroy() {
-    window.removeEventListener("message", this.handleMessage);
+  beforeUnmount() {
+    window.removeEventListener('message', this.handleMessage);
   },
   methods: {
     close() {
       if (this.active) this.active = false;
     },
     handleFlag(name) {
-      this[name + "Flag"] = !this[name + "Flag"];
+      this[name + 'Flag'] = !this[name + 'Flag'];
     },
   },
 };

@@ -1,24 +1,29 @@
-# multiple
+# Vue 3 host example
 
 ## Project setup
-```
-yarn install
+
+```bash
+pnpm install
 ```
 
 ### Compiles and hot-reloads for development
-```
-yarn serve
+
+```bash
+pnpm start
 ```
 
 ### Compiles and minifies for production
-```
-yarn build
+
+```bash
+pnpm build
 ```
 
 ### Lints and fixes files
-```
-yarn lint
+
+```bash
+pnpm lint
 ```
 
 ### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
+See [Vite Configuration](https://vite.dev/config/).

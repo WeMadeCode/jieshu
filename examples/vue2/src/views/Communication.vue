@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import HelloWorld from "@/components/HelloWorld.vue";
+import HelloWorld from '@/components/HelloWorld.vue';
 export default {
   components: {
     HelloWorld,
@@ -34,13 +34,13 @@ export default {
   },
   methods: {
     handleClick() {
-      window?.$wujie.props.jump("react17");
+      window?.$wujie.props.jump('react17');
     },
     handleAlert() {
-      window?.parent.alert("主应用alert");
+      window?.parent.alert('主应用alert');
     },
     handleEmit() {
-      window?.$wujie.bus.$emit("click", "vue2");
+      window?.$wujie.bus.$emit('click', 'vue2');
     },
   },
 };
