@@ -13,3 +13,6 @@ web_search = "cached"
 # Do not forward values whose names commonly contain credentials to subprocesses.
 [shell_environment_policy]
 ignore_default_excludes = false
+
+[sandbox_workspace_write]
+network_access = true

@@ -1,3 +1,31 @@
+const nativeWindowEvents = vi.hoisted(() => ({
+  add: vi.fn(function (
+    this: Window,
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions,
+  ): void {
+    Reflect.apply(this.EventTarget.prototype.addEventListener, this, [type, listener, options]);
+  }),
+  remove: vi.fn(function (
+    this: Window,
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions,
+  ): void {
+    Reflect.apply(this.EventTarget.prototype.removeEventListener, this, [type, listener, options]);
+  }),
+}));
+
+vi.mock('../../src/common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/common')>();
+  return {
+    ...actual,
+    rawWindowAddEventListener: nativeWindowEvents.add,
+    rawWindowRemoveEventListener: nativeWindowEvents.remove,
+  };
+});
+
 import Wujie from '../../src/sandbox';
 import { isWindowEventAllowedByPolicy, patchIframeEvents } from '../../src/iframe';
 
@@ -46,7 +74,7 @@ describe('iframe window event permissions policy', () => {
 
   test('keeps unload behavior when the browser does not recognize the policy feature', () => {
     const iframeWindow = createIframeWindow();
-    const allowsFeature = jest.fn(() => false);
+    const allowsFeature = vi.fn(() => false);
     installFeaturePolicy(iframeWindow, {
       allowsFeature,
       features: () => ['camera'],
@@ -58,14 +86,14 @@ describe('iframe window event permissions policy', () => {
 
   test('does not call the native unload registration when policy blocks it', () => {
     const iframeWindow = createIframeWindow();
-    const allowsFeature = jest.fn(() => false);
+    const allowsFeature = vi.fn(() => false);
     installFeaturePolicy(iframeWindow, {
       allowsFeature,
       features: () => ['unload'],
     });
     installSandbox(iframeWindow);
     patchIframeEvents(iframeWindow);
-    const listener = jest.fn();
+    const listener = vi.fn();
 
     iframeWindow.addEventListener('unload', listener);
     iframeWindow.dispatchEvent(new iframeWindow.Event('unload'));
@@ -86,7 +114,7 @@ describe('iframe window event permissions policy', () => {
     });
     installSandbox(iframeWindow);
     patchIframeEvents(iframeWindow);
-    const listener = jest.fn();
+    const listener = vi.fn();
 
     iframeWindow.onunload = listener;
     iframeWindow.dispatchEvent(new iframeWindow.Event('unload'));
@@ -106,7 +134,7 @@ describe('iframe window event permissions policy', () => {
     });
     installSandbox(iframeWindow);
     patchIframeEvents(iframeWindow);
-    const listener = jest.fn();
+    const listener = vi.fn();
 
     iframeWindow.addEventListener('unload', listener);
     iframeWindow.dispatchEvent(new iframeWindow.Event('unload'));
@@ -125,7 +153,7 @@ describe('iframe window event permissions policy', () => {
     });
     installSandbox(iframeWindow);
     patchIframeEvents(iframeWindow);
-    const listener = jest.fn();
+    const listener = vi.fn();
 
     iframeWindow.onunload = listener;
     iframeWindow.dispatchEvent(new iframeWindow.Event('unload'));
@@ -139,7 +167,7 @@ describe('iframe window event permissions policy', () => {
     const iframeWindow = createIframeWindow();
     installSandbox(iframeWindow);
     patchIframeEvents(iframeWindow);
-    const listener = jest.fn();
+    const listener = vi.fn();
 
     iframeWindow.addEventListener('pagehide', listener);
     window.dispatchEvent(new Event('pagehide'));

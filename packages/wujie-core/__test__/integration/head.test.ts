@@ -1,5 +1,20 @@
+import { expect, test, type Page } from '@playwright/test';
+
 import { awaitConsoleLogMessage, triggerClickByJsSelector, sleep } from './utils';
 import { reactMainAppInfoMap, vueMainAppInfoMap } from './common';
+
+const describe = test.describe;
+const beforeAll = test.beforeAll;
+const it = test;
+let page: Page;
+
+beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
 
 const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainAppInfoMap, homeSelector: string) => {
   it('test head without cache', async () => {
@@ -15,7 +30,7 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
     const vue2MountedPromiseAgain = awaitConsoleLogMessage(page, AppInfoMap.vue2.mountedMessage);
     await page.click(AppInfoMap.vue2.linkSelector);
     await vue2MountedPromiseAgain;
-    let vue2HomeTitle = await page.evaluateHandle(AppInfoMap.vue2.titleJsSelector);
+    let vue2HomeTitle = await page.evaluateHandle<Element>(AppInfoMap.vue2.titleJsSelector);
     // mounted 事件触发后样式还需要 1 帧才会真正应用，等一会儿再读 computed style
     await sleep(100);
     expect(await vue2HomeTitle.asElement()!.evaluate((el) => window.getComputedStyle(el).color)).toBe(
@@ -26,7 +41,7 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
     const vue2DialogMountedPromise = awaitConsoleLogMessage(page, AppInfoMap.vue2.dialogMountedMessage);
     await triggerClickByJsSelector(page, AppInfoMap.vue2.dialogNavSelector);
     await vue2DialogMountedPromise;
-    const vue2DialogTitle = await page.evaluateHandle(AppInfoMap.vue2.titleJsSelector);
+    const vue2DialogTitle = await page.evaluateHandle<Element>(AppInfoMap.vue2.titleJsSelector);
     await sleep(100);
     expect(await vue2DialogTitle.asElement()!.evaluate((el) => window.getComputedStyle(el).color)).toBe(
       'rgb(2, 57, 208)',
@@ -35,7 +50,7 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
 };
 describe('main react head test', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
@@ -47,7 +62,7 @@ describe('main react head test', () => {
 });
 describe('main vue head test', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');

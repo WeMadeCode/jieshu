@@ -1,50 +1,65 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
+import type { Mock, MockInstance } from 'vitest';
 import type { StartOptions } from 'wujie';
-import type { WujieReactRef } from '../../index';
+import WujieReact, { type WujieReactRef } from '../../index';
 
 interface MockController {
-  start: jest.Mock<Promise<void>, [StartOptions]>;
-  refresh: jest.Mock<Promise<void>, [StartOptions]>;
-  destroy: jest.Mock<Promise<void>, [string]>;
-  dispose: jest.Mock<void, []>;
+  start: Mock<(options: StartOptions) => Promise<void>>;
+  refresh: Mock<(options: StartOptions) => Promise<void>>;
+  destroy: Mock<(name: string) => Promise<void>>;
+  dispose: Mock<() => void>;
 }
 
-const mockBus = { $emit: jest.fn() };
-const mockSetupApp = jest.fn();
-const mockPreloadApp = jest.fn();
-const mockDestroyApp = jest.fn();
-const mockRefreshApp = jest.fn();
-const mockClearAssetsCache = jest.fn();
-const mockControllers: MockController[] = [];
+const mocks = vi.hoisted(() => {
+  const mockControllers: MockController[] = [];
+  const mockNewController = (): MockController => ({
+    start: vi.fn<(options: StartOptions) => Promise<void>>().mockResolvedValue(undefined),
+    refresh: vi.fn<(options: StartOptions) => Promise<void>>().mockResolvedValue(undefined),
+    destroy: vi.fn<(name: string) => Promise<void>>().mockResolvedValue(undefined),
+    dispose: vi.fn<() => void>(),
+  });
+  const mockCreateAppController = vi.fn((): MockController => {
+    const controller = mockNewController();
+    mockControllers.push(controller);
+    return controller;
+  });
 
-function mockNewController(): MockController {
   return {
-    start: jest.fn().mockResolvedValue(undefined),
-    refresh: jest.fn().mockResolvedValue(undefined),
-    destroy: jest.fn().mockResolvedValue(undefined),
-    dispose: jest.fn(),
+    mockBus: { $emit: vi.fn() },
+    mockSetupApp: vi.fn(),
+    mockPreloadApp: vi.fn(),
+    mockDestroyApp: vi.fn(),
+    mockRefreshApp: vi.fn(),
+    mockClearAssetsCache: vi.fn(),
+    mockControllers,
+    mockNewController,
+    mockCreateAppController,
   };
-}
-
-const mockCreateAppController = jest.fn((): MockController => {
-  const controller = mockNewController();
-  mockControllers.push(controller);
-  return controller;
 });
 
-jest.mock('wujie', () => ({
-  bus: mockBus,
-  setupApp: mockSetupApp,
-  preloadApp: mockPreloadApp,
-  destroyApp: mockDestroyApp,
-  refreshApp: mockRefreshApp,
-  clearAssetsCache: mockClearAssetsCache,
-  createAppController: mockCreateAppController,
+vi.mock('wujie', () => ({
+  bus: mocks.mockBus,
+  setupApp: mocks.mockSetupApp,
+  preloadApp: mocks.mockPreloadApp,
+  destroyApp: mocks.mockDestroyApp,
+  refreshApp: mocks.mockRefreshApp,
+  clearAssetsCache: mocks.mockClearAssetsCache,
+  createAppController: mocks.mockCreateAppController,
 }));
 
-const WujieReact = require('../../index').default as typeof import('../../index').default;
+const {
+  mockBus,
+  mockSetupApp,
+  mockPreloadApp,
+  mockDestroyApp,
+  mockRefreshApp,
+  mockClearAssetsCache,
+  mockControllers,
+  mockCreateAppController,
+  mockNewController,
+} = mocks;
 
 function renderComponent(
   container: HTMLDivElement,
@@ -64,7 +79,7 @@ async function flushPromises(): Promise<void> {
 
 describe('WujieReact', () => {
   let host: HTMLDivElement;
-  let consoleError: jest.SpyInstance;
+  let consoleError: MockInstance;
 
   beforeEach(() => {
     host = document.createElement('div');
@@ -75,7 +90,7 @@ describe('WujieReact', () => {
       mockControllers.push(controller);
       return controller;
     });
-    consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -90,9 +105,9 @@ describe('WujieReact', () => {
 
   test('mounts with every start option, restarts only for identity changes, and exposes controls', async () => {
     const loading = document.createElement('span');
-    const replace = jest.fn();
-    const customFetch = jest.fn();
-    const lifecycle = jest.fn();
+    const replace = vi.fn();
+    const customFetch = vi.fn();
+    const lifecycle = vi.fn();
     const forwardedRef = React.createRef<WujieReactRef>();
     const props = {
       name: 'first',
@@ -259,18 +274,18 @@ describe('WujieReact', () => {
     await expect(forwardedRef.current?.refresh()).rejects.toBe(failure);
   });
 
-  test('selects the passive ownership effect when imported without a browser window', () => {
+  test('selects the passive ownership effect when imported without a browser window', async () => {
     const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'window');
     if (!descriptor) throw new Error('jsdom window descriptor is unavailable');
 
     try {
       delete (globalThis as unknown as Record<string, unknown>)['window'];
-      jest.isolateModules(() => {
-        const serverComponent = jest.requireActual('../../index').default;
-        expect(serverComponent.displayName).toBe('WujieReact');
-      });
+      vi.resetModules();
+      const serverComponent = (await import('../../index')).default;
+      expect(serverComponent.displayName).toBe('WujieReact');
     } finally {
       Object.defineProperty(globalThis, 'window', descriptor);
+      vi.resetModules();
     }
   });
 });

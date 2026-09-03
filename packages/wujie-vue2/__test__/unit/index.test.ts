@@ -1,53 +1,67 @@
 import Vue, { type VueConstructor } from 'vue';
+import type { Mock, MockInstance } from 'vitest';
 import type { StartOptions } from 'wujie';
+import WujieVue, { type WujieVueInstance } from '../../index';
 
 interface MockController {
-  start: jest.Mock<Promise<void>, [StartOptions]>;
-  refresh: jest.Mock<Promise<void>, [StartOptions]>;
-  destroy: jest.Mock<Promise<void>, [string]>;
-  dispose: jest.Mock<void, []>;
+  start: Mock<(options: StartOptions) => Promise<void>>;
+  refresh: Mock<(options: StartOptions) => Promise<void>>;
+  destroy: Mock<(name: string) => Promise<void>>;
+  dispose: Mock<() => void>;
 }
 
-const mockBus = {
-  $onAll: jest.fn(),
-  $offAll: jest.fn(),
-  $emit: jest.fn(),
-};
-const mockSetupApp = jest.fn();
-const mockPreloadApp = jest.fn();
-const mockDestroyApp = jest.fn();
-const mockRefreshApp = jest.fn();
-const mockClearAssetsCache = jest.fn();
-const mockControllers: MockController[] = [];
+const mocks = vi.hoisted(() => {
+  const mockControllers: MockController[] = [];
+  const mockNewController = (): MockController => ({
+    start: vi.fn<(options: StartOptions) => Promise<void>>().mockResolvedValue(undefined),
+    refresh: vi.fn<(options: StartOptions) => Promise<void>>().mockResolvedValue(undefined),
+    destroy: vi.fn<(name: string) => Promise<void>>().mockResolvedValue(undefined),
+    dispose: vi.fn<() => void>(),
+  });
+  const mockCreateAppController = vi.fn((): MockController => {
+    const controller = mockNewController();
+    mockControllers.push(controller);
+    return controller;
+  });
 
-function mockNewController(): MockController {
   return {
-    start: jest.fn().mockResolvedValue(undefined),
-    refresh: jest.fn().mockResolvedValue(undefined),
-    destroy: jest.fn().mockResolvedValue(undefined),
-    dispose: jest.fn(),
+    mockBus: {
+      $onAll: vi.fn(),
+      $offAll: vi.fn(),
+      $emit: vi.fn(),
+    },
+    mockSetupApp: vi.fn(),
+    mockPreloadApp: vi.fn(),
+    mockDestroyApp: vi.fn(),
+    mockRefreshApp: vi.fn(),
+    mockClearAssetsCache: vi.fn(),
+    mockControllers,
+    mockNewController,
+    mockCreateAppController,
   };
-}
-
-const mockCreateAppController = jest.fn((): MockController => {
-  const controller = mockNewController();
-  mockControllers.push(controller);
-  return controller;
 });
 
-jest.mock('wujie', () => ({
-  bus: mockBus,
-  setupApp: mockSetupApp,
-  preloadApp: mockPreloadApp,
-  destroyApp: mockDestroyApp,
-  refreshApp: mockRefreshApp,
-  clearAssetsCache: mockClearAssetsCache,
-  createAppController: mockCreateAppController,
+vi.mock('wujie', () => ({
+  bus: mocks.mockBus,
+  setupApp: mocks.mockSetupApp,
+  preloadApp: mocks.mockPreloadApp,
+  destroyApp: mocks.mockDestroyApp,
+  refreshApp: mocks.mockRefreshApp,
+  clearAssetsCache: mocks.mockClearAssetsCache,
+  createAppController: mocks.mockCreateAppController,
 }));
 
-import type { WujieVueInstance } from '../../index';
-
-const WujieVue = require('../../index').default as typeof import('../../index').default;
+const {
+  mockBus,
+  mockSetupApp,
+  mockPreloadApp,
+  mockDestroyApp,
+  mockRefreshApp,
+  mockClearAssetsCache,
+  mockControllers,
+  mockCreateAppController,
+  mockNewController,
+} = mocks;
 
 type TestInstance = WujieVueInstance & {
   _isDestroyed: boolean;
@@ -67,7 +81,7 @@ function mountComponent(props: Record<string, unknown>): TestInstance {
 
 describe('WujieVue for Vue 2', () => {
   const instances: TestInstance[] = [];
-  let consoleError: jest.SpyInstance;
+  let consoleError: MockInstance;
 
   beforeAll(() => {
     Vue.config.productionTip = false;
@@ -82,7 +96,7 @@ describe('WujieVue for Vue 2', () => {
       mockControllers.push(controller);
       return controller;
     });
-    consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -96,9 +110,9 @@ describe('WujieVue for Vue 2', () => {
 
   test('mounts with every start option, forwards events, reacts to identity, and cleans up', async () => {
     const loading = document.createElement('span');
-    const replace = jest.fn();
-    const customFetch = jest.fn();
-    const lifecycle = jest.fn();
+    const replace = vi.fn();
+    const customFetch = vi.fn();
+    const lifecycle = vi.fn();
     const props = {
       name: 'first',
       url: 'https://first.test/',
@@ -167,7 +181,7 @@ describe('WujieVue for Vue 2', () => {
     expect(childContainer.style.height).toBe('480px');
     expect(childContainer.style.color).toBe('red');
 
-    const eventHandler = jest.fn();
+    const eventHandler = vi.fn();
     instance.$on('adapter-event', eventHandler);
     const forwardBusEvent = mockBus.$onAll.mock.calls[0][0];
     forwardBusEvent('adapter-event', 'payload', 2);
@@ -191,7 +205,7 @@ describe('WujieVue for Vue 2', () => {
     await expect(instance.destroy()).resolves.toBeUndefined();
     expect(controller.destroy).toHaveBeenCalledWith('second');
 
-    const stopWatch = jest.fn(instance.stopIdentityWatch as () => void);
+    const stopWatch = vi.fn(instance.stopIdentityWatch as () => void);
     instance.stopIdentityWatch = stopWatch;
     instance.$destroy();
     expect(stopWatch).toHaveBeenCalledTimes(1);
@@ -212,7 +226,7 @@ describe('WujieVue for Vue 2', () => {
     expect(WujieVue.refreshApp).toBe(mockRefreshApp);
     expect(WujieVue.clearAssetsCache).toBe(mockClearAssetsCache);
 
-    const VueConstructor = { component: jest.fn() } as unknown as VueConstructor;
+    const VueConstructor = { component: vi.fn() } as unknown as VueConstructor;
     WujieVue.install(VueConstructor);
     expect(VueConstructor.component).toHaveBeenCalledWith('WujieVue', expect.anything());
   });
@@ -260,18 +274,20 @@ describe('WujieVue for Vue 2', () => {
     expect(instance.appController.dispose).toHaveBeenCalledTimes(1);
   });
 
-  test('uses an object prop validator when imported without HTMLElement', () => {
+  test('uses an object prop validator when imported without HTMLElement', async () => {
     const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'HTMLElement');
     if (!descriptor) throw new Error('jsdom HTMLElement descriptor is unavailable');
 
     try {
       delete (globalThis as unknown as Record<string, unknown>)['HTMLElement'];
-      jest.isolateModules(() => {
-        const serverComponent = jest.requireActual('../../index').default;
-        expect(serverComponent.options.name).toBe('WujieVue');
-      });
+      vi.resetModules();
+      const serverComponent = (await import('../../index')).default as unknown as {
+        options: { name: string };
+      };
+      expect(serverComponent.options.name).toBe('WujieVue');
     } finally {
       Object.defineProperty(globalThis, 'HTMLElement', descriptor);
+      vi.resetModules();
     }
   });
 });

@@ -7,20 +7,18 @@
  * onXXX 原值，否则 iframeWindow 会被闭包钉住、主 window 残留 dangling handler。
  */
 
-export {};
-
-const mockWarnDestroy = jest.fn();
-jest.mock('../../src/utils', () => {
-  const actual = jest.requireActual('../../src/utils');
+const mockWarnDestroy = vi.hoisted(() => vi.fn());
+vi.mock('../../src/utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/utils')>();
   return { ...actual, warn: mockWarnDestroy };
 });
 
-const { EventCleanupTracker } = require('../../src/tracker');
+import { EventCleanupTracker } from '../../src/tracker';
 
 describe('EventCleanupTracker 主应用 window.document 上的 listener 反向解绑', () => {
   test('trackMainDocumentListener + cleanupAll 应能反向解绑主 document 上的 listener', () => {
     const tracker = new EventCleanupTracker();
-    const handler = jest.fn();
+    const handler = vi.fn();
 
     window.document.addEventListener('keydown', handler);
     tracker.trackMainDocumentListener({ type: 'keydown', callback: handler });
@@ -37,7 +35,7 @@ describe('EventCleanupTracker 主应用 window.document 上的 listener 反向�
 
   test('untrackMainDocumentListener 后 cleanupAll 不应再次尝试解绑（防御 destroy 时重复解绑）', () => {
     const tracker = new EventCleanupTracker();
-    const handler = jest.fn();
+    const handler = vi.fn();
     const entry = { type: 'keydown', callback: handler };
 
     window.document.addEventListener('keydown', handler);
@@ -55,7 +53,7 @@ describe('EventCleanupTracker 主应用 window.document 上的 listener 反向�
 
   test('cleanupAll 中 removeEventListener 抛错不应中断后续清理（防御性）', () => {
     const tracker = new EventCleanupTracker();
-    const okHandler = jest.fn();
+    const okHandler = vi.fn();
     window.document.addEventListener('keydown', okHandler);
     tracker.trackMainDocumentListener({ type: 'keydown', callback: okHandler });
 

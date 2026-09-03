@@ -34,14 +34,14 @@ function createStartSandbox(): { sandbox: Wujie; iframe: HTMLIFrameElement; ifra
 describe('sandbox startup script lanes', () => {
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('serializes an async-marked inline preset without stalling startup', async () => {
     const { sandbox, iframeWindow } = createStartSandbox();
     const head = iframeWindow.document.head;
     const rawAppendChild = iframeWindow.Node.prototype.appendChild;
-    jest.spyOn(head, 'appendChild').mockImplementation(function <NodeType extends Node>(
+    vi.spyOn(head, 'appendChild').mockImplementation(function <NodeType extends Node>(
       this: HTMLHeadElement,
       node: NodeType,
     ): NodeType {
@@ -51,7 +51,7 @@ describe('sandbox startup script lanes', () => {
       }
       return appended;
     });
-    jest.spyOn(sandbox, 'mount').mockImplementation(() => {
+    vi.spyOn(sandbox, 'mount').mockImplementation(() => {
       sandbox.execQueue.shift()?.();
     });
 

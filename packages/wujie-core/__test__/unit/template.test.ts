@@ -8,7 +8,7 @@ const BASE_URL = 'https://child.example/app/index.html';
 
 function compileWithModuleSupport(template: string, supported: boolean) {
   const scriptElement = (supported ? { noModule: false } : {}) as HTMLScriptElement;
-  const createElement = jest.spyOn(window.document, 'createElement').mockReturnValue(scriptElement);
+  const createElement = vi.spyOn(window.document, 'createElement').mockReturnValue(scriptElement);
   try {
     return processTpl(template, BASE_URL);
   } finally {

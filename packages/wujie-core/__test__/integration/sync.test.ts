@@ -1,3 +1,5 @@
+import { expect, test, type Page } from '@playwright/test';
+
 import {
   awaitConsoleLogMessage,
   getUrlSearchObject,
@@ -5,6 +7,19 @@ import {
   getClassListByJsSelector,
 } from './utils';
 import { reactMainAppInfoMap, reactMainAppInfoList, vueMainAppInfoMap, vueMainAppInfoList } from './common';
+
+const describe = test.describe;
+const beforeAll = test.beforeAll;
+const it = test;
+let page: Page;
+
+beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
 
 const generateReactAppMountedPromiseList = () =>
   reactMainAppInfoList.map((appInfo) => awaitConsoleLogMessage(page, appInfo.mountedMessage));
@@ -85,7 +100,7 @@ const generateTest = (
 
 describe('main react sync', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
@@ -123,7 +138,7 @@ describe('main react sync', () => {
 
 describe('main vue startApp', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');

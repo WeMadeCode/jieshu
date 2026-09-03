@@ -1,8 +1,24 @@
+import { expect, test, type Page } from '@playwright/test';
+
 import { reactMainAppInfoList, vueMainAppInfoList } from './common';
 import { awaitConsoleLogMessage, getTextContentByJsSelector } from './utils';
+
+const describe = test.describe;
+const beforeAll = test.beforeAll;
+const it = test;
+let page: Page;
+
+beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
+
 describe('main react preload', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 开启预加载
       localStorage.clear();
       localStorage.setItem('preload', 'true');
@@ -25,7 +41,7 @@ describe('main react preload', () => {
 
 describe('main vue preload', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 开启预加载
       localStorage.clear();
       localStorage.setItem('preload', 'true');

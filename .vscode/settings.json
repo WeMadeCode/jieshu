@@ -1,5 +1,0 @@
-{
-  "eslint.useFlatConfig": true,
-  "eslint.workingDirectories": ["."],
-  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "vue"]
-}

@@ -6,9 +6,7 @@
  * destroy 阶段才统一清空数组并把节点从父节点 detach。
  */
 
-export {};
-
-const Sandbox = require('../../src/sandbox').default;
+import Sandbox from '../../src/sandbox';
 
 function createMinimalSandbox(): any {
   // 只挑 clear* 调用相关字段构造，避免触发完整 Wujie 构造器
@@ -57,9 +55,9 @@ describe('styleSheetElements destroy 时的清理', () => {
   });
 
   test('clearStyleSheets 应取消尚未触发的样式 patch timer', () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const sandbox = createMinimalSandbox();
-    const patch = jest.fn();
+    const patch = vi.fn();
     const style = document.createElement('style') as HTMLStyleElement & {
       _patcher?: number;
     };
@@ -67,10 +65,10 @@ describe('styleSheetElements destroy 时的清理', () => {
     sandbox.styleSheetElements.push(style);
 
     sandbox.clearStyleSheets();
-    jest.advanceTimersByTime(50);
+    vi.advanceTimersByTime(50);
 
     expect(patch).not.toHaveBeenCalled();
     expect(style._patcher).toBeUndefined();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 });

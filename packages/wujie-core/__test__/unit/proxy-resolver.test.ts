@@ -9,7 +9,7 @@ import type { PropertyDescriptorResolver, PropertyResolver } from '../../src/pro
 
 describe('proxy property resolver pipelines', () => {
   test('stops at the first resolved rule even when its value is undefined', () => {
-    const fallback = jest.fn(() => resolvedProperty('fallback'));
+    const fallback = vi.fn(() => resolvedProperty('fallback'));
     const first: PropertyResolver<{ enabled: boolean }> = (context, key) =>
       context.enabled && key === 'known' ? resolvedProperty(undefined) : unresolved();
     const resolve = createResolverPipeline([first, fallback]);

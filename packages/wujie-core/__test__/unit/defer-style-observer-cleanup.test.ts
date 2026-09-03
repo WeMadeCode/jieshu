@@ -7,9 +7,7 @@
  * 回调闭包链路会把已销毁的 sandbox 钉在内存中。
  */
 
-export {};
-
-const Sandbox = require('../../src/sandbox').default;
+import Sandbox from '../../src/sandbox';
 
 function createMinimalSandbox(): any {
   const sandbox = Object.create(Sandbox.prototype);
@@ -24,8 +22,8 @@ describe('deferredStyleObservers destroy 时的清理', () => {
 
   test('clearDeferredStyleObservers 应 disconnect 全部 observer 并清空数组', () => {
     const sandbox = createMinimalSandbox();
-    const o1 = { disconnect: jest.fn() };
-    const o2 = { disconnect: jest.fn() };
+    const o1 = { disconnect: vi.fn() };
+    const o2 = { disconnect: vi.fn() };
     sandbox.deferredStyleObservers.push(o1, o2);
 
     sandbox.clearDeferredStyleObservers();
@@ -38,11 +36,11 @@ describe('deferredStyleObservers destroy 时的清理', () => {
   test('某个 observer.disconnect 抛错不应中断后续清理', () => {
     const sandbox = createMinimalSandbox();
     const bad = {
-      disconnect: jest.fn(() => {
+      disconnect: vi.fn(() => {
         throw new Error('boom');
       }),
     };
-    const good = { disconnect: jest.fn() };
+    const good = { disconnect: vi.fn() };
     sandbox.deferredStyleObservers.push(bad, good);
 
     expect(() => sandbox.clearDeferredStyleObservers()).not.toThrow();
@@ -53,7 +51,7 @@ describe('deferredStyleObservers destroy 时的清理', () => {
   test('clearDeferredStyleObservers 应保留数组引用（仅清空内容）', () => {
     const sandbox = createMinimalSandbox();
     const arrayRef = sandbox.deferredStyleObservers;
-    arrayRef.push({ disconnect: jest.fn() });
+    arrayRef.push({ disconnect: vi.fn() });
 
     sandbox.clearDeferredStyleObservers();
 

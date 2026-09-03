@@ -6,10 +6,15 @@
  * 场景的主动失效。
  */
 
-export {};
+import { embedHTMLCache, scriptCache, styleCache } from '../../src/entry';
+import * as wujie from '../../src/index';
 
-const { styleCache, scriptCache, embedHTMLCache } = require('../../src/entry');
-const wujie = require('../../src/index');
+const htmlDocument = {
+  template: '<main>cached</main>',
+  assetPublicPath: 'http://a.com/',
+  scripts: [],
+  styles: [],
+};
 
 describe('clearAssetsCache 资源缓存清理 API', () => {
   beforeEach(() => {
@@ -25,7 +30,7 @@ describe('clearAssetsCache 资源缓存清理 API', () => {
   test('clearAssetsCache() 不传参时应清空所有 styleCache/scriptCache/embedHTMLCache', () => {
     styleCache['http://a.com/a.css'] = Promise.resolve('a');
     scriptCache['http://b.com/b.js'] = Promise.resolve('b');
-    embedHTMLCache['http://a.com/index'] = Promise.resolve('html');
+    embedHTMLCache['http://a.com/index'] = Promise.resolve(htmlDocument);
 
     wujie.clearAssetsCache();
 
@@ -39,8 +44,8 @@ describe('clearAssetsCache 资源缓存清理 API', () => {
     styleCache['http://b.com/b.css'] = Promise.resolve('b');
     scriptCache['http://a.com/a.js'] = Promise.resolve('a');
     scriptCache['http://b.com/b.js'] = Promise.resolve('b');
-    embedHTMLCache['http://a.com/index'] = Promise.resolve('html-a');
-    embedHTMLCache['http://b.com/index'] = Promise.resolve('html-b');
+    embedHTMLCache['http://a.com/index'] = Promise.resolve(htmlDocument);
+    embedHTMLCache['http://b.com/index'] = Promise.resolve(htmlDocument);
 
     wujie.clearAssetsCache('http://a.com');
 
@@ -53,14 +58,15 @@ describe('clearAssetsCache 资源缓存清理 API', () => {
   });
 
   test('clearAssetsCache([h1, h2]) 应支持批量 host', () => {
-    styleCache['http://a.com/a.css'] = 'a';
-    styleCache['http://b.com/b.css'] = 'b';
-    styleCache['http://c.com/c.css'] = 'c';
+    const retainedStyle = Promise.resolve('b');
+    styleCache['http://a.com/a.css'] = Promise.resolve('a');
+    styleCache['http://b.com/b.css'] = retainedStyle;
+    styleCache['http://c.com/c.css'] = Promise.resolve('c');
 
     wujie.clearAssetsCache(['http://a.com', 'http://c.com']);
 
     expect(styleCache['http://a.com/a.css']).toBeUndefined();
-    expect(styleCache['http://b.com/b.css']).toBe('b');
+    expect(styleCache['http://b.com/b.css']).toBe(retainedStyle);
     expect(styleCache['http://c.com/c.css']).toBeUndefined();
   });
 });

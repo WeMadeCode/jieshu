@@ -9,7 +9,9 @@ export {};
 
 import Wujie from '../../src/sandbox';
 import {
+  addSandboxCacheWithOptions,
   addSandboxCacheWithWujie,
+  getOptionsById,
   getWujieById,
   idToSandboxCacheMap,
   sandboxTeardownById,
@@ -28,15 +30,15 @@ function createMinimalDestroyableSandbox(id: string) {
   inst.provide = null;
   inst.shadowRoot = null;
   inst.proxyLocation = null;
-  inst.proxyRevoke = jest.fn();
+  inst.proxyRevoke = vi.fn();
   inst.iframe = iframe;
-  inst.bus = { $destroy: jest.fn() };
-  inst.eventCleanupTracker = { cleanupAll: jest.fn() };
+  inst.bus = { $destroy: vi.fn() };
+  inst.eventCleanupTracker = { cleanupAll: vi.fn() };
   inst.styleSheetElements = [];
   inst.dynamicScriptElements = [];
   inst.fontStyleSheetElements = [];
   inst.deferredStyleObservers = [];
-  inst.unmount = jest.fn().mockResolvedValue(undefined);
+  inst.unmount = vi.fn().mockResolvedValue(undefined);
 
   if (iframeWindow) {
     iframeWindow.__WUJIE = { id };
@@ -62,7 +64,7 @@ describe('sandbox.destroy() 同步移除 map 与防重入', () => {
     addSandboxCacheWithWujie('order-test', inst);
     expect(getWujieById('order-test')).toBe(inst);
 
-    inst.unmount = jest.fn().mockImplementation(() => {
+    inst.unmount = vi.fn().mockImplementation(() => {
       expect(getWujieById('order-test')).toBe(null);
       return unmountGate;
     });
@@ -87,7 +89,7 @@ describe('sandbox.destroy() 同步移除 map 与防重入', () => {
 
   test('应在异步 unmount 和用户生命周期运行前登记 teardown tombstone', async () => {
     const { inst } = createMinimalDestroyableSandbox('tombstone-order-test');
-    const unmount = jest.fn(async () => {
+    const unmount = vi.fn(async () => {
       expect(sandboxTeardownById.has('tombstone-order-test')).toBe(true);
     });
     inst.unmount = unmount;
@@ -104,7 +106,7 @@ describe('sandbox.destroy() 同步移除 map 与防重入', () => {
   test('并发 destroy 应共享同一个完成 Promise，而不是让后续调用提前完成', async () => {
     const { inst } = createMinimalDestroyableSandbox('concurrent-destroy-test');
     let finishUnmount!: () => void;
-    inst.unmount = jest.fn(
+    inst.unmount = vi.fn(
       () =>
         new Promise<void>((resolve) => {
           finishUnmount = resolve;
@@ -124,12 +126,12 @@ describe('sandbox.destroy() 同步移除 map 与防重入', () => {
   test('unmount 拒绝时仍应执行完整资源清理，并在结束后保留原拒绝', async () => {
     const { inst, iframe } = createMinimalDestroyableSandbox('failed-unmount-test');
     const unmountError = new Error('user unmount failed');
-    const busDestroy = jest.fn(() => {
+    const busDestroy = vi.fn(() => {
       throw new Error('hostile bus cleanup');
     });
-    const proxyRevoke = jest.fn();
-    const cleanupAll = jest.fn();
-    inst.unmount = jest.fn().mockRejectedValue(unmountError);
+    const proxyRevoke = vi.fn();
+    const cleanupAll = vi.fn();
+    inst.unmount = vi.fn().mockRejectedValue(unmountError);
     inst.bus = { $destroy: busDestroy };
     inst.proxyRevoke = proxyRevoke;
     inst.eventCleanupTracker = { cleanupAll };
@@ -146,8 +148,6 @@ describe('sandbox.destroy() 同步移除 map 与防重入', () => {
   test('有 setupApp options 时，destroy 同步段应只移除 wujie 实例、保留 options', async () => {
     const { inst } = createMinimalDestroyableSandbox('options-test');
     const options = { name: 'options-test', url: '//example.com' };
-    const { addSandboxCacheWithOptions, getOptionsById } = require('../../src/common');
-
     addSandboxCacheWithOptions('options-test', options);
     addSandboxCacheWithWujie('options-test', inst);
 
@@ -170,7 +170,7 @@ describe('destroyApp', () => {
     let destroyFinished = false;
 
     addSandboxCacheWithWujie('async-destroy-app', inst);
-    inst.destroy = jest.fn().mockImplementation(async () => {
+    inst.destroy = vi.fn().mockImplementation(async () => {
       await new Promise((r) => setTimeout(r, 10));
       destroyFinished = true;
     });
@@ -189,7 +189,7 @@ describe('destroyApp', () => {
   test('live map 已移除时并发 destroy 立即确认，但原 teardown 继续完成', async () => {
     const { inst } = createMinimalDestroyableSandbox('pending-teardown');
     let finishUnmount!: () => void;
-    inst.unmount = jest.fn(
+    inst.unmount = vi.fn(
       () =>
         new Promise<void>((resolve) => {
           finishUnmount = resolve;
@@ -219,7 +219,7 @@ describe('destroyApp', () => {
     const { inst } = createMinimalDestroyableSandbox('failed-concurrent-destroy');
     const failure = new Error('unmount failed');
     let failUnmount!: () => void;
-    inst.unmount = jest.fn(
+    inst.unmount = vi.fn(
       () =>
         new Promise<void>((_resolve, reject) => {
           failUnmount = () => reject(failure);

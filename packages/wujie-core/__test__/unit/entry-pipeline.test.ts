@@ -51,7 +51,7 @@ describe('entry asset pipeline', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('accepts omitted plugins and applies HTML loaders from left to right without caching them', async () => {
@@ -90,7 +90,7 @@ describe('entry asset pipeline', () => {
 
   test('coalesces concurrent script requests and evicts a failed request before retry', async () => {
     const pending = deferred<Response>();
-    const sharedFetch = jest.fn((_input: RequestInfo): Promise<Response> => pending.promise);
+    const sharedFetch = vi.fn((_input: RequestInfo): Promise<Response> => pending.promise);
     const source = 'https://assets.example/shared.js';
 
     const first = getExternalScripts([{ src: source }], sharedFetch, undefined, false)[0].contentPromise;
@@ -101,8 +101,8 @@ describe('entry asset pipeline', () => {
 
     clearAssetsCache();
     let attempt = 0;
-    const loadError = jest.fn((_url: string, _failure: Error): void => undefined);
-    const retryFetch = jest.fn((_input: RequestInfo): Promise<Response> => {
+    const loadError = vi.fn((_url: string, _failure: Error): void => undefined);
+    const retryFetch = vi.fn((_input: RequestInfo): Promise<Response> => {
       attempt += 1;
       return attempt === 1 ? Promise.reject(new Error('offline')) : Promise.resolve(response('recovered'));
     });
@@ -120,8 +120,8 @@ describe('entry asset pipeline', () => {
 
   test('reports an HTTP script failure once and leaves it retryable', async () => {
     const source = 'https://assets.example/server-error.js';
-    const loadError = jest.fn((_url: string, _failure: Error): void => undefined);
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> => Promise.resolve(response('failure', 503)));
+    const loadError = vi.fn((_url: string, _failure: Error): void => undefined);
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> => Promise.resolve(response('failure', 503)));
 
     await expect(getExternalScripts([{ src: source }], fetch, loadError, false)[0].contentPromise).resolves.toBe('');
 
@@ -134,8 +134,8 @@ describe('entry asset pipeline', () => {
     'keeps a %s stylesheet failure rejected and retryable',
     async (failureKind, fail) => {
       const source = `https://assets.example/${failureKind}.css`;
-      const loadError = jest.fn((_url: string, _failure: Error): void => undefined);
-      const failedFetch = jest.fn((_input: RequestInfo): Promise<Response> => fail());
+      const loadError = vi.fn((_url: string, _failure: Error): void => undefined);
+      const failedFetch = vi.fn((_input: RequestInfo): Promise<Response> => fail());
 
       await expect(
         getExternalStyleSheets([{ src: source }], failedFetch, loadError)[0].contentPromise,
@@ -143,7 +143,7 @@ describe('entry asset pipeline', () => {
 
       expect(styleCache[source]).toBeUndefined();
       expect(loadError).toHaveBeenCalledWith(source, expect.any(Error));
-      const retryFetch = jest.fn((_input: RequestInfo): Promise<Response> =>
+      const retryFetch = vi.fn((_input: RequestInfo): Promise<Response> =>
         Promise.resolve(response('body { color: green; }')),
       );
       await expect(getExternalStyleSheets([{ src: source }], retryFetch)[0].contentPromise).resolves.toBe(
@@ -158,7 +158,7 @@ describe('entry asset pipeline', () => {
     const source = 'https://child.example/css-fallback/theme.css';
     const originalLink =
       '<link media="print" crossorigin="anonymous" rel="stylesheet" href="./theme.css" integrity="sha256-demo">';
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> => Promise.resolve(response('unavailable', 503)));
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> => Promise.resolve(response('unavailable', 503)));
     const parsed = await importHTML({
       url: entryUrl,
       html: originalLink,
@@ -177,7 +177,7 @@ describe('entry asset pipeline', () => {
 
   test('forwards applicable link and inline-style attributes into successful embedded styles', async () => {
     const entryUrl = 'https://child.example/css-attributes/index.html';
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> =>
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> =>
       Promise.resolve(response('.external { color: green; }')),
     );
     const parsed = await importHTML({
@@ -204,7 +204,7 @@ describe('entry asset pipeline', () => {
 
   test('keeps a disabled stylesheet as a native link with a resolved child URL', async () => {
     const entryUrl = 'https://child.example/disabled/index.html';
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> =>
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> =>
       Promise.resolve(response('.disabled { color: red; }')),
     );
     const parsed = await importHTML({
@@ -232,7 +232,7 @@ describe('entry asset pipeline', () => {
 
   test('restores a plugin-ignored stylesheet with its resolved href and original attributes', async () => {
     const entryUrl = 'https://child.example/css-ignore/index.html';
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> =>
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> =>
       Promise.resolve(response('.ignored { color: red; }')),
     );
     const parsed = await importHTML({
@@ -259,7 +259,7 @@ describe('entry asset pipeline', () => {
   test('coalesces HTML requests, evicts network failures and retries', async () => {
     const url = 'https://child.example/cache/index.html';
     const pending = deferred<Response>();
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> => pending.promise);
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> => pending.promise);
     const parameters = { url, opts: { fetch } };
     const first = importHTML(parameters);
     const second = importHTML(parameters);
@@ -269,7 +269,7 @@ describe('entry asset pipeline', () => {
 
     clearAssetsCache();
     let attempt = 0;
-    const retryFetch = jest.fn((_input: RequestInfo): Promise<Response> => {
+    const retryFetch = vi.fn((_input: RequestInfo): Promise<Response> => {
       attempt += 1;
       return attempt === 1 ? Promise.reject(new Error('offline')) : Promise.resolve(response('<main>recovered</main>'));
     });
@@ -282,9 +282,9 @@ describe('entry asset pipeline', () => {
 
   test('evicts an HTTP-failed HTML document before retrying the same URL', async () => {
     const url = 'https://child.example/http-retry/index.html';
-    const loadError = jest.fn((_url: string, _failure: Error): void => undefined);
+    const loadError = vi.fn((_url: string, _failure: Error): void => undefined);
     let attempt = 0;
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> => {
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> => {
       attempt += 1;
       return Promise.resolve(
         attempt === 1 ? response('temporarily unavailable', 503) : response('<main>recovered</main>'),
@@ -355,11 +355,11 @@ describe('entry asset pipeline', () => {
   });
 
   test('a retired fiber reservation cannot start after a newer scope owns the same URL', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const source = 'https://child.example/generation/lazy.js';
     const currentResponse = deferred<Response>();
-    const staleFetch = jest.fn(() => Promise.resolve(response('stale')));
-    const currentFetch = jest.fn(() => currentResponse.promise);
+    const staleFetch = vi.fn(() => Promise.resolve(response('stale')));
+    const currentFetch = vi.fn(() => currentResponse.promise);
     const staleScope = {};
     const staleContent = getExternalScripts([{ src: source, async: true }], staleFetch, undefined, true, staleScope)[0]
       .contentPromise;
@@ -369,13 +369,13 @@ describe('entry asset pipeline', () => {
     expect(currentFetch).toHaveBeenCalledTimes(1);
     expect(staleFetch).not.toHaveBeenCalled();
     releaseAssetCacheScope(staleScope);
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
     await expect(staleContent).resolves.toBe('');
     expect(staleFetch).not.toHaveBeenCalled();
 
     currentResponse.resolve(response('current'));
     await expect(currentContent).resolves.toBe('current');
-    const laterFetch = jest.fn(() => Promise.resolve(response('later')));
+    const laterFetch = vi.fn(() => Promise.resolve(response('later')));
     await expect(
       getExternalScripts([{ src: source }], laterFetch, undefined, false, {})[0].contentPromise,
     ).resolves.toBe('current');
@@ -383,15 +383,15 @@ describe('entry asset pipeline', () => {
   });
 
   test('two live sandbox scopes may fiber-load the same URL with independent fetchers', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const source = 'https://child.example/shared/live.js';
-    const firstFetch = jest.fn(() => Promise.resolve(response('first')));
-    const secondFetch = jest.fn(() => Promise.resolve(response('second')));
+    const firstFetch = vi.fn(() => Promise.resolve(response('first')));
+    const secondFetch = vi.fn(() => Promise.resolve(response('second')));
     const first = getExternalScripts([{ src: source, async: true }], firstFetch, undefined, true, {})[0].contentPromise;
     const second = getExternalScripts([{ src: source, defer: true }], secondFetch, undefined, true, {})[0]
       .contentPromise;
 
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 
     await expect(Promise.all([first, second])).resolves.toEqual(['first', 'second']);
     expect(firstFetch).toHaveBeenCalledTimes(1);
@@ -399,9 +399,9 @@ describe('entry asset pipeline', () => {
   });
 
   test('retiring a cache scope prevents its queued fiber request from starting I/O', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const scope = {};
-    const fetch = jest.fn(() => Promise.resolve(response('retired')));
+    const fetch = vi.fn(() => Promise.resolve(response('retired')));
     const content = getExternalScripts(
       [{ src: 'https://child.example/generation/retired.js', defer: true }],
       fetch,
@@ -411,7 +411,7 @@ describe('entry asset pipeline', () => {
     )[0].contentPromise;
 
     releaseAssetCacheScope(scope);
-    jest.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
 
     await expect(content).resolves.toBe('');
     expect(fetch).not.toHaveBeenCalled();
@@ -421,13 +421,13 @@ describe('entry asset pipeline', () => {
     const url = 'https://child.example/scoped-document/index.html';
     const scriptUrl = 'https://child.example/scoped-document/app.js';
     const staleScript = deferred<Response>();
-    const oldFetch = jest.fn((input: RequestInfo): Promise<Response> =>
+    const oldFetch = vi.fn((input: RequestInfo): Promise<Response> =>
       String(input) === url ? Promise.resolve(response('<script src="./app.js"></script>')) : staleScript.promise,
     );
     const oldDocument = await importHTML({ url, opts: { fetch: oldFetch, cacheScope: {} } });
     const oldAsset = oldDocument.getExternalScripts()[0].contentPromise;
 
-    const currentFetch = jest.fn((input: RequestInfo): Promise<Response> =>
+    const currentFetch = vi.fn((input: RequestInfo): Promise<Response> =>
       Promise.resolve(response(String(input) === url ? '<script src="./app.js"></script>' : 'current-script')),
     );
     const currentDocument = await importHTML({ url, opts: { fetch: currentFetch, cacheScope: {} } });
@@ -440,7 +440,7 @@ describe('entry asset pipeline', () => {
   });
 
   test('applies excludes and ignores deterministically for reusable global regular expressions', async () => {
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> => Promise.resolve(response('asset')));
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> => Promise.resolve(response('asset')));
     const plugins: WujiePlugin[] = [
       {
         jsExcludes: [/excluded\.js/g],

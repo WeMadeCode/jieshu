@@ -5,9 +5,7 @@
  * dynamic script，数组只在 destroy 阶段需要随 sandbox 一起释放。
  */
 
-export {};
-
-const Sandbox = require('../../src/sandbox').default;
+import Sandbox from '../../src/sandbox';
 
 function createMinimalSandbox(): any {
   const sandbox = Object.create(Sandbox.prototype);

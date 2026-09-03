@@ -94,8 +94,8 @@ describe('dynamic script sequencing', () => {
     createSandbox('ready-app', () => Promise.resolve(scriptResponse('/* ready */')));
     patchRenderEffect(firstRoot, 'pending-app', false);
     patchRenderEffect(secondRoot, 'ready-app', false);
-    const firstLoaded = jest.fn();
-    const secondLoaded = jest.fn();
+    const firstLoaded = vi.fn();
+    const secondLoaded = vi.fn();
 
     appendExternalScript(firstRoot, 'https://assets.example/pending.js', firstLoaded);
     appendExternalScript(secondRoot, 'https://assets.example/ready.js', secondLoaded);
@@ -110,7 +110,7 @@ describe('dynamic script sequencing', () => {
     const staleRoot = createRenderRoot();
     const staleSandbox = createSandbox('same-name', () => pending.promise);
     patchRenderEffect(staleRoot, 'same-name', false);
-    const staleLoaded = jest.fn();
+    const staleLoaded = vi.fn();
     appendExternalScript(staleRoot, 'https://assets.example/stale.js', staleLoaded);
 
     cancelSandboxDynamicScripts(staleSandbox);
@@ -118,7 +118,7 @@ describe('dynamic script sequencing', () => {
     const replacementRoot = createRenderRoot();
     createSandbox('same-name', () => Promise.resolve(scriptResponse('/* replacement */')));
     patchRenderEffect(replacementRoot, 'same-name', false);
-    const replacementLoaded = jest.fn();
+    const replacementLoaded = vi.fn();
     appendExternalScript(replacementRoot, 'https://assets.example/replacement.js', replacementLoaded);
     await flushPromises();
 
@@ -152,12 +152,12 @@ describe('dynamic script sequencing', () => {
   test('a reusable unmount rejects a pending chunk and ignores its late response after remount', async () => {
     const pending = deferred<Response>();
     const root = createRenderRoot();
-    const fetch = jest.fn(() => pending.promise);
+    const fetch = vi.fn(() => pending.promise);
     const sandbox = createSandbox('reusable-app', fetch);
     patchRenderEffect(root, 'reusable-app', false);
-    const loaded = jest.fn();
-    const failed = jest.fn();
-    const retryFailed = jest.fn();
+    const loaded = vi.fn();
+    const failed = vi.fn();
+    const retryFailed = vi.fn();
     const script = document.createElement('script');
     script.src = 'https://assets.example/chunk.js';
     script.onload = loaded;
@@ -193,8 +193,8 @@ describe('dynamic script sequencing', () => {
     const root = createRenderRoot();
     const sandbox = createSandbox('module-app', () => Promise.resolve(scriptResponse('export default 1')));
     patchRenderEffect(root, 'module-app', false);
-    const loaded = jest.fn();
-    const failed = jest.fn();
+    const loaded = vi.fn();
+    const failed = vi.fn();
     const script = document.createElement('script');
     script.type = 'module';
     script.src = 'https://assets.example/module.js';
@@ -222,9 +222,9 @@ describe('dynamic script sequencing', () => {
     const root = createRenderRoot();
     const sandbox = createSandbox('inline-module-app', () => Promise.resolve(scriptResponse('/* next */')));
     patchRenderEffect(root, 'inline-module-app', false);
-    const loaded = jest.fn();
-    const failed = jest.fn();
-    const nextLoaded = jest.fn();
+    const loaded = vi.fn();
+    const failed = vi.fn();
+    const nextLoaded = vi.fn();
     const moduleScript = document.createElement('script');
     moduleScript.type = 'module';
     moduleScript.textContent = 'export default 1';
@@ -290,7 +290,7 @@ describe('dynamic script sequencing', () => {
   );
 
   test('a native retry after an external script HTTP failure forwards error, never load', async () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const root = createRenderRoot();
     const sandbox = createSandbox('native-script-error', () =>
       Promise.resolve({
@@ -299,8 +299,8 @@ describe('dynamic script sequencing', () => {
       } as Response),
     );
     patchRenderEffect(root, 'native-script-error', false);
-    const loaded = jest.fn();
-    const failed = jest.fn();
+    const loaded = vi.fn();
+    const failed = vi.fn();
     const script = document.createElement('script');
     script.src = 'https://assets.example/unavailable.js';
     script.onload = loaded;
@@ -336,8 +336,8 @@ describe('dynamic script sequencing', () => {
       },
     ];
     patchRenderEffect(root, 'dynamic-loader-error', false);
-    const failed = jest.fn();
-    const next = jest.fn();
+    const failed = vi.fn();
+    const next = vi.fn();
     const releaseDynamicTask = (): void => {
       sandbox.execQueue.shift()?.();
     };
@@ -366,8 +366,8 @@ describe('dynamic script sequencing', () => {
     const pendingModule = document.createElement('script');
     pendingModule.type = 'module';
     pendingModule.src = 'https://assets.example/pending-module.js';
-    const queuedLoaded = jest.fn();
-    const remountedLoaded = jest.fn();
+    const queuedLoaded = vi.fn();
+    const remountedLoaded = vi.fn();
 
     root.head.appendChild(pendingModule);
     appendExternalScript(root, 'https://assets.example/queued.js', queuedLoaded);
@@ -395,15 +395,15 @@ describe('dynamic script sequencing', () => {
     const sandbox = createSandbox('css-loader-unmount', () =>
       Promise.resolve(scriptResponse('body { color: rebeccapurple; }')),
     );
-    const cssLoader = jest.fn((content: string) => {
+    const cssLoader = vi.fn((content: string) => {
       sandbox.activeFlag = false;
       cancelSandboxDynamicResources(sandbox, 'unmount');
       return content;
     });
     sandbox.plugins = [{ cssLoader }];
     patchRenderEffect(root, 'css-loader-unmount', false);
-    const loaded = jest.fn();
-    const failed = jest.fn();
+    const loaded = vi.fn();
+    const failed = vi.fn();
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = 'https://assets.example/synchronously-unmounted.css';
@@ -422,12 +422,12 @@ describe('dynamic script sequencing', () => {
 
   test('a reusable unmount rejects both fetching and deferred dynamic styles', async () => {
     const pending = deferred<Response>();
-    const fetch = jest.fn(() => pending.promise);
+    const fetch = vi.fn(() => pending.promise);
     const root = createRenderRoot();
     const sandbox = createSandbox('style-app', fetch);
     patchRenderEffect(root, 'style-app', false);
-    const fetchingFailed = jest.fn();
-    const fetchingLoaded = jest.fn();
+    const fetchingFailed = vi.fn();
+    const fetchingLoaded = vi.fn();
     const fetchingLink = document.createElement('link');
     fetchingLink.rel = 'stylesheet';
     fetchingLink.href = 'https://assets.example/theme.css';
@@ -435,7 +435,7 @@ describe('dynamic script sequencing', () => {
     fetchingLink.onload = fetchingLoaded;
     root.head.appendChild(fetchingLink);
 
-    const deferredFailed = jest.fn();
+    const deferredFailed = vi.fn();
     const deferredLink = document.createElement('link');
     deferredLink.rel = 'stylesheet';
     deferredLink.onerror = deferredFailed;

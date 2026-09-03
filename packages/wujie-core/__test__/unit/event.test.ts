@@ -1,17 +1,18 @@
-const mockWarn = jest.fn();
-const mockError = jest.fn();
+const { mockError, mockWarn } = vi.hoisted(() => ({
+  mockError: vi.fn(),
+  mockWarn: vi.fn(),
+}));
 
-jest.mock('../../src/utils', () => {
+vi.mock('../../src/utils', () => {
   return { warn: mockWarn, error: mockError };
 });
 
-const wujieEvent = require('../../src/event');
-const { EventBus } = wujieEvent;
+import { EventBus } from '../../src/event';
 
 describe('event bus test', () => {
   test('bus event on and off', () => {
     const bus = new EventBus('test-on-and-emit');
-    const mockFn = jest.fn();
+    const mockFn = vi.fn();
     bus.$on('test', mockFn);
     bus.$emit('test');
     expect(mockFn).toHaveBeenCalled();
@@ -25,8 +26,8 @@ describe('event bus test', () => {
 
   test('bus event on repeat', () => {
     const bus = new EventBus('test-on-repeat');
-    const mockFn = jest.fn();
-    const mockTmpFn = jest.fn();
+    const mockFn = vi.fn();
+    const mockTmpFn = vi.fn();
     bus.$on('test', mockFn);
     bus.$on('test', mockFn);
     bus.$on('test', mockTmpFn);
@@ -40,7 +41,7 @@ describe('event bus test', () => {
   test('bus event on when emit arguments', () => {
     const bus = new EventBus('test-emit-arguments');
     const args = ['arg1', 'arg2'];
-    const mockFn = jest.fn();
+    const mockFn = vi.fn();
     bus.$on('test', mockFn);
     bus.$emit('test', ...args);
     expect(mockFn).toHaveBeenCalledWith(...args);
@@ -57,7 +58,7 @@ describe('event bus test', () => {
     const bus = new EventBus('test-on-all');
     const args = ['arg1', 'arg2'];
     const events = ['event1', 'event2'];
-    const mockFn = jest.fn();
+    const mockFn = vi.fn();
     bus.$onAll(mockFn);
     events.forEach((event, index) => {
       bus.$emit(event, ...args);
@@ -69,7 +70,7 @@ describe('event bus test', () => {
 
   test('bus event offAll when onAll', () => {
     const bus = new EventBus('test-off-all');
-    const mockFn = jest.fn();
+    const mockFn = vi.fn();
     bus.$onAll(mockFn);
     bus.$emit('test');
     expect(mockFn).toHaveBeenCalledTimes(1);
@@ -82,8 +83,8 @@ describe('event bus test', () => {
 
   test('bus event on and onAll concurrent', () => {
     const bus = new EventBus('test-on-and-onAll');
-    const mockOnFn = jest.fn();
-    const mockOnAllFn = jest.fn();
+    const mockOnFn = vi.fn();
+    const mockOnAllFn = vi.fn();
     bus.$on('test', mockOnFn);
     bus.$onAll(mockOnAllFn);
     bus.$emit('test');
@@ -94,7 +95,7 @@ describe('event bus test', () => {
 
   test('bus event once', () => {
     const bus = new EventBus('test-once');
-    const mockFn = jest.fn();
+    const mockFn = vi.fn();
     bus.$once('test', mockFn);
     bus.$emit('test');
     expect(mockFn).toHaveBeenCalled();
@@ -106,8 +107,8 @@ describe('event bus test', () => {
 
   test('bus event clear', () => {
     const bus = new EventBus('test-clear');
-    const mockOnFn = jest.fn();
-    const mockOnAllFn = jest.fn();
+    const mockOnFn = vi.fn();
+    const mockOnAllFn = vi.fn();
     bus.$on('test', mockOnFn);
     bus.$onAll(mockOnAllFn);
     bus.$emit('test');
@@ -122,7 +123,7 @@ describe('event bus test', () => {
 
   test('bus event clear when renew', () => {
     let bus = new EventBus('test-clear-renew');
-    const mockOnFn = jest.fn();
+    const mockOnFn = vi.fn();
     bus.$on('test', mockOnFn);
     bus.$emit('test');
     expect(mockOnFn).toHaveBeenCalledTimes(1);
@@ -135,8 +136,8 @@ describe('event bus test', () => {
   test('bus event on an onAll when cross instance', () => {
     const bus = new EventBus('test-on-and-onAll-cross');
     const tmp = new EventBus('test-on-and-onAll-cross-tmp');
-    const mockOnFn = jest.fn();
-    const mockOnAllFn = jest.fn();
+    const mockOnFn = vi.fn();
+    const mockOnAllFn = vi.fn();
     bus.$on('test', mockOnFn);
     bus.$onAll(mockOnAllFn);
     tmp.$emit('test');
@@ -148,8 +149,8 @@ describe('event bus test', () => {
 
   test('constructing the same id clears old listeners but keeps a shared registry entry', () => {
     const firstBus = new EventBus('test-same-id');
-    const oldListener = jest.fn();
-    const newListener = jest.fn();
+    const oldListener = vi.fn();
+    const newListener = vi.fn();
     firstBus.$on('test', oldListener);
 
     const secondBus = new EventBus('test-same-id');
@@ -164,9 +165,9 @@ describe('event bus test', () => {
 
   test('listener changes during emit only affect the next emission', () => {
     const bus = new EventBus('test-emit-snapshot');
-    const lateListener = jest.fn();
-    const removedListener = jest.fn();
-    const changingListener = jest.fn(() => {
+    const lateListener = vi.fn();
+    const removedListener = vi.fn();
+    const changingListener = vi.fn(() => {
       bus.$off('test', removedListener);
       bus.$on('test', lateListener);
     });
@@ -186,11 +187,11 @@ describe('event bus test', () => {
   test('recursive emit takes a fresh snapshot and preserves call order', () => {
     const bus = new EventBus('test-recursive-emit');
     const calls: string[] = [];
-    const firstListener = jest.fn((value: string) => {
+    const firstListener = vi.fn((value: string) => {
       calls.push(`first:${value}`);
       if (value === 'outer') bus.$emit('test', 'inner');
     });
-    const secondListener = jest.fn((value: string) => calls.push(`second:${value}`));
+    const secondListener = vi.fn((value: string) => calls.push(`second:${value}`));
     bus.$on('test', firstListener);
     bus.$on('test', secondListener);
 
@@ -201,7 +202,7 @@ describe('event bus test', () => {
 
   test('once unregisters before invoking so recursive emit cannot call it twice', () => {
     const bus = new EventBus('test-recursive-once');
-    const listener = jest.fn(() => bus.$emit('test'));
+    const listener = vi.fn(() => bus.$emit('test'));
     bus.$once('test', listener);
 
     bus.$emit('test');
@@ -212,8 +213,8 @@ describe('event bus test', () => {
   test('a thrown listener is reported and aborts the remaining snapshot', () => {
     const bus = new EventBus('test-listener-error');
     const thrownError = new Error('listener failed');
-    const laterListener = jest.fn();
-    const allListener = jest.fn();
+    const laterListener = vi.fn();
+    const allListener = vi.fn();
     bus.$on('test', () => {
       throw thrownError;
     });

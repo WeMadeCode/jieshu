@@ -109,8 +109,8 @@ describe('iframe inline event compiler', () => {
 
   it('executes a dynamic click in the child scope instead of the raw iframe global', () => {
     const { iframeWindow } = createIframeWindow('click-scope-app');
-    const childHandler = jest.fn();
-    const rawIframeHandler = jest.fn();
+    const childHandler = vi.fn();
+    const rawIframeHandler = vi.fn();
     const runtimeWindow = iframeWindow as Window & { runDynamicHandler?: () => void };
     runtimeWindow.runDynamicHandler = rawIframeHandler;
     iframeWindow.__getWujieWindow__ = () => ({ runDynamicHandler: childHandler }) as unknown as WindowProxy;
@@ -134,8 +134,8 @@ describe('iframe inline event compiler', () => {
   it('serializes hostile app ids instead of interpolating executable source', () => {
     const appId = 'quoted"\\\n-id];hostEscape()//';
     const compiled = wrapInlineEventHandler('work()', appId);
-    const getScope = jest.fn(() => null);
-    const hostEscape = jest.fn();
+    const getScope = vi.fn(() => null);
+    const hostEscape = vi.fn();
     const execute = new Function('window', 'hostEscape', compiled) as (
       runtimeWindow: { __getWujieWindow__: (id: string) => null },
       escape: () => void,
@@ -148,7 +148,7 @@ describe('iframe inline event compiler', () => {
   });
 
   it('does not execute a stale handler when its child scope no longer exists', () => {
-    const hostOnly = jest.fn();
+    const hostOnly = vi.fn();
     const compiled = wrapInlineEventHandler('hostOnly()', 'removed-app');
     const execute = new Function('window', 'hostOnly', compiled) as (
       runtimeWindow: { __getWujieWindow__: () => null },

@@ -22,7 +22,7 @@ describe('render element listener cleanup', () => {
 
   it('removes capture listeners with their original options and clears retained references', () => {
     const root = createRenderRoot();
-    const listener = jest.fn();
+    const listener = vi.fn();
     patchRenderEffect(root, 'listener-test', false);
 
     root.head.addEventListener('click', listener, { capture: true });
@@ -39,7 +39,7 @@ describe('render element listener cleanup', () => {
 
   it('tracks native listener identity by listener and capture flag', () => {
     const root = createRenderRoot();
-    const listener = jest.fn();
+    const listener = vi.fn();
     patchRenderEffect(root, 'listener-identity', false);
 
     root.body.addEventListener('focus', listener, false);

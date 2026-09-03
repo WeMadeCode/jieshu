@@ -55,7 +55,7 @@ describe('SandboxPromiseSequence', () => {
     const ownerA = {};
     const ownerB = {};
     const calls: string[] = [];
-    const cancelled = jest.fn();
+    const cancelled = vi.fn();
 
     scheduleSandboxDynamicScript(ownerA, staleRequest.promise, {
       fulfilled: (value) => calls.push(value),
@@ -94,8 +94,8 @@ describe('SandboxPromiseSequence', () => {
 
   test('notifies registered resources on unmount and allows completed resources to unregister', () => {
     const owner = {};
-    const pending = jest.fn();
-    const completed = jest.fn();
+    const pending = vi.fn();
+    const completed = vi.fn();
     registerSandboxDynamicResource(owner, pending);
     const unregister = registerSandboxDynamicResource(owner, completed);
     unregister();
@@ -173,7 +173,7 @@ describe('SandboxScriptScheduler', () => {
 
   test('cancels pending work after destruction and still drains the serial queue', async () => {
     const queue: Array<() => unknown> = [];
-    const executed = jest.fn();
+    const executed = vi.fn();
     let active = false;
     const scheduler = new SandboxScriptScheduler(
       queue,
@@ -218,7 +218,7 @@ describe('SandboxScriptScheduler', () => {
   test('rechecks cancellation when fiber work leaves the idle queue', async () => {
     const queue: Array<() => unknown> = [];
     const idleQueue: Array<() => unknown> = [];
-    const executed = jest.fn();
+    const executed = vi.fn();
     let active = true;
     const scheduler = new SandboxScriptScheduler(
       queue,
@@ -239,7 +239,7 @@ describe('SandboxScriptScheduler', () => {
   test('cancel prevents already-dispatched fiber work from running', async () => {
     const queue: Array<() => unknown> = [];
     const idleQueue: Array<() => unknown> = [];
-    const executed = jest.fn();
+    const executed = vi.fn();
     const scheduler = new SandboxScriptScheduler(queue, true, (task) => idleQueue.push(task));
 
     scheduler.schedule(executed);
@@ -256,9 +256,9 @@ describe('SandboxScriptScheduler', () => {
 
   test('advances past a rejected serial script without executing it', async () => {
     const queue: Array<() => unknown> = [];
-    const executed = jest.fn();
+    const executed = vi.fn();
     const scheduler = new SandboxScriptScheduler(queue, false, (task) => task());
-    const afterFailure = jest.fn(() => scheduler.advance());
+    const afterFailure = vi.fn(() => scheduler.advance());
 
     scheduler.scheduleAfter(Promise.reject(new Error('network failed')), executed);
     scheduler.schedule(afterFailure);
@@ -271,7 +271,7 @@ describe('SandboxScriptScheduler', () => {
 
   test('observes a rejected async script and does not execute it', async () => {
     const queue: Array<() => unknown> = [];
-    const executed = jest.fn();
+    const executed = vi.fn();
     const scheduler = new SandboxScriptScheduler(queue, false, (task) => task());
 
     scheduler.executeAfter(Promise.reject(new Error('network failed')), executed);
@@ -284,7 +284,7 @@ describe('SandboxScriptScheduler', () => {
   test('rechecks cancellation before detached fiber work executes', async () => {
     const queue: Array<() => unknown> = [];
     const idleQueue: Array<() => unknown> = [];
-    const executed = jest.fn();
+    const executed = vi.fn();
     let active = true;
     const scheduler = new SandboxScriptScheduler(
       queue,
@@ -306,7 +306,7 @@ describe('SandboxScriptScheduler', () => {
   test('a detached async task cannot revive after a later activation revision', async () => {
     const queue: Array<() => unknown> = [];
     const pending = deferred<string>();
-    const executed = jest.fn();
+    const executed = vi.fn();
     let active = true;
     let revision = 1;
     const ownedRevision = revision;

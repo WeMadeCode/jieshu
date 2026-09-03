@@ -6,16 +6,13 @@
  * 防止反复 setupApp/destroyApp 后 map 条目持续累积。
  */
 
-export {};
+const mockWarnLeak = vi.hoisted(() => vi.fn());
 
-const mockWarnLeak = jest.fn();
-
-jest.mock('../../src/utils', () => {
+vi.mock('../../src/utils', () => {
   return { warn: mockWarnLeak };
 });
 
-const wujieEventLeakModule = require('../../src/event');
-const { EventBus: EventBusForLeakTest, appEventObjMap: appEventObjMapForLeakTest } = wujieEventLeakModule;
+import { EventBus as EventBusForLeakTest, appEventObjMap as appEventObjMapForLeakTest } from '../../src/event';
 
 describe('EventBus.$destroy 应从全局 appEventObjMap 中移除 entry', () => {
   test('EventBus 实例提供 $destroy 用于销毁，调用后全局 map 中应不再保留 id', () => {
@@ -35,7 +32,7 @@ describe('EventBus.$destroy 应从全局 appEventObjMap 中移除 entry', () => 
   test('$destroy 等同于先 $clear 再删 entry，事件全清且不再触发', () => {
     const id = 'test-destroy-no-trigger';
     const bus = new EventBusForLeakTest(id);
-    const fn = jest.fn();
+    const fn = vi.fn();
     bus.$on('ping', fn);
 
     bus.$destroy();

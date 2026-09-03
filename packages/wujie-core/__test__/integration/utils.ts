@@ -1,9 +1,9 @@
+import type { Page } from '@playwright/test';
 import fs from 'fs';
 import http, { type Server } from 'http';
 import path from 'path';
 
 let server: Server | null = null;
-type Page = typeof page;
 export function sleep(time: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
@@ -39,18 +39,18 @@ export async function awaitConsoleLogMessage(page: Page, message: string): Promi
 }
 
 export async function getTextContentByJsSelector(page: Page, selector: string): Promise<string> {
-  const element = await page.evaluateHandle(selector);
+  const element = await page.evaluateHandle<Element>(selector);
   return await element.asElement()!.evaluate((el) => el.textContent ?? '');
 }
 
 export async function getClassListByJsSelector(page: Page, selector: string): Promise<Array<string>> {
-  const element = await page.evaluateHandle(selector);
+  const element = await page.evaluateHandle<Element>(selector);
   const classList = await element.asElement()!.evaluate((el) => el.classList);
   return Object.entries(classList).map((item) => item[1]);
 }
 
 export async function triggerClickByJsSelector(page: Page, selector: string): Promise<void> {
-  const element = await page.evaluateHandle(selector);
+  const element = await page.evaluateHandle<Element>(selector);
   return element.asElement()!.click();
 }
 

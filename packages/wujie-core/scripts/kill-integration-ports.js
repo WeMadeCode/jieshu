@@ -1,10 +1,9 @@
 /**
- * 集成测试启动前释放 jest-puppeteer.config.js 里占用的端口。
- * jest-dev-server 的 usedPortAction: "kill" 依赖 find-process，在 macOS 上常查不到监听进程会报错。
+ * 集成测试启动前释放 playwright.config.mts 里各 webServer 占用的端口。
  */
 const { execSync } = require('child_process');
 
-/** 与 jest-puppeteer.config.js 中 server[].port 保持一致 */
+/** 与 playwright.config.mts 中 webServer[].url 保持一致 */
 const INTEGRATION_PORTS = [7600, 7100, 7200, 7300, 7500, 7400, 7700, 8000];
 
 function execQuiet(command) {

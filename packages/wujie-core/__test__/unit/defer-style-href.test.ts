@@ -12,9 +12,8 @@
 export {};
 
 import type Wujie from '../../src/sandbox';
-
-const { deferStyleSheetByHref } = require('../../src/effect');
-const { addSandboxCacheWithWujie, deleteWujieById } = require('../../src/common');
+import { addSandboxCacheWithWujie, deleteWujieById } from '../../src/common';
+import { deferStyleSheetByHref } from '../../src/effect';
 
 const WUJIE_ID = 'defer-style-href-app';
 
@@ -39,19 +38,19 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
   let sandbox: Wujie;
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     sandbox = createSandbox();
     addSandboxCacheWithWujie(WUJIE_ID, sandbox);
   });
 
   afterEach(() => {
     deleteWujieById(WUJIE_ID);
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("后续 setAttribute('href') 应触发 loadStyleSheet 并带上真实 href", async () => {
     const link = makeLink();
-    const loadStyleSheet = jest.fn();
+    const loadStyleSheet = vi.fn();
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
     expect(sandbox.deferredStyleObservers).toHaveLength(1);
@@ -66,7 +65,7 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
 
   it('后续设置相对 href 时应传入浏览器解析后的绝对 href', async () => {
     const link = makeLink();
-    const loadStyleSheet = jest.fn();
+    const loadStyleSheet = vi.fn();
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
 
@@ -80,7 +79,7 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
 
   it('命中后应 disconnect 并从 sandbox.deferredStyleObservers 出队', async () => {
     const link = makeLink();
-    const loadStyleSheet = jest.fn();
+    const loadStyleSheet = vi.fn();
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
     link.setAttribute('href', 'https://cdn.example.com/skin.min.css');
@@ -96,14 +95,14 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
 
   it('超时未拿到 href 时应放弃监听、出队并触发 error 事件', () => {
     const link = makeLink();
-    const loadStyleSheet = jest.fn();
-    const onerror = jest.fn();
+    const loadStyleSheet = vi.fn();
+    const onerror = vi.fn();
     link.onerror = onerror;
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
     expect(sandbox.deferredStyleObservers).toHaveLength(1);
 
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
 
     expect(loadStyleSheet).not.toHaveBeenCalled();
     expect(onerror).toHaveBeenCalledTimes(1);
@@ -112,8 +111,8 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
 
   it('子应用已销毁后再赋值 href 不应执行 loadStyleSheet', async () => {
     const link = makeLink();
-    const loadStyleSheet = jest.fn();
-    const onerror = jest.fn();
+    const loadStyleSheet = vi.fn();
+    const onerror = vi.fn();
     link.onerror = onerror;
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
@@ -125,7 +124,7 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
 
     link.setAttribute('href', 'https://cdn.example.com/skin.min.css');
     await Promise.resolve();
-    jest.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(5000);
 
     expect(loadStyleSheet).not.toHaveBeenCalled();
     expect(onerror).not.toHaveBeenCalled();
@@ -134,7 +133,7 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
 
   it('环境不支持 MutationObserver 时应安全跳过，不抛错也不入队', () => {
     const link = makeLink();
-    const loadStyleSheet = jest.fn();
+    const loadStyleSheet = vi.fn();
     const fakeWindow = {} as unknown as Window;
 
     expect(() =>

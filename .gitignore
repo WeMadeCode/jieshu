@@ -10,6 +10,9 @@ esm
 !.vscode/settings.json
 yarn.lock
 coverage
+test-results
+playwright-report
+blob-report
 .history
 .npmrc
 .cursor

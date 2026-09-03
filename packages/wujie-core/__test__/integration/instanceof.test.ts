@@ -1,9 +1,24 @@
+import { expect, test, type Page } from '@playwright/test';
+
 import { vueMainAppInfoMap } from './common';
 import { awaitConsoleLogMessage } from './utils';
 
+const describe = test.describe;
+const beforeAll = test.beforeAll;
+const it = test;
+let page: Page;
+
+beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
+
 describe('main vue instanceof patch', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       localStorage.clear();
       localStorage.setItem('preload', 'false');
       localStorage.setItem('degrade', 'false');

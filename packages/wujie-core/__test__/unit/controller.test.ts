@@ -17,10 +17,10 @@ function deferred<T>() {
 
 function runtime(overrides: Partial<AppRuntime> = {}): AppRuntime {
   return {
-    start: jest.fn(async () => undefined),
-    refresh: jest.fn(async () => undefined),
-    destroy: jest.fn(async () => undefined),
-    release: jest.fn(async () => undefined),
+    start: vi.fn(async () => undefined),
+    refresh: vi.fn(async () => undefined),
+    destroy: vi.fn(async () => undefined),
+    release: vi.fn(async () => undefined),
     ...overrides,
   };
 }
@@ -29,12 +29,9 @@ describe('RuntimeAppController', () => {
   test('starts a newer intent immediately and cleans up a stale result', async () => {
     const first = deferred<DestroyHandler | void>();
     const second = deferred<DestroyHandler | void>();
-    const staleDestroy = jest.fn(async () => undefined);
-    const currentDestroy = jest.fn(async () => undefined);
-    const start = jest
-      .fn<ReturnType<AppRuntime['start']>, Parameters<AppRuntime['start']>>()
-      .mockReturnValueOnce(first.promise)
-      .mockReturnValueOnce(second.promise);
+    const staleDestroy = vi.fn(async () => undefined);
+    const currentDestroy = vi.fn(async () => undefined);
+    const start = vi.fn<AppRuntime['start']>().mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
     const controller = new RuntimeAppController(runtime({ start }));
 
     const firstRun = controller.start(options());
@@ -53,12 +50,12 @@ describe('RuntimeAppController', () => {
     const catalogResult = deferred<DestroyHandler | void>();
     const checkoutResult = deferred<DestroyHandler | void>();
     const catalogReleased = deferred<void>();
-    const staleDestroy = jest.fn(async () => undefined);
-    const start = jest
-      .fn<ReturnType<AppRuntime['start']>, Parameters<AppRuntime['start']>>()
+    const staleDestroy = vi.fn(async () => undefined);
+    const start = vi
+      .fn<AppRuntime['start']>()
       .mockReturnValueOnce(catalogResult.promise)
       .mockReturnValueOnce(checkoutResult.promise);
-    const destroy = jest.fn(() => catalogReleased.promise);
+    const destroy = vi.fn(() => catalogReleased.promise);
     const controller = new RuntimeAppController(runtime({ start, destroy }));
 
     const catalog = controller.start(options('catalog'));
@@ -83,11 +80,11 @@ describe('RuntimeAppController', () => {
     const catalogResult = deferred<DestroyHandler | void>();
     const reportsResult = deferred<DestroyHandler | void>();
     const catalogReleased = deferred<void>();
-    const start = jest
-      .fn<ReturnType<AppRuntime['start']>, Parameters<AppRuntime['start']>>()
+    const start = vi
+      .fn<AppRuntime['start']>()
       .mockReturnValueOnce(catalogResult.promise)
       .mockReturnValueOnce(reportsResult.promise);
-    const destroy = jest.fn(() => catalogReleased.promise);
+    const destroy = vi.fn(() => catalogReleased.promise);
     const controller = new RuntimeAppController(runtime({ start, destroy }));
 
     const catalog = controller.start(options('catalog'));
@@ -110,8 +107,8 @@ describe('RuntimeAppController', () => {
 
   test('releases a completed previous name before starting a new identity', async () => {
     const previousReleased = deferred<void>();
-    const start = jest.fn(async () => undefined);
-    const destroy = jest.fn(() => previousReleased.promise);
+    const start = vi.fn(async () => undefined);
+    const destroy = vi.fn(() => previousReleased.promise);
     const controller = new RuntimeAppController(runtime({ start, destroy }));
 
     await controller.start(options('catalog'));
@@ -127,9 +124,9 @@ describe('RuntimeAppController', () => {
   });
 
   test('unmounts a completed alive application before an identity switch while keeping it cacheable', async () => {
-    const start = jest.fn(async () => undefined);
-    const destroy = jest.fn(async () => undefined);
-    const release = jest.fn(async () => undefined);
+    const start = vi.fn(async () => undefined);
+    const destroy = vi.fn(async () => undefined);
+    const release = vi.fn(async () => undefined);
     const controller = new RuntimeAppController(runtime({ start, destroy, release }));
     const aliveOptions = options('catalog');
     aliveOptions.alive = true;
@@ -143,9 +140,9 @@ describe('RuntimeAppController', () => {
   });
 
   test('honors core-resolved reusable state from alive or mount/unmount lifecycles', async () => {
-    const start = jest.fn(async () => undefined);
-    const destroy = jest.fn(async () => undefined);
-    const release = jest.fn(async () => undefined);
+    const start = vi.fn(async () => undefined);
+    const destroy = vi.fn(async () => undefined);
+    const release = vi.fn(async () => undefined);
     const controller = new RuntimeAppController(
       runtime({ start, destroy, release, shouldPreserveOnDisconnect: (name) => name === 'catalog' }),
     );
@@ -159,8 +156,8 @@ describe('RuntimeAppController', () => {
 
   test('waits for an asynchronous reusable unmount before mounting the replacement', async () => {
     const released = deferred<void>();
-    const start = jest.fn(async () => undefined);
-    const release = jest.fn(() => released.promise);
+    const start = vi.fn(async () => undefined);
+    const release = vi.fn(() => released.promise);
     const controller = new RuntimeAppController(
       runtime({ start, release, shouldPreserveOnDisconnect: (name) => name === 'catalog' }),
     );
@@ -177,11 +174,11 @@ describe('RuntimeAppController', () => {
 
   test('falls back to full destroy when reusable unmount rejects', async () => {
     const destroyed = deferred<void>();
-    const start = jest.fn(async () => undefined);
-    const release = jest.fn(async () => {
+    const start = vi.fn(async () => undefined);
+    const release = vi.fn(async () => {
       throw new Error('child unmount failed');
     });
-    const destroy = jest.fn(() => destroyed.promise);
+    const destroy = vi.fn(() => destroyed.promise);
     const controller = new RuntimeAppController(
       runtime({ start, release, destroy, shouldPreserveOnDisconnect: (name) => name === 'catalog' }),
     );
@@ -202,7 +199,7 @@ describe('RuntimeAppController', () => {
     const seen: StartOptions[] = [];
     const controller = new RuntimeAppController(
       runtime({
-        start: jest.fn(async (request) => {
+        start: vi.fn(async (request) => {
           seen.push(request);
           return undefined;
         }),
@@ -219,10 +216,7 @@ describe('RuntimeAppController', () => {
 
   test('does not let a rejection poison later work', async () => {
     const failure = new Error('start failed');
-    const start = jest
-      .fn<ReturnType<AppRuntime['start']>, Parameters<AppRuntime['start']>>()
-      .mockRejectedValueOnce(failure)
-      .mockResolvedValueOnce(undefined);
+    const start = vi.fn<AppRuntime['start']>().mockRejectedValueOnce(failure).mockResolvedValueOnce(undefined);
     const controller = new RuntimeAppController(runtime({ start }));
 
     await expect(controller.start(options())).rejects.toBe(failure);
@@ -231,7 +225,7 @@ describe('RuntimeAppController', () => {
 
   test('refresh delegates one atomic runtime intent with captured options', async () => {
     const refreshGate = deferred<DestroyHandler | void>();
-    const refresh = jest.fn(() => refreshGate.promise);
+    const refresh = vi.fn(() => refreshGate.promise);
     const appRuntime = runtime({
       refresh,
     });
@@ -247,9 +241,9 @@ describe('RuntimeAppController', () => {
 
   test('dispose interrupts an in-flight start and cleans up a late result', async () => {
     const pending = deferred<DestroyHandler | void>();
-    const lateDestroy = jest.fn(async () => undefined);
-    const destroy = jest.fn(async () => undefined);
-    const controller = new RuntimeAppController(runtime({ start: jest.fn(() => pending.promise), destroy }));
+    const lateDestroy = vi.fn(async () => undefined);
+    const destroy = vi.fn(async () => undefined);
+    const controller = new RuntimeAppController(runtime({ start: vi.fn(() => pending.promise), destroy }));
 
     const running = controller.start(options());
     controller.dispose();
@@ -261,7 +255,7 @@ describe('RuntimeAppController', () => {
   });
 
   test('dispose leaves an already completed cached application to the disconnect path', async () => {
-    const destroy = jest.fn(async () => undefined);
+    const destroy = vi.fn(async () => undefined);
     const controller = new RuntimeAppController(runtime({ destroy }));
 
     await controller.start(options());
@@ -273,8 +267,8 @@ describe('RuntimeAppController', () => {
   test('explicit destroy interrupts a pending start without waiting for it', async () => {
     const blocker = deferred<DestroyHandler | void>();
     const destroyGate = deferred<void>();
-    const destroy = jest.fn(() => destroyGate.promise);
-    const controller = new RuntimeAppController(runtime({ start: jest.fn(() => blocker.promise), destroy }));
+    const destroy = vi.fn(() => destroyGate.promise);
+    const controller = new RuntimeAppController(runtime({ start: vi.fn(() => blocker.promise), destroy }));
 
     const running = controller.start(options());
     const destroying = controller.destroy('catalog');
@@ -288,8 +282,8 @@ describe('RuntimeAppController', () => {
 
   test('a newer start supersedes a refresh before its destroy finishes', async () => {
     const refreshGate = deferred<DestroyHandler | void>();
-    const start = jest.fn(async () => undefined);
-    const controller = new RuntimeAppController(runtime({ start, refresh: jest.fn(() => refreshGate.promise) }));
+    const start = vi.fn(async () => undefined);
+    const controller = new RuntimeAppController(runtime({ start, refresh: vi.fn(() => refreshGate.promise) }));
 
     const refreshing = controller.refresh(options('catalog', 'https://example.test/refresh'));
     const starting = controller.start(options('catalog', 'https://example.test/latest'));

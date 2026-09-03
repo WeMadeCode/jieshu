@@ -35,7 +35,7 @@ describe('public operation races', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('destroy interrupts a start whose HTML request is still pending', async () => {
@@ -83,10 +83,10 @@ describe('public operation races', () => {
       beforeLoad: () => {
         const current = getWujieById('latest-start');
         if (!current || current === staleSandbox) return;
-        current.active = jest.fn(async () => {
+        current.active = vi.fn(async () => {
           current.activeFlag = true;
         });
-        current.start = jest.fn(async () => undefined);
+        current.start = vi.fn(async () => undefined);
       },
     });
     await expect(first).resolves.toBeUndefined();
@@ -112,8 +112,8 @@ describe('public operation races', () => {
   test('an unmount during beforeMount cannot publish a partial initialization', async () => {
     const container = document.createElement('main');
     document.body.appendChild(container);
-    const childMount = jest.fn();
-    const afterMount = jest.fn();
+    const childMount = vi.fn();
+    const afterMount = vi.fn();
     let unmounting: Promise<void> | undefined;
 
     const starting = startApp({
@@ -121,11 +121,11 @@ describe('public operation races', () => {
       html: '<html><head></head><body></body></html>',
       beforeLoad: (iframeWindow) => {
         iframeWindow.__WUJIE_MOUNT = childMount;
-        iframeWindow.__WUJIE_UNMOUNT = jest.fn();
+        iframeWindow.__WUJIE_UNMOUNT = vi.fn();
         const current = getWujieById('interrupted-mount');
         if (current) {
           current.el = container;
-          current.active = jest.fn(async () => {
+          current.active = vi.fn(async () => {
             current.activeFlag = true;
           });
         }
@@ -181,10 +181,10 @@ describe('public operation races', () => {
       beforeLoad: () => {
         const sandbox = getWujieById(name);
         if (!sandbox) return;
-        sandbox.active = jest.fn(async () => {
+        sandbox.active = vi.fn(async () => {
           sandbox.activeFlag = true;
         });
-        sandbox.start = jest.fn(async () => undefined);
+        sandbox.start = vi.fn(async () => undefined);
       },
     });
 
@@ -201,7 +201,7 @@ describe('public operation races', () => {
   });
 
   test('idle preload uses the options snapshot captured at call time', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const request = {
       name: 'preload-snapshot',
       url: 'https://example.test/preload-snapshot/',
@@ -212,18 +212,18 @@ describe('public operation races', () => {
     preloadApp(request);
     request.name = 'mutated-name';
     request.url = 'https://example.test/mutated/';
-    jest.advanceTimersByTime(1);
+    vi.advanceTimersByTime(1);
 
     expect(getWujieById('preload-snapshot')).not.toBeNull();
     expect(getWujieById('mutated-name')).toBeNull();
     await destroyApp('preload-snapshot');
     await Promise.resolve();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('destroy issued before idle time prevents a queued preload from reviving the app', async () => {
-    jest.useFakeTimers();
-    const fetch = jest.fn(() => Promise.resolve(response('<html></html>')));
+    vi.useFakeTimers();
+    const fetch = vi.fn(() => Promise.resolve(response('<html></html>')));
 
     preloadApp({
       name: 'cancelled-preload',
@@ -232,16 +232,16 @@ describe('public operation races', () => {
       fiber: false,
     });
     await destroyApp('cancelled-preload');
-    jest.advanceTimersByTime(1);
+    vi.advanceTimersByTime(1);
     await Promise.resolve();
 
     expect(getWujieById('cancelled-preload')).toBeNull();
     expect(fetch).not.toHaveBeenCalled();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('a start adopts an in-flight preload instead of being discarded with its stale idle intent', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const htmlGate = deferred<Response>();
     const container = document.createElement('main');
     document.body.appendChild(container);
@@ -251,12 +251,12 @@ describe('public operation races', () => {
       fetch: () => htmlGate.promise,
       fiber: false,
     });
-    jest.advanceTimersByTime(1);
+    vi.advanceTimersByTime(1);
     await Promise.resolve();
     const preloadSandbox = getWujieById('adopted-preload');
     expect(preloadSandbox).not.toBeNull();
     if (preloadSandbox) {
-      preloadSandbox.active = jest.fn(async () => {
+      preloadSandbox.active = vi.fn(async () => {
         preloadSandbox.activeFlag = true;
       });
     }
@@ -267,10 +267,10 @@ describe('public operation races', () => {
       beforeLoad: () => {
         const current = getWujieById('adopted-preload');
         if (!current || current === preloadSandbox) return;
-        current.active = jest.fn(async () => {
+        current.active = vi.fn(async () => {
           current.activeFlag = true;
         });
-        current.start = jest.fn(async () => undefined);
+        current.start = vi.fn(async () => undefined);
       },
     });
 
@@ -283,6 +283,6 @@ describe('public operation races', () => {
     expect(activeSandbox?.initialized).toBe(true);
 
     await destroyApp('adopted-preload');
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 });

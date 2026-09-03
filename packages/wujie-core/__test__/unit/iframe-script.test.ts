@@ -41,13 +41,13 @@ function createScriptEnvironment(degrade = false): {
 describe('iframe script execution pipeline', () => {
   afterEach(() => {
     document.body.innerHTML = '';
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('configures inline scripts, runs callbacks, and advances the serial queue', () => {
     const { iframeWindow } = createScriptEnvironment();
-    const callback = jest.fn();
-    const onload = jest.fn();
+    const callback = vi.fn();
+    const onload = vi.fn();
 
     insertScriptToIframe(
       {
@@ -74,7 +74,7 @@ describe('iframe script execution pipeline', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const rawElement = iframeWindow.document.createElement('script');
     rawElement.setAttribute(WUJIE_SCRIPT_ID, 'dynamic-7');
-    const onload = jest.fn();
+    const onload = vi.fn();
 
     insertScriptToIframe(
       { src: 'https://cdn.example/chunk.js', crossorigin: true, crossoriginType: 'anonymous', onload },
@@ -99,9 +99,9 @@ describe('iframe script execution pipeline', () => {
 
   it('reports a native error separately and still advances the serial queue', async () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
-    const onload = jest.fn();
-    const onerror = jest.fn();
-    const next = jest.fn();
+    const onload = vi.fn();
+    const onerror = vi.fn();
+    const next = vi.fn();
     sandbox.execQueue.push(next);
 
     const handle = insertScriptToIframe({ src: 'https://cdn.example/missing.js', onload, onerror }, iframeWindow);
@@ -118,7 +118,7 @@ describe('iframe script execution pipeline', () => {
   it('cancels a pending native script without advancing or retaining its node', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const rawElement = iframeWindow.document.createElement('script');
-    const onload = jest.fn();
+    const onload = vi.fn();
     const handle = insertScriptToIframe({ src: 'https://cdn.example/pending.js', onload }, iframeWindow, rawElement);
     const inserted = handle.element;
 
@@ -137,7 +137,7 @@ describe('iframe script execution pipeline', () => {
 
   it('registers a pending static native script for sandbox teardown', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
-    const onload = jest.fn();
+    const onload = vi.fn();
     const handle = insertScriptToIframe({ src: 'https://cdn.example/static-pending.js', onload }, iframeWindow);
 
     expect(handle.element.isConnected).toBe(true);
@@ -151,7 +151,7 @@ describe('iframe script execution pipeline', () => {
   it('keeps transformed module code cancellable until its native load event', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const rawElement = iframeWindow.document.createElement('script');
-    const onload = jest.fn();
+    const onload = vi.fn();
     const handle = insertScriptToIframe(
       { content: 'export default 1', module: true, onload },
       iframeWindow,
@@ -171,7 +171,7 @@ describe('iframe script execution pipeline', () => {
 
   it('ignores a native script event delivered after its sandbox was destroyed', () => {
     const { iframeWindow } = createScriptEnvironment();
-    const onload = jest.fn();
+    const onload = vi.fn();
 
     insertScriptToIframe({ src: 'https://cdn.example/late.js', onload }, iframeWindow);
     const inserted = iframeWindow.document.head.querySelector('script') as HTMLScriptElement;
@@ -189,8 +189,8 @@ describe('iframe script execution pipeline', () => {
 
   it('reports an HTML response and advances without inserting the invalid script', () => {
     const { iframeWindow } = createScriptEnvironment(true);
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    const callback = jest.fn();
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const callback = vi.fn();
 
     insertScriptToIframe({ content: '<!DOCTYPE html><title>not javascript</title>', callback }, iframeWindow);
 
@@ -213,8 +213,8 @@ describe('iframe script execution pipeline', () => {
 
   it('keeps mixed-case import-map JSON byte-for-byte outside transforms and classic wrapping', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
-    const replace = jest.fn((code: string) => `/* replaced */${code}`);
-    const jsLoader = jest.fn((code: string) => `${code};`);
+    const replace = vi.fn((code: string) => `/* replaced */${code}`);
+    const jsLoader = vi.fn((code: string) => `${code};`);
     sandbox.replace = replace;
     sandbox.plugins = [{ jsLoader }];
     const importMap = '{"imports":{"pkg":"https://cdn.example/pkg.js"}}';
@@ -231,7 +231,7 @@ describe('iframe script execution pipeline', () => {
 
   it('does not inject a script when its loader synchronously invalidates the owner', async () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
-    const callback = jest.fn();
+    const callback = vi.fn();
     sandbox.plugins = [
       {
         jsLoader: (code: string) => {

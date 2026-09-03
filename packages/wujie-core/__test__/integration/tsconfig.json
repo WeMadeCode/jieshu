@@ -2,12 +2,8 @@
   "extends": "../../../../tsconfig.json",
   "compilerOptions": {
     "rootDir": "../integration",
-    "module": "Node16",
-    "moduleResolution": "Node16",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "experimentalDecorators": true,
-    "declaration": true,
-    "types": ["puppeteer", "jest-environment-puppeteer", "jest"]
+    "types": ["node", "@playwright/test"]
   }
 }

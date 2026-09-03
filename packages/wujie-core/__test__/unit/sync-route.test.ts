@@ -1,21 +1,21 @@
-const mockGetWujieById = jest.fn();
+const mockGetWujieById = vi.hoisted(() => vi.fn());
 
-jest.mock('../../src/common', () => ({
+vi.mock('../../src/common', () => ({
   getWujieById: mockGetWujieById,
-  rawDocumentQuerySelector: jest.fn(),
+  rawDocumentQuerySelector: vi.fn(),
 }));
 
-jest.mock('../../src/iframe', () => ({
-  patchEventTimeStamp: jest.fn(),
-  renderIframeReplaceApp: jest.fn(),
+vi.mock('../../src/iframe', () => ({
+  patchEventTimeStamp: vi.fn(),
+  renderIframeReplaceApp: vi.fn(),
 }));
 
-jest.mock('../../src/shadow', () => ({
-  initRenderIframeAndContainer: jest.fn(),
-  renderElementToContainer: jest.fn(),
+vi.mock('../../src/shadow', () => ({
+  initRenderIframeAndContainer: vi.fn(),
+  renderElementToContainer: vi.fn(),
 }));
 
-jest.mock('../../src/utils', () => ({
+vi.mock('../../src/utils', () => ({
   appRouteParse: (url: string) => {
     const parsed = new URL(url, 'https://fallback.test');
     return {
@@ -24,11 +24,16 @@ jest.mock('../../src/utils', () => ({
       appRoutePath: parsed.pathname + parsed.search + parsed.hash,
     };
   },
-  getDegradeIframe: jest.fn(),
+  getDegradeIframe: vi.fn(),
 }));
 
-const { clearInactiveAppUrl, processAppForHrefJump, pushUrlToWindow, syncUrlToIframe, syncUrlToWindow } =
-  require('../../src/sync') as typeof import('../../src/sync');
+import {
+  clearInactiveAppUrl,
+  processAppForHrefJump,
+  pushUrlToWindow,
+  syncUrlToIframe,
+  syncUrlToWindow,
+} from '../../src/sync';
 
 describe('sync route orchestration', () => {
   beforeEach(() => {
@@ -111,7 +116,7 @@ describe('sync route orchestration', () => {
 
   test('syncUrlToIframe 首次执行时展开短路径并替换 iframe 路由', () => {
     window.history.replaceState(null, '', '/shell?app=%7Bdetail%7D%2Fitem#/all');
-    const replaceState = jest.fn();
+    const replaceState = vi.fn();
     const iframeWindow = {
       location: { pathname: '/old', search: '', hash: '' },
       history: { replaceState },

@@ -7,17 +7,17 @@
 
 export {};
 
-jest.mock('../../src/sandbox', () => ({}), { virtual: true });
-jest.mock('../../src/index', () => ({}), { virtual: true });
+vi.mock('../../src/sandbox', () => ({}));
+vi.mock('../../src/index', () => ({}));
 
-const {
+import {
   idToSandboxCacheMap,
   addSandboxCacheWithWujie,
   addSandboxCacheWithOptions,
   deleteWujieById,
   getWujieById,
   getOptionsById,
-} = require('../../src/common');
+} from '../../src/common';
 
 describe('common: deleteWujieById', () => {
   beforeEach(() => {

@@ -13,9 +13,7 @@
  * 又能正常显示，问题不易复现。
  */
 
-export {};
-
-const Sandbox = require('../../src/sandbox').default;
+import Sandbox from '../../src/sandbox';
 
 function buildUnmountReadySandbox(alive: boolean): any {
   const sandbox = Object.create(Sandbox.prototype);
@@ -25,7 +23,7 @@ function buildUnmountReadySandbox(alive: boolean): any {
   sandbox.hrefFlag = false;
   sandbox.degrade = false;
   sandbox.lifecycles = {};
-  sandbox.bus = { $clear: jest.fn() };
+  sandbox.bus = { $clear: vi.fn() };
   // shadowRoot / head / body 用普通 div 充当，clearChild 只关心 children；
   // effect.ts removeEventListener 会读 element._cacheListeners.entries()，预置空 Map
   sandbox.shadowRoot = document.createElement('div');
@@ -33,7 +31,7 @@ function buildUnmountReadySandbox(alive: boolean): any {
   sandbox.body = Object.assign(document.createElement('div'), { _cacheListeners: new Map() });
   sandbox.iframe = {
     contentWindow: {
-      __WUJIE_UNMOUNT: jest.fn().mockResolvedValue(undefined),
+      __WUJIE_UNMOUNT: vi.fn().mockResolvedValue(undefined),
     },
   };
   sandbox.styleSheetElements = [];

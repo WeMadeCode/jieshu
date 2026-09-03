@@ -20,6 +20,7 @@
  */
 
 import { patchStylesheetElement } from '../../src/effect';
+import type { Mock } from 'vitest';
 
 interface FakeSandbox {
   styleSheetElements: HTMLStyleElement[];
@@ -42,13 +43,13 @@ const CUR_URL = 'http://child-app.example.com/';
 
 describe('patchStylesheetElement / vite multi-style chain', () => {
   let sandbox: FakeSandbox;
-  let cssLoader: jest.Mock;
+  let cssLoader: Mock;
   let firstStyle: HTMLStyleElement;
 
   beforeEach(() => {
     document.head.innerHTML = '';
     sandbox = createSandbox();
-    cssLoader = jest.fn((code: string) => `/* loaded */${code}`);
+    cssLoader = vi.fn((code: string) => `/* loaded */${code}`);
     firstStyle = document.createElement('style');
     document.head.appendChild(firstStyle);
     patchStylesheetElement(firstStyle as any, cssLoader, sandbox as any, CUR_URL);

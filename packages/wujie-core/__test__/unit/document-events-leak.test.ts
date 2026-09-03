@@ -62,8 +62,8 @@ describe('patchDocumentEffect documentEvents setter 语义', () => {
   });
 
   test('反复重赋值 document.onfullscreenchange = fn 不应在主 document 上累加 listener', () => {
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
+    const handler1 = vi.fn();
+    const handler2 = vi.fn();
 
     iframeWindow.document.onfullscreenchange = handler1;
     iframeWindow.document.onfullscreenchange = handler2;
@@ -78,7 +78,7 @@ describe('patchDocumentEffect documentEvents setter 语义', () => {
   });
 
   test('赋值 null 应能解除已注册的 listener', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     iframeWindow.document.onfullscreenchange = handler;
     iframeWindow.document.onfullscreenchange = null;
 
@@ -88,7 +88,7 @@ describe('patchDocumentEffect documentEvents setter 语义', () => {
   });
 
   test('destroy 阶段 eventCleanupTracker.cleanupAll() 应反向解绑 documentEvents 注册的 listener', () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     iframeWindow.document.onfullscreenchange = handler;
 
     // 验证 listener 当前生效
@@ -108,7 +108,7 @@ describe('patchDocumentEffect documentEvents setter 语义', () => {
     expect(baseline).toBe(0);
 
     for (let i = 0; i < 10; i++) {
-      iframeWindow.document.onvisibilitychange = jest.fn();
+      iframeWindow.document.onvisibilitychange = vi.fn();
     }
 
     const after = countListenersByDispatch('visibilitychange');

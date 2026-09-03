@@ -8,9 +8,7 @@
  *   - 重建模式（非保活且未做生命周期改造）：直接 destroy，避免 sandbox / iframe 长期驻留累积。
  */
 
-export {};
-
-const shadow = require('../../src/shadow');
+import * as shadow from '../../src/shadow';
 
 function createMockSandbox({ alive, hasMount }: { alive: boolean; hasMount: boolean }) {
   return {
@@ -20,8 +18,8 @@ function createMockSandbox({ alive, hasMount }: { alive: boolean; hasMount: bool
         __WUJIE_MOUNT: hasMount ? () => undefined : undefined,
       },
     },
-    unmount: jest.fn().mockResolvedValue(undefined),
-    destroy: jest.fn().mockResolvedValue(undefined),
+    unmount: vi.fn().mockResolvedValue(undefined),
+    destroy: vi.fn().mockResolvedValue(undefined),
   } as any;
 }
 

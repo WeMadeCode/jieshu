@@ -19,7 +19,7 @@ function handler(key: Tag, marker: string): PipelineHandler<Tag, Context, string
 describe('effect insertion handler pipeline', () => {
   it('dispatches only the handler registered for the requested tag', () => {
     const trace: string[] = [];
-    const fallback = jest.fn(() => 'fallback');
+    const fallback = vi.fn(() => 'fallback');
     const pipeline = new HandlerPipeline<Tag, Context, string>([handler('LINK', 'link'), handler('STYLE', 'style')]);
 
     expect(pipeline.dispatch('STYLE', { trace }, fallback)).toBe('style');

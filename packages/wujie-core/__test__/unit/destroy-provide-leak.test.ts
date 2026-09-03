@@ -20,7 +20,7 @@ describe('sandbox.destroy() 对 iframeWindow.$wujie 的清理契约', () => {
     iframeWindow.__WUJIE = { id: 'leak-test' };
     iframeWindow.$wujie = provide;
 
-    const proxyRevoke = jest.fn();
+    const proxyRevoke = vi.fn();
 
     const inst: any = Object.create(Wujie.prototype);
     inst.id = 'leak-test';
@@ -29,9 +29,9 @@ describe('sandbox.destroy() 对 iframeWindow.$wujie 的清理契约', () => {
     inst.proxyLocation = null;
     inst.proxyRevoke = proxyRevoke;
     inst.iframe = iframe;
-    inst.bus = { $destroy: jest.fn() };
-    inst.eventCleanupTracker = { cleanupAll: jest.fn() };
-    inst.unmount = jest.fn().mockResolvedValue(undefined);
+    inst.bus = { $destroy: vi.fn() };
+    inst.eventCleanupTracker = { cleanupAll: vi.fn() };
+    inst.unmount = vi.fn().mockResolvedValue(undefined);
     inst.styleSheetElements = [];
     inst.dynamicScriptElements = [];
     inst.deferredStyleObservers = [];

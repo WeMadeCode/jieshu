@@ -70,18 +70,18 @@ describe('dynamic stylesheet failures', () => {
     const id = 'dynamic-style-failure';
     const source = 'https://assets.example/theme.css';
     let attempt = 0;
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> => {
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> => {
       attempt += 1;
       return Promise.resolve(attempt === 1 ? response('unavailable', 503) : response('body { color: green; }'));
     });
-    const loadError = jest.fn((_url: string, _failure: Error): void => undefined);
+    const loadError = vi.fn((_url: string, _failure: Error): void => undefined);
     const sandbox = createSandbox(id, fetch, loadError);
     const root = createRenderRoot();
     patchRenderEffect(root, id, false);
 
     const failedLink = document.createElement('link');
-    const failedLoad = jest.fn();
-    const failedError = jest.fn();
+    const failedLoad = vi.fn();
+    const failedError = vi.fn();
     failedLink.rel = 'stylesheet';
     failedLink.href = source;
     failedLink.onload = failedLoad;
@@ -96,8 +96,8 @@ describe('dynamic stylesheet failures', () => {
     expect(root.head.querySelector('style[data-wujie-css-href]')).toBeNull();
 
     const retryLink = document.createElement('link');
-    const retryLoad = jest.fn();
-    const retryError = jest.fn();
+    const retryLoad = vi.fn();
+    const retryError = vi.fn();
     retryLink.rel = 'stylesheet';
     retryLink.href = source;
     retryLink.onload = retryLoad;
@@ -115,7 +115,7 @@ describe('dynamic stylesheet failures', () => {
   test('dispatches error and removes the placeholder when cssLoader throws', async () => {
     const id = 'dynamic-style-loader-failure';
     const source = 'https://assets.example/loader-failure.css';
-    const fetch = jest.fn((_input: RequestInfo): Promise<Response> =>
+    const fetch = vi.fn((_input: RequestInfo): Promise<Response> =>
       Promise.resolve(response('body { color: green; }')),
     );
     const sandbox = createSandbox(id, fetch, () => undefined);
@@ -130,8 +130,8 @@ describe('dynamic stylesheet failures', () => {
     patchRenderEffect(root, id, false);
 
     const link = document.createElement('link');
-    const load = jest.fn();
-    const error = jest.fn();
+    const load = vi.fn();
+    const error = vi.fn();
     link.rel = 'stylesheet';
     link.href = source;
     link.onload = load;

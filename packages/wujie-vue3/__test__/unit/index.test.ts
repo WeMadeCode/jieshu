@@ -1,52 +1,67 @@
 import { createApp, defineComponent, h, nextTick, reactive, ref, type App, type ComponentPublicInstance } from 'vue';
+import type { Mock, MockInstance } from 'vitest';
 import type { StartOptions } from 'wujie';
-import type { WujieVueExposed } from '../../index';
+import WujieVue, { type WujieVueExposed } from '../../index';
 
 interface MockController {
-  start: jest.Mock<Promise<void>, [StartOptions]>;
-  refresh: jest.Mock<Promise<void>, [StartOptions]>;
-  destroy: jest.Mock<Promise<void>, [string]>;
-  dispose: jest.Mock<void, []>;
+  start: Mock<(options: StartOptions) => Promise<void>>;
+  refresh: Mock<(options: StartOptions) => Promise<void>>;
+  destroy: Mock<(name: string) => Promise<void>>;
+  dispose: Mock<() => void>;
 }
 
-const mockBus = {
-  $onAll: jest.fn(),
-  $offAll: jest.fn(),
-  $emit: jest.fn(),
-};
-const mockSetupApp = jest.fn();
-const mockPreloadApp = jest.fn();
-const mockDestroyApp = jest.fn();
-const mockRefreshApp = jest.fn();
-const mockClearAssetsCache = jest.fn();
-const mockControllers: MockController[] = [];
+const mocks = vi.hoisted(() => {
+  const mockControllers: MockController[] = [];
+  const mockNewController = (): MockController => ({
+    start: vi.fn<(options: StartOptions) => Promise<void>>().mockResolvedValue(undefined),
+    refresh: vi.fn<(options: StartOptions) => Promise<void>>().mockResolvedValue(undefined),
+    destroy: vi.fn<(name: string) => Promise<void>>().mockResolvedValue(undefined),
+    dispose: vi.fn<() => void>(),
+  });
+  const mockCreateAppController = vi.fn((): MockController => {
+    const controller = mockNewController();
+    mockControllers.push(controller);
+    return controller;
+  });
 
-function mockNewController(): MockController {
   return {
-    start: jest.fn().mockResolvedValue(undefined),
-    refresh: jest.fn().mockResolvedValue(undefined),
-    destroy: jest.fn().mockResolvedValue(undefined),
-    dispose: jest.fn(),
+    mockBus: {
+      $onAll: vi.fn(),
+      $offAll: vi.fn(),
+      $emit: vi.fn(),
+    },
+    mockSetupApp: vi.fn(),
+    mockPreloadApp: vi.fn(),
+    mockDestroyApp: vi.fn(),
+    mockRefreshApp: vi.fn(),
+    mockClearAssetsCache: vi.fn(),
+    mockControllers,
+    mockNewController,
+    mockCreateAppController,
   };
-}
-
-const mockCreateAppController = jest.fn((): MockController => {
-  const controller = mockNewController();
-  mockControllers.push(controller);
-  return controller;
 });
 
-jest.mock('wujie', () => ({
-  bus: mockBus,
-  setupApp: mockSetupApp,
-  preloadApp: mockPreloadApp,
-  destroyApp: mockDestroyApp,
-  refreshApp: mockRefreshApp,
-  clearAssetsCache: mockClearAssetsCache,
-  createAppController: mockCreateAppController,
+vi.mock('wujie', () => ({
+  bus: mocks.mockBus,
+  setupApp: mocks.mockSetupApp,
+  preloadApp: mocks.mockPreloadApp,
+  destroyApp: mocks.mockDestroyApp,
+  refreshApp: mocks.mockRefreshApp,
+  clearAssetsCache: mocks.mockClearAssetsCache,
+  createAppController: mocks.mockCreateAppController,
 }));
 
-const WujieVue = require('../../index').default as typeof import('../../index').default;
+const {
+  mockBus,
+  mockSetupApp,
+  mockPreloadApp,
+  mockDestroyApp,
+  mockRefreshApp,
+  mockClearAssetsCache,
+  mockControllers,
+  mockCreateAppController,
+  mockNewController,
+} = mocks;
 
 type ExposedInstance = ComponentPublicInstance & WujieVueExposed;
 
@@ -91,7 +106,7 @@ function mountComponent(
 
 describe('WujieVue for Vue 3', () => {
   const mountedComponents: MountedComponent[] = [];
-  let consoleError: jest.SpyInstance;
+  let consoleError: MockInstance;
 
   beforeEach(() => {
     document.body.innerHTML = '';
@@ -101,7 +116,7 @@ describe('WujieVue for Vue 3', () => {
       mockControllers.push(controller);
       return controller;
     });
-    consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -113,10 +128,10 @@ describe('WujieVue for Vue 3', () => {
 
   test('mounts with every start option, forwards events, reacts to identity, and cleans up', async () => {
     const loading = document.createElement('span');
-    const replace = jest.fn();
-    const customFetch = jest.fn();
-    const lifecycle = jest.fn();
-    const eventHandler = jest.fn();
+    const replace = vi.fn();
+    const customFetch = vi.fn();
+    const lifecycle = vi.fn();
+    const eventHandler = vi.fn();
     const props = {
       name: 'first',
       url: 'https://first.test/',
@@ -227,7 +242,7 @@ describe('WujieVue for Vue 3', () => {
     expect(WujieVue.refreshApp).toBe(mockRefreshApp);
     expect(WujieVue.clearAssetsCache).toBe(mockClearAssetsCache);
 
-    const app = { component: jest.fn() } as unknown as App;
+    const app = { component: vi.fn() } as unknown as App;
     WujieVue.install(app);
     expect(app.component).toHaveBeenCalledWith('WujieVue', expect.anything());
   });
@@ -254,7 +269,7 @@ describe('WujieVue for Vue 3', () => {
     await expect((mounted.child.value as ExposedInstance).refresh()).rejects.toBe(refreshFailure);
   });
 
-  test('guards pre-mount identity changes and supports import without HTMLElement', () => {
+  test('guards pre-mount identity changes and supports import without HTMLElement', async () => {
     const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'HTMLElement');
     if (!descriptor) throw new Error('jsdom HTMLElement descriptor is unavailable');
     let identityWatcher: (() => void) | undefined;
@@ -264,41 +279,38 @@ describe('WujieVue for Vue 3', () => {
 
     try {
       delete (globalThis as unknown as Record<string, unknown>)['HTMLElement'];
-      jest.isolateModules(() => {
-        jest.doMock('vue', () => ({
-          defineComponent: (options: unknown) => options,
-          h: jest.fn(),
-          onBeforeUnmount: (hook: () => void) => {
-            unmountHook = hook;
-          },
-          onMounted: (hook: () => void) => {
-            mountHook = hook;
-          },
-          ref: () => ({ value: isolatedContainer }),
-          watch: (_sources: unknown, callback: () => void) => {
-            identityWatcher = callback;
-          },
-        }));
-        const isolatedComponent = jest.requireActual('../../index').default as {
-          setup(props: Record<string, unknown>, context: { emit: jest.Mock }): WujieVueExposed;
-        };
-        const exposed = isolatedComponent.setup(
-          { name: 'isolated', url: 'https://isolated.test/' },
-          { emit: jest.fn() },
-        );
-        const controller = mockControllers[mockControllers.length - 1];
+      vi.resetModules();
+      vi.doMock('vue', () => ({
+        defineComponent: (options: unknown) => options,
+        h: vi.fn(),
+        onBeforeUnmount: (hook: () => void) => {
+          unmountHook = hook;
+        },
+        onMounted: (hook: () => void) => {
+          mountHook = hook;
+        },
+        ref: () => ({ value: isolatedContainer }),
+        watch: (_sources: unknown, callback: () => void) => {
+          identityWatcher = callback;
+        },
+      }));
+      const isolatedComponent = (await import('../../index')).default as unknown as {
+        setup(props: Record<string, unknown>, context: { emit: Mock }): WujieVueExposed;
+      };
+      const exposed = isolatedComponent.setup({ name: 'isolated', url: 'https://isolated.test/' }, { emit: vi.fn() });
+      const controller = mockControllers[mockControllers.length - 1];
 
-        identityWatcher?.();
-        expect(controller.start).not.toHaveBeenCalled();
-        mountHook?.();
-        expect(controller.start).toHaveBeenCalledTimes(1);
-        expect(exposed.destroy).toEqual(expect.any(Function));
-        unmountHook?.();
-        expect(controller.dispose).toHaveBeenCalledTimes(1);
-      });
+      identityWatcher?.();
+      expect(controller.start).not.toHaveBeenCalled();
+      mountHook?.();
+      expect(controller.start).toHaveBeenCalledTimes(1);
+      expect(exposed.destroy).toEqual(expect.any(Function));
+      unmountHook?.();
+      expect(controller.dispose).toHaveBeenCalledTimes(1);
     } finally {
-      jest.dontMock('vue');
+      vi.doUnmock('vue');
       Object.defineProperty(globalThis, 'HTMLElement', descriptor);
+      vi.resetModules();
     }
   });
 });

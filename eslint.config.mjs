@@ -5,7 +5,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const typescriptFiles = ['**/*.{ts,mts,cts}'];
-const testFiles = ['**/__test__/**/*.{js,ts,mts,cts}', '**/*.test.{js,ts}'];
+const unitTestFiles = ['**/__test__/unit/**/*.{js,ts,mts,cts}'];
 const unusedVariablesRule = [
   'warn',
   {
@@ -95,13 +95,10 @@ export default [
     },
   },
   {
-    name: 'wujie/tests',
-    files: testFiles,
+    name: 'wujie/unit-tests',
+    files: unitTestFiles,
     languageOptions: {
-      globals: {
-        ...globals.jest,
-        page: 'readonly',
-      },
+      globals: globals.vitest,
     },
   },
   {

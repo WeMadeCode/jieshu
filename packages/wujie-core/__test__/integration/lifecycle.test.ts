@@ -1,5 +1,20 @@
+import { test, type Page } from '@playwright/test';
+
 import { awaitConsoleLogMessage } from './utils';
 import { reactMainAppInfoMap, vueMainAppInfoMap } from './common';
+
+const describe = test.describe;
+const beforeAll = test.beforeAll;
+const it = test;
+let page: Page;
+
+beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
 
 const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainAppInfoMap) => {
   it(`react16 entry lifecycles`, async () => {
@@ -93,7 +108,7 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
 
 describe('main react startApp', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
@@ -106,7 +121,7 @@ describe('main react startApp', () => {
 
 describe('main vue startApp', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');

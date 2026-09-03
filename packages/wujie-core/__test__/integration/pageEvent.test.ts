@@ -1,6 +1,21 @@
 // 子应用页面事件
+import { test, type Page } from '@playwright/test';
+
 import { awaitConsoleLogMessage } from './utils';
 import { reactMainAppInfoMap, vueMainAppInfoMap } from './common';
+
+const describe = test.describe;
+const beforeAll = test.beforeAll;
+const it = test;
+let page: Page;
+
+beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
 
 const pageLiftEventConsoleLogList = [
   'vue2 document DOMContentLoaded trigger',
@@ -13,7 +28,7 @@ const pageLiftEventConsoleLogList = [
 
 describe('main react pageEvent', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
@@ -37,7 +52,7 @@ describe('main react pageEvent', () => {
 
 describe('main vue pageEvent', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');

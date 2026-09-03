@@ -36,7 +36,7 @@ describe('degradation-mode element listener recovery', () => {
   test('restores the same callback registered for both capture phases', () => {
     const { iframeWindow, nativeRemoveEventListener, sandbox } = createTrackedRealm();
     const element = iframeWindow.document.createElement('button');
-    const listener = jest.fn();
+    const listener = vi.fn();
 
     element.addEventListener('click', listener, false);
     element.addEventListener('click', listener, true);
@@ -53,8 +53,8 @@ describe('degradation-mode element listener recovery', () => {
   test('removing an unknown listener preserves cached listeners for recovery', () => {
     const { iframeWindow, nativeRemoveEventListener, sandbox } = createTrackedRealm();
     const element = iframeWindow.document.createElement('button');
-    const retainedListener = jest.fn();
-    const unknownListener = jest.fn();
+    const retainedListener = vi.fn();
+    const unknownListener = vi.fn();
 
     element.addEventListener('click', retainedListener, { capture: false, passive: true });
     element.removeEventListener('click', unknownListener, { capture: false });

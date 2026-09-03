@@ -2,12 +2,10 @@
   "extends": "../../tsconfig.json",
   "include": ["../../index.ts", "./**/*.ts"],
   "compilerOptions": {
-    "module": "Node16",
-    "moduleResolution": "Node16",
     "outDir": "../../.test-build",
     "rootDir": "../..",
     "esModuleInterop": true,
     "sourceMap": true,
-    "types": ["jest", "node"]
+    "types": ["vitest/globals", "node"]
   }
 }

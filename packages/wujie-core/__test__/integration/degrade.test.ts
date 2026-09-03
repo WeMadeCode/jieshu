@@ -1,9 +1,24 @@
+import { expect, test, type Page } from '@playwright/test';
+
 import { awaitConsoleLogMessage, getTextContentByJsSelector } from './utils';
 import { reactMainAppInfoList, vueMainAppInfoList } from './common';
 
+const describe = test.describe;
+const beforeAll = test.beforeAll;
+const it = test;
+let page: Page;
+
+beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
+
 describe('main react degrade', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 开启主动降级
       localStorage.clear();
       localStorage.setItem('preload', 'false');
@@ -24,7 +39,7 @@ describe('main react degrade', () => {
 
 describe('main vue degrade', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 开启主动降级
       localStorage.clear();
       localStorage.setItem('preload', 'false');

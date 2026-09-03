@@ -74,7 +74,7 @@ describe('sandbox lifecycle races', () => {
       });
       return { promise, resolve };
     })();
-    const childUnmount = jest.fn(() => gate.promise);
+    const childUnmount = vi.fn(() => gate.promise);
     sandbox.mountFlag = true;
     sandbox.iframe.contentWindow.__WUJIE_UNMOUNT = childUnmount;
 
@@ -91,7 +91,7 @@ describe('sandbox lifecycle races', () => {
 
   test('does not deactivate an already inactive alive generation twice', async () => {
     const sandbox = createSandbox('idempotent-alive-unmount');
-    const deactivated = jest.fn();
+    const deactivated = vi.fn();
     sandbox.alive = true;
     sandbox.lifecycles = { deactivated };
 
@@ -106,7 +106,7 @@ describe('sandbox lifecycle races', () => {
     const name = 'reentrant-public-destroy';
     const sandbox = createSandbox(name);
     sandbox.mountFlag = true;
-    const childUnmount = jest.fn(() => destroyApp(name));
+    const childUnmount = vi.fn(() => destroyApp(name));
     sandbox.iframe.contentWindow.__WUJIE_UNMOUNT = childUnmount;
 
     await expect(destroyApp(name)).resolves.toBeUndefined();
@@ -120,7 +120,7 @@ describe('sandbox lifecycle races', () => {
     const name = 'async-reentrant-public-destroy';
     const sandbox = createSandbox(name);
     sandbox.mountFlag = true;
-    const childUnmount = jest.fn(async () => {
+    const childUnmount = vi.fn(async () => {
       await Promise.resolve();
       await destroyApp(name);
     });
@@ -145,7 +145,7 @@ describe('sandbox lifecycle races', () => {
   test('async child unmount can reenter through a host callback passed in props', async () => {
     const name = 'async-props-reentrant-destroy';
     const sandbox = createSandbox(name);
-    const hostDestroy = jest.fn(async () => {
+    const hostDestroy = vi.fn(async () => {
       await Promise.resolve();
       await destroyApp(name);
     });
@@ -210,14 +210,14 @@ describe('sandbox lifecycle races', () => {
 
     const replacementContainer = document.createElement('main');
     document.body.appendChild(replacementContainer);
-    const beforeLoad = jest.fn(() => {
+    const beforeLoad = vi.fn(() => {
       expect(cleanupFinished).toBe(true);
       const replacement = idToSandboxCacheMap.get(name)?.wujie;
       if (!replacement) return;
-      replacement.active = jest.fn(async () => {
+      replacement.active = vi.fn(async () => {
         replacement.activeFlag = true;
       });
-      replacement.start = jest.fn(async () => undefined);
+      replacement.start = vi.fn(async () => undefined);
     });
     await expect(
       startApp({
@@ -273,7 +273,7 @@ describe('sandbox lifecycle races', () => {
     const replacementContainer = document.createElement('main');
     document.body.appendChild(replacementContainer);
     sandbox.mountFlag = true;
-    const childUnmount = jest.fn(async () => {
+    const childUnmount = vi.fn(async () => {
       await Promise.resolve();
       await startApp({
         name,
@@ -303,7 +303,7 @@ describe('sandbox lifecycle races', () => {
   test('publishes inactive unmount state before resource error callbacks can re-enter', async () => {
     const sandbox = createSandbox('resource-reentrant-unmount');
     let reentered: Promise<void> | undefined;
-    const cancellation = jest.fn(() => {
+    const cancellation = vi.fn(() => {
       expect(sandbox.activeFlag).toBe(false);
       reentered = sandbox.unmount();
     });
@@ -320,9 +320,9 @@ describe('sandbox lifecycle races', () => {
   test('alive deactivation preserves a deferred stylesheet observer until href arrives', async () => {
     const sandbox = createSandbox('alive-deferred-style');
     const root = createRenderRoot();
-    const loaded = jest.fn();
-    const failed = jest.fn();
-    const fetch = jest.fn(() =>
+    const loaded = vi.fn();
+    const failed = vi.fn();
+    const fetch = vi.fn(() =>
       Promise.resolve({
         status: 200,
         text: () => Promise.resolve('body { color: green; }'),
@@ -365,11 +365,11 @@ describe('sandbox lifecycle races', () => {
 
   test('a destroy triggered by beforeMount prevents child mount', async () => {
     const sandbox = createSandbox('destroy-before-mount');
-    const childMount = jest.fn();
-    const afterMount = jest.fn();
+    const childMount = vi.fn();
+    const afterMount = vi.fn();
     let destroying: Promise<void> | undefined;
     sandbox.mountFlag = false;
-    sandbox.execQueue = [jest.fn()];
+    sandbox.execQueue = [vi.fn()];
     sandbox.iframe.contentWindow.__WUJIE_MOUNT = childMount;
     sandbox.lifecycles = {
       beforeMount: () => {
@@ -387,9 +387,9 @@ describe('sandbox lifecycle races', () => {
 
   test('an ordinary unmount triggered by beforeMount aborts the stale mount and advances its task', async () => {
     const sandbox = createSandbox('unmount-before-mount');
-    const childMount = jest.fn();
-    const afterMount = jest.fn();
-    const advance = jest.fn();
+    const childMount = vi.fn();
+    const afterMount = vi.fn();
+    const advance = vi.fn();
     let unmounting: Promise<void> | undefined;
     sandbox.mountFlag = false;
     sandbox.execQueue = [advance];
@@ -414,11 +414,11 @@ describe('sandbox lifecycle races', () => {
 
   test('a destroy triggered inside child mount observes mounted state and unmounts it', async () => {
     const sandbox = createSandbox('destroy-inside-mount');
-    const childUnmount = jest.fn();
-    const afterMount = jest.fn();
+    const childUnmount = vi.fn();
+    const afterMount = vi.fn();
     let destroying: Promise<void> | undefined;
     sandbox.mountFlag = false;
-    sandbox.execQueue = [jest.fn()];
+    sandbox.execQueue = [vi.fn()];
     sandbox.iframe.contentWindow.__WUJIE_UNMOUNT = childUnmount;
     sandbox.iframe.contentWindow.__WUJIE_MOUNT = () => {
       destroying = sandbox.destroy();
@@ -434,11 +434,11 @@ describe('sandbox lifecycle races', () => {
 
   test('an ordinary unmount inside child mount prevents afterMount', async () => {
     const sandbox = createSandbox('unmount-inside-mount');
-    const childUnmount = jest.fn();
-    const afterMount = jest.fn();
+    const childUnmount = vi.fn();
+    const afterMount = vi.fn();
     let unmounting: Promise<void> | undefined;
     sandbox.mountFlag = false;
-    sandbox.execQueue = [jest.fn()];
+    sandbox.execQueue = [vi.fn()];
     sandbox.iframe.contentWindow.__WUJIE_UNMOUNT = childUnmount;
     sandbox.iframe.contentWindow.__WUJIE_MOUNT = () => {
       unmounting = sandbox.unmount();

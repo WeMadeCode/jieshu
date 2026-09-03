@@ -361,7 +361,7 @@ public async unmount(): Promise<void> {
 
 ---
 
-> 本文为代码审计结论，未在最新仓库上跑 puppeteer 量化复测；建议结合 `notes/memory-leak-investigation.md` 同时新增一份 integration 测试做实测对照。
+> 本文为代码审计结论，未在最新仓库上跑 Playwright 量化复测；建议结合 `notes/memory-leak-investigation.md` 同时新增一份 integration 测试做实测对照。
 
 ---
 
@@ -437,4 +437,4 @@ public async unmount(): Promise<void> {
 | 总用例数（22 → 62） | 28        | 37        | 50             | 55   | 62   | 62/62 GREEN |
 | 关联 issue          | #732 #881 | #715 #890 | #732 #715 #890 | #890 | —    | —           |
 
-> 后续：在 puppeteer 集成测试里加一份 `memory.benchmark.ts`，循环 `startApp/destroyApp` N 轮，量化对比 `Page.evaluate(() => performance.memory)` + `document.querySelectorAll("*").length`，得到一份「修复前/修复后」对照表。该步骤需要重新构建 esm 并启动 8 个 example dev server，建议放在最终验收时单独跑一次。
+> 后续：在 Playwright 集成测试里加一份 `memory.benchmark.ts`，循环 `startApp/destroyApp` N 轮，量化对比 `Page.evaluate(() => performance.memory)` + `document.querySelectorAll("*").length`，得到一份「修复前/修复后」对照表。该步骤需要重新构建 esm 并启动 8 个 example dev server，建议放在最终验收时单独跑一次。

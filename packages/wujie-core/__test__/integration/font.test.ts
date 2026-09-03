@@ -1,12 +1,27 @@
+import { expect, test, type Page } from '@playwright/test';
+
 import { awaitConsoleLogMessage, triggerClickByJsSelector } from './utils';
 import { reactMainAppInfoMap, vueMainAppInfoMap } from './common';
+
+const describe = test.describe;
+const beforeAll = test.beforeAll;
+const it = test;
+let page: Page;
+
+beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
 
 const hasInjectedFontRule = (): boolean =>
   document.querySelector('[data-wujie-font-style-container]')?.textContent?.includes('@font-face') ?? false;
 
 describe('main react startApp', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
@@ -27,13 +42,13 @@ describe('main react startApp', () => {
     await page.waitForResponse((response) => response.url().includes('https://tdesign.gtimg.com/icon/'));
     // FontFaceSet.check 在字体缺失时也可能因 fallback 返回 true；直接等待框架
     // 把子应用的 @font-face 规则提升到宿主容器，才能稳定验证隔离逻辑。
-    await page.waitForFunction(hasInjectedFontRule, { timeout: 5000 });
+    await page.waitForFunction(hasInjectedFontRule, undefined, { timeout: 5000 });
     expect(await page.evaluate(hasInjectedFontRule)).toBe(true);
   });
 });
 describe('main vue startApp', () => {
   beforeAll(async () => {
-    await page.evaluateOnNewDocument(() => {
+    await page.addInitScript(() => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
@@ -52,7 +67,7 @@ describe('main vue startApp', () => {
     await appInfoFontMountedPromise;
     // 等待字体加载
     await page.waitForResponse((response) => response.url().includes('https://tdesign.gtimg.com/icon/'));
-    await page.waitForFunction(hasInjectedFontRule, { timeout: 5000 });
+    await page.waitForFunction(hasInjectedFontRule, undefined, { timeout: 5000 });
     expect(await page.evaluate(hasInjectedFontRule)).toBe(true);
   });
 });
