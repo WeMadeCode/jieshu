@@ -9,9 +9,7 @@ export interface WujieReactRef {
     refresh(): Promise<DestroyHandler | void>;
     destroy(): Promise<void>;
 }
-export type WujieReactPropTypes = Partial<Record<keyof WujieReactProps, unknown>>;
 export interface WujieReactStatics {
-    propTypes: WujieReactPropTypes;
     bus: typeof bus;
     setupApp: typeof setupApp;
     preloadApp: typeof preloadApp;
@@ -19,6 +17,10 @@ export interface WujieReactStatics {
     refreshApp: typeof refreshApp;
     clearAssetsCache: typeof clearAssetsCache;
 }
-export type WujieReactComponent = React.ForwardRefExoticComponent<WujieReactProps & React.RefAttributes<WujieReactRef>> & WujieReactStatics;
+export interface WujieReactComponent extends WujieReactStatics {
+    (props: WujieReactProps & React.RefAttributes<WujieReactRef>): React.ReactElement | null;
+    readonly $$typeof: symbol;
+    displayName?: string;
+}
 declare const WujieReact: WujieReactComponent;
 export default WujieReact;

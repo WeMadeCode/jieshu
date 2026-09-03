@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as PropTypes from "prop-types";
 import {
   bus,
   clearAssetsCache,
@@ -29,42 +28,7 @@ interface ApplicationIdentity {
   url?: string;
 }
 
-export type WujieReactPropTypes = Partial<Record<keyof WujieReactProps, unknown>>;
-
-const propTypes: WujieReactPropTypes = {
-  name: PropTypes.string,
-  // url may be supplied by setupApp and resolved by core at start time.
-  url: PropTypes.string,
-  html: PropTypes.string,
-  width: PropTypes.string,
-  height: PropTypes.string,
-  loading: PropTypes.element,
-  replace: PropTypes.func,
-  fetch: PropTypes.func,
-  props: PropTypes.object,
-  attrs: PropTypes.object,
-  degradeAttrs: PropTypes.object,
-  sync: PropTypes.bool,
-  prefix: PropTypes.object,
-  fiber: PropTypes.bool,
-  alive: PropTypes.bool,
-  degrade: PropTypes.bool,
-  plugins: PropTypes.array,
-  iframeAddEventListeners: PropTypes.arrayOf(PropTypes.string),
-  iframeOnEvents: PropTypes.arrayOf(PropTypes.string),
-  beforeLoad: PropTypes.func,
-  beforeMount: PropTypes.func,
-  afterMount: PropTypes.func,
-  beforeUnmount: PropTypes.func,
-  afterUnmount: PropTypes.func,
-  activated: PropTypes.func,
-  deactivated: PropTypes.func,
-  loadError: PropTypes.func,
-  style: PropTypes.object,
-};
-
 export interface WujieReactStatics {
-  propTypes: WujieReactPropTypes;
   bus: typeof bus;
   setupApp: typeof setupApp;
   preloadApp: typeof preloadApp;
@@ -73,10 +37,11 @@ export interface WujieReactStatics {
   clearAssetsCache: typeof clearAssetsCache;
 }
 
-export type WujieReactComponent = React.ForwardRefExoticComponent<
-  WujieReactProps & React.RefAttributes<WujieReactRef>
-> &
-  WujieReactStatics;
+export interface WujieReactComponent extends WujieReactStatics {
+  (props: WujieReactProps & React.RefAttributes<WujieReactRef>): React.ReactElement | null;
+  readonly $$typeof: symbol;
+  displayName?: string;
+}
 
 function createStartOptions(componentProps: WujieReactProps, container: HTMLDivElement): StartOptions {
   return {
@@ -205,7 +170,6 @@ WujieReactView.displayName = "WujieReact";
 
 const memoizedComponent = React.memo(WujieReactView);
 const componentStatics = memoizedComponent as unknown as WujieReactStatics;
-componentStatics.propTypes = propTypes;
 componentStatics.bus = bus;
 componentStatics.setupApp = setupApp;
 componentStatics.preloadApp = preloadApp;

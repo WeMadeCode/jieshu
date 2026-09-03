@@ -34,6 +34,9 @@ const refreshedApplication = WujieReact.refreshApp(props);
 const destroyedApplication = WujieReact.destroyApp(props.name);
 WujieReact.clearAssetsCache("https://example.test/");
 
+// @ts-expect-error propTypes was removed from the public API.
+WujieReact.propTypes;
+
 // @ts-expect-error name remains the required application identity.
 const missingName: WujieReactProps = {};
 

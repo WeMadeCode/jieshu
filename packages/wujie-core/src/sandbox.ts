@@ -54,6 +54,7 @@ import {
   SandboxScriptScheduler,
 } from "./sandbox-runtime";
 import type { OperationSlots } from "./operation-intent";
+import { shouldHandlePageHideTeardown } from "./sandbox-policy";
 
 /**
  * A sandbox iframe is attached before its runtime is initialized. Keeping the
@@ -289,9 +290,9 @@ export default class Wujie {
       if (el) clearChild(iframeBody);
       // 修复vue的event.timeStamp问题
       patchEventTimeStamp(renderIframeWindow, iframeWindow);
-      // 当销毁iframe时主动unmount子应用
-      renderIframeWindow.onunload = () => {
-        if (!this.destroyed && !this.relocating) void this.unmount();
+      // pagehide 与子 frame 销毁时机一致，且不会依赖已弃用的 unload。
+      renderIframeWindow.onpagehide = (event) => {
+        if (shouldHandlePageHideTeardown(event) && !this.destroyed && !this.relocating) void this.unmount();
       };
       if (this.document) {
         if (this.alive) {

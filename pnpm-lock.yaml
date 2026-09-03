@@ -1014,12 +1014,6 @@ importers:
 
   packages/wujie-react:
     dependencies:
-      prop-types:
-        specifier: ^15.8.1
-        version: 15.8.1
-      react:
-        specifier: '>=16.8.0'
-        version: 17.0.2
       wujie:
         specifier: workspace:2.1.0
         version: link:../wujie-core
@@ -1036,6 +1030,9 @@ importers:
       '@babel/preset-react':
         specifier: ^7.16.7
         version: 7.27.1(@babel/core@7.28.4)
+      '@types/react':
+        specifier: ^17.0.0
+        version: 17.0.89
       babel-loader:
         specifier: ^8.2.3
         version: 8.4.1(@babel/core@7.28.4)(webpack@5.98.0)
@@ -1048,6 +1045,12 @@ importers:
       eslint-plugin-react:
         specifier: ^7.29.3
         version: 7.37.5(eslint@8.57.1)
+      react:
+        specifier: ^17.0.2
+        version: 17.0.2
+      typescript:
+        specifier: ^4.4.2
+        version: 4.9.5
       webpack:
         specifier: 5.98.0
         version: 5.98.0(webpack-cli@4.10.0)
@@ -1057,9 +1060,6 @@ importers:
 
   packages/wujie-vue2:
     dependencies:
-      vue:
-        specifier: ^2.6.0
-        version: 2.7.16
       wujie:
         specifier: workspace:2.1.0
         version: link:../wujie-core
@@ -1088,6 +1088,12 @@ importers:
       eslint-plugin-vue:
         specifier: ^8.0.3
         version: 8.7.1(eslint@8.57.1)
+      typescript:
+        specifier: ^4.4.2
+        version: 4.9.5
+      vue:
+        specifier: ^2.6.0
+        version: 2.7.16
       webpack:
         specifier: 5.98.0
         version: 5.98.0(webpack-cli@4.10.0)
@@ -1125,6 +1131,9 @@ importers:
       eslint-plugin-vue:
         specifier: ^8.0.3
         version: 8.7.1(eslint@8.57.1)
+      typescript:
+        specifier: ^4.4.2
+        version: 4.9.5
       vue:
         specifier: ^3.0.0
         version: 3.5.22(typescript@4.9.5)
@@ -20854,13 +20863,13 @@ snapshots:
 
   axios@0.25.0:
     dependencies:
-      follow-redirects: 1.15.11(debug@4.4.3)
+      follow-redirects: 1.15.11(debug@4.4.3(supports-color@6.1.0))
     transitivePeerDependencies:
       - debug
 
   axios@1.12.2:
     dependencies:
-      follow-redirects: 1.15.11(debug@4.4.3)
+      follow-redirects: 1.15.11(debug@4.4.3(supports-color@6.1.0))
       form-data: 4.0.4
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -25238,7 +25247,7 @@ snapshots:
   http-proxy-middleware@2.0.9(@types/express@4.17.23):
     dependencies:
       '@types/http-proxy': 1.17.16
-      http-proxy: 1.18.1(debug@4.4.3)
+      http-proxy: 1.18.1(debug@4.4.3(supports-color@6.1.0))
       is-glob: 4.0.3
       is-plain-obj: 3.0.0
       micromatch: 4.0.8
@@ -26449,7 +26458,7 @@ snapshots:
       dom-serialize: 2.2.1
       glob: 7.2.3
       graceful-fs: 4.2.11
-      http-proxy: 1.18.1(debug@4.4.3)
+      http-proxy: 1.18.1(debug@4.4.3(supports-color@6.1.0))
       isbinaryfile: 4.0.10
       lodash: 4.17.21
       log4js: 6.9.1

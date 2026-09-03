@@ -16,5 +16,5 @@
     "strict": true,
     "target": "ES5"
   },
-  "include": ["index.ts", "react-build.d.ts", "prop-types-build.d.ts"]
+  "include": ["index.ts"]
 }

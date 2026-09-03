@@ -115,11 +115,21 @@ export const sandboxEventPolicy = {
       "load",
       "beforeunload",
       "unload",
+      "pagehide",
+      "pageshow",
       "message",
       "error",
       "unhandledrejection",
     ],
-    iframeProperties: ["onload", "onbeforeunload", "onunload", "onerror", "onunhandledrejection"],
+    iframeProperties: [
+      "onload",
+      "onbeforeunload",
+      "onunload",
+      "onpagehide",
+      "onpageshow",
+      "onerror",
+      "onunhandledrejection",
+    ],
   },
 };
 
@@ -129,6 +139,10 @@ export const mainDocumentAddEventListenerEvents = sandboxEventPolicy.document.ho
 export const mainAndAppAddEventListenerEvents = sandboxEventPolicy.document.hostAndShadowListeners;
 export const appWindowAddEventListenerEvents = sandboxEventPolicy.window.iframeListeners;
 export const appWindowOnEvent = sandboxEventPolicy.window.iframeProperties;
+
+export function shouldHandlePageHideTeardown(event: Pick<PageTransitionEvent, "persisted">): boolean {
+  return !event.persisted;
+}
 
 interface RelativeElementAttribute {
   readonly attribute: string;

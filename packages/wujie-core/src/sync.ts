@@ -3,6 +3,7 @@ import { renderIframeReplaceApp, patchEventTimeStamp } from "./iframe";
 import { renderElementToContainer, initRenderIframeAndContainer } from "./shadow";
 import { getWujieById, rawDocumentQuerySelector } from "./common";
 import { compactRoutePath, getAppRoute, readRouteState, writeRouteState } from "./route-state";
+import { shouldHandlePageHideTeardown } from "./sandbox-policy";
 
 /**
  * 同步子应用路由到主应用路由
@@ -128,8 +129,8 @@ export function processAppForHrefJump(): void {
             const documentElement = iframeBody.firstElementChild;
             if (!renderWindow || !renderDocument || !appWindow || !documentElement) return;
             patchEventTimeStamp(renderWindow, appWindow);
-            renderWindow.onunload = () => {
-              sandbox.unmount();
+            renderWindow.onpagehide = (event) => {
+              if (shouldHandlePageHideTeardown(event)) void sandbox.unmount();
             };
             renderDocument.appendChild(documentElement);
             sandbox.document = renderDocument;

@@ -77,36 +77,9 @@ await this.wujieRef.current.refresh();
 
 ```javascript
 import React from "react";
-import PropTypes from "prop-types";
 import { bus, setupApp ,preloadApp, startApp, destroyApp } from "wujie";
 
 export default class WujieReact extends React.PureComponent {
-  static propTypes = {
-    height: PropTypes.string,
-    width: PropTypes.string,
-    name: PropTypes.string,
-    loading: PropTypes.element;
-    url: PropTypes.string,
-    alive: PropTypes.bool,
-    fetch: PropTypes.func,
-    props: PropTypes.object,
-    replace: PropTypes.func,
-    sync: PropTypes.bool,
-    prefix: PropTypes.object,
-    fiber: PropTypes.bool,
-    degrade: PropTypes.bool,
-    plugins: PropTypes.array,
-    beforeLoad: PropTypes.func,
-    beforeMount: PropTypes.func,
-    afterMount: PropTypes.func,
-    beforeUnmount: PropTypes.func,
-    afterUnmount: PropTypes.func,
-    activated: PropTypes.func,
-    deactivated: PropTypes.func,
-    loadError: PropTypes.func,
-    iframeAddEventListeners: PropTypes.array,
-    iframeOnEvents: PropTypes.array,
-  };
   static bus = bus;
   static setupApp = setupApp;
   static preloadApp = preloadApp;

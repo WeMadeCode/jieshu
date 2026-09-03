@@ -16,6 +16,15 @@
 4. 不提交构建产物、`node_modules`、测试覆盖率、Puppeteer 下载的浏览器或本地密钥。
 5. 不修改发布、标签、npm 发布和 GitHub Release 配置，除非任务明确要求。
 
+## 三个框架适配包的强制测试规则
+
+- 本节适用于 `packages/wujie-react`、`packages/wujie-vue2`、`packages/wujie-vue3`。
+- 三个包的 UI 测试和单元测试必须完整覆盖其公开行为、组件交互、生命周期、事件、属性透传、异常路径及兼容性边界，不允许以类型检查或 lint 代替行为测试。
+- 三个包的单元测试覆盖率要求为 100%，包括 statements、branches、functions 和 lines；新增或修改代码时必须同步补齐测试，不得降低覆盖率。
+- 任何改动只要触及上述任一包，都必须执行该包的 UI 测试、单元测试和完整 `test` 脚本；同时改动多个包时，逐包执行对应测试。即使改动仅涉及类型、构建配置或测试代码，也不得跳过。
+- 如果目标包尚未提供独立的 UI、单元测试或覆盖率命令，本次改动必须先补齐相应测试脚本和覆盖率阈值，再执行验证；不能以“暂无脚本”为由省略测试。
+- 交付时必须逐包列出实际执行的命令、测试结果和覆盖率结果；未达到 100% 或存在失败用例时，不得宣称任务完成。
+
 ## 常用命令
 
 ```bash
@@ -23,6 +32,9 @@ pnpm install
 pnpm test
 pnpm --filter wujie test:unit
 pnpm --filter wujie test:integration
+pnpm --filter wujie-react test
+pnpm --filter wujie-vue2 test
+pnpm --filter wujie-vue3 test
 pnpm --filter wujie-docs docs:build
 pnpm start
 ```
@@ -34,7 +46,7 @@ pnpm start
 ## 完成前检查
 
 1. 检查 `git diff --check` 与 `git status --short`，确认只包含本任务的改动。
-2. 运行与改动相称的最小验证，并在交付时说明运行结果和未运行项。
+2. 运行与改动相称的验证；触及三个框架适配包时，严格执行上述强制测试规则，并在交付时逐包说明命令、结果和覆盖率。
 3. 提交信息遵循 `CONTRIBUTING.md` 中的 Conventional Commits 规则；不要自行创建提交，除非用户明确要求。
 4. 提交 Pull Request 前，使用 Codex `/review` 审查未提交变更或相对 `master` 的分支差异；审查只报告问题，不应改动工作树。
 

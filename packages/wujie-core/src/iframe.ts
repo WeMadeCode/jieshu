@@ -69,6 +69,16 @@ interface CachedElementEventListener {
   options?: boolean | AddEventListenerOptions;
 }
 
+interface FeaturePolicyInspector {
+  allowsFeature(feature: string): boolean;
+  features?(): ReadonlyArray<string>;
+}
+
+type PolicyAwareDocument = Document & {
+  featurePolicy?: FeaturePolicyInspector;
+  permissionsPolicy?: FeaturePolicyInspector;
+};
+
 declare global {
   interface Window {
     // 是否存在无界
@@ -150,10 +160,55 @@ declare global {
 }
 
 /**
+ * Chrome 将 unload 逐步改为受 Permissions Policy 控制。策略明确禁用时，
+ * 原生 addEventListener 本身就是 no-op，但调用仍会向控制台打印 Violation。
+ * 无法检查策略或浏览器尚未识别该 feature 时维持原行为。
+ */
+export function isWindowEventAllowedByPolicy(targetWindow: Window, type: string): boolean {
+  if (type !== "unload") return true;
+
+  try {
+    const targetDocument = targetWindow.document as PolicyAwareDocument;
+    const policy = targetDocument.permissionsPolicy ?? targetDocument.featurePolicy;
+    if (!policy || typeof policy.allowsFeature !== "function") return true;
+
+    const supportedFeatures = typeof policy.features === "function" ? policy.features() : undefined;
+    if (supportedFeatures && !supportedFeatures.includes("unload")) return true;
+    return policy.allowsFeature("unload");
+  } catch (_) {
+    // 跨域 targetWindow、旧浏览器或非标准实现不应改变既有监听行为。
+    return true;
+  }
+}
+
+function patchPolicyControlledUnloadProperty(iframeWindow: Window): void {
+  const descriptor = Object.getOwnPropertyDescriptor(iframeWindow, "onunload");
+  if (!descriptor?.configurable || !descriptor.get || !descriptor.set) return;
+
+  const rawGet = descriptor.get;
+  const rawSet = descriptor.set;
+  try {
+    Object.defineProperty(iframeWindow, "onunload", {
+      configurable: true,
+      enumerable: descriptor.enumerable,
+      get: (): unknown => Reflect.apply(rawGet, iframeWindow, []),
+      set: (handler: unknown): void => {
+        // null/undefined 只移除已有 handler，不受 unload 注册策略限制。
+        if (handler != null && !isWindowEventAllowedByPolicy(iframeWindow, "unload")) return;
+        Reflect.apply(rawSet, iframeWindow, [handler]);
+      },
+    });
+  } catch (_) {
+    // 非标准 Window 实现无法覆盖属性时维持浏览器原行为。
+  }
+}
+
+/**
  * 修改window对象的事件监听，只有路由事件采用iframe的事件
  */
-function patchIframeEvents(iframeWindow: Window) {
+export function patchIframeEvents(iframeWindow: Window): void {
   iframeWindow.__WUJIE_EVENTLISTENER__ = iframeWindow.__WUJIE_EVENTLISTENER__ || new Set();
+  patchPolicyControlledUnloadProperty(iframeWindow);
   iframeWindow.addEventListener = function addEventListener<K extends keyof WindowEventMap>(
     type: K,
     listener: (this: Window, ev: WindowEventMap[K]) => unknown,
@@ -162,13 +217,14 @@ function patchIframeEvents(iframeWindow: Window) {
     const eventListener = listener as EventListener;
     // 运行插件钩子函数
     execHooks(iframeWindow.__WUJIE.plugins, "windowAddEventListenerHook", iframeWindow, type, eventListener, options);
-    // 相同参数多次调用 addEventListener 不会导致重复注册，所以用set。
+    // 保留完整注册记录，使显式 remove 和 sandbox destroy 仍会触发对称的清理钩子。
     iframeWindow.__WUJIE_EVENTLISTENER__.add({ type, listener: eventListener, options });
     if (
       appWindowAddEventListenerEvents.concat(iframeWindow.__WUJIE.iframeAddEventListeners ?? []).includes(type) ||
       (typeof options === "object" && options.targetWindow)
     ) {
       const targetWindow = typeof options === "object" && options.targetWindow ? options?.targetWindow : iframeWindow;
+      if (!isWindowEventAllowedByPolicy(targetWindow, type)) return;
       return rawWindowAddEventListener.call(targetWindow, type, eventListener, options);
     }
     // 在子应用嵌套场景使用window.window获取真实window

@@ -15,14 +15,14 @@
     "index.d.ts"
   ],
   "scripts": {
-    "declarations": "../wujie-core/node_modules/.bin/tsc -p tsconfig.declaration.json && cp esm/index.d.ts index.d.ts",
-    "check:declarations": "../wujie-core/node_modules/.bin/tsc -p tsconfig.declaration.json && diff -u index.d.ts esm/index.d.ts",
-    "typecheck": "pnpm run check:declarations && ../wujie-core/node_modules/.bin/tsc -p tsconfig.type-test.json && ../wujie-core/node_modules/.bin/tsc -p tsconfig.consumer.json",
+    "declarations": "tsc -p tsconfig.declaration.json && cp esm/index.d.ts index.d.ts",
+    "check:declarations": "tsc -p tsconfig.declaration.json && diff -u index.d.ts esm/index.d.ts",
+    "typecheck": "pnpm run check:declarations && tsc -p tsconfig.type-test.json && tsc -p tsconfig.consumer.json",
     "lint": "eslint --ext .ts --ext .mts --ext .cts index.ts __test__",
     "lib": "pnpm run typecheck && pnpm run esm && webpack build --mode=production --config webpack.config.js",
-    "esm": "../wujie-core/node_modules/.bin/tsc -p tsconfig.json",
+    "esm": "tsc -p tsconfig.json",
     "prepack": "bash build.sh",
-    "start": "../wujie-core/node_modules/.bin/tsc -p tsconfig.json --watch",
+    "start": "tsc -p tsconfig.json --watch",
     "test": "pnpm run lint && pnpm run typecheck"
   },
   "author": "yiludege",
@@ -49,6 +49,8 @@
     "csstype": "^3.1.1",
     "eslint": "^8.2.0",
     "eslint-plugin-vue": "^8.0.3",
+    "typescript": "^4.4.2",
+    "vue": "^2.6.0",
     "webpack": "5.98.0",
     "webpack-cli": "^4.9.1"
   }

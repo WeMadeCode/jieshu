@@ -89,12 +89,6 @@ class HookHarness {
   }
 }
 
-function createValidator() {
-  const validator = () => null;
-  validator.isRequired = () => null;
-  return validator;
-}
-
 function createSyntheticModule(context, exports) {
   return new SyntheticModule(
     Object.keys(exports),
@@ -140,15 +134,6 @@ function createAppController() {
   return controller;
 }
 
-const validators = {
-  array: createValidator(),
-  arrayOf: createValidator(),
-  bool: createValidator(),
-  element: createValidator(),
-  func: createValidator(),
-  object: createValidator(),
-  string: createValidator(),
-};
 const context = createContext({ console, Error, Object, Promise, window: {} });
 const modules = new Map([
   [
@@ -162,18 +147,6 @@ const modules = new Map([
       useImperativeHandle: harness.useImperativeHandle,
       useLayoutEffect: harness.useEffect,
       useRef: harness.useRef,
-    }),
-  ],
-  [
-    "prop-types",
-    createSyntheticModule(context, {
-      array: validators.array,
-      arrayOf: () => validators.arrayOf,
-      bool: validators.bool,
-      element: validators.element,
-      func: validators.func,
-      object: validators.object,
-      string: validators.string,
     }),
   ],
   [
@@ -231,9 +204,7 @@ assert.equal(WujieReact.preloadApp, preloadApp);
 assert.equal(WujieReact.destroyApp, destroyApp);
 assert.equal(WujieReact.refreshApp, refreshApp);
 assert.equal(WujieReact.clearAssetsCache, clearAssetsCache);
-assert.equal(WujieReact.propTypes.name, validators.string);
-assert.notEqual(WujieReact.propTypes.name, validators.string.isRequired);
-assert.equal(WujieReact.propTypes.loading, validators.element);
+assert.equal("propTypes" in WujieReact, false);
 
 harness.unmount();
 assert.equal(controllers.length, 1);
