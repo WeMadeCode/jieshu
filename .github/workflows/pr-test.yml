@@ -40,6 +40,9 @@ jobs:
         working-directory: packages/wujie-core
         run: pnpm run test:unit
 
+      - name: Run framework adapter tests with 100% coverage
+        run: pnpm run test:adapters
+
       - name: Job summary
         if: always()
         run: |

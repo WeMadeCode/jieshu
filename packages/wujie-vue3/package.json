@@ -22,7 +22,8 @@
     "start": "tsc --watch --preserveWatchOutput",
     "typecheck": "tsc -p tsconfig.type-test.json",
     "lint": "eslint --ext .ts index.ts __test__",
-    "test": "pnpm run lint && pnpm run typecheck"
+    "test:unit": "jest --config __test__/unit/jest.config.js --runInBand",
+    "test": "pnpm run lint && pnpm run typecheck && pnpm run test:unit"
   },
   "author": "yiludege",
   "publishConfig": {
@@ -43,11 +44,14 @@
     "@babel/cli": "^7.18.6",
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
+    "@types/jest": "27.5.2",
     "babel-loader": "^8.2.3",
     "cross-env": "^7.0.3",
     "csstype": "^3.1.1",
     "eslint": "^8.2.0",
     "eslint-plugin-vue": "^8.0.3",
+    "jest": "27.5.1",
+    "ts-jest": "27.1.5",
     "typescript": "^4.4.2",
     "vue": "^3.0.0",
     "webpack": "5.98.0",

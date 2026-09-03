@@ -20,10 +20,11 @@
     "types": "pnpm run esm",
     "typecheck": "tsc --project tsconfig.json",
     "typecheck:public": "tsc --project tsconfig.test.json",
-    "lint": "eslint --ext .ts,.mjs index.ts __test__",
+    "lint": "eslint --ext .ts index.ts __test__",
     "prepack": "bash build.sh",
     "start": "tsc --project tsconfig.json --watch --preserveWatchOutput",
-    "test": "pnpm run lint && pnpm run typecheck && pnpm run typecheck:public && node --no-warnings --experimental-vm-modules __test__/functional-runtime.mjs"
+    "test:unit": "jest --config __test__/unit/jest.config.js --runInBand",
+    "test": "pnpm run lint && pnpm run typecheck && pnpm run typecheck:public && pnpm run test:unit"
   },
   "publishConfig": {
     "access": "public"
@@ -45,12 +46,17 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
     "@babel/preset-react": "^7.16.7",
+    "@types/jest": "27.5.2",
     "@types/react": "^17.0.0",
+    "@types/react-dom": "17.0.26",
     "babel-loader": "^8.2.3",
     "cross-env": "^7.0.3",
     "eslint": "^8.2.0",
     "eslint-plugin-react": "^7.29.3",
+    "jest": "27.5.1",
     "react": "^17.0.2",
+    "react-dom": "17.0.2",
+    "ts-jest": "27.1.5",
     "typescript": "^4.4.2",
     "webpack": "5.98.0",
     "webpack-cli": "^4.9.1"

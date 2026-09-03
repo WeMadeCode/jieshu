@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["../../index.ts", "./**/*.ts"],
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES2018",
+    "outDir": "../../.test-build",
+    "declaration": false,
+    "sourceMap": true,
+    "types": ["jest"]
+  }
+}

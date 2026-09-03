@@ -14,6 +14,7 @@
     "doc": "lerna run docs:dev",
     "clean": "rimraf node_modules **/*/node_modules",
     "test": "NODE_OPTIONS=--openssl-legacy-provider lerna run test --scope wujie",
+    "test:adapters": "pnpm --filter wujie-react --filter wujie-vue2 --filter wujie-vue3 test",
     "commitlint": "commitlint -E COMMIT_EDITMSG_PATH",
     "husky-commitlint": "commitlint -e",
     "prepare": "husky install"
