@@ -142,6 +142,7 @@ h3 {
   height: 40px;
   padding: 5px;
   margin-left: 15px;
+  border: 1px solid transparent;
 }
 
 .docs {
@@ -166,15 +167,47 @@ h3 {
   font-size: 20px;
 }
 
-.home .ant-switch-checked {
-  color: #2c3e50;
+.home .switch.ant-switch-checked {
   background: var(--theme);
-  border: 1px solid #d9d9d9;
   box-shadow: 0 2px #00000004;
 }
 
+.home .switch.ant-switch-checked:hover:not(.ant-switch-disabled) {
+  background: var(--theme);
+}
+
+.switch .ant-switch-handle {
+  top: 6px;
+  inset-inline-start: 1px;
+  width: 25px;
+  height: 25px;
+}
+
+.switch .ant-switch-handle::before {
+  border-radius: 13px;
+}
+
+.switch.ant-switch-checked .ant-switch-handle {
+  inset-inline-start: calc(100% - 27px);
+}
+
 .switch .ant-switch-inner {
+  padding-inline: 24px 6px;
+}
+
+.switch.ant-switch-checked .ant-switch-inner {
+  padding-inline: 6px 24px;
+}
+
+.switch .ant-switch-inner .ant-switch-inner-checked,
+.switch .ant-switch-inner .ant-switch-inner-unchecked {
+  min-height: 28px;
   font-size: 20px;
+  line-height: 20px;
+}
+
+.switch .ant-switch-inner .ant-switch-inner-unchecked {
+  margin-top: -28px;
 }
 
 .header {

@@ -5,8 +5,8 @@
   "private": true,
   "packageManager": "pnpm@11.13.0",
   "scripts": {
-    "build:packages": "pnpm --recursive --filter './packages/*' run build",
-    "build:examples": "pnpm run build:packages && pnpm --recursive --workspace-concurrency=1 --filter './examples/*' run build && pnpm --filter jieshu-docs run docs:build && pnpm run assemble:examples",
+    "build:packages": "pnpm --recursive --filter \"./packages/*\" run build",
+    "build:examples": "pnpm run build:packages && pnpm --recursive --workspace-concurrency=1 --filter \"./examples/*\" run build && pnpm --filter jieshu-docs run docs:build && pnpm run assemble:examples",
     "assemble:examples": "node scripts/assemble-examples.mjs",
     "preview:examples": "pnpm run assemble:examples && vite preview --outDir site --host 0.0.0.0 --port 4173 --strictPort --open /demo-main-react/",
     "dev:examples:docs": "pnpm --filter jieshu-docs exec vitepress dev --host 0.0.0.0 --port 5173",
