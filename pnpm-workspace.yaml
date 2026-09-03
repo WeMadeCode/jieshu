@@ -3,9 +3,6 @@ packages:
   - 'examples/*'
   - 'docs'
 
-# pnpm 10.26+ lifecycle allowlist. Only esbuild needs its postinstall step to
-# locate and validate the platform binary; the other scripts are nonessential
-# banners, telemetry, or optional native acceleration.
 allowBuilds:
   '@angular/cli': false
   ant-design-vue: false
@@ -17,3 +14,5 @@ allowBuilds:
   fsevents: false
   nice-napi: false
   vue-demi: false
+
+minimumReleaseAge: 0

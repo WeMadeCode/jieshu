@@ -6,9 +6,9 @@ const repositoryRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const siteRoot = join(repositoryRoot, 'site');
 
 const outputs = [
-  ['main-react', 'examples/main-react/build', 'demo-main-react'],
-  ['main-react-ts', 'examples/main-react-ts/dist', 'demo-main-react-ts'],
-  ['main-vue', 'examples/main-vue/dist', 'demo-main-vue'],
+  ['main-react-webpack', 'examples/main-react-webpack/build', 'demo-main-react-webpack'],
+  ['main-react-rspack', 'examples/main-react-rspack/dist', 'demo-main-react-rspack'],
+  ['main-vue-vite', 'examples/main-vue-vite/dist', 'demo-main-vue-vite'],
   ['react16', 'examples/react16/build', 'demo-react16'],
   ['react17', 'examples/react17/build', 'demo-react17'],
   ['vue2', 'examples/vue2/dist', 'demo-vue2'],
