@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./index.js",
+  entry: "./esm/index.js",
   target: ["web", "es5"],
   output: {
     publicPath: "/",

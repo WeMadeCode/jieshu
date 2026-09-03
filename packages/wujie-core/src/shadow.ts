@@ -1,12 +1,12 @@
 import {
+  CONTAINER_OVERFLOW_DATA_FLAG,
+  CONTAINER_POSITION_DATA_FLAG,
+  LOADING_DATA_FLAG,
   WUJIE_APP_ID,
   WUJIE_IFRAME_CLASS,
-  WUJIE_SHADE_STYLE,
-  CONTAINER_POSITION_DATA_FLAG,
-  CONTAINER_OVERFLOW_DATA_FLAG,
-  LOADING_DATA_FLAG,
   WUJIE_LOADING_STYLE,
   WUJIE_LOADING_SVG,
+  WUJIE_SHADE_STYLE,
 } from "./constant";
 import {
   getWujieById,
@@ -16,15 +16,36 @@ import {
   relativeElementTagAttrMap,
 } from "./common";
 import { getExternalStyleSheets } from "./entry";
-import Wujie from "./sandbox";
-import { initBase, patchElementEffect } from "./iframe";
 import { patchRenderEffect } from "./effect";
+import { initBase, patchElementEffect } from "./iframe";
 import { getCssLoader, getPresetLoaders } from "./plugin";
+import type Wujie from "./sandbox";
+import type { IframeAttributes } from "./contracts";
+import type { StyleObject } from "./template";
 import { getAbsolutePath, getContainer, getCurUrl, isFunction, setAttrsToElement, warn } from "./utils";
 
-const cssSelectorMap = {
-  ":root": ":host",
-};
+const WUJIE_ELEMENT_NAME = "wujie-app";
+const EMPTY_IFRAME_DOCUMENT = "<!DOCTYPE html><html><head></head><body></body></html>";
+const DEFAULT_IFRAME_STYLE = "height:100%;width:100%";
+const ROOT_SELECTOR_PATTERN = /:root/g;
+
+type DisconnectAction = "destroy" | "unmount";
+type PresetStylePosition = "before" | "after";
+type PatchStyleElements = [HTMLStyleElement | null, HTMLStyleElement | null];
+
+interface LoadedPresetStyle {
+  src: string;
+  content: string;
+}
+
+interface TemplateSections {
+  head: HTMLHeadElement;
+  body: HTMLBodyElement;
+}
+
+function isRenderContextLive(sandbox: Wujie, iframeWindow: Window | null | undefined): boolean {
+  return !sandbox.destroyed && sandbox.iframe?.contentWindow === iframeWindow && getWujieById(sandbox.id) === sandbox;
+}
 
 declare global {
   interface ShadowRoot {
@@ -33,393 +54,490 @@ declare global {
   }
 }
 
+function getElementSandbox(element: HTMLElement): Wujie | null {
+  const appId = element.getAttribute(WUJIE_APP_ID);
+  return appId ? getWujieById(appId) : null;
+}
+
+/** Decide how a detached application should release its runtime. */
+export function getDisconnectAction(sandbox: Wujie): DisconnectAction {
+  const hasReusableMount = isFunction(sandbox.iframe?.contentWindow?.__WUJIE_MOUNT);
+  return sandbox.alive || hasReusableMount ? "unmount" : "destroy";
+}
+
+function reportDisconnectFailure(action: DisconnectAction, reason: unknown): void {
+  warn(`${action} error: ${String(reason)}`);
+}
+
 /**
- * 处理 wujie-app webComponent disconnect 时的销毁策略，按运行模式自动决定 destroy / unmount：
- *
- * - 保活模式（alive）：仅 unmount，保留 sandbox / iframe，再次进入直接 active 复用。
- * - 单例模式（非保活但做了生命周期改造，存在 __WUJIE_MOUNT）：仅 unmount，sandbox 复用，
- *   再次进入走 startApp 的 unmount → active → mount 时序。
- * - 重建模式（非保活且未做生命周期改造）：sandbox 不会被复用，且 unmount 对其而言基本是空操作
- *   （没有 mountFlag / __WUJIE_UNMOUNT），若仅 unmount 会导致 sandbox / iframe 长期驻留累积，
- *   故直接 destroy。
+ * A retained or lifecycle-enabled application can be unmounted and reused.
+ * A rebuild-only application is destroyed immediately so its hidden iframe
+ * cannot accumulate after the host element is detached.
  */
 export function handleWujieAppDisconnect(sandbox: Wujie | null | undefined): void {
   if (!sandbox) return;
-  const iframeWindow = sandbox.iframe?.contentWindow;
-  const isRebuildMode = !sandbox.alive && !isFunction(iframeWindow?.__WUJIE_MOUNT);
-  if (isRebuildMode) {
-    sandbox.destroy().catch((e) => warn(`destroy error: ${e}`));
-  } else {
-    sandbox.unmount().catch((e) => warn(`unmount error: ${e}`));
+  const action = getDisconnectAction(sandbox);
+
+  try {
+    const completion = action === "destroy" ? sandbox.destroy() : sandbox.unmount();
+    completion.catch((reason: unknown) => reportDisconnectFailure(action, reason));
+  } catch (reason: unknown) {
+    reportDisconnectFailure(action, reason);
   }
 }
 
-/**
- * 定义 wujie webComponent，将shadow包裹并获得dom装载和卸载的生命周期
- */
-export function defineWujieWebComponent() {
-  const customElements = window.customElements;
-  if (customElements && !customElements?.get("wujie-app")) {
-    class WujieApp extends HTMLElement {
-      connectedCallback(): void {
-        if (this.shadowRoot) return;
-        const shadowRoot = this.attachShadow({ mode: "open" });
-        const sandbox = getWujieById(this.getAttribute(WUJIE_APP_ID));
-        patchElementEffect(shadowRoot, sandbox.iframe.contentWindow);
-        sandbox.shadowRoot = shadowRoot;
+/** Register the host element once and bridge its DOM lifecycle to a sandbox. */
+export function defineWujieWebComponent(): void {
+  const registry = window.customElements;
+  if (!registry || registry.get(WUJIE_ELEMENT_NAME)) return;
+
+  class WujieAppElement extends HTMLElement {
+    connectedCallback(): void {
+      const sandbox = getElementSandbox(this);
+      const iframeWindow = sandbox?.iframe?.contentWindow;
+      if (!sandbox || !iframeWindow) return;
+
+      if (this.shadowRoot) {
+        sandbox.shadowRoot = this.shadowRoot;
+        return;
       }
 
-      disconnectedCallback(): void {
-        const sandbox = getWujieById(this.getAttribute(WUJIE_APP_ID));
-        handleWujieAppDisconnect(sandbox);
-      }
+      const root = this.attachShadow({ mode: "open" });
+      patchElementEffect(root, iframeWindow);
+      sandbox.shadowRoot = root;
     }
-    customElements?.define("wujie-app", WujieApp);
+
+    disconnectedCallback(): void {
+      const sandbox = getElementSandbox(this);
+      if (!sandbox?.relocating) handleWujieAppDisconnect(sandbox);
+    }
   }
+
+  registry.define(WUJIE_ELEMENT_NAME, WujieAppElement);
 }
 
 export function createWujieWebComponent(id: string): HTMLElement {
-  const contentElement = window.document.createElement("wujie-app");
-  contentElement.setAttribute(WUJIE_APP_ID, id);
-  contentElement.classList.add(WUJIE_IFRAME_CLASS);
-  return contentElement;
+  const element = window.document.createElement(WUJIE_ELEMENT_NAME);
+  element.setAttribute(WUJIE_APP_ID, id);
+  element.classList.add(WUJIE_IFRAME_CLASS);
+  return element;
 }
 
-/**
- * 将准备好的内容插入容器
- */
+function hasLoadingIndicator(container: HTMLElement): boolean {
+  return Boolean(container.querySelector(`div[${LOADING_DATA_FLAG}]`));
+}
+
+/** Replace a host container's contents while allowing its loading overlay to survive. */
 export function renderElementToContainer(
   element: Element | ChildNode,
   selectorOrElement: string | HTMLElement
 ): HTMLElement {
   const container = getContainer(selectorOrElement);
-  if (container && !container.contains(element)) {
-    // 有 loading 无需清理，已经清理过了
-    if (!container.querySelector(`div[${LOADING_DATA_FLAG}]`)) {
-      // 清除内容
-      clearChild(container);
-    }
-    // 插入元素
-    if (element) {
-      rawElementAppendChild.call(container, element);
-    }
-  }
+  if (container.contains(element)) return container;
+
+  if (!hasLoadingIndicator(container)) clearChild(container);
+  rawElementAppendChild.call(container, element);
   return container;
 }
 
-/**
- * 将降级的iframe挂在到容器上并进行初始化
- */
+function resetIframeDocument(iframe: HTMLIFrameElement): Document {
+  const contentDocument = iframe.contentDocument;
+  if (!contentDocument) throw new Error("Unable to initialize the application iframe document");
+
+  contentDocument.open();
+  contentDocument.write(EMPTY_IFRAME_DOCUMENT);
+  contentDocument.close();
+  return contentDocument;
+}
+
+/** Create and initialize the visible iframe used by degrade mode. */
 export function initRenderIframeAndContainer(
   id: string,
   parent: string | HTMLElement,
-  degradeAttrs: { [key: string]: any } = {}
+  degradeAttrs: IframeAttributes = {}
 ): { iframe: HTMLIFrameElement; container: HTMLElement } {
   const iframe = createIframeContainer(id, degradeAttrs);
   const container = renderElementToContainer(iframe, parent);
-  const contentDocument = iframe.contentWindow.document;
-  contentDocument.open();
-  contentDocument.write("<!DOCTYPE html><html><head></head><body></body></html>");
-  contentDocument.close();
+  resetIframeDocument(iframe);
   return { iframe, container };
 }
 
-/**
- * 处理css-before-loader 以及 css-after-loader
- */
-async function processCssLoaderForTemplate(sandbox: Wujie, html: HTMLHtmlElement): Promise<HTMLHtmlElement> {
-  const document = sandbox.iframe.contentDocument;
-  const { plugins, replace, proxyLocation } = sandbox;
-  const cssLoader = getCssLoader({ plugins, replace });
-  const cssBeforeLoaders = getPresetLoaders("cssBeforeLoaders", plugins);
-  const cssAfterLoaders = getPresetLoaders("cssAfterLoaders", plugins);
-  const curUrl = getCurUrl(proxyLocation);
-
-  return await Promise.all([
-    Promise.all(
-      getExternalStyleSheets(cssBeforeLoaders, sandbox.fetch, sandbox.lifecycles.loadError).map(
-        ({ src, contentPromise }) => contentPromise.then((content) => ({ src, content }))
-      )
-    ).then((contentList) => {
-      contentList.forEach(({ src, content }) => {
-        if (!content) return;
-        const styleElement = document.createElement("style");
-        styleElement.setAttribute("type", "text/css");
-        styleElement.appendChild(document.createTextNode(content ? cssLoader(content, src, curUrl) : content));
-        const head = html.querySelector("head");
-        const body = html.querySelector("body");
-        html.insertBefore(styleElement, head || body || html.firstChild);
-      });
-    }),
-    Promise.all(
-      getExternalStyleSheets(cssAfterLoaders, sandbox.fetch, sandbox.lifecycles.loadError).map(
-        ({ src, contentPromise }) => contentPromise.then((content) => ({ src, content }))
-      )
-    ).then((contentList) => {
-      contentList.forEach(({ src, content }) => {
-        if (!content) return;
-        const styleElement = document.createElement("style");
-        styleElement.setAttribute("type", "text/css");
-        styleElement.appendChild(document.createTextNode(content ? cssLoader(content, src, curUrl) : content));
-        html.appendChild(styleElement);
-      });
-    }),
-  ]).then(
-    () => html,
-    () => html
+async function loadPresetStyles(styles: readonly StyleObject[], sandbox: Wujie): Promise<LoadedPresetStyle[]> {
+  const results = getExternalStyleSheets(
+    [...styles],
+    sandbox.fetch,
+    sandbox.lifecycles.loadError,
+    sandbox.assetCacheScope
+  );
+  return Promise.all(
+    results.map(
+      async ({ src, contentPromise }): Promise<LoadedPresetStyle> => ({
+        src,
+        content: await contentPromise,
+      })
+    )
   );
 }
 
-// 替换html的head和body
-function replaceHeadAndBody(html: HTMLHtmlElement, head: HTMLHeadElement, body: HTMLBodyElement): HTMLHtmlElement {
-  const headElement = html.querySelector("head");
-  const bodyElement = html.querySelector("body");
-  if (headElement) {
-    while (headElement.firstChild) {
-      rawAppendChild.call(head, headElement.firstChild.cloneNode(true));
-      headElement.removeChild(headElement.firstChild);
-    }
-    headElement.parentNode.replaceChild(head, headElement);
+function createPresetStyleElement(
+  ownerDocument: Document,
+  style: LoadedPresetStyle,
+  transform: (code: string, url: string, base: string) => string,
+  baseUrl: string
+): HTMLStyleElement | null {
+  if (!style.content) return null;
+
+  const element = ownerDocument.createElement("style");
+  element.type = "text/css";
+  element.appendChild(ownerDocument.createTextNode(transform(style.content, style.src, baseUrl)));
+  return element;
+}
+
+function placePresetStyle(html: HTMLHtmlElement, style: HTMLStyleElement, position: PresetStylePosition): void {
+  if (position === "after") {
+    rawAppendChild.call(html, style);
+    return;
   }
-  if (bodyElement) {
-    while (bodyElement.firstChild) {
-      rawAppendChild.call(body, bodyElement.firstChild.cloneNode(true));
-      bodyElement.removeChild(bodyElement.firstChild);
-    }
-    bodyElement.parentNode.replaceChild(body, bodyElement);
-  }
+
+  const anchor = html.querySelector("head") || html.querySelector("body") || html.firstChild;
+  html.insertBefore(style, anchor);
+}
+
+async function injectPresetStyleGroup(
+  html: HTMLHtmlElement,
+  sandbox: Wujie,
+  styles: readonly StyleObject[],
+  position: PresetStylePosition
+): Promise<void> {
+  const loadedStyles = await loadPresetStyles(styles, sandbox);
+  if (!isRenderContextLive(sandbox, sandbox.iframe?.contentWindow)) return;
+  const ownerDocument = sandbox.iframe.contentDocument;
+  if (!ownerDocument) return;
+
+  const transform = getCssLoader({ plugins: sandbox.plugins, replace: sandbox.replace });
+  const baseUrl = getCurUrl(sandbox.proxyLocation);
+  loadedStyles.forEach((style) => {
+    const element = createPresetStyleElement(ownerDocument, style, transform, baseUrl);
+    if (element) placePresetStyle(html, element, position);
+  });
+}
+
+/** Decorate a parsed template with plugin styles without coupling parsing to I/O. */
+async function decorateTemplateWithPresetStyles(sandbox: Wujie, html: HTMLHtmlElement): Promise<HTMLHtmlElement> {
+  const before = getPresetLoaders("cssBeforeLoaders", sandbox.plugins);
+  const after = getPresetLoaders("cssAfterLoaders", sandbox.plugins);
+
+  await Promise.all([
+    injectPresetStyleGroup(html, sandbox, before, "before"),
+    injectPresetStyleGroup(html, sandbox, after, "after"),
+  ]).catch((): void => undefined);
   return html;
 }
 
-/**
- * 将template渲染成html元素
- */
-function renderTemplateToHtml(iframeWindow: Window, template: string): HTMLHtmlElement {
+function copyDocumentElementAttributes(template: string, target: HTMLHtmlElement): void {
+  const parsed = new DOMParser().parseFromString(template, "text/html");
+  Array.from(parsed.documentElement.attributes).forEach(({ name, value }) => target.setAttribute(name, value));
+}
+
+function ensureTemplateSections(html: HTMLHtmlElement, ownerDocument: Document): TemplateSections {
+  let head = html.querySelector("head");
+  let body = html.querySelector("body");
+
+  if (!head) {
+    head = ownerDocument.createElement("head");
+    html.insertBefore(head, body || html.firstChild);
+  }
+  if (!body) {
+    body = ownerDocument.createElement("body");
+    rawAppendChild.call(html, body);
+  }
+  return { head, body };
+}
+
+function refillSection(source: HTMLElement, reusable: HTMLElement): void {
+  clearChild(reusable);
+  while (source.firstChild) rawAppendChild.call(reusable, source.firstChild);
+  source.parentNode?.replaceChild(reusable, source);
+}
+
+function reuseSandboxSections(sections: TemplateSections, sandbox: Wujie): TemplateSections {
+  const reusableHead = sandbox.head;
+  const reusableBody = sandbox.body;
+  if (!reusableHead || !reusableBody) return sections;
+
+  refillSection(sections.head, reusableHead);
+  refillSection(sections.body, reusableBody);
+  return { head: reusableHead, body: reusableBody };
+}
+
+function resolveSourceSet(value: string, baseURI: string): string {
+  const candidates: string[] = [];
+  let cursor = 0;
+  while (cursor < value.length) {
+    while (cursor < value.length && (value[cursor] === "," || /\s/.test(value[cursor]))) cursor += 1;
+    if (cursor >= value.length) break;
+    const urlStart = cursor;
+    const dataUrl = value.slice(cursor, cursor + 5).toLowerCase() === "data:";
+    while (cursor < value.length && !/\s/.test(value[cursor]) && (dataUrl || value[cursor] !== ",")) cursor += 1;
+    const url = value.slice(urlStart, cursor);
+    while (cursor < value.length && /\s/.test(value[cursor])) cursor += 1;
+    const descriptorStart = cursor;
+    while (cursor < value.length && value[cursor] !== ",") cursor += 1;
+    const descriptor = value.slice(descriptorStart, cursor).trim();
+    candidates.push(`${dataUrl ? url : getAbsolutePath(url, baseURI)}${descriptor ? ` ${descriptor}` : ""}`);
+  }
+  return candidates.join(", ");
+}
+
+export function repairRelativeElementUrl(element: HTMLElement): void {
+  const attributes = relativeElementTagAttrMap[element.tagName];
+  if (!attributes) return;
+
+  attributes.forEach(({ attribute, property = attribute, sourceSet }) => {
+    if (!element.hasAttribute(attribute)) return;
+    const rawValue = element.getAttribute(attribute) ?? "";
+    const resolvedValue = sourceSet
+      ? resolveSourceSet(rawValue, element.baseURI || "")
+      : Reflect.get(element, property);
+    if (typeof resolvedValue === "string") {
+      element.setAttribute(
+        attribute,
+        sourceSet ? resolvedValue : getAbsolutePath(resolvedValue, element.baseURI || "")
+      );
+    }
+  });
+}
+
+function patchTemplateTree(html: HTMLHtmlElement, iframeWindow: Window): void {
+  const iterator = iframeWindow.document.createTreeWalker(html, NodeFilter.SHOW_ELEMENT, null, false);
+  let element = iterator.currentNode as HTMLElement | null;
+  while (element) {
+    patchElementEffect(element, iframeWindow);
+    repairRelativeElementUrl(element);
+    element = iterator.nextNode() as HTMLElement | null;
+  }
+}
+
+/** Parse, normalize and patch a template in the JavaScript sandbox's realm. */
+function buildTemplateRoot(iframeWindow: Window, template: string): HTMLHtmlElement {
   const sandbox = iframeWindow.__WUJIE;
-  const { head, body, alive, execFlag } = sandbox;
-  const document = iframeWindow.document;
-  const parser = new DOMParser();
-  const parsedDocument = parser.parseFromString(template, "text/html");
-
-  // 无论 template 是否包含html，documentElement 必然是 HTMLHtmlElement
-  const parsedHtml = parsedDocument.documentElement as HTMLHtmlElement;
-  const sourceAttributes = parsedHtml.attributes;
-  let html = document.createElement("html");
+  const ownerDocument = iframeWindow.document;
+  const html = ownerDocument.createElement("html");
   html.innerHTML = template;
-  for (let i = 0; i < sourceAttributes.length; i++) {
-    html.setAttribute(sourceAttributes[i].name, sourceAttributes[i].value);
-  }
-  // 组件多次渲染，head和body必须一直使用同一个来应对被缓存的场景
-  if (!alive && execFlag) {
-    html = replaceHeadAndBody(html, head, body);
-  } else {
-    sandbox.head = html.querySelector("head");
-    sandbox.body = html.querySelector("body");
-  }
-  const ElementIterator = document.createTreeWalker(html, NodeFilter.SHOW_ELEMENT, null, false);
-  let nextElement = ElementIterator.currentNode as HTMLElement;
-  while (nextElement) {
-    patchElementEffect(nextElement, iframeWindow);
-    const relativeAttr = relativeElementTagAttrMap[nextElement.tagName];
-    const url = nextElement[relativeAttr];
-    if (relativeAttr) nextElement.setAttribute(relativeAttr, getAbsolutePath(url, nextElement.baseURI || ""));
-    nextElement = ElementIterator.nextNode() as HTMLElement;
-  }
-  if (!html.querySelector("head")) {
-    const head = document.createElement("head");
-    html.appendChild(head);
-  }
-  if (!html.querySelector("body")) {
-    const body = document.createElement("body");
-    html.appendChild(body);
-  }
+  copyDocumentElementAttributes(template, html);
+
+  let sections = ensureTemplateSections(html, ownerDocument);
+  if (!sandbox.alive && sandbox.execFlag) sections = reuseSandboxSections(sections, sandbox);
+  sandbox.head = sections.head;
+  sandbox.body = sections.body;
+
+  patchTemplateTree(html, iframeWindow);
   return html;
 }
 
-/**
- * 将template渲染到shadowRoot
- */
+async function prepareTemplateRoot(iframeWindow: Window, template: string): Promise<HTMLHtmlElement> {
+  const html = buildTemplateRoot(iframeWindow, template);
+  return decorateTemplateWithPresetStyles(iframeWindow.__WUJIE, html);
+}
+
+function installDocumentParentFacade(html: HTMLHtmlElement, iframeDocument: Document): void {
+  Object.defineProperty(html, "parentNode", {
+    enumerable: true,
+    configurable: true,
+    get: () => iframeDocument,
+  });
+}
+
+function installShadowRootFacades(shadowRoot: ShadowRoot, iframeWindow: Window): void {
+  const shadowHtml = shadowRoot.firstElementChild as HTMLHtmlElement | null;
+  if (!shadowHtml) throw new Error("The application shadow root has no document element");
+
+  installDocumentParentFacade(shadowHtml, iframeWindow.document);
+  Object.defineProperty(shadowHtml, "getBoundingClientRect", {
+    enumerable: true,
+    configurable: true,
+    value: (): DOMRect => {
+      const sourceHtml = iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, "html");
+      if (!sourceHtml) throw new Error("The application iframe has no document element");
+      return sourceHtml.getBoundingClientRect();
+    },
+  });
+}
+
+/** Render a normalized application document into its shadow root. */
 export async function renderTemplateToShadowRoot(
   shadowRoot: ShadowRoot,
   iframeWindow: Window,
-  template: string
+  template: string,
+  canRender: () => boolean = () => true
 ): Promise<void> {
-  const html = renderTemplateToHtml(iframeWindow, template);
-  // 处理 css-before-loader 和 css-after-loader
-  const processedHtml = await processCssLoaderForTemplate(iframeWindow.__WUJIE, html);
-  // change ownerDocument
-  shadowRoot.appendChild(processedHtml);
+  const sandbox = iframeWindow.__WUJIE;
+  const html = await prepareTemplateRoot(iframeWindow, template);
+  if (!canRender() || !sandbox || !isRenderContextLive(sandbox, iframeWindow) || sandbox.shadowRoot !== shadowRoot)
+    return;
+  rawAppendChild.call(shadowRoot, html);
+  if (!canRender() || !isRenderContextLive(sandbox, iframeWindow)) {
+    rawElementRemoveChild.call(shadowRoot, html);
+    return;
+  }
+
   const shade = document.createElement("div");
   shade.setAttribute("style", WUJIE_SHADE_STYLE);
-  processedHtml.insertBefore(shade, processedHtml.firstChild);
-  shadowRoot.head = shadowRoot.querySelector("head");
-  shadowRoot.body = shadowRoot.querySelector("body");
+  html.insertBefore(shade, html.firstChild);
 
-  const shadowHtml = shadowRoot.firstElementChild as HTMLElement;
-  Object.defineProperties(shadowHtml, {
-    // 修复 html parentNode
-    parentNode: {
-      enumerable: true,
-      configurable: true,
-      get: () => iframeWindow.document,
-    },
-
-    // 修复 html getBoundingClientRect
-    getBoundingClientRect: {
-      enumerable: true,
-      configurable: true,
-      value: () =>
-        iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, "html")!.getBoundingClientRect(),
-    },
-  });
-
-  patchRenderEffect(shadowRoot, iframeWindow.__WUJIE.id, false);
+  const { head, body } = ensureTemplateSections(html, iframeWindow.document);
+  shadowRoot.head = head;
+  shadowRoot.body = body;
+  installShadowRootFacades(shadowRoot, iframeWindow);
+  patchRenderEffect(shadowRoot, sandbox.id, false);
 }
 
-export function createIframeContainer(id: string, degradeAttrs: { [key: string]: any } = {}): HTMLIFrameElement {
+function iframeStyle(attributes: Record<string, unknown>): string {
+  const configuredStyle = attributes.style;
+  if (configuredStyle === undefined || configuredStyle === null || configuredStyle === "") return DEFAULT_IFRAME_STYLE;
+  return `${DEFAULT_IFRAME_STYLE};${String(configuredStyle)}`;
+}
+
+export function createIframeContainer(id: string, degradeAttrs: IframeAttributes = {}): HTMLIFrameElement {
   const iframe = document.createElement("iframe");
-  const defaultStyle = "height:100%;width:100%";
+  const attributes = degradeAttrs as Record<string, unknown>;
   setAttrsToElement(iframe, {
-    ...degradeAttrs,
-    style: [defaultStyle, degradeAttrs.style].join(";"),
+    ...attributes,
+    style: iframeStyle(attributes),
     [WUJIE_APP_ID]: id,
   });
   return iframe;
 }
 
-/**
- * 将template渲染到iframe
- */
+function connectDegradeWindow(renderDocument: Document, iframeWindow: Window): void {
+  const renderWindow = renderDocument.defaultView;
+  if (!renderWindow) return;
+
+  initBase(renderWindow, iframeWindow.__WUJIE.url, "");
+  renderWindow.__getWujieWindow__ = window.__getWujieWindow__;
+}
+
+/** Render a normalized application document into the visible degrade iframe. */
 export async function renderTemplateToIframe(
   renderDocument: Document,
   iframeWindow: Window,
-  template: string
+  template: string,
+  canRender: () => boolean = () => true
 ): Promise<void> {
-  // 插入template
-  const html = renderTemplateToHtml(iframeWindow, template);
-  // 处理 css-before-loader 和 css-after-loader
-  const processedHtml = await processCssLoaderForTemplate(iframeWindow.__WUJIE, html);
-  renderDocument.replaceChild(processedHtml, renderDocument.documentElement);
-
-  // 修复 html parentNode
-  Object.defineProperty(renderDocument.documentElement, "parentNode", {
-    enumerable: true,
-    configurable: true,
-    get: () => iframeWindow.document,
-  });
-
-  // 降级渲染 iframe 无 src 补丁，需与 JS iframe 一样注入 base，供 img 等相对路径解析到子应用域名
-  const renderWindow = renderDocument.defaultView;
-  if (renderWindow) {
-    // 对于降级场景不需要添加 path
-    initBase(renderWindow, iframeWindow.__WUJIE.url, "");
-    // 降级模式内联事件运行在渲染 iframe realm，需把辅助函数注入到该 window，
-    // 使编译后的 with(window.__getWujieWindow__(...)) 可调用（其内部会向 parent.document 查找沙箱 iframe）
-    (renderWindow as any).__getWujieWindow__ = (window as any).__getWujieWindow__;
-  }
-
-  patchRenderEffect(renderDocument, iframeWindow.__WUJIE.id, true);
+  const sandbox = iframeWindow.__WUJIE;
+  const html = await prepareTemplateRoot(iframeWindow, template);
+  if (!canRender() || !sandbox || !isRenderContextLive(sandbox, iframeWindow)) return;
+  renderDocument.replaceChild(html, renderDocument.documentElement);
+  if (!canRender() || !isRenderContextLive(sandbox, iframeWindow)) return;
+  installDocumentParentFacade(renderDocument.documentElement as HTMLHtmlElement, iframeWindow.document);
+  connectDegradeWindow(renderDocument, iframeWindow);
+  patchRenderEffect(renderDocument, sandbox.id, true);
 }
 
-/**
- * 清除Element所有节点
- */
+/** Remove all direct children through the captured native DOM method. */
 export function clearChild(root: ShadowRoot | Node): void {
-  // 清除内容
-  while (root?.firstChild) {
-    rawElementRemoveChild.call(root, root.firstChild);
+  while (root?.firstChild) rawElementRemoveChild.call(root, root.firstChild);
+}
+
+function rememberOverflow(container: HTMLElement, overflow: string): void {
+  container.setAttribute(CONTAINER_OVERFLOW_DATA_FLAG, overflow === "visible" ? "" : overflow);
+}
+
+function lockContainerLayout(container: HTMLElement, styles: CSSStyleDeclaration): void {
+  if (styles.position === "static") {
+    container.setAttribute(CONTAINER_POSITION_DATA_FLAG, styles.position);
+    rememberOverflow(container, styles.overflow);
+    container.style.setProperty("position", "relative");
+    container.style.setProperty("overflow", "hidden");
+    return;
+  }
+
+  if (styles.position === "relative" || styles.position === "sticky") {
+    rememberOverflow(container, styles.overflow);
+    container.style.setProperty("overflow", "hidden");
   }
 }
 
-/**
- * 给容器添加loading
- */
-export function addLoading(el: string | HTMLElement, loading: HTMLElement): void {
+function createLoadingIndicator(loading?: HTMLElement): HTMLDivElement {
+  const indicator = document.createElement("div");
+  indicator.setAttribute(LOADING_DATA_FLAG, "");
+  indicator.setAttribute("style", WUJIE_LOADING_STYLE);
+  if (loading) indicator.appendChild(loading);
+  else indicator.innerHTML = WUJIE_LOADING_SVG;
+  return indicator;
+}
+
+/** Clear a host container and display a stable loading overlay. */
+export function addLoading(el: string | HTMLElement, loading?: HTMLElement): void {
   const container = getContainer(el);
   clearChild(container);
-  // 给容器设置一些样式，防止 loading 抖动
-  let containerStyles = null;
+
+  let styles: CSSStyleDeclaration;
   try {
-    containerStyles = window.getComputedStyle(container);
+    styles = window.getComputedStyle(container);
   } catch {
     return;
   }
-  if (containerStyles.position === "static") {
-    container.setAttribute(CONTAINER_POSITION_DATA_FLAG, containerStyles.position);
-    container.setAttribute(
-      CONTAINER_OVERFLOW_DATA_FLAG,
-      containerStyles.overflow === "visible" ? "" : containerStyles.overflow
-    );
-    container.style.setProperty("position", "relative");
-    container.style.setProperty("overflow", "hidden");
-  } else if (["relative", "sticky"].includes(containerStyles.position)) {
-    container.setAttribute(
-      CONTAINER_OVERFLOW_DATA_FLAG,
-      containerStyles.overflow === "visible" ? "" : containerStyles.overflow
-    );
-    container.style.setProperty("overflow", "hidden");
-  }
-  const loadingContainer = document.createElement("div");
-  loadingContainer.setAttribute(LOADING_DATA_FLAG, "");
-  loadingContainer.setAttribute("style", WUJIE_LOADING_STYLE);
-  if (loading) loadingContainer.appendChild(loading);
-  else loadingContainer.innerHTML = WUJIE_LOADING_SVG;
-  container.appendChild(loadingContainer);
+
+  lockContainerLayout(container, styles);
+  rawElementAppendChild.call(container, createLoadingIndicator(loading));
 }
-/**
- * 移除loading
- */
-export function removeLoading(el: HTMLElement): void {
-  // 去除容器设置的样式
-  const positionFlag = el.getAttribute(CONTAINER_POSITION_DATA_FLAG);
-  const overflowFlag = el.getAttribute(CONTAINER_OVERFLOW_DATA_FLAG);
-  if (positionFlag) el.style.removeProperty("position");
-  if (overflowFlag !== null) {
-    overflowFlag ? el.style.setProperty("overflow", overflowFlag) : el.style.removeProperty("overflow");
+
+/** Remove a loading overlay and restore layout properties changed by addLoading. */
+export function removeLoading(container: HTMLElement): void {
+  const position = container.getAttribute(CONTAINER_POSITION_DATA_FLAG);
+  const overflow = container.getAttribute(CONTAINER_OVERFLOW_DATA_FLAG);
+
+  if (position !== null) container.style.removeProperty("position");
+  if (overflow !== null) {
+    if (overflow) container.style.setProperty("overflow", overflow);
+    else container.style.removeProperty("overflow");
   }
-  el.removeAttribute(CONTAINER_POSITION_DATA_FLAG);
-  el.removeAttribute(CONTAINER_OVERFLOW_DATA_FLAG);
-  const loadingContainer = el.querySelector(`div[${LOADING_DATA_FLAG}]`);
-  loadingContainer && el.removeChild(loadingContainer);
+
+  container.removeAttribute(CONTAINER_POSITION_DATA_FLAG);
+  container.removeAttribute(CONTAINER_OVERFLOW_DATA_FLAG);
+  const indicator = container.querySelector(`div[${LOADING_DATA_FLAG}]`);
+  if (indicator) rawElementRemoveChild.call(container, indicator);
 }
-/**
- * 获取修复好的样式元素
- * 主要是针对对root样式和font-face样式
- */
-export function getPatchStyleElements(rootStyleSheets: Array<CSSStyleSheet>): Array<HTMLStyleElement | null> {
-  const rootCssRules = [];
-  const fontCssRules = [];
-  const rootStyleReg = /:root/g;
 
-  // 找出root的cssRules
-  for (let i = 0; i < rootStyleSheets.length; i++) {
-    const cssRules = rootStyleSheets[i]?.cssRules ?? [];
-    for (let j = 0; j < cssRules.length; j++) {
-      const cssRuleText = cssRules[j].cssText;
-      // 如果是root的cssRule
-      if (rootStyleReg.test(cssRuleText)) {
-        rootCssRules.push(cssRuleText.replace(rootStyleReg, (match) => cssSelectorMap[match]));
-      }
-      // 如果是font-face的cssRule
-      if (cssRules[j].type === CSSRule.FONT_FACE_RULE) {
-        fontCssRules.push(cssRuleText);
-      }
-    }
+function readableRules(styleSheet: CSSStyleSheet | null | undefined): readonly CSSRule[] {
+  if (!styleSheet) return [];
+  try {
+    return Array.from(styleSheet.cssRules ?? []);
+  } catch {
+    // Accessing cssRules of a cross-origin stylesheet throws a SecurityError.
+    return [];
   }
+}
 
-  let rootStyleSheetElement = null;
-  let fontStyleSheetElement = null;
+function collectPatchRules(styleSheets: readonly (CSSStyleSheet | null | undefined)[]): {
+  rootRules: string[];
+  fontRules: string[];
+} {
+  const rootRules: string[] = [];
+  const fontRules: string[] = [];
+  const fontFaceRule = typeof CSSRule === "undefined" ? 5 : CSSRule.FONT_FACE_RULE;
 
-  // 复制到host上
-  if (rootCssRules.length) {
-    rootStyleSheetElement = window.document.createElement("style");
-    rootStyleSheetElement.innerHTML = rootCssRules.join("");
-  }
+  styleSheets.forEach((styleSheet) => {
+    readableRules(styleSheet).forEach((rule) => {
+      if (rule.cssText.includes(":root")) rootRules.push(rule.cssText.replace(ROOT_SELECTOR_PATTERN, ":host"));
+      if (rule.type === fontFaceRule) fontRules.push(rule.cssText);
+    });
+  });
+  return { rootRules, fontRules };
+}
 
-  if (fontCssRules.length) {
-    fontStyleSheetElement = window.document.createElement("style");
-    fontStyleSheetElement.innerHTML = fontCssRules.join("");
-  }
+function rulesToStyleElement(rules: readonly string[]): HTMLStyleElement | null {
+  if (!rules.length) return null;
+  const element = window.document.createElement("style");
+  element.textContent = rules.join("");
+  return element;
+}
 
-  return [rootStyleSheetElement, fontStyleSheetElement];
+/** Extract :root and @font-face rules for placement outside application stylesheets. */
+export function getPatchStyleElements(
+  rootStyleSheets: readonly (CSSStyleSheet | null | undefined)[]
+): PatchStyleElements {
+  const { rootRules, fontRules } = collectPatchRules(rootStyleSheets);
+  return [rulesToStyleElement(rootRules), rulesToStyleElement(fontRules)];
 }

@@ -10,7 +10,6 @@ describe("main react degrade", () => {
       localStorage.setItem("degrade", "true");
     });
     await page.goto("http://localhost:7700/");
-    await page.waitForNavigation();
   });
 
   reactMainAppInfoList.forEach((appInfo) =>
@@ -32,7 +31,6 @@ describe("main vue degrade", () => {
       localStorage.setItem("degrade", "true");
     });
     await page.goto("http://localhost:8000/");
-    await page.waitForNavigation();
   });
 
   vueMainAppInfoList.forEach((appInfo) =>

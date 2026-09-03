@@ -36,6 +36,10 @@ import {
   WUJIE_APP_ID,
 } from "./constant";
 import { ScriptObject, parseTagAttributes } from "./template";
+import { HandlerPipeline } from "./effect-pipeline";
+import type { PipelineHandler } from "./effect-pipeline";
+import { registerSandboxDynamicResource, scheduleSandboxDynamicScript } from "./sandbox-runtime";
+import type { SandboxDynamicResourceCancellationReason } from "./sandbox-runtime";
 
 function patchCustomEvent(
   e: CustomEvent,
@@ -56,32 +60,46 @@ function patchCustomEvent(
 /**
  * 手动触发事件回调
  */
-function manualInvokeElementEvent(element: HTMLLinkElement | HTMLScriptElement, event: string): void {
-  const customEvent = new CustomEvent(event);
-  const patchedEvent = patchCustomEvent(customEvent, () => element);
-  if (isFunction(element[`on${event}`])) {
-    element[`on${event}`](patchedEvent);
-  } else {
-    element.dispatchEvent(patchedEvent);
+type ResourceElement = HTMLLinkElement | HTMLScriptElement;
+type ResourceEventName = "load" | "error";
+
+class ElementEventForwarder {
+  dispatch(element: ResourceElement, event: ResourceEventName): void {
+    const customEvent = new CustomEvent(event);
+    const patchedEvent = patchCustomEvent(customEvent, () => element);
+    const eventHandler = Reflect.get(element, `on${event}`);
+    if (isFunction(eventHandler)) {
+      Reflect.apply(eventHandler, element, [patchedEvent]);
+    } else {
+      element.dispatchEvent(patchedEvent);
+    }
   }
 }
+
+const elementEventForwarder = new ElementEventForwarder();
 
 /**
  * 样式元素的css变量处理，每个stylesheetElement单独节流
  */
-function handleStylesheetElementPatch(stylesheetElement: HTMLStyleElement & { _patcher?: any }, sandbox: Wujie) {
+type PatchedStyleElement = HTMLStyleElement & { _patcher?: ReturnType<typeof setTimeout> };
+type RawDomInsertion = <T extends Node>(newChild: T, refChild?: Node | null) => T;
+
+function handleStylesheetElementPatch(stylesheetElement: PatchedStyleElement, sandbox: Wujie) {
   if (!stylesheetElement.innerHTML || sandbox.degrade) return;
   const patcher = () => {
+    stylesheetElement._patcher = undefined;
+    if (sandbox.destroyed || !sandbox.shadowRoot) return;
     const [hostStyleSheetElement, fontStyleSheetElement] = getPatchStyleElements([stylesheetElement.sheet]);
     if (hostStyleSheetElement) {
       sandbox.shadowRoot.head.appendChild(hostStyleSheetElement);
     }
     if (fontStyleSheetElement) {
-      sandbox.inject.fontStyleSheetContainer?.appendChild(fontStyleSheetElement);
+      sandbox.inject?.fontStyleSheetContainer?.appendChild(fontStyleSheetElement);
       fontStyleSheetElement.setAttribute(WUJIE_APP_ID, sandbox.id);
-      sandbox.fontStyleSheetElements.push(fontStyleSheetElement);
+      if (Array.isArray(sandbox.fontStyleSheetElements)) {
+        sandbox.fontStyleSheetElements.push(fontStyleSheetElement);
+      }
     }
-    stylesheetElement._patcher = undefined;
   };
   if (stylesheetElement._patcher) {
     clearTimeout(stylesheetElement._patcher);
@@ -103,6 +121,12 @@ export function patchStylesheetElement(
   const innerHTMLDesc = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
   const innerTextDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "innerText");
   const textContentDesc = Object.getOwnPropertyDescriptor(Node.prototype, "textContent");
+  const innerHTMLGetter = innerHTMLDesc?.get;
+  const innerHTMLSetter = innerHTMLDesc?.set;
+  const innerTextGetter = innerTextDesc?.get;
+  const innerTextSetter = innerTextDesc?.set;
+  const textContentGetter = textContentDesc?.get;
+  const textContentSetter = textContentDesc?.set;
   const RawInsertRule = stylesheetElement.sheet?.insertRule;
   // 这个地方将cssRule加到innerHTML中去，防止子应用切换之后丢失
   function patchSheetInsertRule() {
@@ -114,51 +138,57 @@ export function patchStylesheetElement(
   }
   patchSheetInsertRule();
 
-  if (innerHTMLDesc) {
+  if (innerHTMLGetter && innerHTMLSetter) {
     Object.defineProperties(stylesheetElement, {
       innerHTML: {
-        get: function () {
-          return innerHTMLDesc.get.call(stylesheetElement);
+        get: function (this: HTMLStyleElement) {
+          return innerHTMLGetter.call(this);
         },
-        set: function (code: string) {
-          innerHTMLDesc.set.call(stylesheetElement, cssLoader(code, "", curUrl));
+        set: function (this: HTMLStyleElement, code: string) {
+          innerHTMLSetter.call(this, cssLoader(code, "", curUrl));
           nextTick(() => handleStylesheetElementPatch(this, sandbox));
         },
       },
     });
   }
 
+  if (innerTextGetter && innerTextSetter) {
+    Object.defineProperty(stylesheetElement, "innerText", {
+      get: function (this: HTMLStyleElement) {
+        return innerTextGetter.call(this);
+      },
+      set: function (this: HTMLStyleElement, code: string) {
+        innerTextSetter.call(this, cssLoader(code, "", curUrl));
+        nextTick(() => handleStylesheetElementPatch(this, sandbox));
+      },
+    });
+  }
+
+  if (textContentGetter && textContentSetter) {
+    Object.defineProperty(stylesheetElement, "textContent", {
+      get: function (this: HTMLStyleElement) {
+        return textContentGetter.call(this);
+      },
+      set: function (this: HTMLStyleElement, code: string) {
+        textContentSetter.call(this, cssLoader(code, "", curUrl));
+        nextTick(() => handleStylesheetElementPatch(this, sandbox));
+      },
+    });
+  }
+
   Object.defineProperties(stylesheetElement, {
-    innerText: {
-      get: function () {
-        return innerTextDesc.get.call(stylesheetElement);
-      },
-      set: function (code: string) {
-        innerTextDesc.set.call(stylesheetElement, cssLoader(code, "", curUrl));
-        nextTick(() => handleStylesheetElementPatch(this, sandbox));
-      },
-    },
-    textContent: {
-      get: function () {
-        return textContentDesc.get.call(stylesheetElement);
-      },
-      set: function (code: string) {
-        textContentDesc.set.call(stylesheetElement, cssLoader(code, "", curUrl));
-        nextTick(() => handleStylesheetElementPatch(this, sandbox));
-      },
-    },
     appendChild: {
       value: function (node: Node): Node {
         nextTick(() => handleStylesheetElementPatch(this, sandbox));
         if (node.nodeType === Node.TEXT_NODE) {
           const res = rawAppendChild.call(
             stylesheetElement,
-            stylesheetElement.ownerDocument.createTextNode(cssLoader(node.textContent, "", curUrl))
+            stylesheetElement.ownerDocument.createTextNode(cssLoader(node.textContent ?? "", "", curUrl))
           );
           // 当appendChild之后，样式元素的sheet对象发生改变，要重新patch
           patchSheetInsertRule();
           return res;
-        } else return rawAppendChild(node);
+        } else return rawAppendChild.call(stylesheetElement, node);
       },
     },
     insertAdjacentElement: {
@@ -210,21 +240,25 @@ export function deferStyleSheetByHref(opts: {
   iframeWindow: Window;
   loadStyleSheet: (href: string, element: HTMLLinkElement) => void;
 }): void {
-  let { element } = opts;
+  let element: HTMLLinkElement | null = opts.element;
   const { wujieId, iframeWindow, loadStyleSheet } = opts;
   // 部分环境（jsdom / 老浏览器）可能不支持 MutationObserver，直接放弃延迟处理
-  const MutationObserverCtor = (iframeWindow as any).MutationObserver;
+  const MutationObserverCtor = (iframeWindow as Window & { MutationObserver?: typeof MutationObserver })
+    .MutationObserver;
   if (typeof MutationObserverCtor !== "function") return;
 
   let settled = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
+  let registration: Pick<MutationObserver, "disconnect">;
+  let unregisterCancellation: (() => void) | undefined;
   const observer: MutationObserver = new MutationObserverCtor(() => {
     if (settled) return;
-    const attrHref = element?.getAttribute("href");
-    if (!attrHref) return;
-    const realHref = element.href || attrHref;
     const target = element;
-    finalize(() => target && loadStyleSheet(realHref, target));
+    if (!target) return;
+    const attrHref = target.getAttribute("href");
+    if (!attrHref) return;
+    const realHref = target.href || attrHref;
+    finalize(() => loadStyleSheet(realHref, target));
   });
 
   // 统一收尾：disconnect + 出队 + 清理定时器，再执行收尾动作
@@ -235,6 +269,8 @@ export function deferStyleSheetByHref(opts: {
       clearTimeout(timer);
       timer = null;
     }
+    unregisterCancellation?.();
+    unregisterCancellation = undefined;
     try {
       observer.disconnect();
     } catch (_) {
@@ -244,7 +280,7 @@ export function deferStyleSheetByHref(opts: {
     const sandbox = getWujieById(wujieId);
     const observers = sandbox?.deferredStyleObservers;
     if (Array.isArray(observers)) {
-      const index = observers.indexOf(observer);
+      const index = observers.indexOf(registration);
       if (index !== -1) observers.splice(index, 1);
     }
     if (sandbox) action?.();
@@ -254,229 +290,567 @@ export function deferStyleSheetByHref(opts: {
   const sandbox = getWujieById(wujieId);
   // 子应用已不存在则无需监听
   if (!sandbox || !Array.isArray(sandbox.deferredStyleObservers)) return;
-  sandbox.deferredStyleObservers.push(observer);
+  if (!isDynamicEffectContextLive(sandbox, wujieId)) {
+    const target = element;
+    element = null;
+    if (target) nextTick(() => elementEventForwarder.dispatch(target, "error"));
+    return;
+  }
+  registration = { disconnect: () => finalize() };
+  sandbox.deferredStyleObservers.push(registration);
+  unregisterCancellation = registerSandboxDynamicResource(sandbox, (reason) => {
+    const target = element;
+    const liveSandbox = getWujieById(wujieId);
+    finalize();
+    if (reason === "unmount" && target && liveSandbox) elementEventForwarder.dispatch(target, "error");
+  });
   observer.observe(element, { attributes: true, attributeFilter: ["href"] });
   // 超时兜底：长时间没等到 href，放弃监听并触发 error，让上游（如 tinymce）的失败回调收尾
   timer = setTimeout(() => {
     const target = element;
+    const liveSandbox = getWujieById(wujieId);
     finalize();
-    if (target) manualInvokeElementEvent(target, "error");
+    if (target && liveSandbox) elementEventForwarder.dispatch(target, "error");
   }, DEFER_STYLE_HREF_TIMEOUT);
 }
 
-let dynamicScriptExecStack = Promise.resolve();
-function rewriteAppendOrInsertChild(opts: {
-  rawDOMAppendOrInsertBefore: <T extends Node>(newChild: T, refChild?: Node | null) => T;
-  wujieId: string;
-}) {
-  return function appendChildOrInsertBefore<T extends Node>(
-    this: HTMLHeadElement | HTMLBodyElement,
-    newChild: T,
-    refChild?: Node | null
-  ) {
-    let element = newChild as any;
-    const { rawDOMAppendOrInsertBefore, wujieId } = opts;
-    const sandbox = getWujieById(wujieId);
+type HijackingTagName = "LINK" | "STYLE" | "SCRIPT" | "IFRAME";
+type InsertionTarget = HTMLHeadElement | HTMLBodyElement;
 
-    const { styleSheetElements, replace, fetch, plugins, iframe, lifecycles, proxyLocation, fiber } = sandbox;
+interface InsertionContext {
+  readonly target: InsertionTarget;
+  element: HTMLElement | null;
+  readonly refChild?: Node | null;
+  readonly rawInsert: RawDomInsertion;
+  readonly wujieId: string;
+  readonly sandbox: Wujie;
+  readonly iframeDocument: Document;
+  readonly iframeWindow: Window;
+  readonly curUrl: string;
+}
 
-    if (!isHijackingTag(element.tagName) || !wujieId) {
-      const res = rawDOMAppendOrInsertBefore.call(this, element, refChild) as T;
-      patchElementEffect(element, iframe.contentWindow);
-      execHooks(plugins, "appendOrInsertElementHook", element, iframe.contentWindow);
-      return res;
+/** Dynamic effects may continue while kept alive, but never after a normal inactive unmount. */
+export function isDynamicEffectContextLive(sandbox: Wujie, wujieId: string): boolean {
+  return (
+    !sandbox.destroyed &&
+    Boolean(sandbox.iframe) &&
+    (sandbox.alive || sandbox.activeFlag) &&
+    getWujieById(wujieId) === sandbox
+  );
+}
+
+type TypedInsertionHandler<TElement extends HTMLElement> = (context: InsertionContext, element: TElement) => Node;
+
+function insertNode<T extends Node>(context: InsertionContext, node: T): T {
+  return context.rawInsert.call(context.target, node, context.refChild) as T;
+}
+
+function invokeInsertionHook(context: InsertionContext, element: HTMLElement): void {
+  execHooks(context.sandbox.plugins, "appendOrInsertElementHook", element, context.iframeWindow);
+}
+
+function insertElementWithHook<T extends HTMLElement>(context: InsertionContext, element: T): T {
+  const result = insertNode(context, element);
+  invokeInsertionHook(context, element);
+  return result;
+}
+
+function createInsertionHandler<TElement extends HTMLElement>(
+  key: HijackingTagName,
+  handle: TypedInsertionHandler<TElement>
+): PipelineHandler<HijackingTagName, InsertionContext, Node> {
+  return {
+    key,
+    handle: (context) => {
+      if (!context.element) throw new Error(`Released insertion context for ${key}`);
+      return handle(context, context.element as TElement);
+    },
+  };
+}
+
+function releaseAfter<T>(promise: Promise<T>, release: () => void): Promise<T> {
+  return promise.then(
+    (value) => {
+      release();
+      return value;
+    },
+    (error: unknown) => {
+      release();
+      throw error;
+    }
+  );
+}
+
+class StylesheetResourceLoader {
+  private linkElement: HTMLLinkElement | null;
+  private placeholderElement: HTMLStyleElement | null = null;
+  private unregisterCancellation?: () => void;
+  private cancelled = false;
+
+  constructor(private readonly context: InsertionContext, linkElement: HTMLLinkElement) {
+    this.linkElement = linkElement;
+  }
+
+  load = (realHref: string, requestedElement: HTMLLinkElement): void => {
+    const linkElement = this.linkElement;
+    if (!linkElement || linkElement !== requestedElement) return;
+    if (!this.isLive()) {
+      this.release();
+      nextTick(() => elementEventForwarder.dispatch(linkElement, "error"));
+      return;
+    }
+    const { sandbox } = this.context;
+    const { plugins, proxyLocation, fetch, lifecycles, replace, styleSheetElements } = sandbox;
+    const attrHref = linkElement.getAttribute("href");
+    const styleHref = attrHref ? getAbsolutePath(attrHref, (proxyLocation as Location).href) : realHref;
+    if (!styleHref || isMatchUrl(styleHref, getEffectLoaders("cssExcludes", plugins))) return;
+
+    const placeholderElement = this.context.iframeDocument.createElement("style");
+    this.placeholderElement = placeholderElement;
+    this.unregisterCancellation = registerSandboxDynamicResource(sandbox, (reason) => this.cancel(reason));
+    setAttrsToElement(placeholderElement, parseTagAttributes(linkElement.outerHTML));
+    placeholderElement.setAttribute("data-wujie-css-href", styleHref);
+    insertNode(this.context, placeholderElement);
+
+    getExternalStyleSheets(
+      [{ src: styleHref, ignore: isMatchUrl(styleHref, getEffectLoaders("cssIgnores", plugins)) }],
+      fetch,
+      lifecycles.loadError,
+      sandbox.assetCacheScope
+    ).forEach(({ src, ignore, contentPromise }) => {
+      const pendingLoad = contentPromise.then(
+        (content) => {
+          if (!this.isLive()) {
+            placeholderElement.parentNode?.removeChild(placeholderElement);
+            return;
+          }
+          if (ignore && src) {
+            placeholderElement.parentNode?.removeChild(placeholderElement);
+            insertNode(this.context, linkElement);
+            return;
+          }
+
+          const cssLoader = getCssLoader({ plugins, replace });
+          let transformedContent: string;
+          try {
+            transformedContent = cssLoader(content, src, this.context.curUrl);
+          } catch {
+            placeholderElement.parentNode?.removeChild(placeholderElement);
+            const shouldNotify = this.isLive();
+            this.release();
+            if (shouldNotify) elementEventForwarder.dispatch(linkElement, "error");
+            return;
+          }
+          // cssLoader is user code and may synchronously unmount the app. The
+          // cancellation removes this placeholder and releases this loader;
+          // never resurrect that obsolete lifecycle generation afterwards.
+          if (!this.isLive()) {
+            placeholderElement.parentNode?.removeChild(placeholderElement);
+            return;
+          }
+          placeholderElement.innerHTML = transformedContent;
+          styleSheetElements.push(placeholderElement);
+          handleStylesheetElementPatch(placeholderElement, sandbox);
+          this.release();
+          elementEventForwarder.dispatch(linkElement, "load");
+        },
+        () => {
+          placeholderElement.parentNode?.removeChild(placeholderElement);
+          const shouldNotify = this.isLive();
+          this.release();
+          if (shouldNotify) elementEventForwarder.dispatch(linkElement, "error");
+        }
+      );
+      releaseAfter(pendingLoad, () => this.release());
+    });
+  };
+
+  private isLive(): boolean {
+    const { sandbox, wujieId } = this.context;
+    return !this.cancelled && isDynamicEffectContextLive(sandbox, wujieId);
+  }
+
+  private cancel(reason: SandboxDynamicResourceCancellationReason): void {
+    const linkElement = this.linkElement;
+    if (!linkElement) return;
+    this.cancelled = true;
+    this.placeholderElement?.parentNode?.removeChild(this.placeholderElement);
+    const shouldNotify = reason === "unmount" && !this.context.sandbox.destroyed;
+    this.release();
+    if (shouldNotify) {
+      elementEventForwarder.dispatch(linkElement, "error");
+    }
+  }
+
+  private release(): void {
+    this.unregisterCancellation?.();
+    this.unregisterCancellation = undefined;
+    this.linkElement = null;
+    this.placeholderElement = null;
+    this.context.element = null;
+  }
+}
+
+function toScriptCrossOrigin(value: string | null): "anonymous" | "use-credentials" | "" {
+  return (value || "") as "anonymous" | "use-credentials" | "";
+}
+
+class DynamicScriptScheduler {
+  private scriptElement: HTMLScriptElement | null;
+  private executionQueue: Array<() => unknown> | null = null;
+  private queuedTask?: () => unknown;
+  private laneReservation?: () => unknown;
+  private executionHandle?: ReturnType<typeof insertScriptToIframe>;
+  private unregisterCancellation?: () => void;
+  private completionStarted = false;
+
+  constructor(private readonly context: InsertionContext, scriptElement: HTMLScriptElement) {
+    this.scriptElement = scriptElement;
+  }
+
+  schedule(): void {
+    const { sandbox } = this.context;
+    const scriptElement = this.scriptElement;
+    if (!scriptElement) return;
+    if (!this.isLive()) {
+      this.release();
+      nextTick(() => elementEventForwarder.dispatch(scriptElement, "error"));
+      return;
+    }
+    this.unregisterCancellation = registerSandboxDynamicResource(sandbox, (reason) => this.cancel(reason));
+    const { src, text, type, crossOrigin } = scriptElement;
+    const isModule = type.toLowerCase() === "module";
+    setTagToScript(scriptElement);
+
+    if (src && !isMatchUrl(src, getEffectLoaders("jsExcludes", sandbox.plugins))) {
+      const scriptOptions: ScriptObject = {
+        src,
+        module: isModule,
+        crossorigin: crossOrigin !== null,
+        crossoriginType: toScriptCrossOrigin(crossOrigin),
+        ignore: isMatchUrl(src, getEffectLoaders("jsIgnores", sandbox.plugins)),
+        attrs: parseTagAttributes(scriptElement.outerHTML),
+      };
+      getExternalScripts(
+        [scriptOptions],
+        sandbox.fetch,
+        sandbox.lifecycles.loadError,
+        sandbox.fiber,
+        sandbox.assetCacheScope
+      ).forEach((scriptResult) => this.scheduleExternal(scriptResult));
+      return;
     }
 
-    const iframeDocument = iframe.contentDocument;
-    const curUrl = getCurUrl(proxyLocation);
-
-    // TODO 过滤可以开放
-    if (element.tagName) {
-      switch (element.tagName?.toUpperCase()) {
-        case "LINK": {
-          const { href, rel, type } = element as HTMLLinkElement;
-          const styleFlag = rel === "stylesheet" || type === "text/css" || href.endsWith(".css");
-          // 非 stylesheet 不做处理
-          if (!styleFlag) {
-            const res = rawDOMAppendOrInsertBefore.call(this, element, refChild);
-            execHooks(plugins, "appendOrInsertElementHook", element, iframe.contentWindow);
-            return res;
-          }
-
-          // 拉取 css 内容并以 <style> 注入子应用、回调 link 的 load/error 事件。
-          // 抽成闭包以便「append 时已有 href」与「append 后才 setAttribute('href')」两条路径复用。
-          const loadStyleSheet = (realHref: string, linkElement: HTMLLinkElement) => {
-            const attrHref = linkElement.getAttribute("href");
-            const styleHref = attrHref ? getAbsolutePath(attrHref, (proxyLocation as Location).href) : realHref;
-            const exclude = isMatchUrl(styleHref, getEffectLoaders("cssExcludes", plugins));
-            if (!styleHref || exclude) return;
-
-            // 立即创建占位 <style> 元素，避免异步加载期间重复插入
-            // 保留原始 link 的属性（如 class），以便 checkLinkAndLoad 等去重逻辑能找到
-            const rawAttrs = parseTagAttributes(linkElement.outerHTML);
-            const placeholderElement = iframeDocument.createElement("style");
-            setAttrsToElement(placeholderElement, rawAttrs);
-            placeholderElement.setAttribute("data-wujie-css-href", styleHref);
-            rawDOMAppendOrInsertBefore.call(this, placeholderElement, refChild);
-
-            getExternalStyleSheets(
-              [{ src: styleHref, ignore: isMatchUrl(styleHref, getEffectLoaders("cssIgnores", plugins)) }],
-              fetch,
-              lifecycles.loadError
-            ).forEach(({ src, ignore, contentPromise }) =>
-              contentPromise.then(
-                (content) => {
-                  if (ignore && src) {
-                    // 忽略的元素应该直接把对应元素插入，而不是用新的 link 标签进行替代插入，保证 element 的上下文正常
-                    // 移除占位元素，插入原始 link
-                    placeholderElement.parentNode?.removeChild(placeholderElement);
-                    rawDOMAppendOrInsertBefore.call(this, linkElement, refChild);
-                  } else {
-                    // 填充 CSS 内容到占位元素
-                    // 处理css-loader插件
-                    const cssLoader = getCssLoader({ plugins, replace });
-                    placeholderElement.innerHTML = cssLoader(content, src, curUrl);
-                    styleSheetElements.push(placeholderElement);
-                    // 处理样式补丁
-                    handleStylesheetElementPatch(placeholderElement, sandbox);
-                    manualInvokeElementEvent(linkElement, "load");
-                  }
-                  if (element === linkElement) element = null;
-                },
-                () => {
-                  manualInvokeElementEvent(linkElement, "error");
-                  if (element === linkElement) element = null;
-                }
-              )
-            );
-          };
-
-          if (href) {
-            // 排除css
-            if (!isMatchUrl(href, getEffectLoaders("cssExcludes", plugins))) {
-              loadStyleSheet(href, element);
-            }
-          } else {
-            // 关联 issue: https://github.com/Tencent/wujie/issues/224 https://github.com/Tencent/wujie/issues/974
-            //
-            // 部分库（如 tinymce 的 StyleSheetLoader）先 appendChild(link) 再
-            // setAttribute('href', url)。此时 href 为空，若直接丢弃则该样式永远不会被加载，
-            // 后续在游离 link 上设置 href 也不会触发浏览器加载，skin.min.css 等资源缺失。
-            // 这里监听 href 的后续赋值，拿到真实 href 后再走与上面完全一致的加载流程。
-            deferStyleSheetByHref({ element, wujieId, iframeWindow: iframe.contentWindow, loadStyleSheet });
-          }
-
-          const comment = iframeDocument.createComment(`dynamic link ${href} replaced by wujie`);
-          return rawDOMAppendOrInsertBefore.call(this, comment, refChild);
+    this.enqueue(() => {
+      const pendingElement = this.scriptElement;
+      if (!pendingElement) return;
+      if (!this.isLive()) {
+        warn(WUJIE_TIPS_REPEAT_RENDER);
+        this.cancelQueuedTask();
+        return;
+      }
+      const iframeWindow = sandbox.iframe.contentWindow;
+      if (!iframeWindow) {
+        this.cancelQueuedTask();
+        return;
+      }
+      const inlineScript: ScriptObject = {
+        content: text,
+        module: isModule,
+        attrs: parseTagAttributes(pendingElement.outerHTML),
+      };
+      if (isModule) this.executeWithForwardedOutcome(inlineScript);
+      else {
+        try {
+          insertScriptToIframe(inlineScript, iframeWindow, pendingElement);
+        } finally {
+          this.release();
         }
-        case "STYLE": {
-          const stylesheetElement: HTMLStyleElement = newChild as any;
-          styleSheetElements.push(stylesheetElement);
-          const content = stylesheetElement.innerHTML;
-          const cssLoader = getCssLoader({ plugins, replace });
-          content && (stylesheetElement.innerHTML = cssLoader(content, "", curUrl));
-          const res = rawDOMAppendOrInsertBefore.call(this, element, refChild);
-          // 处理样式补丁
-          patchStylesheetElement(stylesheetElement, cssLoader, sandbox, curUrl);
-          handleStylesheetElementPatch(stylesheetElement, sandbox);
-          execHooks(plugins, "appendOrInsertElementHook", element, iframe.contentWindow);
-          return res;
+      }
+    });
+  }
+
+  private scheduleExternal(scriptResult: ScriptObject & { contentPromise: Promise<string> }): void {
+    scheduleSandboxDynamicScript(this.context.sandbox, scriptResult.contentPromise, {
+      fulfilled: (content) => {
+        if (!this.isLive()) {
+          this.release();
+          return warn(WUJIE_TIPS_REPEAT_RENDER);
         }
-        case "SCRIPT": {
-          setTagToScript(element);
-          const { src, text, type, crossOrigin } = element as HTMLScriptElement;
-          // 排除js
-          if (src && !isMatchUrl(src, getEffectLoaders("jsExcludes", plugins))) {
-            const execScript = (scriptResult: ScriptObject) => {
-              // 假如子应用被连续渲染两次，两次渲染会导致处理流程的交叉污染
-              if (sandbox.iframe === null) return warn(WUJIE_TIPS_REPEAT_RENDER);
-              const onload = () => {
-                manualInvokeElementEvent(element, "load");
-                element = null;
-              };
-              insertScriptToIframe({ ...scriptResult, onload }, sandbox.iframe.contentWindow, element);
-            };
-            const scriptOptions = {
-              src,
-              module: type === "module",
-              crossorigin: crossOrigin !== null,
-              crossoriginType: crossOrigin || "",
-              ignore: isMatchUrl(src, getEffectLoaders("jsIgnores", plugins)),
-              attrs: parseTagAttributes(element.outerHTML),
-            } as ScriptObject;
-            getExternalScripts([scriptOptions], fetch, lifecycles.loadError, fiber).forEach((scriptResult) => {
-              dynamicScriptExecStack = dynamicScriptExecStack.then(() =>
-                scriptResult.contentPromise.then(
-                  (content) => {
-                    if (sandbox.execQueue === null) return warn(WUJIE_TIPS_REPEAT_RENDER);
-                    const execQueueLength = sandbox.execQueue?.length;
-                    sandbox.execQueue.push(() =>
-                      fiber
-                        ? sandbox.requestIdleCallback(() => {
-                            execScript({ ...scriptResult, content });
-                          })
-                        : execScript({ ...scriptResult, content })
-                    );
-                    // 同步脚本如果都执行完了，需要手动触发执行
-                    if (!execQueueLength) sandbox.execQueue.shift()();
-                  },
-                  () => {
-                    manualInvokeElementEvent(element, "error");
-                    element = null;
-                  }
-                )
-              );
-            });
-          } else {
-            const execQueueLength = sandbox.execQueue?.length;
-            sandbox.execQueue.push(() =>
-              fiber
-                ? sandbox.requestIdleCallback(() => {
-                    insertScriptToIframe(
-                      { src: null, content: text, attrs: parseTagAttributes(element.outerHTML) },
-                      sandbox.iframe.contentWindow,
-                      element
-                    );
-                  })
-                : insertScriptToIframe(
-                    { src: null, content: text, attrs: parseTagAttributes(element.outerHTML) },
-                    sandbox.iframe.contentWindow,
-                    element
-                  )
-            );
-            if (!execQueueLength) sandbox.execQueue.shift()();
-          }
-          // inline script never trigger the onload and onerror event
-          const comment = iframeDocument.createComment(`dynamic script ${src} replaced by wujie`);
-          return rawDOMAppendOrInsertBefore.call(this, comment, refChild);
-        }
-        // 修正子应用内部iframe的window.parent指向
-        case "IFRAME": {
-          // 嵌套的子应用的js-iframe需要插入子应用的js-iframe内部
-          if (element.getAttribute(WUJIE_DATA_FLAG) === "") {
-            return rawAppendChild.call(rawDocumentQuerySelector.call(this.ownerDocument, "html"), element);
-          }
-          const res = rawDOMAppendOrInsertBefore.call(this, element, refChild);
-          execHooks(plugins, "appendOrInsertElementHook", element, iframe.contentWindow);
-          return res;
-        }
-        default:
+        this.enqueue(() => this.executeWithForwardedOutcome({ ...scriptResult, content }));
+      },
+      rejected: () => {
+        const pendingElement = this.scriptElement;
+        const shouldNotify = Boolean(pendingElement && this.isLive());
+        this.release();
+        if (pendingElement && shouldNotify) elementEventForwarder.dispatch(pendingElement, "error");
+      },
+      cancelled: (reason) => this.cancel(reason),
+    });
+  }
+
+  private executeWithForwardedOutcome(scriptResult: ScriptObject): void {
+    const { sandbox } = this.context;
+    const pendingElement = this.scriptElement;
+    if (!pendingElement) return;
+    if (!this.isLive()) {
+      warn(WUJIE_TIPS_REPEAT_RENDER);
+      this.cancelQueuedTask();
+      return;
+    }
+    const complete = (outcome: ResourceEventName) => {
+      if (this.completionStarted) return;
+      this.completionStarted = true;
+      const completedElement = this.scriptElement;
+      const shouldNotify = Boolean(completedElement && this.isLive());
+      try {
+        if (completedElement && shouldNotify) elementEventForwarder.dispatch(completedElement, outcome);
+      } finally {
+        // insertScriptToIframe advances execQueue immediately after this
+        // callback. Leave our reservation in place across user event handlers
+        // so reentrant script insertion cannot observe an empty lane.
+        this.release(true);
+      }
+    };
+    const iframeWindow = sandbox.iframe.contentWindow;
+    if (!iframeWindow) {
+      this.cancelQueuedTask();
+      return;
+    }
+    try {
+      const executionHandle = insertScriptToIframe(
+        {
+          ...scriptResult,
+          onload: () => complete("load"),
+          onerror: () => complete("error"),
+        },
+        iframeWindow,
+        pendingElement
+      );
+      if (this.scriptElement) {
+        this.executionHandle = executionHandle;
+      }
+    } catch (cause: unknown) {
+      const failedElement = this.scriptElement;
+      // Loader/DOM setup failed before insertScriptToIframe could publish a
+      // completion handle. This task has already left execQueue, so explicitly
+      // advance the lane and surface the failure through the original element.
+      if (!failedElement) return;
+      const shouldNotify = this.isLive();
+      this.cancelQueuedTask();
+      if (shouldNotify) elementEventForwarder.dispatch(failedElement, "error");
+      warn(cause);
+    }
+  }
+
+  private enqueue(task: () => unknown): void {
+    const { sandbox } = this.context;
+    const queue = sandbox.execQueue;
+    if (!Array.isArray(queue) || !this.isLive()) {
+      warn(WUJIE_TIPS_REPEAT_RENDER);
+      this.release();
+      return;
+    }
+    const queueWasEmpty = queue.length === 0;
+    this.executionQueue = queue;
+    const runIfLive = () => {
+      if (!this.isLive()) {
+        this.cancelQueuedTask();
+        return;
+      }
+      task();
+    };
+    const queuedTask = () => {
+      this.queuedTask = undefined;
+      this.reserveExecutionLane(queue);
+      return sandbox.fiber ? sandbox.requestIdleCallback(runIfLive, () => this.cancelQueuedTask()) : runIfLive();
+    };
+    this.queuedTask = queuedTask;
+    queue.push(queuedTask);
+    if (queueWasEmpty) queue.shift()?.();
+  }
+
+  /** Keep the lane occupied while the dequeued task waits for fiber/native completion. */
+  private reserveExecutionLane(queue: Array<() => unknown>): void {
+    const reservation = () => {
+      if (this.laneReservation !== reservation) return;
+      this.laneReservation = undefined;
+      queue.shift()?.();
+    };
+    this.laneReservation = reservation;
+    queue.unshift(reservation);
+  }
+
+  private isLive(): boolean {
+    const { sandbox, wujieId } = this.context;
+    return isDynamicEffectContextLive(sandbox, wujieId);
+  }
+
+  private cancel(reason: SandboxDynamicResourceCancellationReason): void {
+    const pendingElement = this.scriptElement;
+    if (!pendingElement) return;
+    const shouldNotify = reason === "unmount" && !this.context.sandbox.destroyed && !this.completionStarted;
+    this.executionHandle?.cancel();
+    this.release();
+    if (shouldNotify) {
+      elementEventForwarder.dispatch(pendingElement, "error");
+    }
+  }
+
+  /** The current task has already been shifted, so cancellation must advance the remaining queue. */
+  private cancelQueuedTask(): void {
+    const queue = this.executionQueue ?? this.context.sandbox.execQueue;
+    const ownsLane = Boolean(this.laneReservation);
+    this.release();
+    if (ownsLane && Array.isArray(queue)) queue.shift()?.();
+  }
+
+  private release(preserveExecutionLane = false): void {
+    const queue = this.executionQueue ?? this.context.sandbox.execQueue;
+    if (Array.isArray(queue)) {
+      if (this.queuedTask) {
+        const queuedIndex = queue.indexOf(this.queuedTask);
+        if (queuedIndex !== -1) queue.splice(queuedIndex, 1);
+      }
+      if (this.laneReservation && !preserveExecutionLane) {
+        const reservationIndex = queue.indexOf(this.laneReservation);
+        if (reservationIndex !== -1) queue.splice(reservationIndex, 1);
       }
     }
+    this.queuedTask = undefined;
+    if (!preserveExecutionLane) this.laneReservation = undefined;
+    this.unregisterCancellation?.();
+    this.unregisterCancellation = undefined;
+    this.executionHandle = undefined;
+    this.scriptElement = null;
+    this.context.element = null;
+    this.executionQueue = null;
+  }
+}
+
+const linkInsertionHandler = createInsertionHandler<HTMLLinkElement>("LINK", (context, linkElement) => {
+  const { href, rel, type } = linkElement;
+  const isStylesheet = rel === "stylesheet" || type === "text/css" || href.endsWith(".css");
+  if (!isStylesheet) return insertElementWithHook(context, linkElement);
+
+  const resourceLoader = new StylesheetResourceLoader(context, linkElement);
+  if (href) {
+    if (!isMatchUrl(href, getEffectLoaders("cssExcludes", context.sandbox.plugins))) {
+      resourceLoader.load(href, linkElement);
+    }
+  } else {
+    deferStyleSheetByHref({
+      element: linkElement,
+      wujieId: context.wujieId,
+      iframeWindow: context.iframeWindow,
+      loadStyleSheet: resourceLoader.load,
+    });
+  }
+
+  return insertNode(context, context.iframeDocument.createComment(`dynamic link ${href} replaced by wujie`));
+});
+
+const styleInsertionHandler = createInsertionHandler<HTMLStyleElement>("STYLE", (context, stylesheetElement) => {
+  const { sandbox } = context;
+  sandbox.styleSheetElements.push(stylesheetElement);
+  const cssLoader = getCssLoader({ plugins: sandbox.plugins, replace: sandbox.replace });
+  const content = stylesheetElement.innerHTML;
+  if (content) stylesheetElement.innerHTML = cssLoader(content, "", context.curUrl);
+  const result = insertNode(context, stylesheetElement);
+  patchStylesheetElement(stylesheetElement, cssLoader, sandbox, context.curUrl);
+  handleStylesheetElementPatch(stylesheetElement, sandbox);
+  invokeInsertionHook(context, stylesheetElement);
+  return result;
+});
+
+const scriptInsertionHandler = createInsertionHandler<HTMLScriptElement>("SCRIPT", (context, scriptElement) => {
+  new DynamicScriptScheduler(context, scriptElement).schedule();
+  return insertNode(
+    context,
+    context.iframeDocument.createComment(`dynamic script ${scriptElement.src} replaced by wujie`)
+  );
+});
+
+const iframeInsertionHandler = createInsertionHandler<HTMLIFrameElement>("IFRAME", (context, iframeElement) => {
+  if (iframeElement.getAttribute(WUJIE_DATA_FLAG) === "") {
+    const documentElement = rawDocumentQuerySelector.call(context.target.ownerDocument, "html");
+    return rawAppendChild.call(documentElement, iframeElement);
+  }
+  return insertElementWithHook(context, iframeElement);
+});
+
+const insertionPipeline = new HandlerPipeline<HijackingTagName, InsertionContext, Node>([
+  linkInsertionHandler,
+  styleInsertionHandler,
+  scriptInsertionHandler,
+  iframeInsertionHandler,
+]);
+
+function toHijackingTagName(tagName: string): HijackingTagName {
+  return tagName.toUpperCase() as HijackingTagName;
+}
+
+function insertUnmanagedElement<T extends Node>(context: InsertionContext, element: T): T {
+  const result = insertNode(context, element);
+  patchElementEffect(element as unknown as HTMLElement, context.iframeWindow);
+  execHooks(context.sandbox.plugins, "appendOrInsertElementHook", element, context.iframeWindow);
+  return result;
+}
+
+function rewriteAppendOrInsertChild(opts: { rawDOMAppendOrInsertBefore: RawDomInsertion; wujieId: string }) {
+  return function appendChildOrInsertBefore<T extends Node>(
+    this: InsertionTarget,
+    newChild: T,
+    refChild?: Node | null
+  ): T {
+    const element = newChild as unknown as HTMLElement;
+    const sandbox = getWujieById(opts.wujieId);
+    // Patched head/body nodes can outlive their sandbox briefly. In that
+    // window, preserve native DOM behavior instead of dereferencing a released
+    // iframe through the stale patch closure.
+    if (!sandbox?.iframe) {
+      return opts.rawDOMAppendOrInsertBefore.call(this, newChild, refChild) as T;
+    }
+    const iframeDocument = sandbox.iframe.contentDocument;
+    const iframeWindow = sandbox.iframe.contentWindow;
+    if (!iframeDocument || !iframeWindow) {
+      return opts.rawDOMAppendOrInsertBefore.call(this, newChild, refChild) as T;
+    }
+    const context: InsertionContext = {
+      target: this,
+      element,
+      refChild,
+      rawInsert: opts.rawDOMAppendOrInsertBefore,
+      wujieId: opts.wujieId,
+      sandbox,
+      iframeDocument,
+      iframeWindow,
+      curUrl: getCurUrl(sandbox.proxyLocation),
+    };
+
+    if (!isHijackingTag(element.tagName) || !opts.wujieId) {
+      return insertUnmanagedElement(context, newChild);
+    }
+
+    return insertionPipeline.dispatch(toHijackingTagName(element.tagName), context, (fallbackContext) =>
+      insertUnmanagedElement(fallbackContext, newChild)
+    ) as T;
   };
 }
 
 function findScriptElementFromIframe(rawElement: HTMLScriptElement, wujieId: string) {
   const wujieTag = getTagFromScript(rawElement);
   const sandbox = getWujieById(wujieId);
+  if (!sandbox?.iframe) return { targetScript: null, rawHead: null };
   const { iframe } = sandbox;
-  const targetScript = iframe.contentWindow.__WUJIE_RAW_DOCUMENT_HEAD__.querySelector(
-    `script[${WUJIE_SCRIPT_ID}='${wujieTag}']`
-  );
+  const iframeWindow = iframe.contentWindow;
+  if (!iframeWindow) return { targetScript: null, rawHead: null };
+  const rawHead = iframeWindow.__WUJIE_RAW_DOCUMENT_HEAD__;
+  const targetScript = rawHead.querySelector(`script[${WUJIE_SCRIPT_ID}='${wujieTag}']`);
   if (targetScript === null) {
     warn(WUJIE_TIPS_NO_SCRIPT, `<script ${WUJIE_SCRIPT_ID}='${wujieTag}'/>`);
   }
-  return { targetScript, iframe };
+  return { targetScript, rawHead };
 }
 
 function rewriteContains(opts: { rawElementContains: (other: Node | null) => boolean; wujieId: string }) {
@@ -484,7 +858,8 @@ function rewriteContains(opts: { rawElementContains: (other: Node | null) => boo
     const element = other as HTMLElement;
     const { rawElementContains, wujieId } = opts;
     if (element && isScriptElement(element)) {
-      const { targetScript } = findScriptElementFromIframe(element as HTMLScriptElement, wujieId);
+      const { targetScript, rawHead } = findScriptElementFromIframe(element as HTMLScriptElement, wujieId);
+      if (!rawHead) return rawElementContains(element);
       return targetScript !== null;
     }
     return rawElementContains(element);
@@ -496,9 +871,10 @@ function rewriteRemoveChild(opts: { rawElementRemoveChild: <T extends Node>(chil
     const element = child as HTMLElement;
     const { rawElementRemoveChild, wujieId } = opts;
     if (element && isScriptElement(element)) {
-      const { targetScript, iframe } = findScriptElementFromIframe(element as HTMLScriptElement, wujieId);
+      const { targetScript, rawHead } = findScriptElementFromIframe(element as HTMLScriptElement, wujieId);
+      if (!rawHead) return rawElementRemoveChild(element);
       if (targetScript !== null) {
-        return iframe.contentWindow.__WUJIE_RAW_DOCUMENT_HEAD__.removeChild(targetScript);
+        return rawHead.removeChild(targetScript);
       }
       return null;
     }
@@ -509,8 +885,12 @@ function rewriteRemoveChild(opts: { rawElementRemoveChild: <T extends Node>(chil
 /**
  * 记录head和body的事件，等重新渲染复用head和body时需要清空事件
  */
-function patchEventListener(element: HTMLHeadElement | HTMLBodyElement) {
-  const listenerMap = new Map<string, EventListenerOrEventListenerObject[]>();
+function captureOption(options?: boolean | AddEventListenerOptions): boolean {
+  return typeof options === "boolean" ? options : Boolean(options?.capture);
+}
+
+function patchEventListener(element: HTMLHeadElement | HTMLBodyElement): void {
+  const listenerMap: HTMLHeadElement["_cacheListeners"] = new Map();
   element._cacheListeners = listenerMap;
 
   element.addEventListener = (
@@ -519,7 +899,10 @@ function patchEventListener(element: HTMLHeadElement | HTMLBodyElement) {
     options?: boolean | AddEventListenerOptions
   ) => {
     const listeners = listenerMap.get(type) || [];
-    listenerMap.set(type, [...listeners, listener]);
+    const capture = captureOption(options);
+    if (!listeners.some((entry) => entry.listener === listener && captureOption(entry.options) === capture)) {
+      listenerMap.set(type, [...listeners, { listener, options }]);
+    }
     return rawAddEventListener.call(element, type, listener, options);
   };
 
@@ -529,9 +912,13 @@ function patchEventListener(element: HTMLHeadElement | HTMLBodyElement) {
     options?: boolean | AddEventListenerOptions
   ) => {
     const typeListeners = listenerMap.get(type);
-    const index = typeListeners?.indexOf(listener);
-    if (typeListeners?.length && index !== -1) {
+    const capture = captureOption(options);
+    const index = typeListeners?.findIndex(
+      (entry) => entry.listener === listener && captureOption(entry.options) === capture
+    );
+    if (typeListeners?.length && index !== undefined && index !== -1) {
       typeListeners.splice(index, 1);
+      if (!typeListeners.length) listenerMap.delete(type);
     }
     return rawRemoveEventListener.call(element, type, listener, options);
   };
@@ -540,11 +927,13 @@ function patchEventListener(element: HTMLHeadElement | HTMLBodyElement) {
 /**
  * 清空head和body的绑定的事件
  */
-export function removeEventListener(element: HTMLHeadElement | HTMLBodyElement) {
+export function removeEventListener(element: HTMLHeadElement | HTMLBodyElement): void {
   const listenerMap = element._cacheListeners;
-  [...listenerMap.entries()].forEach(([type, listeners]) => {
-    listeners.forEach((listener) => rawRemoveEventListener.call(element, type, listener));
+  if (!listenerMap) return;
+  listenerMap.forEach((listeners, type) => {
+    listeners.forEach(({ listener, options }) => rawRemoveEventListener.call(element, type, listener, options));
   });
+  listenerMap.clear();
 }
 
 /**
@@ -563,7 +952,7 @@ export function patchRenderEffect(render: ShadowRoot | Document, id: string, deg
     wujieId: id,
   }) as typeof rawAppendChild;
   render.head.insertBefore = rewriteAppendOrInsertChild({
-    rawDOMAppendOrInsertBefore: rawHeadInsertBefore as any,
+    rawDOMAppendOrInsertBefore: rawHeadInsertBefore as unknown as RawDomInsertion,
     wujieId: id,
   }) as typeof rawHeadInsertBefore;
   render.head.removeChild = rewriteRemoveChild({
@@ -583,7 +972,7 @@ export function patchRenderEffect(render: ShadowRoot | Document, id: string, deg
     wujieId: id,
   }) as typeof rawAppendChild;
   render.body.insertBefore = rewriteAppendOrInsertChild({
-    rawDOMAppendOrInsertBefore: rawBodyInsertBefore as any,
+    rawDOMAppendOrInsertBefore: rawBodyInsertBefore as unknown as RawDomInsertion,
     wujieId: id,
   }) as typeof rawBodyInsertBefore;
 }

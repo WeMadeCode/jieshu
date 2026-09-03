@@ -65,4 +65,15 @@ describe("common: deleteWujieById", () => {
 
     expect(getOptionsById("repeat-app")).toBe(options);
   });
+
+  test("旧实例的延迟 destroy 不应删除同名替代实例", () => {
+    const staleSandbox = { id: "replacement-app" } as any;
+    const replacement = { id: "replacement-app" } as any;
+    addSandboxCacheWithWujie("replacement-app", staleSandbox);
+    addSandboxCacheWithWujie("replacement-app", replacement);
+
+    deleteWujieById("replacement-app", staleSandbox);
+
+    expect(getWujieById("replacement-app")).toBe(replacement);
+  });
 });

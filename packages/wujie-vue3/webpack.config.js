@@ -1,7 +1,9 @@
 const path = require('path')
 
 module.exports = {
-  entry: './index.js',
+  // TypeScript compilation is the single source for ESM and declarations.
+  // The UMD build consumes that generated JavaScript.
+  entry: './esm/index.js',
   target: ["web", "es5"],
   output: {
     publicPath: '/',

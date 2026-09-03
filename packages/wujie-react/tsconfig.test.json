@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "lib": ["DOM", "ES2018"],
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "wujie-react": ["."]
+    },
+    "skipLibCheck": false,
+    "strict": true,
+    "target": "ES2018"
+  },
+  "include": ["__test__/public-api.ts", "react-build.d.ts", "prop-types-build.d.ts"]
+}

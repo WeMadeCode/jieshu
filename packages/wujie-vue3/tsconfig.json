@@ -1,0 +1,22 @@
+{
+  "include": ["./index.ts"],
+  "exclude": ["node_modules", "esm", "lib"],
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "lib": ["DOM", "ES2018"],
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationDir": ".",
+    "outDir": "./esm",
+    "sourceMap": true,
+    "skipLibCheck": true
+  }
+}

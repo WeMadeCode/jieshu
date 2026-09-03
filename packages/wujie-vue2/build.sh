@@ -13,8 +13,6 @@ echo -e "${GREEN}============WujieVue开始编译============${NC}"
 [ -d lib ] && rm -rf lib
 [ -d esm ] && rm -rf esm
 
-npm run lib
-
-npm run esm
+pnpm run lib
 
 echo -e "${GREEN}============WujieVue编译成功============${NC}"

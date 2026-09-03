@@ -1,97 +1,165 @@
-/**
- * 销毁链路清理跟踪器。
- *
- * 子应用通过 patchDocumentEffect 注册的部分事件会被转发到主应用 window.document，
- * patchWindowEffect 改写的 window.onXXX 也会写到主应用 window 上。两者若不在
- * sandbox.destroy() 时反向清理，handler 闭包会持有 iframeWindow，整个子应用
- * 上下文都无法被 GC，且主 window 上会留下 dangling handler。
- *
- * 跟踪器实例挂在每个 Wujie 沙箱上，在 sandbox.destroy() 末尾统一清理。
- */
-
-export type DocumentListenerEntry = {
+/** A listener forwarded from a sandbox document to the host document. */
+export interface DocumentListenerEntry {
   type: string;
   callback: EventListenerOrEventListenerObject;
   options?: boolean | AddEventListenerOptions;
-};
+}
 
-export type WindowOnEventOriginal = {
-  key: string;
-  /** 主应用 window 上该 key 的原始值（可能是原 handler / null / undefined） */
-  originalValue: any;
-  /** 该 key 原本是否是主应用 window 的 own property（用于 cleanup 决定是否要 delete） */
-  hadOwnProperty: boolean;
-};
+interface WindowPropertySnapshot {
+  value: unknown;
+  wasOwnProperty: boolean;
+}
 
-export class EventCleanupTracker {
-  /** 已经从 patchDocumentEffect 转发到主应用 window.document 的 listener */
-  private readonly mainDocumentListeners: Set<DocumentListenerEntry> = new Set();
-  /** 已被 patchWindowEffect 改写过的主应用 window onXXX，记录原始状态以便还原 */
-  private readonly windowOnEventOverrides: Map<string, WindowOnEventOriginal> = new Map();
+interface WindowPropertyOverride {
+  readonly owner: EventCleanupTracker;
+  readonly installedValue: unknown;
+  previous: WindowPropertySnapshot;
+}
 
-  trackMainDocumentListener(entry: DocumentListenerEntry): void {
-    this.mainDocumentListeners.add(entry);
+type DynamicWindow = Window & Record<string, unknown>;
+type WindowOverrideStacks = Map<string, WindowPropertyOverride[]>;
+
+const sharedWindowOverrides = new WeakMap<Window, WindowOverrideStacks>();
+
+function sameListener(left: DocumentListenerEntry, right: DocumentListenerEntry): boolean {
+  const leftCapture = typeof left.options === "boolean" ? left.options : left.options?.capture === true;
+  const rightCapture = typeof right.options === "boolean" ? right.options : right.options?.capture === true;
+  return left.type === right.type && left.callback === right.callback && leftCapture === rightCapture;
+}
+
+function dynamicWindow(target: Window): DynamicWindow {
+  return target as DynamicWindow;
+}
+
+function snapshotWindowProperty(targetWindow: Window, key: string): WindowPropertySnapshot {
+  return {
+    value: Reflect.get(targetWindow, key),
+    wasOwnProperty: Object.prototype.hasOwnProperty.call(targetWindow, key),
+  };
+}
+
+function restoreWindowProperty(targetWindow: Window, key: string, snapshot: WindowPropertySnapshot): void {
+  const target = dynamicWindow(targetWindow);
+  // Assignment is required for native on* accessors: it invokes their setter
+  // and restores the browser's internal handler slot.
+  target[key] = snapshot.value;
+  if (!snapshot.wasOwnProperty) delete target[key];
+}
+
+function windowOverrideStacks(targetWindow: Window): WindowOverrideStacks {
+  let stacks = sharedWindowOverrides.get(targetWindow);
+  if (!stacks) {
+    stacks = new Map();
+    sharedWindowOverrides.set(targetWindow, stacks);
   }
+  return stacks;
+}
 
-  /** removeEventListener 时同步从跟踪集合中剔除，避免 destroy 时再次解绑 */
-  untrackMainDocumentListener(entry: DocumentListenerEntry): void {
-    for (const existing of this.mainDocumentListeners) {
-      if (existing.type === entry.type && existing.callback === entry.callback && existing.options === entry.options) {
-        this.mainDocumentListeners.delete(existing);
-        break;
-      }
+/**
+ * Records effects that a sandbox forwards to host-owned objects. The tracker is
+ * intentionally independent from Wujie so cleanup remains usable while the
+ * sandbox itself is being torn down.
+ */
+export class EventCleanupTracker {
+  private readonly mainDocumentListeners = new Set<DocumentListenerEntry>();
+  private readonly windowProperties = new Map<Window, Set<string>>();
+
+  public trackMainDocumentListener(entry: DocumentListenerEntry): void {
+    if (!Array.from(this.mainDocumentListeners).some((candidate) => sameListener(candidate, entry))) {
+      this.mainDocumentListeners.add(entry);
     }
   }
 
-  /** 清理主应用 window.document 上的 listener */
-  cleanupMainDocumentListeners(targetDocument: Document = window.document): void {
-    this.mainDocumentListeners.forEach(({ type, callback, options }) => {
+  public untrackMainDocumentListener(entry: DocumentListenerEntry): void {
+    const trackedEntry = Array.from(this.mainDocumentListeners).find((candidate) => sameListener(candidate, entry));
+    if (trackedEntry) this.mainDocumentListeners.delete(trackedEntry);
+  }
+
+  /** Install a host window on* value while preserving cross-sandbox ownership. */
+  public setWindowOnEvent(targetWindow: Window, key: string, installedValue: unknown): void {
+    const stacks = windowOverrideStacks(targetWindow);
+    const stack = stacks.get(key) ?? [];
+    const existingIndex = stack.findIndex((entry) => entry.owner === this);
+    const existing = existingIndex === -1 ? undefined : stack[existingIndex];
+    const isExistingTop = existingIndex === stack.length - 1;
+    const currentValue = Reflect.get(targetWindow, key);
+    const previous =
+      existing && isExistingTop && Object.is(currentValue, existing.installedValue)
+        ? existing.previous
+        : snapshotWindowProperty(targetWindow, key);
+
+    if (!Reflect.set(targetWindow, key, installedValue)) return;
+
+    if (existing) {
+      stack.splice(existingIndex, 1);
+      // Removing a layer from the middle must let its successor restore the
+      // value that existed before the removed owner, never that owner's bound
+      // iframe handler.
+      const successor = stack[existingIndex];
+      if (successor) successor.previous = existing.previous;
+    }
+    stack.push({ owner: this, installedValue, previous });
+    stacks.set(key, stack);
+
+    let keys = this.windowProperties.get(targetWindow);
+    if (!keys) {
+      keys = new Set();
+      this.windowProperties.set(targetWindow, keys);
+    }
+    keys.add(key);
+  }
+
+  public cleanupMainDocumentListeners(targetDocument: Document = window.document): void {
+    for (const { type, callback, options } of this.mainDocumentListeners) {
       try {
-        targetDocument.removeEventListener(type, callback, options as any);
-      } catch (_) {
-        /* noop: destroy 阶段任何异常都不应中断后续清理 */
+        targetDocument.removeEventListener(type, callback, options);
+      } catch {
+        // Cleanup is best-effort; one hostile listener must not block the rest.
       }
-    });
+    }
     this.mainDocumentListeners.clear();
   }
 
-  /**
-   * 记录主应用 window.onXXX 被子应用覆盖前的状态，供 destroy 时还原。
-   * 同一 key 仅首次记录，避免把子应用后续写入的 handler 当作原值。
-   *
-   * 一些 onXXX 属性由 accessor 管理，cleanup 时需要通过赋值写回 originalValue，
-   * 让 setter 清掉内部保存的 handler；如果赋值新增了 own property，再按需 delete。
-   */
-  trackWindowOnEvent(key: string, originalValue: any, hadOwnProperty: boolean): void {
-    if (!this.windowOnEventOverrides.has(key)) {
-      this.windowOnEventOverrides.set(key, { key, originalValue, hadOwnProperty });
-    }
-  }
+  public cleanupWindowOnEventOverrides(targetWindow: Window = window): void {
+    const keys = this.windowProperties.get(targetWindow);
+    const stacks = sharedWindowOverrides.get(targetWindow);
+    if (!keys || !stacks) return;
 
-  /** 清理主应用 window 上的 onXXX */
-  cleanupWindowOnEventOverrides(targetWindow: Window = window): void {
-    this.windowOnEventOverrides.forEach(({ key, originalValue, hadOwnProperty }) => {
+    keys.forEach((key) => {
+      const stack = stacks.get(key);
+      if (!stack) return;
+      const ownerIndex = stack.findIndex((entry) => entry.owner === this);
+      if (ownerIndex === -1) return;
+      const override = stack[ownerIndex];
+      const wasTop = ownerIndex === stack.length - 1;
+      let ownsCurrentValue = false;
       try {
-        // 直接赋值：对 prototype accessor 而言会调用 setter 把内部存储覆盖回原值；
-        // 对自定义 data property 而言会更新自身值。
-        (targetWindow as any)[key] = originalValue;
-      } catch (_) {
-        /* noop */
+        ownsCurrentValue = Object.is(Reflect.get(targetWindow, key), override.installedValue);
+      } catch {
+        // A hostile getter means ownership cannot be proven; never overwrite it.
       }
-      // 原本没有 own property（例如 patchWindowEffect 之前主 window 没设过自定义属性）
-      // 时，cleanup 后再 delete，避免 polluted 痕迹残留为 own。
-      if (!hadOwnProperty) {
+
+      stack.splice(ownerIndex, 1);
+      const successor = stack[ownerIndex];
+      if (successor) successor.previous = override.previous;
+
+      if (wasTop && ownsCurrentValue) {
         try {
-          delete (targetWindow as any)[key];
-        } catch (_) {
-          /* noop */
+          restoreWindowProperty(targetWindow, key, override.previous);
+        } catch {
+          // Continue restoring other properties.
         }
       }
+
+      if (stack.length) stacks.set(key, stack);
+      else stacks.delete(key);
     });
-    this.windowOnEventOverrides.clear();
+
+    this.windowProperties.delete(targetWindow);
+    if (!stacks.size) sharedWindowOverrides.delete(targetWindow);
   }
 
-  cleanupAll(targetWindow: Window = window): void {
+  public cleanupAll(targetWindow: Window = window): void {
     this.cleanupMainDocumentListeners(targetWindow.document);
     this.cleanupWindowOnEventOverrides(targetWindow);
   }

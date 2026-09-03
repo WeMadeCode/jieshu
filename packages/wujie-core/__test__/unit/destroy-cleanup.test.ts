@@ -82,13 +82,12 @@ describe("EventCleanupTracker 主应用 window.onXXX 污染还原", () => {
     (window as any).__leakProbeOnEvent = originalOnTestEvent;
   });
 
-  test("trackWindowOnEvent + cleanupAll 应还原主应用 window 上的属性", () => {
+  test("setWindowOnEvent + cleanupAll 应还原主应用 window 上的属性", () => {
     const tracker = new EventCleanupTracker();
     const original = "original-value";
     (window as any).__leakProbeOnEvent = original;
 
-    tracker.trackWindowOnEvent("__leakProbeOnEvent", original, true);
-    (window as any).__leakProbeOnEvent = "polluted-value";
+    tracker.setWindowOnEvent(window, "__leakProbeOnEvent", "polluted-value");
     expect((window as any).__leakProbeOnEvent).toBe("polluted-value");
 
     tracker.cleanupAll();
@@ -96,15 +95,13 @@ describe("EventCleanupTracker 主应用 window.onXXX 污染还原", () => {
     expect((window as any).__leakProbeOnEvent).toBe(original);
   });
 
-  test("trackWindowOnEvent 同一 key 仅首次记录，避免后续覆盖把脏值当原始值", () => {
+  test("同一 tracker 反复覆盖时仍还原首次接管前的值", () => {
     const tracker = new EventCleanupTracker();
     const original = "first-original";
     (window as any).__leakProbeOnEvent = original;
 
-    tracker.trackWindowOnEvent("__leakProbeOnEvent", original, true);
-    (window as any).__leakProbeOnEvent = "polluted-1";
-    tracker.trackWindowOnEvent("__leakProbeOnEvent", "polluted-1", true);
-    (window as any).__leakProbeOnEvent = "polluted-2";
+    tracker.setWindowOnEvent(window, "__leakProbeOnEvent", "polluted-1");
+    tracker.setWindowOnEvent(window, "__leakProbeOnEvent", "polluted-2");
 
     tracker.cleanupAll();
 
@@ -115,11 +112,50 @@ describe("EventCleanupTracker 主应用 window.onXXX 污染还原", () => {
     const tracker = new EventCleanupTracker();
     delete (window as any).__leakProbeOnEvent;
 
-    tracker.trackWindowOnEvent("__leakProbeOnEvent", undefined, false);
-    (window as any).__leakProbeOnEvent = "polluted";
+    tracker.setWindowOnEvent(window, "__leakProbeOnEvent", "polluted");
 
     tracker.cleanupAll();
 
     expect("__leakProbeOnEvent" in window).toBe(false);
+  });
+
+  test("交错销毁多个 sandbox 时不得覆盖当前 owner 或复活旧 handler", () => {
+    const first = new EventCleanupTracker();
+    const second = new EventCleanupTracker();
+    (window as any).__leakProbeOnEvent = "host";
+
+    first.setWindowOnEvent(window, "__leakProbeOnEvent", "first");
+    second.setWindowOnEvent(window, "__leakProbeOnEvent", "second");
+
+    first.cleanupAll();
+    expect((window as any).__leakProbeOnEvent).toBe("second");
+
+    second.cleanupAll();
+    expect((window as any).__leakProbeOnEvent).toBe("host");
+  });
+
+  test("最近写入的 owner 销毁后恢复上一个 sandbox，再恢复主应用", () => {
+    const first = new EventCleanupTracker();
+    const second = new EventCleanupTracker();
+    (window as any).__leakProbeOnEvent = "host";
+
+    first.setWindowOnEvent(window, "__leakProbeOnEvent", "first");
+    second.setWindowOnEvent(window, "__leakProbeOnEvent", "second");
+    second.cleanupAll();
+    expect((window as any).__leakProbeOnEvent).toBe("first");
+
+    first.cleanupAll();
+    expect((window as any).__leakProbeOnEvent).toBe("host");
+  });
+
+  test("主应用在 sandbox 之后写入的值不得被 cleanup 回滚", () => {
+    const tracker = new EventCleanupTracker();
+    (window as any).__leakProbeOnEvent = "host-before";
+
+    tracker.setWindowOnEvent(window, "__leakProbeOnEvent", "sandbox");
+    (window as any).__leakProbeOnEvent = "host-latest";
+    tracker.cleanupAll();
+
+    expect((window as any).__leakProbeOnEvent).toBe("host-latest");
   });
 });

@@ -1,118 +1,164 @@
 import { warn, error } from "./utils";
 import { WUJIE_ALL_EVENT, WUJIE_TIPS_NO_SUBJECT } from "./constant";
 
-export type EventObj = { [event: string]: Array<Function> };
+/**
+ * EventBus does not prescribe a payload shape. The generic tuple is inferred at
+ * each call site while the registry stores callbacks behind a non-callable
+ * `never[]` boundary. Invocation is centralized in `invoke`, where the runtime
+ * payload is deliberately applied with Reflect.
+ */
+export type EventCallback<Arguments extends unknown[] = never[]> = (...args: Arguments) => unknown;
+type StoredEventCallback = EventCallback;
 
-// 全部事件存储map
-// 除了挂载到WuJie实例上，还挂载到全局__WUJIE_INJECT变量上，防止重复创建
-export const appEventObjMap = (() => {
-  if (window.__WUJIE_INJECT?.appEventObjMap) return window.__WUJIE_INJECT.appEventObjMap;
-  else {
-    const cacheMap = window.__POWERED_BY_WUJIE__ ? window.__WUJIE.inject.appEventObjMap : new Map<String, EventObj>();
-    window.__WUJIE_INJECT = { ...window.__WUJIE_INJECT, appEventObjMap: cacheMap };
-    return cacheMap;
-  }
-})();
+export type EventObj = Record<string, StoredEventCallback[]>;
+type EventRegistry = Map<string, EventObj>;
 
-// eventBus 事件中心
+interface EventRuntimeWindow {
+  __POWERED_BY_WUJIE__?: boolean;
+  __WUJIE_INJECT?: {
+    appEventObjMap?: EventRegistry;
+  };
+  __WUJIE?: {
+    inject: {
+      appEventObjMap: EventRegistry;
+    };
+  };
+}
+
+function eraseCallbackArguments<Arguments extends unknown[]>(callback: EventCallback<Arguments>): StoredEventCallback {
+  // The registry is intentionally payload-agnostic. Preserve the original
+  // function identity while erasing only its compile-time argument tuple.
+  return callback as unknown as StoredEventCallback;
+}
+
+function createEventRegistry(): EventRegistry {
+  const runtimeWindow = window as unknown as EventRuntimeWindow;
+  const inheritedRegistry = runtimeWindow.__WUJIE_INJECT?.appEventObjMap;
+  if (inheritedRegistry) return inheritedRegistry;
+
+  const registry = runtimeWindow.__POWERED_BY_WUJIE__
+    ? runtimeWindow.__WUJIE!.inject.appEventObjMap
+    : new Map<string, EventObj>();
+
+  runtimeWindow.__WUJIE_INJECT = {
+    ...runtimeWindow.__WUJIE_INJECT,
+    appEventObjMap: registry,
+  };
+  return registry;
+}
+
+/** Shared across host and nested applications so an emit reaches every bus. */
+export const appEventObjMap = createEventRegistry();
+
+function invoke(callback: StoredEventCallback, args: readonly unknown[]): unknown {
+  return Reflect.apply(callback, undefined, args);
+}
+
+function reportListenerError(caughtError: unknown): void {
+  // utils.error historically accepts the thrown value as its sole runtime
+  // argument even though its old declaration only mentions strings.
+  Reflect.apply(error, undefined, [caughtError]);
+}
+
+function listenersFor(eventObj: EventObj, event: string): StoredEventCallback[] {
+  return eventObj[event] ?? [];
+}
+
+/** Cross-application event hub. */
 export class EventBus {
-  private id: string;
+  private readonly id: string;
   private eventObj: EventObj;
 
   constructor(id: string) {
     this.id = id;
-    this.$clear();
-    if (!appEventObjMap.get(this.id)) {
-      appEventObjMap.set(this.id, {});
+
+    // Constructing another bus with the same id intentionally replaces its
+    // subscriptions. This is relied on when a sandbox is rebuilt.
+    const existingEvents = appEventObjMap.get(id);
+    if (existingEvents) {
+      Object.keys(existingEvents).forEach((event) => delete existingEvents[event]);
+      this.eventObj = existingEvents;
+    } else {
+      this.eventObj = {};
+      appEventObjMap.set(id, this.eventObj);
     }
-    this.eventObj = appEventObjMap.get(this.id);
   }
 
-  // 监听事件
-  public $on(event: string, fn: Function): EventBus {
-    const cbs = this.eventObj[event];
-    if (!cbs) {
-      this.eventObj[event] = [fn];
-      return this;
+  public $on<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): EventBus {
+    const storedCallback = eraseCallbackArguments(callback);
+    const currentListeners = this.eventObj[event];
+
+    if (!currentListeners) {
+      this.eventObj[event] = [storedCallback];
+    } else if (!currentListeners.includes(storedCallback)) {
+      currentListeners.push(storedCallback);
     }
-    if (!cbs.includes(fn)) cbs.push(fn);
     return this;
   }
 
-  /** 任何$emit都会导致监听函数触发，第一个参数为事件名，后续的参数为$emit的参数 */
-  public $onAll(fn: (event: string, ...args: Array<any>) => any): EventBus {
-    return this.$on(WUJIE_ALL_EVENT, fn);
+  /** Listen to every emitted event; the first callback argument is its name. */
+  public $onAll<Arguments extends unknown[]>(callback: EventCallback<[event: string, ...args: Arguments]>): EventBus {
+    return this.$on(WUJIE_ALL_EVENT, callback);
   }
 
-  // 一次性监听事件
-  public $once(event: string, fn: Function): void {
-    const on = function (...args: Array<any>) {
-      this.$off(event, on);
-      fn(...args);
-    }.bind(this);
-    this.$on(event, on);
+  public $once<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): void {
+    const onceCallback: EventCallback<Arguments> = (...args: Arguments): unknown => {
+      this.$off(event, onceCallback);
+      return callback(...args);
+    };
+    this.$on(event, onceCallback);
   }
 
-  // 取消监听
-  public $off(event: string, fn: Function): EventBus {
-    const cbs = this.eventObj[event];
-    if (!event || !cbs || !cbs.length) {
+  public $off<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): EventBus {
+    const currentListeners = this.eventObj[event];
+    if (!event || !currentListeners?.length) {
       warn(`${event} ${WUJIE_TIPS_NO_SUBJECT}`);
       return this;
     }
 
-    let cb;
-    let i = cbs.length;
-    while (i--) {
-      cb = cbs[i];
-      if (cb === fn) {
-        cbs.splice(i, 1);
-        break;
-      }
-    }
+    const storedCallback = eraseCallbackArguments(callback);
+    const callbackIndex = currentListeners.lastIndexOf(storedCallback);
+    if (callbackIndex >= 0) currentListeners.splice(callbackIndex, 1);
     return this;
   }
 
-  // 取消监听$onAll
-  public $offAll(fn: Function): EventBus {
-    return this.$off(WUJIE_ALL_EVENT, fn);
+  public $offAll<Arguments extends unknown[]>(callback: EventCallback<[event: string, ...args: Arguments]>): EventBus {
+    return this.$off(WUJIE_ALL_EVENT, callback);
   }
 
-  // 发送事件
-  public $emit(event: string, ...args: Array<any>): EventBus {
-    let cbs = [];
-    let allCbs = [];
+  public $emit<Arguments extends unknown[]>(event: string, ...args: Arguments): EventBus {
+    const eventListeners: StoredEventCallback[] = [];
+    const allEventListeners: StoredEventCallback[] = [];
 
+    // Snapshot before invoking. Adds/removals during an emit only affect the
+    // next (or a recursively triggered) emission.
     appEventObjMap.forEach((eventObj) => {
-      if (eventObj[event]) cbs = cbs.concat(eventObj[event]);
-      if (eventObj[WUJIE_ALL_EVENT]) allCbs = allCbs.concat(eventObj[WUJIE_ALL_EVENT]);
+      eventListeners.push(...listenersFor(eventObj, event));
+      allEventListeners.push(...listenersFor(eventObj, WUJIE_ALL_EVENT));
     });
 
-    if (!event || (cbs.length === 0 && allCbs.length === 0)) {
+    if (!event || (eventListeners.length === 0 && allEventListeners.length === 0)) {
       warn(`${event} ${WUJIE_TIPS_NO_SUBJECT}`);
-    } else {
-      try {
-        for (let i = 0, l = cbs.length; i < l; i++) cbs[i](...args);
-        for (let i = 0, l = allCbs.length; i < l; i++) allCbs[i](event, ...args);
-      } catch (e) {
-        error(e);
-      }
+      return this;
+    }
+
+    try {
+      for (const callback of eventListeners) invoke(callback, args);
+      const allArgs: readonly unknown[] = [event, ...args];
+      for (const callback of allEventListeners) invoke(callback, allArgs);
+    } catch (caughtError: unknown) {
+      // Keep the historical fail-fast behavior: one failing listener aborts
+      // the remainder of this emission, but the error never escapes $emit.
+      reportListenerError(caughtError);
     }
     return this;
   }
 
-  // 清空当前所有的监听事件
   public $clear(): EventBus {
-    const eventObj = appEventObjMap.get(this.id) ?? {};
-    const events = Object.keys(eventObj);
-    events.forEach((event) => delete eventObj[event]);
+    Object.keys(this.eventObj).forEach((event) => delete this.eventObj[event]);
     return this;
   }
 
-  /**
-   * 销毁 EventBus：先 $clear 再从全局 appEventObjMap 中移除当前 id 的 entry。
-   * 防止 sandbox.destroy() 之后该子应用仍长期占用一项 map 条目。
-   */
   public $destroy(): void {
     this.$clear();
     appEventObjMap.delete(this.id);

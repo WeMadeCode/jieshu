@@ -55,4 +55,22 @@ describe("styleSheetElements destroy 时的清理", () => {
     expect(sandbox.styleSheetElements).toBe(arrayRef);
     expect(arrayRef.length).toBe(0);
   });
+
+  test("clearStyleSheets 应取消尚未触发的样式 patch timer", () => {
+    jest.useFakeTimers();
+    const sandbox = createMinimalSandbox();
+    const patch = jest.fn();
+    const style = document.createElement("style") as HTMLStyleElement & {
+      _patcher?: number;
+    };
+    style._patcher = window.setTimeout(patch, 50);
+    sandbox.styleSheetElements.push(style);
+
+    sandbox.clearStyleSheets();
+    jest.advanceTimersByTime(50);
+
+    expect(patch).not.toHaveBeenCalled();
+    expect(style._patcher).toBeUndefined();
+    jest.useRealTimers();
+  });
 });

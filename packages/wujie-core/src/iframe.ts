@@ -1,5 +1,4 @@
-import WuJie from "./sandbox";
-import { ScriptObject } from "./template";
+import type WuJie from "./sandbox";
 import { renderElementToContainer } from "./shadow";
 import { syncUrlToWindow } from "./sync";
 import {
@@ -9,13 +8,9 @@ import {
   isMatchSyncQueryById,
   isFunction,
   warn,
-  error,
   execHooks,
-  getCurUrl,
   getAbsolutePath,
   setAttrsToElement,
-  setTagToScript,
-  getTagFromScript,
 } from "./utils";
 import {
   documentProxyProperties,
@@ -34,9 +29,11 @@ import {
   rawWindowRemoveEventListener,
 } from "./common";
 import type { appAddEventListenerOptions } from "./common";
-import { getJsLoader } from "./plugin";
-import { WUJIE_TIPS_SCRIPT_ERROR_REQUESTED, WUJIE_DATA_FLAG } from "./constant";
-import { ScriptObjectLoader } from "./index";
+import { WUJIE_DATA_FLAG } from "./constant";
+import type { IframeAttributes } from "./contracts";
+import { compileInlineEvents, patchInlineEventSetAttribute } from "./iframe-inline-events";
+
+export { insertScriptToIframe } from "./iframe-script";
 
 const extraInstanceofConstructorNames = new Set([
   "ClipboardEvent",
@@ -67,6 +64,11 @@ const extraInstanceofConstructorNames = new Set([
   "TimeRanges",
 ]);
 
+interface CachedElementEventListener {
+  listener: EventListenerOrEventListenerObject;
+  options?: boolean | AddEventListenerOptions;
+}
+
 declare global {
   interface Window {
     // 是否存在无界
@@ -94,13 +96,17 @@ declare global {
     // 子应用共享上下文
     __WUJIE_INJECT: WuJie["inject"];
     // 记录注册在主应用中的事件
-    __WUJIE_EVENTLISTENER__: Set<{ listener: EventListenerOrEventListenerObject; type: string; options: any }>;
+    __WUJIE_EVENTLISTENER__: Set<{
+      listener: EventListenerOrEventListenerObject;
+      type: string;
+      options?: boolean | AddEventListenerOptions;
+    }>;
     // 子应用mount函数
     __WUJIE_MOUNT: () => void;
     // 子应用unmount函数
     __WUJIE_UNMOUNT: () => void | Promise<void>;
     // 获取子应用 window 的辅助函数（用于内联事件处理器），入参为子应用 appId
-    __getWujieWindow__: (appId: string) => WindowProxy;
+    __getWujieWindow__: (appId: string) => WindowProxy | null;
     // document type
     Document: typeof Document;
     // img type
@@ -125,13 +131,13 @@ declare global {
     Event: typeof Event;
     ShadowRoot: typeof ShadowRoot;
     // 注入对象
-    $wujie: { [key: string]: any };
+    $wujie: WuJie["provide"];
   }
   interface HTMLHeadElement {
-    _cacheListeners: Map<string, EventListenerOrEventListenerObject[]>;
+    _cacheListeners: Map<string, CachedElementEventListener[]>;
   }
   interface HTMLBodyElement {
-    _cacheListeners: Map<string, EventListenerOrEventListenerObject[]>;
+    _cacheListeners: Map<string, CachedElementEventListener[]>;
   }
   interface Document {
     createTreeWalker(
@@ -150,45 +156,54 @@ function patchIframeEvents(iframeWindow: Window) {
   iframeWindow.__WUJIE_EVENTLISTENER__ = iframeWindow.__WUJIE_EVENTLISTENER__ || new Set();
   iframeWindow.addEventListener = function addEventListener<K extends keyof WindowEventMap>(
     type: K,
-    listener: (this: Window, ev: WindowEventMap[K]) => any,
+    listener: (this: Window, ev: WindowEventMap[K]) => unknown,
     options?: boolean | appAddEventListenerOptions
   ) {
+    const eventListener = listener as EventListener;
     // 运行插件钩子函数
-    execHooks(iframeWindow.__WUJIE.plugins, "windowAddEventListenerHook", iframeWindow, type, listener, options);
+    execHooks(iframeWindow.__WUJIE.plugins, "windowAddEventListenerHook", iframeWindow, type, eventListener, options);
     // 相同参数多次调用 addEventListener 不会导致重复注册，所以用set。
-    iframeWindow.__WUJIE_EVENTLISTENER__.add({ type, listener, options });
+    iframeWindow.__WUJIE_EVENTLISTENER__.add({ type, listener: eventListener, options });
     if (
-      appWindowAddEventListenerEvents.concat(iframeWindow.__WUJIE.iframeAddEventListeners).includes(type) ||
+      appWindowAddEventListenerEvents.concat(iframeWindow.__WUJIE.iframeAddEventListeners ?? []).includes(type) ||
       (typeof options === "object" && options.targetWindow)
     ) {
       const targetWindow = typeof options === "object" && options.targetWindow ? options?.targetWindow : iframeWindow;
-      return rawWindowAddEventListener.call(targetWindow, type, listener, options);
+      return rawWindowAddEventListener.call(targetWindow, type, eventListener, options);
     }
     // 在子应用嵌套场景使用window.window获取真实window
-    rawWindowAddEventListener.call(window.__WUJIE_RAW_WINDOW__ || window, type, listener, options);
+    rawWindowAddEventListener.call(window.__WUJIE_RAW_WINDOW__ || window, type, eventListener, options);
   };
 
   iframeWindow.removeEventListener = function removeEventListener<K extends keyof WindowEventMap>(
     type: K,
-    listener: (this: Window, ev: WindowEventMap[K]) => any,
+    listener: (this: Window, ev: WindowEventMap[K]) => unknown,
     options?: boolean | appAddEventListenerOptions
   ) {
+    const eventListener = listener as EventListener;
     // 运行插件钩子函数
-    execHooks(iframeWindow.__WUJIE.plugins, "windowRemoveEventListenerHook", iframeWindow, type, listener, options);
+    execHooks(
+      iframeWindow.__WUJIE.plugins,
+      "windowRemoveEventListenerHook",
+      iframeWindow,
+      type,
+      eventListener,
+      options
+    );
     iframeWindow.__WUJIE_EVENTLISTENER__.forEach((o) => {
       // 这里严格一点，确保子应用销毁的时候都能销毁
-      if (o.listener === listener && o.type === type && options == o.options) {
+      if (o.listener === eventListener && o.type === type && options == o.options) {
         iframeWindow.__WUJIE_EVENTLISTENER__.delete(o);
       }
     });
     if (
-      appWindowAddEventListenerEvents.concat(iframeWindow.__WUJIE.iframeAddEventListeners).includes(type) ||
+      appWindowAddEventListenerEvents.concat(iframeWindow.__WUJIE.iframeAddEventListeners ?? []).includes(type) ||
       (typeof options === "object" && options.targetWindow)
     ) {
       const targetWindow = typeof options === "object" && options.targetWindow ? options?.targetWindow : iframeWindow;
-      return rawWindowRemoveEventListener.call(targetWindow, type, listener, options);
+      return rawWindowRemoveEventListener.call(targetWindow, type, eventListener, options);
     }
-    rawWindowRemoveEventListener.call(window.__WUJIE_RAW_WINDOW__ || window, type, listener, options);
+    rawWindowRemoveEventListener.call(window.__WUJIE_RAW_WINDOW__ || window, type, eventListener, options);
   };
 }
 
@@ -211,22 +226,22 @@ function patchIframeHistory(iframeWindow: Window, appHostPath: string, mainHostP
   const history = iframeWindow.history;
   const rawHistoryPushState = history.pushState;
   const rawHistoryReplaceState = history.replaceState;
-  history.pushState = function (data: any, title: string, url?: string): void {
+  history.pushState = function (data: unknown, title: string, url?: string): void {
     const baseUrl =
       mainHostPath + iframeWindow.location.pathname + iframeWindow.location.search + iframeWindow.location.hash;
-    const mainUrl = getAbsolutePath(url?.replace(appHostPath, ""), baseUrl);
     const ignoreFlag = url === undefined;
+    const mainUrl = ignoreFlag ? undefined : getAbsolutePath(url.replace(appHostPath, ""), baseUrl);
 
     rawHistoryPushState.call(history, data, title, ignoreFlag ? undefined : mainUrl);
     if (ignoreFlag) return;
     updateBase(iframeWindow, appHostPath, mainHostPath);
     syncUrlToWindow(iframeWindow);
   };
-  history.replaceState = function (data: any, title: string, url?: string): void {
+  history.replaceState = function (data: unknown, title: string, url?: string): void {
     const baseUrl =
       mainHostPath + iframeWindow.location.pathname + iframeWindow.location.search + iframeWindow.location.hash;
-    const mainUrl = getAbsolutePath(url?.replace(appHostPath, ""), baseUrl);
     const ignoreFlag = url === undefined;
+    const mainUrl = ignoreFlag ? undefined : getAbsolutePath(url.replace(appHostPath, ""), baseUrl);
 
     rawHistoryReplaceState.call(history, data, title, ignoreFlag ? undefined : mainUrl);
     if (ignoreFlag) return;
@@ -255,16 +270,17 @@ function updateBase(iframeWindow: Window, appHostPath: string, mainHostPath: str
 export function patchWindowEffect(iframeWindow: Window): void {
   // 属性处理函数
   function processWindowProperty(key: string): boolean {
-    const value = iframeWindow[key];
+    const value = Reflect.get(iframeWindow, key);
     try {
       if (typeof value === "function" && !isConstructable(value)) {
-        iframeWindow[key] = window[key].bind(window);
+        const parentValue = Reflect.get(window, key) as CallableFunction;
+        Reflect.set(iframeWindow, key, parentValue.bind(window));
       } else {
-        iframeWindow[key] = window[key];
+        Reflect.set(iframeWindow, key, Reflect.get(window, key));
       }
       return true;
     } catch (e) {
-      warn(e.message);
+      warn(e instanceof Error ? e.message : e);
       return false;
     }
   }
@@ -299,7 +315,7 @@ export function patchWindowEffect(iframeWindow: Window): void {
   // onEvent set
   const windowOnEvents = Object.getOwnPropertyNames(window)
     .filter((p) => /^on/.test(p))
-    .filter((e) => !appWindowOnEvent.concat(iframeWindow.__WUJIE.iframeOnEvents).includes(e));
+    .filter((e) => !appWindowOnEvent.concat(iframeWindow.__WUJIE.iframeOnEvents ?? []).includes(e));
 
   // 走主应用window
   windowOnEvents.forEach((e) => {
@@ -311,7 +327,7 @@ export function patchWindowEffect(iframeWindow: Window): void {
       Object.defineProperty(iframeWindow, e, {
         enumerable: descriptor.enumerable,
         configurable: true,
-        get: () => window[e],
+        get: () => Reflect.get(window, e),
         set:
           descriptor.writable || descriptor.set
             ? (handler) => {
@@ -319,13 +335,14 @@ export function patchWindowEffect(iframeWindow: Window): void {
                 // 还原（accessor 不能用 defineProperty descriptor 直接还原内部 handler），
                 // 防止主应用 window 被 dangling handler 长期污染。
                 const tracker = iframeWindow.__WUJIE?.eventCleanupTracker;
-                tracker?.trackWindowOnEvent(e, window[e], Object.prototype.hasOwnProperty.call(window, e));
-                window[e] = typeof handler === "function" ? handler.bind(iframeWindow) : handler;
+                const installedValue = typeof handler === "function" ? handler.bind(iframeWindow) : handler;
+                if (tracker) tracker.setWindowOnEvent(window, e, installedValue);
+                else Reflect.set(window, e, installedValue);
               }
             : undefined,
       });
     } catch (e) {
-      warn(e.message);
+      warn(e instanceof Error ? e.message : e);
     }
   });
   // 降级模式 DOM 在渲染 iframe，instanceof 需在 document 就绪后由 patchDegradeInstanceofAcrossRealms 处理
@@ -336,10 +353,117 @@ export function patchWindowEffect(iframeWindow: Window): void {
   }
 }
 
-function isDomConstructor(name: string, ctor: Function, peerWindow: Window): boolean {
+type DomConstructor = CallableFunction & { prototype?: object };
+
+interface InstanceofPatchState {
+  readonly constructor: DomConstructor;
+  readonly peers: Map<DomConstructor, number>;
+}
+
+const instanceofPatchStates = new WeakMap<DomConstructor, InstanceofPatchState>();
+const degradeInstanceofReleases = new WeakMap<Window, () => void>();
+const nativeHasInstance = Function.prototype[Symbol.hasInstance];
+
+function matchesPatchedInstance(state: InstanceofPatchState, receiver: unknown, element: unknown): boolean {
+  if (nativeHasInstance.call(receiver, element)) return true;
+  // Symbol.hasInstance is inherited by user subclasses. Only the constructor
+  // that owns this patch may broaden its realm; otherwise every peer Element
+  // would incorrectly become an instance of every application subclass.
+  if (receiver !== state.constructor) return false;
+  for (const peer of state.peers.keys()) {
+    if (nativeHasInstance.call(peer, element)) return true;
+  }
+  return false;
+}
+
+function createSharedConstructorFacade(original: DomConstructor): DomConstructor {
+  let facade!: DomConstructor;
+  let state!: InstanceofPatchState;
+  const peers = new Map<DomConstructor, number>();
+  const hasInstance = function (this: unknown, element: unknown): boolean {
+    return matchesPatchedInstance(state, this, element);
+  };
+  facade = new Proxy(original, {
+    get(target, property, receiver) {
+      return property === Symbol.hasInstance ? hasInstance : Reflect.get(target, property, receiver);
+    },
+    construct(target, argumentsList, newTarget) {
+      return Reflect.construct(target, argumentsList, newTarget === facade ? target : newTarget);
+    },
+  });
+  state = { constructor: facade, peers };
+  instanceofPatchStates.set(facade, state);
+  return facade;
+}
+
+function isolateSharedConstructor(
+  targetWindow: Window,
+  name: string,
+  targetConstructor: DomConstructor
+): DomConstructor | undefined {
+  let hostConstructor: unknown;
+  try {
+    hostConstructor = Reflect.get(window, name);
+  } catch {
+    return targetConstructor;
+  }
+  if (targetWindow === window || targetConstructor !== hostConstructor) return targetConstructor;
+
+  const descriptor = Object.getOwnPropertyDescriptor(targetWindow, name);
+  if (descriptor && !descriptor.configurable) return undefined;
+  const facade = createSharedConstructorFacade(targetConstructor);
+  try {
+    Object.defineProperty(targetWindow, name, {
+      configurable: true,
+      enumerable: descriptor?.enumerable ?? false,
+      writable: true,
+      value: facade,
+    });
+    return facade;
+  } catch (cause: unknown) {
+    console.warn(cause);
+    return undefined;
+  }
+}
+
+function registerInstanceofPeer(targetConstructor: DomConstructor, peerConstructor: DomConstructor): () => void {
+  let state = instanceofPatchStates.get(targetConstructor);
+  if (!state) {
+    const createdState: InstanceofPatchState = { constructor: targetConstructor, peers: new Map() };
+    try {
+      Object.defineProperty(targetConstructor, Symbol.hasInstance, {
+        configurable: true,
+        value: function (this: unknown, element: unknown): boolean {
+          return matchesPatchedInstance(createdState, this, element);
+        },
+      });
+      instanceofPatchStates.set(targetConstructor, createdState);
+      state = createdState;
+    } catch (cause: unknown) {
+      console.warn(cause);
+      return () => undefined;
+    }
+  }
+
+  state.peers.set(peerConstructor, (state.peers.get(peerConstructor) ?? 0) + 1);
+  const registeredState = state;
+  let registered = true;
+  return () => {
+    if (!registered) return;
+    registered = false;
+    const registrations = registeredState.peers.get(peerConstructor);
+    if (registrations === undefined) return;
+    if (registrations === 1) registeredState.peers.delete(peerConstructor);
+    else registeredState.peers.set(peerConstructor, registrations - 1);
+  };
+}
+
+function isDomConstructor(name: string, ctor: DomConstructor, peerWindow: Window): boolean {
   const prototype = ctor.prototype;
   if (!prototype) return false;
-  if (ctor === peerWindow.EventTarget || ctor === peerWindow.Event) return true;
+  const peerEventTarget = peerWindow.EventTarget as unknown as DomConstructor;
+  const peerEvent = peerWindow.Event as unknown as DomConstructor;
+  if (ctor === peerEventTarget || ctor === peerEvent) return true;
   if (prototype instanceof peerWindow.EventTarget || prototype instanceof peerWindow.Event) return true;
   if (/^(HTML|SVG|MathML).+Element$/.test(name)) return true;
   return extraInstanceofConstructorNames.has(name);
@@ -350,48 +474,33 @@ function isDomConstructor(name: string, ctor: Function, peerWindow: Window): boo
  * 非降级：targetWindow=子应用 JS iframe，peerWindow=主应用 window（DOM 在 shadowRoot）。
  * 降级：在 patchDegradeInstanceofAcrossRealms 中对渲染 iframe 与执行 iframe 双向调用。
  */
-export function patchInstanceofAcrossRealms(targetWindow: Window, peerWindow: Window = window): void {
-  // DOM 构造函数之间存在继承链（HTMLIFrameElement -> HTMLElement -> Element -> Node ...），
-  // 对构造函数的属性读取会沿这条链向上查找。因此 _hasPatch / Symbol.hasInstance 必须用 own
-  // 语义判断，否则会读到已被 patch 的祖先构造函数的值，导致 patch 被跳过或判断串味到祖先 realm。
-  const nativeHasInstance = Function.prototype[Symbol.hasInstance];
+export function patchInstanceofAcrossRealms(targetWindow: Window, peerWindow: Window = window): () => void {
+  const releases: Array<() => void> = [];
+  // DOM 构造函数之间存在继承链（HTMLIFrameElement -> HTMLElement -> Element -> Node ...）。
+  // Each concrete constructor receives its own realm registration; inherited
+  // Symbol.hasInstance behavior must not make one constructor claim a sibling.
   Object.getOwnPropertyNames(targetWindow).forEach((name) => {
-    let targetConstructor: Function & { _hasPatch?: boolean };
-    let peerConstructor: Function;
+    let targetConstructor: DomConstructor;
+    let peerConstructor: DomConstructor;
 
     try {
-      targetConstructor = targetWindow[name];
-      peerConstructor = peerWindow[name];
+      targetConstructor = Reflect.get(targetWindow, name) as DomConstructor;
+      peerConstructor = Reflect.get(peerWindow, name) as DomConstructor;
     } catch (error) {
       return;
     }
 
     if (typeof targetConstructor !== "function" || typeof peerConstructor !== "function") return;
-    if (targetConstructor === peerConstructor || Object.prototype.hasOwnProperty.call(targetConstructor, "_hasPatch"))
-      return;
+    if (targetConstructor === peerConstructor) return;
     if (!isDomConstructor(name, peerConstructor, peerWindow)) return;
-
-    try {
-      Object.defineProperties(targetConstructor, {
-        [Symbol.hasInstance]: {
-          configurable: true,
-          value(element: unknown) {
-            // 用 this 而非闭包变量，确保命中的始终是当前构造函数自己的判断。
-            // 对端也用原生 hasInstance，避免双向 patch 时 element instanceof peerConstructor 递归栈溢出。
-            if (nativeHasInstance.call(this, element)) return true;
-            return nativeHasInstance.call(peerConstructor, element);
-          },
-        },
-        _hasPatch: { value: true },
-      });
-    } catch (error) {
-      console.warn(error);
-    }
+    const isolatedConstructor = isolateSharedConstructor(targetWindow, name, targetConstructor);
+    if (isolatedConstructor) releases.push(registerInstanceofPeer(isolatedConstructor, peerConstructor));
   });
   const wujie = (targetWindow as Window & { __WUJIE?: WuJie }).__WUJIE;
   if (wujie) {
     execHooks(wujie.plugins, "windowPropertyOverride", targetWindow);
   }
+  return () => releases.forEach((release) => release());
 }
 
 /**
@@ -400,14 +509,24 @@ export function patchInstanceofAcrossRealms(targetWindow: Window, peerWindow: Wi
  */
 export function patchDegradeInstanceofAcrossRealms(appWindow: Window, renderWindow: Window): void {
   if (!renderWindow || appWindow === renderWindow) return;
-  patchInstanceofAcrossRealms(renderWindow, appWindow);
-  patchInstanceofAcrossRealms(appWindow, renderWindow);
+  degradeInstanceofReleases.get(appWindow)?.();
+  const releaseRenderPatch = patchInstanceofAcrossRealms(renderWindow, appWindow);
+  const releaseAppPatch = patchInstanceofAcrossRealms(appWindow, renderWindow);
+  degradeInstanceofReleases.set(appWindow, () => {
+    releaseRenderPatch();
+    releaseAppPatch();
+  });
 }
 
 /**
  * 记录节点的监听事件
  */
-function recordEventListeners(iframeWindow: Window) {
+function listenerUsesCapture(options?: boolean | EventListenerOptions): boolean {
+  return typeof options === "boolean" ? options : options?.capture === true;
+}
+
+/** @internal Exported for focused degradation-mode recovery tests. */
+export function recordEventListeners(iframeWindow: Window): void {
   const sandbox = iframeWindow.__WUJIE;
   iframeWindow.Node.prototype.addEventListener = function (
     type: string,
@@ -416,8 +535,14 @@ function recordEventListeners(iframeWindow: Window) {
   ): void {
     // 添加事件缓存
     const elementListenerList = sandbox.elementEventCacheMap.get(this);
+    const capture = listenerUsesCapture(options);
     if (elementListenerList) {
-      if (!elementListenerList.find((listener) => listener.type === type && listener.handler === handler)) {
+      if (
+        !elementListenerList.find(
+          (listener) =>
+            listener.type === type && listener.handler === handler && listenerUsesCapture(listener.options) === capture
+        )
+      ) {
         elementListenerList.push({ type, handler, options });
       }
     } else sandbox.elementEventCacheMap.set(this, [{ type, handler, options }]);
@@ -432,8 +557,12 @@ function recordEventListeners(iframeWindow: Window) {
     // 清除缓存
     const elementListenerList = sandbox.elementEventCacheMap.get(this);
     if (elementListenerList) {
-      const index = elementListenerList?.findIndex((ele) => ele.type === type && ele.handler === handler);
-      elementListenerList.splice(index, 1);
+      const capture = listenerUsesCapture(options);
+      const index = elementListenerList.findIndex(
+        (listener) =>
+          listener.type === type && listener.handler === handler && listenerUsesCapture(listener.options) === capture
+      );
+      if (index >= 0) elementListenerList.splice(index, 1);
     }
     if (!elementListenerList?.length) {
       sandbox.elementEventCacheMap.delete(this);
@@ -449,7 +578,11 @@ export function recoverEventListeners(rootElement: Element | ChildNode, iframeWi
   const sandbox = iframeWindow.__WUJIE;
   const elementEventCacheMap: WeakMap<
     Node,
-    Array<{ type: string; handler: EventListenerOrEventListenerObject; options: any }>
+    Array<{
+      type: string;
+      handler: EventListenerOrEventListenerObject;
+      options?: boolean | AddEventListenerOptions;
+    }>
   > = new WeakMap();
   const ElementIterator = document.createTreeWalker(rootElement, NodeFilter.SHOW_ELEMENT, null, false);
   let nextElement = ElementIterator.currentNode;
@@ -477,7 +610,11 @@ export function recoverDocumentListeners(
   const sandbox = iframeWindow.__WUJIE;
   const elementEventCacheMap: WeakMap<
     Node,
-    Array<{ type: string; handler: EventListenerOrEventListenerObject; options: any }>
+    Array<{
+      type: string;
+      handler: EventListenerOrEventListenerObject;
+      options?: boolean | AddEventListenerOptions;
+    }>
   > = new WeakMap();
   const elementListenerList = sandbox.elementEventCacheMap.get(oldRootElement);
   if (elementListenerList?.length) {
@@ -516,7 +653,9 @@ export function patchDocumentEffect(iframeWindow: Window): void {
    */
   const handlerCallbackMap: WeakMap<EventListenerOrEventListenerObject, EventListenerOrEventListenerObject> =
     new WeakMap();
-  const handlerTypeMap: WeakMap<EventListenerOrEventListenerObject, Array<string>> = new WeakMap();
+  const handlerRegistrationMap: WeakMap<EventListenerOrEventListenerObject, Set<string>> = new WeakMap();
+  const listenerRegistrationKey = (type: string, options?: boolean | AddEventListenerOptions): string =>
+    `${type}:${listenerUsesCapture(options) ? "capture" : "bubble"}`;
   iframeWindow.Document.prototype.addEventListener = function (
     type: string,
     handler: EventListenerOrEventListenerObject,
@@ -524,18 +663,17 @@ export function patchDocumentEffect(iframeWindow: Window): void {
   ): void {
     if (!handler) return;
     let callback = handlerCallbackMap.get(handler);
-    const typeList = handlerTypeMap.get(handler);
+    let registrations = handlerRegistrationMap.get(handler);
     // 设置 handlerCallbackMap
     if (!callback) {
       callback = typeof handler === "function" ? handler.bind(this) : handler;
       handlerCallbackMap.set(handler, callback);
     }
-    // 设置 handlerTypeMap
-    if (typeList) {
-      if (!typeList.includes(type)) typeList.push(type);
-    } else {
-      handlerTypeMap.set(handler, [type]);
+    if (!registrations) {
+      registrations = new Set();
+      handlerRegistrationMap.set(handler, registrations);
     }
+    registrations.add(listenerRegistrationKey(type, options));
 
     // 运行插件钩子函数
     execHooks(iframeWindow.__WUJIE.plugins, "documentAddEventListenerHook", iframeWindow, type, callback, options);
@@ -562,15 +700,13 @@ export function patchDocumentEffect(iframeWindow: Window): void {
     handler: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ): void {
-    const callback: EventListenerOrEventListenerObject = handlerCallbackMap.get(handler);
-    const typeList = handlerTypeMap.get(handler);
+    const callback = handlerCallbackMap.get(handler);
+    const registrations = handlerRegistrationMap.get(handler);
     if (callback) {
-      if (typeList?.includes(type)) {
-        typeList.splice(typeList.indexOf(type), 1);
-        if (!typeList.length) {
-          handlerCallbackMap.delete(handler);
-          handlerTypeMap.delete(handler);
-        }
+      registrations?.delete(listenerRegistrationKey(type, options));
+      if (!registrations?.size) {
+        handlerCallbackMap.delete(handler);
+        handlerRegistrationMap.delete(handler);
       }
 
       // 运行插件钩子函数
@@ -608,17 +744,21 @@ export function patchDocumentEffect(iframeWindow: Window): void {
         Object.defineProperty(iframeWindow.Document.prototype, e, {
           enumerable: descriptor.enumerable,
           configurable: true,
-          get: () => (sandbox.degrade ? sandbox.document[e] : sandbox.shadowRoot.firstElementChild[e]),
+          get: () => {
+            const target = sandbox.degrade ? sandbox.document : sandbox.shadowRoot?.firstElementChild;
+            return target ? Reflect.get(target, e) : descriptor.get?.call(iframeWindow.document);
+          },
           set:
             descriptor.writable || descriptor.set
               ? (handler) => {
                   const val = typeof handler === "function" ? handler.bind(iframeWindow.document) : handler;
-                  sandbox.degrade ? (sandbox.document[e] = val) : (sandbox.shadowRoot.firstElementChild[e] = val);
+                  const target = sandbox.degrade ? sandbox.document : sandbox.shadowRoot?.firstElementChild;
+                  if (target) Reflect.set(target, e, val);
                 }
               : undefined,
         });
       } catch (e) {
-        warn(e.message);
+        warn(e instanceof Error ? e.message : e);
       }
     });
   // 处理属性get
@@ -640,11 +780,20 @@ export function patchDocumentEffect(iframeWindow: Window): void {
       Object.defineProperty(iframeWindow.Document.prototype, propKey, {
         enumerable: descriptor.enumerable,
         configurable: true,
-        get: () => sandbox.proxyDocument[propKey],
+        get: () => {
+          const proxyDocument = sandbox.proxyDocument;
+          if (proxyDocument && (typeof proxyDocument === "object" || typeof proxyDocument === "function")) {
+            return Reflect.get(proxyDocument, propKey);
+          }
+          // Detached iframe implementations may read readyState/title from a
+          // queued task after destroy has released the proxy. Fall back to the
+          // captured native descriptor instead of touching released state.
+          return descriptor.get?.call(iframeWindow.document);
+        },
         set: undefined,
       });
     } catch (e) {
-      warn(e.message);
+      warn(e instanceof Error ? e.message : e);
     }
   });
   // 处理 document 专属事件（onfullscreenchange / onpointerlockchange 等）。
@@ -671,9 +820,13 @@ export function patchDocumentEffect(iframeWindow: Window): void {
       Object.defineProperty(iframeWindow.Document.prototype, propKey, {
         enumerable: descriptor.enumerable,
         configurable: true,
-        get: () => (sandbox.degrade ? sandbox : window).document[propKey],
+        get: () => {
+          const targetDocument = sandbox.degrade ? sandbox.document : window.document;
+          return targetDocument ? Reflect.get(targetDocument, propKey) : descriptor.get?.call(iframeWindow.document);
+        },
         set: (handler) => {
           const targetDoc = (sandbox.degrade ? sandbox : window).document;
+          if (!targetDoc) return;
           const previous = documentEventActiveListeners.get(propKey);
           if (previous) {
             targetDoc.removeEventListener(eventType, previous);
@@ -690,15 +843,22 @@ export function patchDocumentEffect(iframeWindow: Window): void {
         },
       });
     } catch (e) {
-      warn(e.message);
+      warn(e instanceof Error ? e.message : e);
     }
   });
   // process owner property
   ownerProperties.forEach((propKey) => {
+    const nativeDescriptor = Object.getOwnPropertyDescriptor(iframeWindow.document, propKey);
     Object.defineProperty(iframeWindow.document, propKey, {
       enumerable: true,
       configurable: true,
-      get: () => sandbox.proxyDocument[propKey],
+      get: () => {
+        const proxyDocument = sandbox.proxyDocument;
+        if (proxyDocument && (typeof proxyDocument === "object" || typeof proxyDocument === "function")) {
+          return Reflect.get(proxyDocument, propKey);
+        }
+        return nativeDescriptor?.get?.call(iframeWindow.document) ?? nativeDescriptor?.value;
+      },
       set: undefined,
     });
   });
@@ -723,25 +883,26 @@ function patchNodeEffect(iframeWindow: Window): void {
     else return rootNode;
   };
   iframeWindow.Node.prototype.appendChild = function <T extends Node>(node: T): T {
-    const res = rawAppendChild.call(this, node);
+    const res = rawAppendChild.call(this, node) as T;
     patchElementEffect(node, iframeWindow);
     return res;
   };
   iframeWindow.Node.prototype.insertBefore = function <T extends Node>(node: T, child: Node | null): T {
-    const res = rawInsertRule.call(this, node, child);
+    const res = rawInsertRule.call(this, node, child) as T;
     patchElementEffect(node, iframeWindow);
     return res;
   };
   iframeWindow.Node.prototype.removeChild = function <T extends Node>(node: T): T {
-    let res;
+    let res: T = node;
     try {
-      res = rawRemoveChild.call(this, node);
+      res = rawRemoveChild.call(this, node) as T;
     } catch (e) {
       console.warn(
         `Failed to removeChild: ${node.nodeName.toLowerCase()} is not a child of ${this.nodeName.toLowerCase()}, try again with parentNode attribute. `
       );
-      if (node.isConnected && isFunction(node.parentNode?.removeChild)) {
-        node.parentNode.removeChild(node);
+      const parent = node.parentNode;
+      if (node.isConnected && parent && isFunction(parent.removeChild)) {
+        res = parent.removeChild(node) as T;
       }
     }
     patchElementEffect(node, iframeWindow);
@@ -806,7 +967,7 @@ function initIframeDom(iframeWindow: Window, wujie: WuJie, mainHostPath: string,
   patchDocumentEffect(iframeWindow);
   patchNodeEffect(iframeWindow);
   patchRelativeUrlEffect(iframeWindow);
-  patchSetAttribute(iframeWindow);
+  patchInlineEventSetAttribute(iframeWindow);
 }
 
 /**
@@ -824,22 +985,51 @@ function initIframeDom(iframeWindow: Window, wujie: WuJie, mainHostPath: string,
  * 如果 trick 在当前浏览器上失败（极少见），会兜底到 fallbackSrc 真实加载，
  * 此时由于不再走 srcdoc，需要切换到 stopIframeLoading 的"立即 stop"分支。
  */
-function stopIframeLoading(iframe: HTMLIFrameElement, options: { fallbackSrc: string } | false) {
+interface IframeLoadingStopper {
+  promise: Promise<void>;
+  cancel: () => void;
+}
+
+function stopIframeLoading(iframe: HTMLIFrameElement, options: { fallbackSrc: string } | false): IframeLoadingStopper {
   const iframeWindow = iframe.contentWindow;
-  return new Promise<void>((resolve) => {
+  if (!iframeWindow) {
+    return { promise: Promise.resolve(), cancel: (): void => undefined };
+  }
+  let cancel = (): void => undefined;
+  const promise = new Promise<void>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
     // srcdoc 路径：等 srcdoc 文档就位（load 事件），然后做一次 document.open() trick
     if (options) {
       let done = false;
+      let fallbackStopper: IframeLoadingStopper | undefined;
+      let safetyTimer: ReturnType<typeof setTimeout> | undefined;
+      const cleanup = () => {
+        iframe.removeEventListener("load", runTrick);
+        if (safetyTimer !== undefined) clearTimeout(safetyTimer);
+      };
       const runTrick = () => {
         if (done) return;
         done = true;
-        const newDoc = iframeWindow.document;
-        const previousHref = iframeWindow.location.href;
+        cleanup();
+        let newDoc: Document;
+        let previousHref: string;
+        try {
+          if (!iframe.isConnected || !iframeWindow.location) return finish();
+          newDoc = iframeWindow.document;
+          previousHref = iframeWindow.location.href;
+        } catch {
+          return finish();
+        }
         newDoc.open();
         newDoc.close();
         // 按 HTML spec，document.open() 同步改写当前 document 的 URL，无需轮询
         if (iframeWindow.location.href !== previousHref) {
-          resolve();
+          finish();
           return;
         }
         // 极少数浏览器未按 spec 同步改 URL，兜底走 fallbackSrc 真实加载
@@ -847,35 +1037,52 @@ function stopIframeLoading(iframe: HTMLIFrameElement, options: { fallbackSrc: st
         // HTML spec 规定 srcdoc 优先级高于 src，必须先移除 srcdoc 才能让 src 生效
         iframe.removeAttribute("srcdoc");
         iframe.src = options.fallbackSrc;
-        stopIframeLoading(iframe, false).then(resolve);
+        fallbackStopper = stopIframeLoading(iframe, false);
+        fallbackStopper.promise.then(finish);
       };
       iframe.addEventListener("load", runTrick, { once: true });
       // 5s 安全网：load 理论上必定触发，加一层保险避免诡异挂死
-      setTimeout(runTrick, 5e3);
+      safetyTimer = setTimeout(runTrick, 5e3);
+      cancel = () => {
+        if (done && fallbackStopper) fallbackStopper.cancel();
+        done = true;
+        cleanup();
+        finish();
+      };
       return;
     }
 
     // fallback 真实加载路径：仍需轮询，赶在页面真正加载完成前 stop()
-    const oldDoc = iframeWindow.document;
+    const fallbackWindow: Window = iframeWindow;
+    const oldDoc = fallbackWindow.document;
     const loopDeadline = Date.now() + 5e3;
+    let cancelled = false;
+    let pollTimer: ReturnType<typeof setTimeout> | undefined;
     function loop() {
-      setTimeout(() => {
-        let newDoc: Document;
+      pollTimer = setTimeout(() => {
+        if (cancelled) return;
+        let newDoc: Document | null;
         try {
-          newDoc = iframeWindow.document;
-        } catch (err) {
+          newDoc = fallbackWindow.document;
+        } catch {
           newDoc = null;
         }
         if ((!newDoc || newDoc == oldDoc) && Date.now() < loopDeadline) {
           loop();
           return;
         }
-        iframeWindow.stop ? iframeWindow.stop() : newDoc.execCommand("Stop");
-        resolve();
+        if (newDoc) fallbackWindow.stop ? fallbackWindow.stop() : newDoc.execCommand("Stop");
+        finish();
       }, 1);
     }
+    cancel = () => {
+      cancelled = true;
+      if (pollTimer !== undefined) clearTimeout(pollTimer);
+      finish();
+    };
     loop();
   });
+  return { promise, cancel: () => cancel() };
 }
 
 /**
@@ -895,10 +1102,9 @@ export function patchElementEffect(
   iframeWindow: Window
 ): void {
   if (element._hasPatch) return;
-  const HasWeakRef = typeof (globalThis as any).WeakRef === "function";
-  const iframeWindowRef: { deref(): Window | undefined } = HasWeakRef
-    ? new (globalThis as any).WeakRef(iframeWindow)
-    : { deref: () => iframeWindow };
+  type WeakRefConstructor = new <T extends object>(target: T) => { deref(): T | undefined };
+  const WeakRefCtor = (globalThis as typeof globalThis & { WeakRef?: WeakRefConstructor }).WeakRef;
+  const iframeWindowRef = WeakRefCtor ? new WeakRefCtor(iframeWindow) : { deref: () => iframeWindow };
   try {
     Object.defineProperties(element, {
       baseURI: {
@@ -948,114 +1154,16 @@ export function syncIframeUrlToWindow(iframeWindow: Window): void {
 }
 
 /**
- * iframe插入脚本
- * @param scriptResult script请求结果
- * @param iframeWindow
- * @param rawElement 原始的脚本
- */
-export function insertScriptToIframe(
-  scriptResult: ScriptObject | ScriptObjectLoader,
-  iframeWindow: Window,
-  rawElement?: HTMLScriptElement
-) {
-  const { src, module, content, crossorigin, crossoriginType, async, attrs, callback, onload } =
-    scriptResult as ScriptObjectLoader;
-  const scriptElement = iframeWindow.document.createElement("script");
-  const nextScriptElement = iframeWindow.document.createElement("script");
-  const { replace, plugins, proxyLocation } = iframeWindow.__WUJIE;
-  const jsLoader = getJsLoader({ plugins, replace });
-  let code = jsLoader(content, src, getCurUrl(proxyLocation));
-  // 添加属性
-  attrs &&
-    Object.keys(attrs)
-      .filter((key) => !Object.keys(scriptResult).includes(key))
-      .forEach((key) => scriptElement.setAttribute(key, String(attrs[key])));
-
-  // 内联脚本
-  if (content) {
-    // patch location
-    if (!iframeWindow.__WUJIE.degrade && !module && attrs?.type !== "importmap") {
-      code = `(function(window, self, global, location) {
-      ${code}
-}).bind(window.__WUJIE.proxy)(
-  window.__WUJIE.proxy,
-  window.__WUJIE.proxy,
-  window.__WUJIE.proxy,
-  window.__WUJIE.proxyLocation,
-);`;
-    }
-    const descriptor = Object.getOwnPropertyDescriptor(scriptElement, "src");
-    // 部分浏览器 src 不可配置 取不到descriptor表示无该属性，可写
-    if (descriptor?.configurable || !descriptor) {
-      // 解决 webpack publicPath 为 auto 无法加载资源的问题
-      try {
-        Object.defineProperty(scriptElement, "src", { get: () => src || "" });
-      } catch (error) {
-        console.warn(error);
-      }
-    }
-  } else {
-    src && scriptElement.setAttribute("src", src);
-    crossorigin && scriptElement.setAttribute("crossorigin", crossoriginType);
-  }
-  module && scriptElement.setAttribute("type", "module");
-  scriptElement.textContent = code || "";
-  nextScriptElement.textContent =
-    "if(window.__WUJIE.execQueue && window.__WUJIE.execQueue.length){ window.__WUJIE.execQueue.shift()()}";
-
-  const container = rawDocumentQuerySelector.call(iframeWindow.document, "head");
-  const execNextScript = () => !async && container.appendChild(nextScriptElement);
-  const afterExecScript = () => {
-    onload?.();
-    execNextScript();
-  };
-
-  // 错误情况处理
-  if (/^<!DOCTYPE html/i.test(code)) {
-    error(WUJIE_TIPS_SCRIPT_ERROR_REQUESTED, scriptResult);
-    return execNextScript();
-  }
-
-  // 打标记
-  if (rawElement) {
-    setTagToScript(scriptElement, getTagFromScript(rawElement));
-    // rawElement 不为空表示这是 effect.ts 转发的动态 <script>（webpack 异步 chunk 等）。
-    // 登记到 sandbox.dynamicScriptElements，由 destroy() 统一清理，避免 iframe 残留 detach。
-    const sandboxForCleanup = iframeWindow.__WUJIE;
-    if (sandboxForCleanup && Array.isArray(sandboxForCleanup.dynamicScriptElements)) {
-      sandboxForCleanup.dynamicScriptElements.push(scriptElement);
-    }
-  }
-  // 外联脚本执行后的处理
-  const isOutlineScript = !content && src;
-  if (isOutlineScript) {
-    scriptElement.onload = afterExecScript;
-    scriptElement.onerror = afterExecScript;
-  }
-  container.appendChild(scriptElement);
-
-  // 调用回调
-  callback?.(iframeWindow);
-  // 执行 hooks
-  execHooks(plugins, "appendOrInsertElementHook", scriptElement, iframeWindow, rawElement);
-  // 内联脚本执行后的处理
-  !isOutlineScript && afterExecScript();
-}
-
-/**
  * 加载iframe替换子应用
  * @param src 地址
  * @param element
  * @param degradeAttrs
  */
-export function renderIframeReplaceApp(
-  src: string,
-  element: HTMLElement,
-  degradeAttrs: { [key: string]: any } = {}
-): void {
+export function renderIframeReplaceApp(src: string, element: HTMLElement, degradeAttrs: IframeAttributes = {}): void {
   const iframe = window.document.createElement("iframe");
   const defaultStyle = "height:100%;width:100%";
-  setAttrsToElement(iframe, { ...degradeAttrs, src, style: [defaultStyle, degradeAttrs.style].join(";") });
+  const style = (degradeAttrs as { style?: unknown }).style;
+  setAttrsToElement(iframe, { ...degradeAttrs, src, style: [defaultStyle, style].join(";") });
   renderElementToContainer(iframe, element);
 }
 
@@ -1081,14 +1189,14 @@ const SANDBOX_EMPTY_SRCDOC = "<!DOCTYPE html><html><head></head><body></body></h
  */
 export function iframeGenerator(
   sandbox: WuJie,
-  attrs: { [key: string]: any },
+  attrs: IframeAttributes,
   mainHostPath: string,
   appHostPath: string,
   appRoutePath: string
 ): HTMLIFrameElement {
   // 把用户传入的 src 拆出来作为 fallback 用，不再作为 iframe 的初始 src 直接挂载
-  const { src: userFallbackSrc, ...restAttrs } = attrs || {};
-  const fallbackSrc = userFallbackSrc || mainHostPath;
+  const { src: userFallbackSrc, ...restAttrs } = attrs as Record<string, unknown>;
+  const fallbackSrc = typeof userFallbackSrc === "string" && userFallbackSrc ? userFallbackSrc : mainHostPath;
 
   const iframe = window.document.createElement("iframe");
   const attrsMerge = {
@@ -1102,9 +1210,16 @@ export function iframeGenerator(
   window.document.body.appendChild(iframe);
 
   const iframeWindow = iframe.contentWindow;
+  if (!iframeWindow) {
+    iframe.remove();
+    throw new Error(`Unable to create an execution window for app "${sandbox.id}".`);
+  }
   // 变量需要提前注入，在入口函数通过变量防止死循环
   patchIframeVariable(iframeWindow, sandbox, appHostPath);
-  sandbox.iframeReady = stopIframeLoading(iframe, { fallbackSrc }).then(() => {
+  const loadingStopper = stopIframeLoading(iframe, { fallbackSrc });
+  sandbox.cancelIframeReady = loadingStopper.cancel;
+  sandbox.iframeReady = loadingStopper.promise.then(() => {
+    if (sandbox.destroyed || sandbox.iframe !== iframe) return;
     if (!iframeWindow.__WUJIE) {
       patchIframeVariable(iframeWindow, sandbox, appHostPath);
     }
@@ -1117,67 +1232,4 @@ export function iframeGenerator(
     }
   });
   return iframe;
-}
-
-// 内联事件编译后的统一前缀，用于幂等判断，避免重复包裹
-const WUJIE_INLINE_EVENT_PREFIX = "with(window.__getWujieWindow__(";
-
-/**
- * 将内联事件处理器包裹为子应用作用域执行的形式
- * onclick="greet()" -> onclick='with(window.__getWujieWindow__("appId")){ greet() }'
- * 已包裹过则原样返回，保证幂等
- */
-function wrapInlineEventHandler(handler: string, appId: string): string {
-  if (handler.startsWith(WUJIE_INLINE_EVENT_PREFIX)) return handler;
-  return `${WUJIE_INLINE_EVENT_PREFIX}"${appId}")){ ${handler} }`;
-}
-
-/**
- * 编译元素的内联事件处理器
- * 将 onclick="..." 编译为 onclick='with(window.__getWujieWindow__("appId")){ ... }'
- * 通过把 appId 烤进字符串字面量，避免运行时依赖被劫持的 getRootNode
- */
-function compileInlineEvents(element: Element, iframeWindow: Window): void {
-  // 只处理元素节点
-  if (element.nodeType !== Node.ELEMENT_NODE) return;
-  // 降级模式同样需要编译：函数定义在沙箱 iframe 全局，DOM 渲染在另一个渲染 iframe，
-  // 原生 onclick 跨 realm 取不到函数，必须经 with(__getWujieWindow__) 桥接
-  const appId = iframeWindow.__WUJIE?.id;
-  if (!appId) return;
-
-  // 遍历所有属性，查找内联事件
-  const attributes = Array.from(element.attributes);
-  attributes.forEach((attr) => {
-    if (attr.name.startsWith("on") && typeof attr.value === "string") {
-      const compiledHandler = wrapInlineEventHandler(attr.value, appId);
-      if (compiledHandler !== attr.value) {
-        element.setAttribute(attr.name, compiledHandler);
-      }
-    }
-  });
-
-  // 递归处理子元素
-  if (element.children && element.children.length > 0) {
-    Array.from(element.children).forEach((child) => {
-      compileInlineEvents(child, iframeWindow);
-    });
-  }
-}
-
-/**
- * 拦截 Element.prototype.setAttribute，编译内联事件属性
- * 用于捕获子应用运行期间（如 Vue 模板渲染）动态设置的内联事件
- */
-function patchSetAttribute(iframeWindow: Window): void {
-  const rawSetAttribute = iframeWindow.Element.prototype.setAttribute;
-
-  iframeWindow.Element.prototype.setAttribute = function (name: string, value: string): void {
-    // 内联事件属性进行编译，幂等避免重复包裹（降级模式同样需要，见 compileInlineEvents 说明）
-    if (name.startsWith("on") && typeof value === "string") {
-      const appId = iframeWindow.__WUJIE?.id;
-      rawSetAttribute.call(this, name, appId ? wrapInlineEventHandler(value, appId) : value);
-    } else {
-      rawSetAttribute.call(this, name, value);
-    }
-  };
 }

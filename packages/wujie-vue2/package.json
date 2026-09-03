@@ -8,17 +8,22 @@
   },
   "main": "./lib/index.js",
   "module": "./esm/index.js",
+  "types": "./index.d.ts",
   "files": [
     "esm",
     "lib",
     "index.d.ts"
   ],
   "scripts": {
-    "lib": "webpack build --mode=production --config webpack.config.js",
-    "esm": "cross-env BABEL_ENV=esm babel index.js --out-dir ./esm --source-maps",
+    "declarations": "../wujie-core/node_modules/.bin/tsc -p tsconfig.declaration.json && cp esm/index.d.ts index.d.ts",
+    "check:declarations": "../wujie-core/node_modules/.bin/tsc -p tsconfig.declaration.json && diff -u index.d.ts esm/index.d.ts",
+    "typecheck": "pnpm run check:declarations && ../wujie-core/node_modules/.bin/tsc -p tsconfig.type-test.json && ../wujie-core/node_modules/.bin/tsc -p tsconfig.consumer.json",
+    "lint": "eslint --ext .ts --ext .mts --ext .cts index.ts __test__",
+    "lib": "pnpm run typecheck && pnpm run esm && webpack build --mode=production --config webpack.config.js",
+    "esm": "../wujie-core/node_modules/.bin/tsc -p tsconfig.json",
     "prepack": "bash build.sh",
-    "start": "cross-env BABEL_ENV=esm babel index.js --out-dir ./esm --source-maps inline --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "../wujie-core/node_modules/.bin/tsc -p tsconfig.json --watch",
+    "test": "pnpm run lint && pnpm run typecheck"
   },
   "author": "yiludege",
   "publishConfig": {

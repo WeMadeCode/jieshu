@@ -1,7 +1,8 @@
 const warn = jest.fn();
+const error = jest.fn();
 
 jest.mock("../../src/utils", () => {
-  return { warn };
+  return { warn, error };
 });
 
 const wujieEvent = require("../../src/event");
@@ -143,5 +144,86 @@ describe("event bus test", () => {
     expect(mockOnAllFn).toHaveBeenCalledTimes(1);
     bus.$clear();
     tmp.$clear();
+  });
+
+  test("constructing the same id clears old listeners but keeps a shared registry entry", () => {
+    const firstBus = new EventBus("test-same-id");
+    const oldListener = jest.fn();
+    const newListener = jest.fn();
+    firstBus.$on("test", oldListener);
+
+    const secondBus = new EventBus("test-same-id");
+    secondBus.$emit("test");
+    expect(oldListener).not.toHaveBeenCalled();
+
+    firstBus.$on("test", newListener);
+    secondBus.$emit("test");
+    expect(newListener).toHaveBeenCalledTimes(1);
+    secondBus.$destroy();
+  });
+
+  test("listener changes during emit only affect the next emission", () => {
+    const bus = new EventBus("test-emit-snapshot");
+    const lateListener = jest.fn();
+    const removedListener = jest.fn();
+    const changingListener = jest.fn(() => {
+      bus.$off("test", removedListener);
+      bus.$on("test", lateListener);
+    });
+    bus.$on("test", changingListener);
+    bus.$on("test", removedListener);
+
+    bus.$emit("test");
+    expect(removedListener).toHaveBeenCalledTimes(1);
+    expect(lateListener).not.toHaveBeenCalled();
+
+    bus.$emit("test");
+    expect(removedListener).toHaveBeenCalledTimes(1);
+    expect(lateListener).toHaveBeenCalledTimes(1);
+    bus.$destroy();
+  });
+
+  test("recursive emit takes a fresh snapshot and preserves call order", () => {
+    const bus = new EventBus("test-recursive-emit");
+    const calls: string[] = [];
+    const firstListener = jest.fn((value: string) => {
+      calls.push(`first:${value}`);
+      if (value === "outer") bus.$emit("test", "inner");
+    });
+    const secondListener = jest.fn((value: string) => calls.push(`second:${value}`));
+    bus.$on("test", firstListener);
+    bus.$on("test", secondListener);
+
+    bus.$emit("test", "outer");
+    expect(calls).toEqual(["first:outer", "first:inner", "second:inner", "second:outer"]);
+    bus.$destroy();
+  });
+
+  test("once unregisters before invoking so recursive emit cannot call it twice", () => {
+    const bus = new EventBus("test-recursive-once");
+    const listener = jest.fn(() => bus.$emit("test"));
+    bus.$once("test", listener);
+
+    bus.$emit("test");
+    expect(listener).toHaveBeenCalledTimes(1);
+    bus.$destroy();
+  });
+
+  test("a thrown listener is reported and aborts the remaining snapshot", () => {
+    const bus = new EventBus("test-listener-error");
+    const thrownError = new Error("listener failed");
+    const laterListener = jest.fn();
+    const allListener = jest.fn();
+    bus.$on("test", () => {
+      throw thrownError;
+    });
+    bus.$on("test", laterListener);
+    bus.$onAll(allListener);
+
+    expect(() => bus.$emit("test")).not.toThrow();
+    expect(error).toHaveBeenCalledWith(thrownError);
+    expect(laterListener).not.toHaveBeenCalled();
+    expect(allListener).not.toHaveBeenCalled();
+    bus.$destroy();
   });
 });

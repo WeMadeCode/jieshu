@@ -18,8 +18,15 @@ describe("main vue instanceof patch", () => {
     await appInfoMountedPromise;
 
     const result = await page.evaluate((childName) => {
-      const childWindow = (window.frames as any)[childName];
-      const childProxyWindow = childWindow.__WUJIE.proxy;
+      const childFrame = Array.from(document.getElementsByTagName("iframe")).find(
+        (candidate) => candidate.name === childName
+      );
+      const childWindow = childFrame?.contentWindow;
+      const childRuntime = childWindow
+        ? (Reflect.get(childWindow, "__WUJIE") as { proxy: Window & typeof globalThis } | undefined)
+        : undefined;
+      if (!childWindow || !childRuntime) throw new Error(`Cannot find child window for ${childName}`);
+      const childProxyWindow = childRuntime.proxy;
       const mainElement = document.createElement("div");
       const mainMouseEvent = new MouseEvent("click");
       const childElement = childWindow.document.createElement("div");
@@ -30,7 +37,7 @@ describe("main vue instanceof patch", () => {
         mainEventIsChildMouseEvent: mainMouseEvent instanceof childProxyWindow.MouseEvent,
         mainEventIsChildEvent: mainMouseEvent instanceof childProxyWindow.Event,
         childElementStillWorks: childElement instanceof childProxyWindow.HTMLDivElement,
-        hasPatchMark: childProxyWindow.HTMLDivElement._hasPatch === true,
+        avoidsLegacyPatchMark: Reflect.get(childProxyWindow.HTMLDivElement, "_hasPatch") !== true,
       };
     }, appInfo.name);
 
@@ -40,7 +47,7 @@ describe("main vue instanceof patch", () => {
       mainEventIsChildMouseEvent: true,
       mainEventIsChildEvent: true,
       childElementStillWorks: true,
-      hasPatchMark: true,
+      avoidsLegacyPatchMark: true,
     });
   });
 });

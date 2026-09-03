@@ -61,11 +61,7 @@ describe("patchStylesheetElement / vite multi-style chain", () => {
     cssLoader.mockClear();
     firstStyle.insertAdjacentElement("afterend", second);
 
-    expect(cssLoader).toHaveBeenCalledWith(
-      "@font-face{font-family:'t';src:url(./t.woff)}",
-      "",
-      CUR_URL
-    );
+    expect(cssLoader).toHaveBeenCalledWith("@font-face{font-family:'t';src:url(./t.woff)}", "", CUR_URL);
     expect(sandbox.styleSheetElements).toContain(second);
   });
 
@@ -77,11 +73,7 @@ describe("patchStylesheetElement / vite multi-style chain", () => {
     cssLoader.mockClear();
     second.textContent = "@font-face{src:url(./b.woff)}";
 
-    expect(cssLoader).toHaveBeenCalledWith(
-      "@font-face{src:url(./b.woff)}",
-      "",
-      CUR_URL
-    );
+    expect(cssLoader).toHaveBeenCalledWith("@font-face{src:url(./b.woff)}", "", CUR_URL);
   });
 
   it("第二个 style 后续 innerHTML 更新应仍走 cssLoader", () => {
@@ -92,11 +84,7 @@ describe("patchStylesheetElement / vite multi-style chain", () => {
     cssLoader.mockClear();
     second.innerHTML = "body{background:url(./bg.png)}";
 
-    expect(cssLoader).toHaveBeenCalledWith(
-      "body{background:url(./bg.png)}",
-      "",
-      CUR_URL
-    );
+    expect(cssLoader).toHaveBeenCalledWith("body{background:url(./bg.png)}", "", CUR_URL);
   });
 
   it("链式 insertAdjacentElement (second → third) 应递归保持劫持", () => {
@@ -110,11 +98,7 @@ describe("patchStylesheetElement / vite multi-style chain", () => {
     cssLoader.mockClear();
     second.insertAdjacentElement("afterend", third);
 
-    expect(cssLoader).toHaveBeenCalledWith(
-      "@font-face{src:url(./c.woff)}",
-      "",
-      CUR_URL
-    );
+    expect(cssLoader).toHaveBeenCalledWith("@font-face{src:url(./c.woff)}", "", CUR_URL);
     expect(sandbox.styleSheetElements).toContain(third);
 
     // 第三个 style 的后续更新也必须被劫持
@@ -131,5 +115,12 @@ describe("patchStylesheetElement / vite multi-style chain", () => {
 
     expect(cssLoader).not.toHaveBeenCalled();
     expect(sandbox.styleSheetElements).not.toContain(link as any);
+  });
+
+  it("appendChild 非文本节点时仍调用原生方法并保留父子关系", () => {
+    const marker = document.createElement("span");
+
+    expect(firstStyle.appendChild(marker)).toBe(marker);
+    expect(marker.parentNode).toBe(firstStyle);
   });
 });

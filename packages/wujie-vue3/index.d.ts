@@ -1,12 +1,27 @@
-import { bus, preloadApp, destroyApp, setupApp, refreshApp } from "wujie";
-import type { DefineComponent, Plugin } from 'vue';
-
-declare const WujieVue: DefineComponent & Plugin & {
-  bus: typeof bus;
-  setupApp: typeof setupApp;
-  preloadApp: typeof preloadApp;
-  destroyApp: typeof destroyApp;
-  refreshApp: typeof refreshApp;
+import type { App, ComponentPublicInstance, CSSProperties, DefineComponent } from "vue";
+import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp } from "wujie";
+import type { DestroyHandler, StartOptions } from "wujie";
+export type WujieVueProps = Omit<StartOptions, "el"> & {
+    width?: string;
+    height?: string;
+    style?: CSSProperties;
 };
-
+export interface WujieVueExposed {
+    refresh(): Promise<DestroyHandler | void>;
+    destroy(): Promise<void>;
+}
+export type WujieVueInstance = ComponentPublicInstance<WujieVueProps> & WujieVueExposed;
+export interface WujieVueStatics {
+    bus: typeof bus;
+    setupApp: typeof setupApp;
+    preloadApp: typeof preloadApp;
+    destroyApp: typeof destroyApp;
+    refreshApp: typeof refreshApp;
+    clearAssetsCache: typeof clearAssetsCache;
+    install(app: App): void;
+}
+export type WujieVueComponent = DefineComponent<WujieVueProps> & WujieVueStatics & {
+    new (): WujieVueInstance;
+};
+declare const WujieVue: WujieVueComponent;
 export default WujieVue;

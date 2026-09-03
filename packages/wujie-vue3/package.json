@@ -8,17 +8,21 @@
   },
   "main": "./lib/index.js",
   "module": "./esm/index.js",
+  "types": "./index.d.ts",
   "files": [
     "esm",
     "lib",
     "index.d.ts"
   ],
   "scripts": {
-    "lib": "webpack build --mode=production --config webpack.config.js",
-    "esm": "cross-env BABEL_ENV=esm babel index.js --out-dir ./esm --source-maps",
+    "compile": "../wujie-core/node_modules/.bin/tsc",
+    "lib": "pnpm run compile && webpack build --mode=production --config webpack.config.js",
+    "esm": "pnpm run compile",
     "prepack": "bash build.sh",
-    "start": "cross-env BABEL_ENV=esm babel index.js --out-dir ./esm --source-maps inline --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "../wujie-core/node_modules/.bin/tsc --watch --preserveWatchOutput",
+    "typecheck": "../wujie-core/node_modules/.bin/tsc -p tsconfig.type-test.json",
+    "lint": "../wujie-core/node_modules/.bin/eslint --ext .ts index.ts __test__",
+    "test": "pnpm run lint && pnpm run typecheck"
   },
   "author": "yiludege",
   "publishConfig": {

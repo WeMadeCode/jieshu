@@ -8,23 +8,28 @@
   },
   "main": "./lib/index.js",
   "module": "./esm/index.js",
+  "types": "./types/index.d.ts",
   "files": [
     "esm",
     "lib",
-    "index.d.ts"
+    "types"
   ],
   "scripts": {
-    "lib": "webpack build --config webpack.config.js",
-    "esm": "cross-env BABEL_ENV=esm babel index.js --out-dir ./esm --source-maps",
+    "lib": "pnpm run esm && webpack build --config webpack.config.js",
+    "esm": "../wujie-core/node_modules/.bin/tsc --project tsconfig.json",
+    "types": "pnpm run esm",
+    "typecheck": "../wujie-core/node_modules/.bin/tsc --project tsconfig.json",
+    "typecheck:public": "../wujie-core/node_modules/.bin/tsc --project tsconfig.test.json",
+    "lint": "eslint --ext .ts,.mjs index.ts __test__",
     "prepack": "bash build.sh",
-    "start": "cross-env BABEL_ENV=esm babel index.js --out-dir ./esm --source-maps inline --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "../wujie-core/node_modules/.bin/tsc --project tsconfig.json --watch --preserveWatchOutput",
+    "test": "pnpm run lint && pnpm run typecheck && pnpm run typecheck:public && node --no-warnings --experimental-vm-modules __test__/functional-runtime.mjs"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
-    "react": ">=16.0.0"
+    "react": ">=16.8.0"
   },
   "config": {
     "unsafe-perm": true,

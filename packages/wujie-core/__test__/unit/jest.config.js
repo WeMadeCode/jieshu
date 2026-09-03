@@ -1,7 +1,25 @@
+const path = require("path");
+
 /*
  * For a detailed explanation regarding each configuration property, visit:
  * https://jestjs.io/docs/configuration
  */
+
+/**
+ * Resolve jsdom through the Jest version owned by this package. In a pnpm
+ * workspace a different Jest major may be hoisted for another package; using
+ * the bare environment name would then pair Jest 27 with an incompatible
+ * environment implementation.
+ */
+function resolveJestEnvironment() {
+  const packageRoot = path.resolve(__dirname, "../..");
+  const jestPackage = require.resolve("jest/package.json", { paths: [packageRoot] });
+  const jestCliPackage = require.resolve("jest-cli/package.json", { paths: [path.dirname(jestPackage)] });
+  const jestCorePackage = require.resolve("@jest/core/package.json", { paths: [path.dirname(jestCliPackage)] });
+  const jestConfigPackage = require.resolve("jest-config/package.json", { paths: [path.dirname(jestCorePackage)] });
+
+  return require.resolve("jest-environment-jsdom", { paths: [path.dirname(jestConfigPackage)] });
+}
 
 module.exports = {
   // All imported modules in your tests should be mocked automatically
@@ -141,7 +159,7 @@ module.exports = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "jsdom",
+  testEnvironment: resolveJestEnvironment(),
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},

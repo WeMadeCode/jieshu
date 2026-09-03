@@ -11,13 +11,22 @@
 
 export {};
 
+import type Wujie from "../../src/sandbox";
+
 const { deferStyleSheetByHref } = require("../../src/effect");
 const { addSandboxCacheWithWujie, deleteWujieById } = require("../../src/common");
 
 const WUJIE_ID = "defer-style-href-app";
 
-function createSandbox(): any {
-  return { id: WUJIE_ID, deferredStyleObservers: [] };
+function createSandbox(): Wujie {
+  return {
+    id: WUJIE_ID,
+    deferredStyleObservers: [],
+    destroyed: false,
+    iframe: document.createElement("iframe"),
+    alive: false,
+    activeFlag: true,
+  } as unknown as Wujie;
 }
 
 function makeLink(): HTMLLinkElement {
@@ -27,7 +36,7 @@ function makeLink(): HTMLLinkElement {
 }
 
 describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟加载", () => {
-  let sandbox: any;
+  let sandbox: Wujie;
 
   beforeEach(() => {
     jest.useFakeTimers();
@@ -104,16 +113,23 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
   it("子应用已销毁后再赋值 href 不应执行 loadStyleSheet", async () => {
     const link = makeLink();
     const loadStyleSheet = jest.fn();
+    const onerror = jest.fn();
+    link.onerror = onerror;
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
     // 模拟 destroy：统一 disconnect 并移除全局缓存
-    sandbox.deferredStyleObservers.forEach((o: MutationObserver) => o.disconnect());
+    [...sandbox.deferredStyleObservers].forEach((observer: Pick<MutationObserver, "disconnect">) =>
+      observer.disconnect()
+    );
     deleteWujieById(WUJIE_ID);
 
     link.setAttribute("href", "https://cdn.example.com/skin.min.css");
     await Promise.resolve();
+    jest.advanceTimersByTime(5000);
 
     expect(loadStyleSheet).not.toHaveBeenCalled();
+    expect(onerror).not.toHaveBeenCalled();
+    expect(sandbox.deferredStyleObservers).toHaveLength(0);
   });
 
   it("环境不支持 MutationObserver 时应安全跳过，不抛错也不入队", () => {
