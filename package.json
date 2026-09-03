@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "description": "极致的微前端框架",
   "private": true,
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@11.13.0",
   "scripts": {
     "build:packages": "pnpm --recursive --filter './packages/*' run build",
-    "start": "NODE_OPTIONS=--openssl-legacy-provider lerna run start --parallel",
-    "doc": "lerna run docs:dev",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider pnpm --recursive --parallel --if-present run start",
+    "doc": "pnpm --filter wujie-docs run docs:dev",
     "clean": "rimraf node_modules **/*/node_modules packages/*/lib packages/*/esm packages/*/types",
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
@@ -15,7 +15,7 @@
     "format:check": "prettier --check .",
     "typecheck": "pnpm --filter wujie-core --filter wujie-react --filter wujie-vue3 --filter wujie-docs run typecheck",
     "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck",
-    "test": "NODE_OPTIONS=--openssl-legacy-provider lerna run test --scope wujie-core",
+    "test": "NODE_OPTIONS=--openssl-legacy-provider pnpm --filter wujie-core run test",
     "test:unit": "vitest run --config vitest.config.mts --coverage",
     "test:adapters": "pnpm --filter wujie-react --filter wujie-vue3 test",
     "prepare": "husky install"
@@ -35,8 +35,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@lerna-lite/cli": "^5.6.1",
-    "@lerna-lite/run": "^5.6.1",
     "@playwright/test": "1.62.1",
     "@types/node": "22.20.1",
     "@vitest/coverage-istanbul": "4.1.11",

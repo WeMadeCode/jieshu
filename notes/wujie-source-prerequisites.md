@@ -211,7 +211,7 @@ wujie 与其他微前端方案最根本的区别：
 | **打包工具的运行时机制**            | webpack 的 `__webpack_public_path__`、`publicPath: auto`；Vite 的 ESM 产物形态。子应用接入报错八成出在这里 |
 | **UMD / 库打包格式**                | 子应用需要暴露生命周期钩子时会用到                                                                         |
 | **事件循环、微任务/宏任务**         | `execQueue` 串行执行、`MutationObserver` 回调时机、生命周期顺序                                            |
-| **pnpm workspace + lerna**          | 本仓库是 monorepo：`wujie-core` 是内核，`wujie-vue3/react` 是框架适配层                                    |
+| **pnpm workspace**                  | 本仓库是 monorepo：`wujie-core` 是内核，`wujie-vue3/react` 是框架适配层                                    |
 | **同源策略与 CSP**                  | 理解 iframe 方案的边界；某些场景 CSP 会直接禁掉 `srcdoc`                                                   |
 | **CSS 变量、`:host` / `::slotted`** | Shadow DOM 内的样式穿透手段                                                                                |
 

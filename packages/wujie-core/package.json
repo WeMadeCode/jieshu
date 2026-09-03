@@ -34,9 +34,8 @@
     "lint:fix": "pnpm run lint --fix",
     "test": "pnpm run test:unit && pnpm run test:integration",
     "test:unit": "vitest run --config __test__/unit/vitest.config.mts --coverage",
-    "kill-integration-ports": "node scripts/kill-integration-ports.js",
     "install-playwright-browser": "playwright install chromium",
-    "test:integration": "pnpm run install-playwright-browser && pnpm run kill-integration-ports && NODE_OPTIONS=--openssl-legacy-provider playwright test --config __test__/integration/playwright.config.mts"
+    "test:integration": "pnpm run install-playwright-browser && NODE_OPTIONS=--openssl-legacy-provider playwright test --config __test__/integration/playwright.config.mts"
   },
   "repository": {
     "type": "git",
