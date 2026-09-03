@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   bus,
   clearAssetsCache,
@@ -10,9 +10,9 @@ import {
   type AppController,
   type DestroyHandler,
   type StartOptions,
-} from "wujie";
+} from 'wujie';
 
-export type WujieReactProps = Omit<StartOptions, "el"> & {
+export type WujieReactProps = Omit<StartOptions, 'el'> & {
   width?: string;
   height?: string;
   style?: React.CSSProperties;
@@ -75,98 +75,99 @@ function createStartOptions(componentProps: WujieReactProps, container: HTMLDivE
 }
 
 function reportAutomaticFailure(error: unknown): void {
-  console.error("[wujie-react] failed to start application", error);
+  console.error('[wujie-react] failed to start application', error);
 }
 
-const useOwnershipEffect = typeof window === "undefined" ? React.useEffect : React.useLayoutEffect;
+const useOwnershipEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
 
-const WujieReactView = React.forwardRef<WujieReactRef, WujieReactProps>(function WujieReact(
-  componentProps,
-  forwardedRef
-) {
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const controllerRef = React.useRef<AppController | null>(null);
-  const propsRef = React.useRef(componentProps);
-  const previousIdentityRef = React.useRef<ApplicationIdentity>({
-    name: componentProps.name,
-    url: componentProps.url,
-  });
-  propsRef.current = componentProps;
-
-  const getController = React.useCallback((): AppController => {
-    if (controllerRef.current === null) controllerRef.current = createAppController();
-    return controllerRef.current;
-  }, []);
-
-  const getStartOptions = React.useCallback((): StartOptions => {
-    const container = containerRef.current;
-    if (container === null) {
-      throw new Error("WujieReact cannot start before its container is mounted");
-    }
-    return createStartOptions(propsRef.current, container);
-  }, []);
-
-  const startAutomatically = React.useCallback((): void => {
-    let operation: Promise<DestroyHandler | void>;
-    try {
-      operation = getController().start(getStartOptions());
-    } catch (error: unknown) {
-      operation = Promise.reject(error);
-    }
-    void operation.catch(reportAutomaticFailure);
-  }, [getController, getStartOptions]);
-
-  const refresh = React.useCallback((): Promise<DestroyHandler | void> => {
-    try {
-      return getController().refresh(getStartOptions());
-    } catch (error: unknown) {
-      return Promise.reject(error);
-    }
-  }, [getController, getStartOptions]);
-
-  const destroy = React.useCallback((): Promise<void> => {
-    return getController().destroy(propsRef.current.name);
-  }, [getController]);
-
-  React.useImperativeHandle(
-    forwardedRef,
-    (): WujieReactRef => ({
-      refresh,
-      destroy,
-    }),
-    [destroy, refresh]
-  );
-
-  useOwnershipEffect(() => {
-    startAutomatically();
-    return (): void => {
-      const controller = controllerRef.current;
-      controller?.dispose();
-      if (controllerRef.current === controller) controllerRef.current = null;
-    };
-  }, [startAutomatically]);
-
-  React.useEffect(() => {
-    const previousIdentity = previousIdentityRef.current;
-    const nextIdentity: ApplicationIdentity = {
+const WujieReactView = React.forwardRef<WujieReactRef, WujieReactProps>(
+  function WujieReact(componentProps, forwardedRef) {
+    const containerRef = React.useRef<HTMLDivElement | null>(null);
+    const controllerRef = React.useRef<AppController | null>(null);
+    const propsRef = React.useRef(componentProps);
+    const previousIdentityRef = React.useRef<ApplicationIdentity>({
       name: componentProps.name,
       url: componentProps.url,
-    };
-    previousIdentityRef.current = nextIdentity;
+    });
+    propsRef.current = componentProps;
 
-    if (nextIdentity.name !== previousIdentity.name || nextIdentity.url !== previousIdentity.url) {
+    const getController = React.useCallback((): AppController => {
+      if (controllerRef.current === null) controllerRef.current = createAppController();
+      return controllerRef.current;
+    }, []);
+
+    const getStartOptions = React.useCallback((): StartOptions => {
+      const container = containerRef.current;
+      if (container === null) {
+        throw new Error('WujieReact cannot start before its container is mounted');
+      }
+      return createStartOptions(propsRef.current, container);
+    }, []);
+
+    const startAutomatically = React.useCallback((): void => {
+      let operation: Promise<DestroyHandler | void>;
+      try {
+        operation = getController().start(getStartOptions());
+      } catch (error: unknown) {
+        operation = Promise.reject(error);
+      }
+      void operation.catch(reportAutomaticFailure);
+    }, [getController, getStartOptions]);
+
+    const refresh = React.useCallback((): Promise<DestroyHandler | void> => {
+      try {
+        return getController().refresh(getStartOptions());
+      } catch (error: unknown) {
+        return Promise.reject(error);
+      }
+    }, [getController, getStartOptions]);
+
+    const destroy = React.useCallback((): Promise<void> => {
+      return getController().destroy(propsRef.current.name);
+    }, [getController]);
+
+    React.useImperativeHandle(
+      forwardedRef,
+      (): WujieReactRef => ({
+        refresh,
+        destroy,
+      }),
+      [destroy, refresh],
+    );
+
+    useOwnershipEffect(() => {
       startAutomatically();
-    }
-  });
+      return (): void => {
+        const controller = controllerRef.current;
+        controller?.dispose();
+        // dispose cannot replace this component's private ref; retain the guard for future re-entrant implementations.
+        /* istanbul ignore else */
+        if (controllerRef.current === controller) controllerRef.current = null;
+      };
+    }, [startAutomatically]);
 
-  const { width, height, style } = componentProps;
-  return React.createElement("div", {
-    ref: containerRef,
-    style: { width, height, ...style },
-  });
-});
+    React.useEffect(() => {
+      const previousIdentity = previousIdentityRef.current;
+      const nextIdentity: ApplicationIdentity = {
+        name: componentProps.name,
+        url: componentProps.url,
+      };
+      previousIdentityRef.current = nextIdentity;
 
-WujieReactView.displayName = "WujieReact";
+      if (nextIdentity.name !== previousIdentity.name || nextIdentity.url !== previousIdentity.url) {
+        startAutomatically();
+      }
+    });
+
+    const { width, height, style } = componentProps;
+    return React.createElement('div', {
+      ref: containerRef,
+      style: { width, height, ...style },
+    });
+  },
+);
+
+WujieReactView.displayName = 'WujieReact';
 
 const memoizedComponent = React.memo(WujieReactView);
 const componentStatics = memoizedComponent as unknown as WujieReactStatics;
@@ -178,6 +179,6 @@ componentStatics.refreshApp = refreshApp;
 componentStatics.clearAssetsCache = clearAssetsCache;
 
 const WujieReact = memoizedComponent as unknown as WujieReactComponent;
-WujieReact.displayName = "WujieReact";
+WujieReact.displayName = 'WujieReact';
 
 export default WujieReact;

@@ -1,20 +1,13 @@
 {
+  "extends": "../../../../tsconfig.json",
   "compilerOptions": {
-    "target": "es6", 
-    "rootDirs": ["../src","../unit"],
-  
-    /* 额外的检查 */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
+    "rootDirs": ["../src", "../unit"],
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "esModuleInterop": true,
-    "noEmitOnError": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "moduleResolution": "node",
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "declaration": true,
+    "types": ["jest", "node"]
   }
 }

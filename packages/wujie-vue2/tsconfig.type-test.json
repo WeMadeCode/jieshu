@@ -2,9 +2,8 @@
   "extends": "./tsconfig.json",
   "include": ["./index.ts", "./__test__/types.mts"],
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "wujie-vue2": ["."]
+      "wujie-vue2": ["./index.ts"]
     },
     "noEmit": true,
     "declaration": false,

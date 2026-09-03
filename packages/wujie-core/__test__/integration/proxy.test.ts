@@ -1,14 +1,15 @@
-import { awaitConsoleLogMessage } from "./utils";
-import { reactMainAppInfoMap, vueMainAppInfoMap, vueMainAppNameList, reactMainAppNameList } from "./common";
+import { awaitConsoleLogMessage } from './utils';
+import { reactMainAppInfoMap, vueMainAppInfoMap, vueMainAppNameList, reactMainAppNameList } from './common';
 
 const generateTest = (
   AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainAppInfoMap,
-  AppNameList: typeof vueMainAppNameList | typeof reactMainAppNameList
+  AppNameList: typeof vueMainAppNameList | typeof reactMainAppNameList,
 ) => {
   AppNameList.slice(0, 5).forEach((appName) => {
-    it("proxy test", async () => {
-      const childApplicationMountedPromise = awaitConsoleLogMessage(page, AppInfoMap[appName].mountedMessage);
-      await page.click(AppInfoMap[appName].linkSelector);
+    it('proxy test', async () => {
+      const appInfo = (AppInfoMap as Record<string, { linkSelector: string; mountedMessage: string }>)[appName];
+      const childApplicationMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
+      await page.click(appInfo.linkSelector);
       await childApplicationMountedPromise;
 
       // 测试boundValue缓存，及作用域
@@ -18,7 +19,7 @@ const generateTest = (
         const currentObject: any = {};
         const childProxyWindow = childWindow.__WUJIE.proxy;
         childProxyWindow.addAttributeToObject = function addAttributeToObject() {
-          this.currentAttribute = "Add attribute";
+          this.currentAttribute = 'Add attribute';
         };
         childProxyWindow.addAttributeToObject.call(currentObject);
         return {
@@ -27,35 +28,35 @@ const generateTest = (
         };
       }, appName);
 
-      expect(targetCurrentAttribute).toBe("Add attribute");
+      expect(targetCurrentAttribute).toBe('Add attribute');
       expect(isSameBoundFn).toBe(true);
     });
   });
 };
 
-describe("main react startApp", () => {
+describe('main react startApp', () => {
   beforeAll(async () => {
     await page.evaluateOnNewDocument(() => {
       // 关闭预加载
       localStorage.clear();
-      localStorage.setItem("preload", "false");
-      localStorage.setItem("degrade", "false");
+      localStorage.setItem('preload', 'false');
+      localStorage.setItem('degrade', 'false');
     });
-    await page.goto("http://localhost:7700/");
+    await page.goto('http://localhost:7700/');
   });
 
   generateTest(reactMainAppInfoMap, reactMainAppNameList);
 });
 
-describe("main vue startApp", () => {
+describe('main vue startApp', () => {
   beforeAll(async () => {
     await page.evaluateOnNewDocument(() => {
       // 关闭预加载
       localStorage.clear();
-      localStorage.setItem("preload", "false");
-      localStorage.setItem("degrade", "false");
+      localStorage.setItem('preload', 'false');
+      localStorage.setItem('degrade', 'false');
     });
-    await page.goto("http://localhost:8000/");
+    await page.goto('http://localhost:8000/');
   });
 
   generateTest(vueMainAppInfoMap, vueMainAppNameList);

@@ -6,10 +6,10 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  introduction: String,
+const props = withDefaults(defineProps<{ introduction?: string }>(), {
+  introduction: '',
 });
-const [title, subTitle] = props.introduction.split("|");
+const [title, subTitle] = props.introduction.split('|');
 </script>
 <style scoped>
 .content-container {

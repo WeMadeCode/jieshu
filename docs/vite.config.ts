@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   // ssr: {
@@ -8,4 +8,4 @@ export default defineConfig({
   //   buildSsrCjsExternalHeuristics: true
   // }
   css: { preprocessorOptions: { scss: { charset: false } } },
-})
+});

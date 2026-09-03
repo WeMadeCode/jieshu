@@ -56,9 +56,9 @@ npm install wujie -S
 - 使用
 
 ```javascript
-import { startApp } from "wujie";
+import { startApp } from 'wujie';
 
-startApp({ name: "唯一id", url: "子应用路径", el: "容器", sync: true });
+startApp({ name: '唯一id', url: '子应用路径', el: '容器', sync: true });
 ```
 
 ### vue 框架
@@ -77,10 +77,10 @@ npm i wujie-vue3 -S
 
 ```javascript
 // vue2
-import WujieVue from "wujie-vue2";
+import WujieVue from 'wujie-vue2';
 Vue.use(WujieVue);
 // vue3
-import WujieVue from "wujie-vue3";
+import WujieVue from 'wujie-vue3';
 app.use(WujieVue);
 ```
 
@@ -117,7 +117,7 @@ npm i wujie-react -S
 - 引入
 
 ```javascript
-import WujieReact from "wujie-react";
+import WujieReact from 'wujie-react';
 ```
 
 - 使用
@@ -155,4 +155,4 @@ npm run start           // 启动所有应用
 
 ## One more thing
 
-无界微前端解决方案来源于团队的[**无极低代码平台**](https://wujicode.cn)。无极是专注于高效实现企业B端应用、专业的一站式低代码解决方案，是腾讯内部应用最广泛的低代码平台，360度覆盖全企业应用场景。通过无界微前端，存量页面和低代码页面可以丝滑的互相内嵌，闭环新老系统的连接。欢迎体验[【腾讯无极低代码】](https://wujicode.cn)，感受智能而高效的研发模式！
+无界微前端解决方案来源于团队的[**无极低代码平台**](https://wujicode.cn)。无极是专注于高效实现企业 B 端应用、专业的一站式低代码解决方案，是腾讯内部应用最广泛的低代码平台，360 度覆盖全企业应用场景。通过无界微前端，存量页面和低代码页面可以丝滑的互相内嵌，闭环新老系统的连接。欢迎体验[【腾讯无极低代码】](https://wujicode.cn)，感受智能而高效的研发模式！

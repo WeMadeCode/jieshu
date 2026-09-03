@@ -4,8 +4,26 @@
 
 ```bash
 pnpm i                  // 安装包依赖，务必使用pnpm
-npm run start           // 启动子应用
+pnpm start              // 启动子应用
 ```
+
+## 代码规范
+
+ESLint 和 Prettier 由 workspace 根目录统一管理，覆盖根目录、`packages/*` 和 `docs`；`examples/*` 作为独立实例工程，继续使用各自的工具链与规范。
+
+```bash
+pnpm lint               # 检查代码质量
+pnpm lint:fix           # 自动修复可修复的 ESLint 问题
+pnpm format             # 使用 Prettier 格式化
+pnpm format:check       # 仅检查格式
+pnpm typecheck          # 检查核心包、框架适配包和文档站类型
+pnpm check              # 依次执行 ESLint、Prettier 和 TypeScript 检查
+```
+
+TypeScript 6.0.3 由 workspace 根目录统一管理，库包的最低编译目标为 ES2018，不再兼容 ES5。
+维护代码的 `tsconfig` 继承根目录 `tsconfig.json`
+中的严格类型约束；编译目标、模块格式、声明产物和框架差异仍由各包的 `tsconfig` 管理。
+`examples/*` 不继承这套配置，保持示例工程自身的 TypeScript 版本与工具链。
 
 ## Issue 提交
 

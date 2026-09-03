@@ -1,26 +1,26 @@
-import importHTML, { initInlineEventHelper, processCssLoader } from "./entry";
+import importHTML, { initInlineEventHelper, processCssLoader } from './entry';
 
-export { clearAssetsCache } from "./entry";
-import WuJie from "./sandbox";
-import { defineWujieWebComponent, addLoading, getDisconnectAction } from "./shadow";
-import { processAppForHrefJump } from "./sync";
-import { getPlugins } from "./plugin";
-import { wujieSupport, isFunction, requestIdleCallback, isMatchSyncQueryById, warn, stopMainAppRun } from "./utils";
-import { assertResolvedStartOptions, resolveOptions } from "./options";
+export { clearAssetsCache } from './entry';
+import WuJie from './sandbox';
+import { defineWujieWebComponent, addLoading, getDisconnectAction } from './shadow';
+import { processAppForHrefJump } from './sync';
+import { getPlugins } from './plugin';
+import { wujieSupport, isFunction, requestIdleCallback, isMatchSyncQueryById, warn, stopMainAppRun } from './utils';
+import { assertResolvedStartOptions, resolveOptions } from './options';
 import {
   getWujieById,
   getOptionsById,
   addSandboxCacheWithOptions,
   waitForSandboxTeardown,
   isSandboxUnmountHookActive,
-} from "./common";
-import { EventBus } from "./event";
-import { RuntimeAppController } from "./controller";
-import { beginOperation, isOperationCurrent, observeOperation } from "./operation-intent";
-import type { OperationIntent } from "./operation-intent";
-import { WUJIE_TIPS_NOT_SUPPORTED } from "./constant";
-import type { CacheOptions, DestroyHandler, PreOptions, StartOptions } from "./contracts";
-import type { AppController } from "./controller";
+} from './common';
+import { EventBus } from './event';
+import { RuntimeAppController } from './controller';
+import { beginOperation, isOperationCurrent, observeOperation } from './operation-intent';
+import type { OperationIntent } from './operation-intent';
+import { WUJIE_TIPS_NOT_SUPPORTED } from './constant';
+import type { CacheOptions, DestroyHandler, PreOptions, StartOptions } from './contracts';
+import type { AppController } from './controller';
 
 export type {
   BaseOptions,
@@ -43,9 +43,9 @@ export type {
   plugin,
   preOptions,
   startOptions,
-} from "./contracts";
-export type { AppController } from "./controller";
-export type { ResolvedOptions } from "./options";
+} from './contracts';
+export type { AppController } from './controller';
+export type { ResolvedOptions } from './options';
 
 export const bus = new EventBus(Date.now().toString());
 
@@ -56,9 +56,9 @@ function isChildSelfUnmountOperation(id: string): boolean {
     const owner = window.__WUJIE;
     return Boolean(
       window.__POWERED_BY_WUJIE__ &&
-        owner?.id === id &&
-        typeof owner.waitForUnmount === "function" &&
-        owner.waitForUnmount()
+      owner?.id === id &&
+      typeof owner.waitForUnmount === 'function' &&
+      owner.waitForUnmount(),
     );
   } catch {
     return false;
@@ -341,7 +341,7 @@ function startAppWithCompletion(request: StartOptions): Promise<DestroyHandler |
   const intent = beginOperation(request.name);
   const starting = settleWhenCancelled(
     startAppNow(request, () => isOperationCurrent(intent)),
-    intent
+    intent,
   );
   return starting;
 }
@@ -354,7 +354,7 @@ export function startApp(startOptions: StartOptions): Promise<DestroyHandler | v
   // but its outward acknowledgement cannot be awaited by that same hook. This
   // matches the historical concurrent-call contract while preventing overlap.
   return pendingLifecycle
-    ? (detachReentrantOperation(starting, "start app after teardown") as Promise<DestroyHandler | void>)
+    ? (detachReentrantOperation(starting, 'start app after teardown') as Promise<DestroyHandler | void>)
     : starting;
 }
 
@@ -501,14 +501,14 @@ function destroyAppWithCompletion(id: string): Promise<void> {
   // promise cycle: the outer destroy waits for the hook while the hook waits
   // for the outer teardown tombstone. The teardown keeps running, but the
   // reentrant call must settle at the point where ownership was transferred.
-  return detachReentrantOperation(destroying, "destroy app") as Promise<void>;
+  return detachReentrantOperation(destroying, 'destroy app') as Promise<void>;
 }
 
 export function destroyApp(id: string): Promise<void> {
   const pendingLifecycle = hasPendingLifecycle(id);
   const destroying = destroyAppWithCompletion(id);
   return pendingLifecycle
-    ? (detachReentrantOperation(destroying, "destroy app after teardown") as Promise<void>)
+    ? (detachReentrantOperation(destroying, 'destroy app after teardown') as Promise<void>)
     : destroying;
 }
 
@@ -523,7 +523,7 @@ function refreshAppWithCompletion(request: StartOptions): Promise<DestroyHandler
   const intent = beginOperation(request.name);
   const canContinue = () => isOperationCurrent(intent);
   const work = destroyAppNow(request.name, canContinue).then(() =>
-    canContinue() ? startAppNow(request, canContinue) : undefined
+    canContinue() ? startAppNow(request, canContinue) : undefined,
   );
   const refreshing = settleWhenCancelled(work, intent);
   return refreshing;
@@ -534,7 +534,7 @@ export function refreshApp(startOptions: StartOptions): Promise<DestroyHandler |
   const pendingLifecycle = hasPendingLifecycle(request.name);
   const refreshing = refreshAppWithCompletion(request);
   return pendingLifecycle
-    ? (detachReentrantOperation(refreshing, "refresh app after teardown") as Promise<DestroyHandler | void>)
+    ? (detachReentrantOperation(refreshing, 'refresh app after teardown') as Promise<DestroyHandler | void>)
     : refreshing;
 }
 
@@ -553,12 +553,12 @@ export function createAppController(): AppController {
         await waitForSandboxTeardown(name);
         return;
       }
-      if (getDisconnectAction(sandbox) === "unmount") await sandbox.unmount();
+      if (getDisconnectAction(sandbox) === 'unmount') await sandbox.unmount();
       else await sandbox.destroy();
     },
     shouldPreserveOnDisconnect: (name) => {
       const sandbox = getWujieById(name);
-      return sandbox ? getDisconnectAction(sandbox) === "unmount" : false;
+      return sandbox ? getDisconnectAction(sandbox) === 'unmount' : false;
     },
   });
 }

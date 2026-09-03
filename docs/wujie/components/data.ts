@@ -4,23 +4,23 @@ export const wujieList = [
   //   url: "https://wujicode.cn/xy/app/prod/official/index",
   // },
   {
-    name: "AntDesign",
-    url: "https://ant.design/components/drawer-cn/",
+    name: 'AntDesign',
+    url: 'https://ant.design/components/drawer-cn/',
   },
   {
-    name: "React",
-    url: "https://react.dev/",
+    name: 'React',
+    url: 'https://react.dev/',
   },
   {
-    name: "Webpack",
-    url: "https://webpack.js.org/",
+    name: 'Webpack',
+    url: 'https://webpack.js.org/',
   },
   {
-    name: "Vuetify",
-    url: "https://vuetifyjs.com/en/",
+    name: 'Vuetify',
+    url: 'https://vuetifyjs.com/en/',
   },
   {
-    name: "NaiveUI",
-    url: "https://www.naiveui.com/zh-CN/os-theme/components/button",
-  }
+    name: 'NaiveUI',
+    url: 'https://www.naiveui.com/zh-CN/os-theme/components/button',
+  },
 ];

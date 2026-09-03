@@ -16,7 +16,7 @@ npm i wujie-react -S
 ## 引入
 
 ```javascript
-import WujieReact from "wujie-react";
+import WujieReact from 'wujie-react';
 
 const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = WujieReact;
 ```
@@ -76,8 +76,8 @@ await this.wujieRef.current.refresh();
 ## 原理
 
 ```javascript
-import React from "react";
-import { bus, setupApp ,preloadApp, startApp, destroyApp } from "wujie";
+import React from 'react';
+import { bus, setupApp, preloadApp, startApp, destroyApp } from 'wujie';
 
 export default class WujieReact extends React.PureComponent {
   static bus = bus;
@@ -151,7 +151,7 @@ export default class WujieReact extends React.PureComponent {
 
   render() {
     this.execStartApp();
-    return React.createElement("div", {
+    return React.createElement('div', {
       style: {
         width: this.props.width,
         height: this.props.height,

@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { wujieList } from "./data";
+import { ref, watch } from 'vue';
+import { wujieList } from './data';
 
-const emit = defineEmits(["changeUrl"]);
-const url = ref("https://ant.design/components/drawer-cn/");
+const emit = defineEmits(['changeUrl']);
+const url = ref('https://ant.design/components/drawer-cn/');
 const flag = ref(false);
 const currentIndex = ref(0);
-function preventDefault(event) {
+function preventDefault(event: Event) {
   event.preventDefault;
   const reg = /(https):\/\/([\w.]+\/?)\S*/;
   if (reg.test(url.value)) {
     flag.value = !flag.value;
-    emit("changeUrl", [url.value, flag.value]);
+    emit('changeUrl', [url.value, flag.value]);
   }
 }
 const props = defineProps<{
@@ -20,14 +20,14 @@ const props = defineProps<{
 watch(
   () => props.baseUrl,
   (newValue) => {
-    url.value = newValue!;
-  }
+    if (newValue) url.value = newValue;
+  },
 );
 
-function changeWujieUrl(item: { url: String }, index: number) {
+function changeWujieUrl(item: { url: string }, index: number) {
   flag.value = !flag.value;
   currentIndex.value = index;
-  emit("changeUrl", [item.url, flag.value]);
+  emit('changeUrl', [item.url, flag.value]);
 }
 </script>
 <template>
@@ -57,6 +57,7 @@ function changeWujieUrl(item: { url: String }, index: number) {
       <span>快速前往:</span>
       <div
         v-for="(item, index) in wujieList"
+        :key="item.url"
         :class="['wujieItem', { chooseItem: index === currentIndex }]"
         @click="changeWujieUrl(item, index)"
       >
@@ -105,7 +106,9 @@ function changeWujieUrl(item: { url: String }, index: number) {
   border-bottom: 1px solid var(--vp-c-divider-light);
   padding: 32px 24px;
   background: var(--vp-c-bg-soft);
-  transition: border-color 0.5s, background-color 0.5s;
+  transition:
+    border-color 0.5s,
+    background-color 0.5s;
   display: flex;
   flex-direction: column;
 }
@@ -155,7 +158,9 @@ function changeWujieUrl(item: { url: String }, index: number) {
   font-size: 16px;
   width: 100%;
   color: var(--vp-c-text-1);
-  transition: border-color 0.25s, background-color 0.25s;
+  transition:
+    border-color 0.25s,
+    background-color 0.25s;
 }
 .input:hover,
 .input:focus {

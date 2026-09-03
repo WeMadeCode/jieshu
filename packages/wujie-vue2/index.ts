@@ -1,15 +1,7 @@
-import Vue from "vue";
-import type { CreateElement, PropOptions, PropType, VueConstructor, VNode, VNodeData } from "vue";
-import type { AppController, DestroyHandler, StartOptions } from "wujie";
-import {
-  bus,
-  clearAssetsCache,
-  createAppController,
-  destroyApp,
-  preloadApp,
-  refreshApp,
-  setupApp,
-} from "wujie";
+import Vue from 'vue';
+import type { CreateElement, PropOptions, PropType, VueConstructor, VNode, VNodeData } from 'vue';
+import type { AppController, DestroyHandler, StartOptions } from 'wujie';
+import { bus, clearAssetsCache, createAppController, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie';
 
 type WujieStyleValue = string | number | undefined;
 type StandardStyleProperty = {
@@ -20,8 +12,8 @@ type FlexibleStyle = Record<string, WujieStyleValue>;
 
 export type WujieVueStyle = StandardStyle | FlexibleStyle;
 
-export type WujieVueProps = Omit<StartOptions, "el" | "url"> &
-  Partial<Pick<StartOptions, "url">> & {
+export type WujieVueProps = Omit<StartOptions, 'el' | 'url'> &
+  Partial<Pick<StartOptions, 'url'>> & {
     width?: string;
     height?: string;
     style?: WujieVueStyle;
@@ -60,48 +52,47 @@ interface AdapterMethods extends WujieVueExposed {
 type AdapterInstance = Vue & Readonly<WujieVueProps> & AdapterState & AdapterMethods;
 
 const DOM_ELEMENT_TYPE: PropType<HTMLElement> =
-  typeof HTMLElement === "undefined" ? (Object as PropType<HTMLElement>) : HTMLElement;
+  typeof HTMLElement === 'undefined' ? (Object as PropType<HTMLElement>) : HTMLElement;
 
 function prop<Value>(type: PropType<Value>, defaultValue?: Value): PropOptions<Value> {
   return { type, default: defaultValue };
 }
 
 const componentProps = {
-  width: prop<string>(String, ""),
-  height: prop<string>(String, ""),
+  width: prop<string>(String, ''),
+  height: prop<string>(String, ''),
   // Kept as a prop for compatibility with the existing wrapper API.
-  // eslint-disable-next-line vue/no-reserved-props
   style: prop<WujieVueStyle>(Object),
-  name: prop<string>(String, ""),
-  url: prop<string>(String, ""),
-  html: prop<DefinedStartOption<"html">>(String),
-  loading: prop<DefinedStartOption<"loading">>(DOM_ELEMENT_TYPE),
-  replace: prop<DefinedStartOption<"replace">>(Function),
-  fetch: prop<DefinedStartOption<"fetch">>(Function),
-  props: prop<DefinedStartOption<"props">>(Object),
-  attrs: prop<DefinedStartOption<"attrs">>(Object),
-  degradeAttrs: prop<DefinedStartOption<"degradeAttrs">>(Object),
-  sync: prop<DefinedStartOption<"sync">>(Boolean),
-  prefix: prop<DefinedStartOption<"prefix">>(Object),
-  fiber: prop<DefinedStartOption<"fiber">>(Boolean),
-  alive: prop<DefinedStartOption<"alive">>(Boolean),
-  degrade: prop<DefinedStartOption<"degrade">>(Boolean),
-  plugins: prop<DefinedStartOption<"plugins">>(Array),
-  iframeAddEventListeners: prop<DefinedStartOption<"iframeAddEventListeners">>(Array),
-  iframeOnEvents: prop<DefinedStartOption<"iframeOnEvents">>(Array),
-  beforeLoad: prop<DefinedStartOption<"beforeLoad">>(Function),
-  beforeMount: prop<DefinedStartOption<"beforeMount">>(Function),
-  afterMount: prop<DefinedStartOption<"afterMount">>(Function),
-  beforeUnmount: prop<DefinedStartOption<"beforeUnmount">>(Function),
-  afterUnmount: prop<DefinedStartOption<"afterUnmount">>(Function),
-  activated: prop<DefinedStartOption<"activated">>(Function),
-  deactivated: prop<DefinedStartOption<"deactivated">>(Function),
-  loadError: prop<DefinedStartOption<"loadError">>(Function),
+  name: prop<string>(String, ''),
+  url: prop<string>(String, ''),
+  html: prop<DefinedStartOption<'html'>>(String),
+  loading: prop<DefinedStartOption<'loading'>>(DOM_ELEMENT_TYPE),
+  replace: prop<DefinedStartOption<'replace'>>(Function),
+  fetch: prop<DefinedStartOption<'fetch'>>(Function),
+  props: prop<DefinedStartOption<'props'>>(Object),
+  attrs: prop<DefinedStartOption<'attrs'>>(Object),
+  degradeAttrs: prop<DefinedStartOption<'degradeAttrs'>>(Object),
+  sync: prop<DefinedStartOption<'sync'>>(Boolean),
+  prefix: prop<DefinedStartOption<'prefix'>>(Object),
+  fiber: prop<DefinedStartOption<'fiber'>>(Boolean),
+  alive: prop<DefinedStartOption<'alive'>>(Boolean),
+  degrade: prop<DefinedStartOption<'degrade'>>(Boolean),
+  plugins: prop<DefinedStartOption<'plugins'>>(Array),
+  iframeAddEventListeners: prop<DefinedStartOption<'iframeAddEventListeners'>>(Array),
+  iframeOnEvents: prop<DefinedStartOption<'iframeOnEvents'>>(Array),
+  beforeLoad: prop<DefinedStartOption<'beforeLoad'>>(Function),
+  beforeMount: prop<DefinedStartOption<'beforeMount'>>(Function),
+  afterMount: prop<DefinedStartOption<'afterMount'>>(Function),
+  beforeUnmount: prop<DefinedStartOption<'beforeUnmount'>>(Function),
+  afterUnmount: prop<DefinedStartOption<'afterUnmount'>>(Function),
+  activated: prop<DefinedStartOption<'activated'>>(Function),
+  deactivated: prop<DefinedStartOption<'deactivated'>>(Function),
+  loadError: prop<DefinedStartOption<'loadError'>>(Function),
 };
 
 function optionsFromInstance(instance: AdapterInstance): StartOptions {
-  const container = instance.$refs.wujieContainer;
-  if (!container) throw new Error("WujieVue cannot start before its container is mounted");
+  const container = instance.$refs['wujieContainer'];
+  if (!container) throw new Error('WujieVue cannot start before its container is mounted');
 
   return {
     name: instance.name,
@@ -135,7 +126,7 @@ function optionsFromInstance(instance: AdapterInstance): StartOptions {
 }
 
 const component = Vue.extend<AdapterState, AdapterMethods, Record<string, never>, WujieVueProps>({
-  name: "WujieVue",
+  name: 'WujieVue',
   props: componentProps,
 
   beforeCreate(): void {
@@ -152,7 +143,7 @@ const component = Vue.extend<AdapterState, AdapterMethods, Record<string, never>
       (): readonly [string, string | undefined] => [this.name, this.url],
       (): void => {
         void this.startAutomatically();
-      }
+      },
     );
   },
 
@@ -175,7 +166,7 @@ const component = Vue.extend<AdapterState, AdapterMethods, Record<string, never>
         operation = Promise.reject(cause);
       }
       return operation.catch((cause: unknown): void => {
-        console.error("[wujie-vue2] failed to start application", cause);
+        console.error('[wujie-vue2] failed to start application', cause);
       });
     },
 
@@ -199,9 +190,9 @@ const component = Vue.extend<AdapterState, AdapterMethods, Record<string, never>
       height: this.height,
       ...compatibleStyle,
     };
-    return createElement("div", {
-      ref: "wujieContainer",
-      style: mergedStyle as unknown as VNodeData["style"],
+    return createElement('div', {
+      ref: 'wujieContainer',
+      style: mergedStyle as unknown as VNodeData['style'],
     });
   },
 });
@@ -214,7 +205,7 @@ WujieVue.destroyApp = destroyApp;
 WujieVue.refreshApp = refreshApp;
 WujieVue.clearAssetsCache = clearAssetsCache;
 WujieVue.install = (VueConstructor: VueConstructor): void => {
-  VueConstructor.component("WujieVue", component);
+  VueConstructor.component('WujieVue', component);
 };
 
 export default WujieVue;

@@ -7,7 +7,7 @@ sidebarDepth: 2
 ## 快速开始
 
 :::tip
-wujie 可以通过脚手架来定制需要的主子应用框架的Demo，以及其他特性
+wujie 可以通过脚手架来定制需要的主子应用框架的 Demo，以及其他特性
 :::
 
 ### 安装 wujie-skill

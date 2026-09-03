@@ -1,11 +1,11 @@
-import { insertScriptToIframe } from "../../src/iframe";
-import { WUJIE_SCRIPT_ID } from "../../src/constant";
-import { cancelSandboxDynamicResources } from "../../src/sandbox-runtime";
-import type Wujie from "../../src/sandbox";
+import { insertScriptToIframe } from '../../src/iframe';
+import { WUJIE_SCRIPT_ID } from '../../src/constant';
+import { cancelSandboxDynamicResources } from '../../src/sandbox-runtime';
+import type Wujie from '../../src/sandbox';
 
 interface ScriptTestSandbox {
   replace: (code: string) => string;
-  plugins: Window["__WUJIE"]["plugins"];
+  plugins: Window['__WUJIE']['plugins'];
   proxyLocation: Location;
   degrade: boolean;
   proxy: Window;
@@ -20,7 +20,7 @@ function createScriptEnvironment(degrade = false): {
   iframeWindow: Window;
   sandbox: ScriptTestSandbox;
 } {
-  const iframe = document.createElement("iframe");
+  const iframe = document.createElement('iframe');
   document.body.appendChild(iframe);
   const iframeWindow = iframe.contentWindow as Window;
   const sandbox: ScriptTestSandbox = {
@@ -34,83 +34,80 @@ function createScriptEnvironment(degrade = false): {
     activeFlag: true,
     destroyed: false,
   };
-  iframeWindow.__WUJIE = sandbox as unknown as Window["__WUJIE"];
+  iframeWindow.__WUJIE = sandbox as unknown as Window['__WUJIE'];
   return { iframe, iframeWindow, sandbox };
 }
 
-describe("iframe script execution pipeline", () => {
+describe('iframe script execution pipeline', () => {
   afterEach(() => {
-    document.body.innerHTML = "";
+    document.body.innerHTML = '';
     jest.restoreAllMocks();
   });
 
-  it("configures inline scripts, runs callbacks, and advances the serial queue", () => {
+  it('configures inline scripts, runs callbacks, and advances the serial queue', () => {
     const { iframeWindow } = createScriptEnvironment();
     const callback = jest.fn();
     const onload = jest.fn();
 
     insertScriptToIframe(
       {
-        content: "window.inlineExecuted = true;",
-        src: "https://child.example/inline.js",
-        attrs: { nonce: "abc" },
+        content: 'window.inlineExecuted = true;',
+        src: 'https://child.example/inline.js',
+        attrs: { nonce: 'abc' },
         callback,
         onload,
       },
-      iframeWindow
+      iframeWindow,
     );
 
-    const scripts = iframeWindow.document.head.querySelectorAll("script");
+    const scripts = iframeWindow.document.head.querySelectorAll('script');
     expect(scripts).toHaveLength(2);
-    expect(scripts[0].textContent).toContain(".bind(window.__WUJIE.proxy)");
-    expect(scripts[0].getAttribute("nonce")).toBe("abc");
-    expect(scripts[0].src).toBe("https://child.example/inline.js");
-    expect(scripts[1].textContent).toContain("execQueue.shift()()");
+    expect(scripts[0].textContent).toContain('.bind(window.__WUJIE.proxy)');
+    expect(scripts[0].getAttribute('nonce')).toBe('abc');
+    expect(scripts[0].src).toBe('https://child.example/inline.js');
+    expect(scripts[1].textContent).toContain('execQueue.shift()()');
     expect(callback).toHaveBeenCalledWith(iframeWindow);
     expect(onload).toHaveBeenCalledTimes(1);
   });
 
-  it("waits for an external script event before advancing and tracks dynamic scripts", () => {
+  it('waits for an external script event before advancing and tracks dynamic scripts', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
-    const rawElement = iframeWindow.document.createElement("script");
-    rawElement.setAttribute(WUJIE_SCRIPT_ID, "dynamic-7");
+    const rawElement = iframeWindow.document.createElement('script');
+    rawElement.setAttribute(WUJIE_SCRIPT_ID, 'dynamic-7');
     const onload = jest.fn();
 
     insertScriptToIframe(
-      { src: "https://cdn.example/chunk.js", crossorigin: true, crossoriginType: "anonymous", onload },
+      { src: 'https://cdn.example/chunk.js', crossorigin: true, crossoriginType: 'anonymous', onload },
       iframeWindow,
-      rawElement
+      rawElement,
     );
 
-    const inserted = iframeWindow.document.head.querySelector("script") as HTMLScriptElement;
-    expect(iframeWindow.document.head.querySelectorAll("script")).toHaveLength(1);
-    expect(inserted.getAttribute(WUJIE_SCRIPT_ID)).toBe("dynamic-7");
-    expect(inserted.getAttribute("crossorigin")).toBe("anonymous");
+    const inserted = iframeWindow.document.head.querySelector('script') as HTMLScriptElement;
+    expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(1);
+    expect(inserted.getAttribute(WUJIE_SCRIPT_ID)).toBe('dynamic-7');
+    expect(inserted.getAttribute('crossorigin')).toBe('anonymous');
     expect(sandbox.dynamicScriptElements).toEqual([inserted]);
 
-    inserted.dispatchEvent(new Event("load"));
+    inserted.dispatchEvent(new Event('load'));
     expect(onload).toHaveBeenCalledTimes(1);
-    expect(iframeWindow.document.head.querySelectorAll("script")).toHaveLength(2);
+    expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(2);
     expect(inserted.onload).toBeNull();
     expect(inserted.onerror).toBeNull();
-    inserted.dispatchEvent(new Event("error"));
+    inserted.dispatchEvent(new Event('error'));
     expect(onload).toHaveBeenCalledTimes(1);
   });
 
-  it("reports a native error separately and still advances the serial queue", async () => {
+  it('reports a native error separately and still advances the serial queue', async () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const onload = jest.fn();
     const onerror = jest.fn();
     const next = jest.fn();
     sandbox.execQueue.push(next);
 
-    const handle = insertScriptToIframe(
-      { src: "https://cdn.example/missing.js", onload, onerror },
-      iframeWindow
-    );
-    handle.element.dispatchEvent(new Event("error"));
+    const handle = insertScriptToIframe({ src: 'https://cdn.example/missing.js', onload, onerror }, iframeWindow);
+    handle.element.dispatchEvent(new Event('error'));
 
-    await expect(handle.completion).resolves.toBe("error");
+    await expect(handle.completion).resolves.toBe('error');
     expect(onerror).toHaveBeenCalledTimes(1);
     expect(onload).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledTimes(1);
@@ -118,15 +115,11 @@ describe("iframe script execution pipeline", () => {
     expect(handle.element.onerror).toBeNull();
   });
 
-  it("cancels a pending native script without advancing or retaining its node", () => {
+  it('cancels a pending native script without advancing or retaining its node', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
-    const rawElement = iframeWindow.document.createElement("script");
+    const rawElement = iframeWindow.document.createElement('script');
     const onload = jest.fn();
-    const handle = insertScriptToIframe(
-      { src: "https://cdn.example/pending.js", onload },
-      iframeWindow,
-      rawElement
-    );
+    const handle = insertScriptToIframe({ src: 'https://cdn.example/pending.js', onload }, iframeWindow, rawElement);
     const inserted = handle.element;
 
     expect(inserted.isConnected).toBe(true);
@@ -137,88 +130,88 @@ describe("iframe script execution pipeline", () => {
     expect(inserted.onload).toBeNull();
     expect(inserted.onerror).toBeNull();
     expect(sandbox.dynamicScriptElements).toEqual([]);
-    inserted.dispatchEvent(new Event("load"));
+    inserted.dispatchEvent(new Event('load'));
     expect(onload).not.toHaveBeenCalled();
-    expect(iframeWindow.document.head.querySelectorAll("script")).toHaveLength(0);
+    expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(0);
   });
 
-  it("registers a pending static native script for sandbox teardown", () => {
+  it('registers a pending static native script for sandbox teardown', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const onload = jest.fn();
-    const handle = insertScriptToIframe({ src: "https://cdn.example/static-pending.js", onload }, iframeWindow);
+    const handle = insertScriptToIframe({ src: 'https://cdn.example/static-pending.js', onload }, iframeWindow);
 
     expect(handle.element.isConnected).toBe(true);
-    cancelSandboxDynamicResources(sandbox as unknown as Wujie, "unmount");
+    cancelSandboxDynamicResources(sandbox as unknown as Wujie, 'unmount');
 
     expect(handle.element.isConnected).toBe(false);
-    handle.element.dispatchEvent(new Event("load"));
+    handle.element.dispatchEvent(new Event('load'));
     expect(onload).not.toHaveBeenCalled();
   });
 
-  it("keeps transformed module code cancellable until its native load event", () => {
+  it('keeps transformed module code cancellable until its native load event', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
-    const rawElement = iframeWindow.document.createElement("script");
+    const rawElement = iframeWindow.document.createElement('script');
     const onload = jest.fn();
     const handle = insertScriptToIframe(
-      { content: "export default 1", module: true, onload },
+      { content: 'export default 1', module: true, onload },
       iframeWindow,
-      rawElement
+      rawElement,
     );
 
-    expect(handle.element.getAttribute("type")).toBe("module");
+    expect(handle.element.getAttribute('type')).toBe('module');
     expect(onload).not.toHaveBeenCalled();
     expect(sandbox.dynamicScriptElements).toEqual([handle.element]);
 
     handle.cancel();
-    handle.element.dispatchEvent(new Event("load"));
+    handle.element.dispatchEvent(new Event('load'));
     expect(onload).not.toHaveBeenCalled();
     expect(handle.element.isConnected).toBe(false);
     expect(sandbox.dynamicScriptElements).toEqual([]);
   });
 
-  it("ignores a native script event delivered after its sandbox was destroyed", () => {
+  it('ignores a native script event delivered after its sandbox was destroyed', () => {
     const { iframeWindow } = createScriptEnvironment();
     const onload = jest.fn();
 
-    insertScriptToIframe({ src: "https://cdn.example/late.js", onload }, iframeWindow);
-    const inserted = iframeWindow.document.head.querySelector("script") as HTMLScriptElement;
+    insertScriptToIframe({ src: 'https://cdn.example/late.js', onload }, iframeWindow);
+    const inserted = iframeWindow.document.head.querySelector('script') as HTMLScriptElement;
     const sandbox = iframeWindow.__WUJIE;
     sandbox.destroyed = true;
-    iframeWindow.__WUJIE = null;
+    Reflect.set(iframeWindow, '__WUJIE', null);
 
-    inserted.dispatchEvent(new Event("load"));
+    inserted.dispatchEvent(new Event('load'));
 
     expect(onload).not.toHaveBeenCalled();
-    expect(iframeWindow.document.head.querySelectorAll("script")).toHaveLength(1);
+    expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(1);
     expect(inserted.onload).toBeNull();
     expect(inserted.onerror).toBeNull();
   });
 
-  it("reports an HTML response and advances without inserting the invalid script", () => {
+  it('reports an HTML response and advances without inserting the invalid script', () => {
     const { iframeWindow } = createScriptEnvironment(true);
-    const consoleError = jest.spyOn(console, "error").mockImplementation(() => undefined);
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     const callback = jest.fn();
 
-    insertScriptToIframe({ content: "<!DOCTYPE html><title>not javascript</title>", callback }, iframeWindow);
+    insertScriptToIframe({ content: '<!DOCTYPE html><title>not javascript</title>', callback }, iframeWindow);
 
     expect(consoleError).toHaveBeenCalled();
     expect(callback).not.toHaveBeenCalled();
-    const scripts = iframeWindow.document.head.querySelectorAll("script");
+    const scripts = iframeWindow.document.head.querySelectorAll('script');
     expect(scripts).toHaveLength(1);
-    expect(scripts[0].textContent).toContain("execQueue.shift()");
+    expect(scripts[0].textContent).toContain('execQueue.shift()');
   });
 
-  it("accepts an external preset with no fetched content when js loaders inspect the code", () => {
+  it('accepts an external preset with no fetched content when js loaders inspect the code', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     sandbox.plugins = [{ jsLoader: (code: string) => code.trim() }];
 
-    expect(() => insertScriptToIframe({ src: "https://cdn.example/preset.js" }, iframeWindow)).not.toThrow();
-    expect(iframeWindow.document.head.querySelector("script")?.getAttribute("src")).toBe(
-      "https://cdn.example/preset.js"
+    expect(() => insertScriptToIframe({ src: 'https://cdn.example/preset.js' }, iframeWindow)).not.toThrow();
+    expect(iframeWindow.document.head.querySelector('script')?.getAttribute('src')).toBe(
+      'https://cdn.example/preset.js',
     );
   });
 
-  it("keeps mixed-case import-map JSON byte-for-byte outside transforms and classic wrapping", () => {
+  it('keeps mixed-case import-map JSON byte-for-byte outside transforms and classic wrapping', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const replace = jest.fn((code: string) => `/* replaced */${code}`);
     const jsLoader = jest.fn((code: string) => `${code};`);
@@ -226,17 +219,17 @@ describe("iframe script execution pipeline", () => {
     sandbox.plugins = [{ jsLoader }];
     const importMap = '{"imports":{"pkg":"https://cdn.example/pkg.js"}}';
 
-    insertScriptToIframe({ content: importMap, attrs: { type: "ImportMap" } }, iframeWindow);
+    insertScriptToIframe({ content: importMap, attrs: { type: 'ImportMap' } }, iframeWindow);
 
-    const inserted = iframeWindow.document.head.querySelector("script") as HTMLScriptElement;
-    expect(inserted.getAttribute("type")).toBe("ImportMap");
+    const inserted = iframeWindow.document.head.querySelector('script') as HTMLScriptElement;
+    expect(inserted.getAttribute('type')).toBe('ImportMap');
     expect(inserted.textContent).toBe(importMap);
-    expect(inserted.textContent).not.toContain(".bind(window.__WUJIE.proxy)");
+    expect(inserted.textContent).not.toContain('.bind(window.__WUJIE.proxy)');
     expect(replace).not.toHaveBeenCalled();
     expect(jsLoader).not.toHaveBeenCalled();
   });
 
-  it("does not inject a script when its loader synchronously invalidates the owner", async () => {
+  it('does not inject a script when its loader synchronously invalidates the owner', async () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const callback = jest.fn();
     sandbox.plugins = [
@@ -249,29 +242,29 @@ describe("iframe script execution pipeline", () => {
       },
     ];
 
-    const handle = insertScriptToIframe({ content: "window.staleCodeExecuted = true;", callback }, iframeWindow);
-    await expect(handle.completion).resolves.toBe("cancelled");
+    const handle = insertScriptToIframe({ content: 'window.staleCodeExecuted = true;', callback }, iframeWindow);
+    await expect(handle.completion).resolves.toBe('cancelled');
 
     expect(handle.element.isConnected).toBe(false);
-    expect(iframeWindow.document.head.querySelectorAll("script")).toHaveLength(0);
+    expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(0);
     expect(callback).not.toHaveBeenCalled();
   });
 
-  it("does not forward mixed-case reserved source attributes onto transformed inline scripts", () => {
+  it('does not forward mixed-case reserved source attributes onto transformed inline scripts', () => {
     const { iframeWindow } = createScriptEnvironment();
 
     insertScriptToIframe(
       {
-        src: "https://cdn.example/app.js",
-        content: "window.transformed = true;",
-        attrs: { SRC: "https://cdn.example/bypass.js", nonce: "safe" },
+        src: 'https://cdn.example/app.js',
+        content: 'window.transformed = true;',
+        attrs: { SRC: 'https://cdn.example/bypass.js', nonce: 'safe' },
       },
-      iframeWindow
+      iframeWindow,
     );
 
-    const inserted = iframeWindow.document.head.querySelector("script") as HTMLScriptElement;
-    expect(inserted.getAttribute("src")).toBeNull();
-    expect(inserted.getAttribute("nonce")).toBe("safe");
-    expect(inserted.textContent).toContain("window.transformed = true;");
+    const inserted = iframeWindow.document.head.querySelector('script') as HTMLScriptElement;
+    expect(inserted.getAttribute('src')).toBeNull();
+    expect(inserted.getAttribute('nonce')).toBe('safe');
+    expect(inserted.textContent).toContain('window.transformed = true;');
   });
 });

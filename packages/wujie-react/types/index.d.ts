@@ -1,6 +1,6 @@
-import * as React from "react";
-import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp, type DestroyHandler, type StartOptions } from "wujie";
-export type WujieReactProps = Omit<StartOptions, "el"> & {
+import * as React from 'react';
+import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp, type DestroyHandler, type StartOptions } from 'wujie';
+export type WujieReactProps = Omit<StartOptions, 'el'> & {
     width?: string;
     height?: string;
     style?: React.CSSProperties;

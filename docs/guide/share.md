@@ -1,4 +1,3 @@
-
 # 应用共享
 
 一个微前端系统可能同时运行多个子应用，不同子应用之间可能存在相同的包依赖，那么这个依赖就会在不同子应用中重复打包、重复执行造成性能和内存的浪费
@@ -8,9 +7,8 @@
 以这个场景举例：主应用使用到了`lodash`，子应用 A 也使用到了相同版本的`lodash`
 
 ::: warning 警告
-应用共享原理是主应用和子应用运行iframe沙箱同域可以共享内存，对于组件库这样有副作用的第三方包，可能无法共享
+应用共享原理是主应用和子应用运行 iframe 沙箱同域可以共享内存，对于组件库这样有副作用的第三方包，可能无法共享
 :::
-
 
 ## 子应用只运行在微前端框架
 
@@ -20,7 +18,7 @@
 
 ```javascript
 // index.js
-import lodash from "lodash";
+import lodash from 'lodash';
 
 // 将需要共享的包挂载到主应用全局
 window.lodash = lodash;
@@ -41,11 +39,11 @@ window.lodash = lodash;
 ```javascript
 module.exports = {
   externals: {
-    "lodash": {
-      root: "lodash",
-      commonjs: "lodash",
-      commonjs2: "lodash",
-      amd: "lodash",
+    lodash: {
+      root: 'lodash',
+      commonjs: 'lodash',
+      commonjs2: 'lodash',
+      amd: 'lodash',
     },
   },
 };

@@ -1,7 +1,5 @@
-/* eslint-env jest */
-
-import Vue, { type VueConstructor } from "vue";
-import type { StartOptions } from "wujie";
+import Vue, { type VueConstructor } from 'vue';
+import type { StartOptions } from 'wujie';
 
 interface MockController {
   start: jest.Mock<Promise<void>, [StartOptions]>;
@@ -37,7 +35,7 @@ const mockCreateAppController = jest.fn((): MockController => {
   return controller;
 });
 
-jest.mock("wujie", () => ({
+jest.mock('wujie', () => ({
   bus: mockBus,
   setupApp: mockSetupApp,
   preloadApp: mockPreloadApp,
@@ -47,7 +45,9 @@ jest.mock("wujie", () => ({
   createAppController: mockCreateAppController,
 }));
 
-import WujieVue, { type WujieVueInstance } from "../../index";
+import type { WujieVueInstance } from '../../index';
+
+const WujieVue = require('../../index').default as typeof import('../../index').default;
 
 type TestInstance = WujieVueInstance & {
   _isDestroyed: boolean;
@@ -65,7 +65,7 @@ function mountComponent(props: Record<string, unknown>): TestInstance {
   return instance;
 }
 
-describe("WujieVue for Vue 2", () => {
+describe('WujieVue for Vue 2', () => {
   const instances: TestInstance[] = [];
   let consoleError: jest.SpyInstance;
 
@@ -75,14 +75,14 @@ describe("WujieVue for Vue 2", () => {
   });
 
   beforeEach(() => {
-    document.body.innerHTML = "";
+    document.body.innerHTML = '';
     mockControllers.length = 0;
     mockCreateAppController.mockImplementation((): MockController => {
       const controller = mockNewController();
       mockControllers.push(controller);
       return controller;
     });
-    consoleError = jest.spyOn(console, "error").mockImplementation(() => undefined);
+    consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -90,36 +90,36 @@ describe("WujieVue for Vue 2", () => {
       if (!instance._isDestroyed) instance.$destroy();
     });
     instances.length = 0;
-    document.body.innerHTML = "";
+    document.body.innerHTML = '';
     consoleError.mockRestore();
   });
 
-  test("mounts with every start option, forwards events, reacts to identity, and cleans up", async () => {
-    const loading = document.createElement("span");
+  test('mounts with every start option, forwards events, reacts to identity, and cleans up', async () => {
+    const loading = document.createElement('span');
     const replace = jest.fn();
     const customFetch = jest.fn();
     const lifecycle = jest.fn();
     const props = {
-      name: "first",
-      url: "https://first.test/",
-      html: "<main>first</main>",
-      width: "100%",
-      height: "480px",
-      style: { width: "75%", color: "red" },
+      name: 'first',
+      url: 'https://first.test/',
+      html: '<main>first</main>',
+      width: '100%',
+      height: '480px',
+      style: { width: '75%', color: 'red' },
       loading,
       replace,
       fetch: customFetch,
-      props: { token: "secret" },
-      attrs: { title: "child" },
-      degradeAttrs: { sandbox: "allow-scripts" },
+      props: { token: 'secret' },
+      attrs: { title: 'child' },
+      degradeAttrs: { sandbox: 'allow-scripts' },
       sync: true,
-      prefix: { prefix: "/child" },
+      prefix: { prefix: '/child' },
       fiber: true,
       alive: true,
       degrade: false,
       plugins: [{ cssLoader: lifecycle }],
-      iframeAddEventListeners: ["hashchange"],
-      iframeOnEvents: ["load"],
+      iframeAddEventListeners: ['hashchange'],
+      iframeOnEvents: ['load'],
       beforeLoad: lifecycle,
       beforeMount: lifecycle,
       afterMount: lifecycle,
@@ -132,7 +132,7 @@ describe("WujieVue for Vue 2", () => {
     const instance = mountComponent(props);
     instances.push(instance);
     const controller = mockControllers[0];
-    const childContainer = instance.$refs.wujieContainer as HTMLDivElement;
+    const childContainer = instance.$refs['wujieContainer'] as HTMLDivElement;
 
     expect(mockCreateAppController).toHaveBeenCalledTimes(1);
     expect(controller.start).toHaveBeenCalledWith({
@@ -163,31 +163,33 @@ describe("WujieVue for Vue 2", () => {
       deactivated: lifecycle,
       loadError: lifecycle,
     });
-    expect(childContainer.style.width).toBe("75%");
-    expect(childContainer.style.height).toBe("480px");
-    expect(childContainer.style.color).toBe("red");
+    expect(childContainer.style.width).toBe('75%');
+    expect(childContainer.style.height).toBe('480px');
+    expect(childContainer.style.color).toBe('red');
 
     const eventHandler = jest.fn();
-    instance.$on("adapter-event", eventHandler);
+    instance.$on('adapter-event', eventHandler);
     const forwardBusEvent = mockBus.$onAll.mock.calls[0][0];
-    forwardBusEvent("adapter-event", "payload", 2);
-    expect(eventHandler).toHaveBeenCalledWith("payload", 2);
+    forwardBusEvent('adapter-event', 'payload', 2);
+    expect(eventHandler).toHaveBeenCalledWith('payload', 2);
 
-    instance._props.name = "second";
+    instance._props['name'] = 'second';
     await Vue.nextTick();
     expect(controller.start).toHaveBeenCalledTimes(2);
-    instance._props.url = "https://second.test/";
+    instance._props['url'] = 'https://second.test/';
     await Vue.nextTick();
     expect(controller.start).toHaveBeenCalledTimes(3);
 
     await expect(instance.refresh()).resolves.toBeUndefined();
-    expect(controller.refresh).toHaveBeenCalledWith(expect.objectContaining({
-      name: "second",
-      url: "https://second.test/",
-      el: childContainer,
-    }));
+    expect(controller.refresh).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'second',
+        url: 'https://second.test/',
+        el: childContainer,
+      }),
+    );
     await expect(instance.destroy()).resolves.toBeUndefined();
-    expect(controller.destroy).toHaveBeenCalledWith("second");
+    expect(controller.destroy).toHaveBeenCalledWith('second');
 
     const stopWatch = jest.fn(instance.stopIdentityWatch as () => void);
     instance.stopIdentityWatch = stopWatch;
@@ -197,11 +199,11 @@ describe("WujieVue for Vue 2", () => {
     expect(controller.dispose).toHaveBeenCalledTimes(1);
   });
 
-  test("uses default styles and preserves the plugin/static API", () => {
-    const instance = mountComponent({ name: "defaults" });
+  test('uses default styles and preserves the plugin/static API', () => {
+    const instance = mountComponent({ name: 'defaults' });
     instances.push(instance);
-    const childContainer = instance.$refs.wujieContainer as HTMLDivElement;
-    expect(childContainer.getAttribute("style") ?? "").toBe("");
+    const childContainer = instance.$refs['wujieContainer'] as HTMLDivElement;
+    expect(childContainer.getAttribute('style') ?? '').toBe('');
 
     expect(WujieVue.bus).toBe(mockBus);
     expect(WujieVue.setupApp).toBe(mockSetupApp);
@@ -212,24 +214,24 @@ describe("WujieVue for Vue 2", () => {
 
     const VueConstructor = { component: jest.fn() } as unknown as VueConstructor;
     WujieVue.install(VueConstructor);
-    expect(VueConstructor.component).toHaveBeenCalledWith("WujieVue", expect.anything());
+    expect(VueConstructor.component).toHaveBeenCalledWith('WujieVue', expect.anything());
   });
 
-  test("turns pre-mount start and refresh failures into settled promises", async () => {
-    const instance = new WujieVue({ propsData: { name: "not-mounted" } } as never) as TestInstance;
+  test('turns pre-mount start and refresh failures into settled promises', async () => {
+    const instance = new WujieVue({ propsData: { name: 'not-mounted' } } as never) as TestInstance;
     instances.push(instance);
 
     await expect(instance.startAutomatically()).resolves.toBeUndefined();
     expect(consoleError).toHaveBeenCalledWith(
-      "[wujie-vue2] failed to start application",
-      expect.objectContaining({ message: "WujieVue cannot start before its container is mounted" })
+      '[wujie-vue2] failed to start application',
+      expect.objectContaining({ message: 'WujieVue cannot start before its container is mounted' }),
     );
-    await expect(instance.refresh()).rejects.toThrow("cannot start before its container is mounted");
+    await expect(instance.refresh()).rejects.toThrow('cannot start before its container is mounted');
   });
 
-  test("reports controller start failures and rejects controller refresh failures", async () => {
-    const startFailure = new Error("start failed");
-    const refreshFailure = new Error("refresh failed");
+  test('reports controller start failures and rejects controller refresh failures', async () => {
+    const startFailure = new Error('start failed');
+    const refreshFailure = new Error('refresh failed');
     const controller = mockNewController();
     controller.start.mockImplementation(() => {
       throw startFailure;
@@ -241,16 +243,16 @@ describe("WujieVue for Vue 2", () => {
       mockControllers.push(controller);
       return controller;
     });
-    const instance = mountComponent({ name: "broken" });
+    const instance = mountComponent({ name: 'broken' });
     instances.push(instance);
     await Promise.resolve();
 
-    expect(consoleError).toHaveBeenCalledWith("[wujie-vue2] failed to start application", startFailure);
+    expect(consoleError).toHaveBeenCalledWith('[wujie-vue2] failed to start application', startFailure);
     await expect(instance.refresh()).rejects.toBe(refreshFailure);
   });
 
-  test("destroys an unmounted instance without an identity watcher", () => {
-    const instance = new WujieVue({ propsData: { name: "unmounted" } } as never) as TestInstance;
+  test('destroys an unmounted instance without an identity watcher', () => {
+    const instance = new WujieVue({ propsData: { name: 'unmounted' } } as never) as TestInstance;
     instances.push(instance);
 
     expect(instance.stopIdentityWatch).toBeNull();
@@ -258,18 +260,18 @@ describe("WujieVue for Vue 2", () => {
     expect(instance.appController.dispose).toHaveBeenCalledTimes(1);
   });
 
-  test("uses an object prop validator when imported without HTMLElement", () => {
-    const descriptor = Object.getOwnPropertyDescriptor(globalThis, "HTMLElement");
-    if (!descriptor) throw new Error("jsdom HTMLElement descriptor is unavailable");
+  test('uses an object prop validator when imported without HTMLElement', () => {
+    const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'HTMLElement');
+    if (!descriptor) throw new Error('jsdom HTMLElement descriptor is unavailable');
 
     try {
-      delete (globalThis as unknown as Record<string, unknown>).HTMLElement;
+      delete (globalThis as unknown as Record<string, unknown>)['HTMLElement'];
       jest.isolateModules(() => {
-        const serverComponent = jest.requireActual("../../index").default;
-        expect(serverComponent.options.name).toBe("WujieVue");
+        const serverComponent = jest.requireActual('../../index').default;
+        expect(serverComponent.options.name).toBe('WujieVue');
       });
     } finally {
-      Object.defineProperty(globalThis, "HTMLElement", descriptor);
+      Object.defineProperty(globalThis, 'HTMLElement', descriptor);
     }
   });
 });

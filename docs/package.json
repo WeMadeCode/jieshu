@@ -7,6 +7,7 @@
   "scripts": {
     "docs:dev": "vitepress dev --open --port=9765",
     "docs:build": "vitepress build",
+    "typecheck": "vue-tsc --project tsconfig.json --noEmit",
     "documate:upload": "documate upload"
   },
   "keywords": [],

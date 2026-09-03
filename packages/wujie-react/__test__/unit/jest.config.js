@@ -1,18 +1,15 @@
 module.exports = {
-  rootDir: "../..",
-  preset: "ts-jest",
-  testEnvironment: "jsdom",
-  testMatch: ["<rootDir>/__test__/unit/**/*.test.ts"],
-  globals: {
-    "ts-jest": {
-      tsconfig: "<rootDir>/__test__/unit/tsconfig.json",
-    },
+  rootDir: '../..',
+  testEnvironment: 'jsdom',
+  testMatch: ['<rootDir>/__test__/unit/**/*.test.ts'],
+  transform: {
+    '^.+\\.tsx?$': 'babel-jest',
   },
   clearMocks: true,
   collectCoverage: true,
-  collectCoverageFrom: ["<rootDir>/index.ts"],
-  coverageDirectory: "<rootDir>/coverage/unit",
-  coverageReporters: ["text", "text-summary"],
+  collectCoverageFrom: ['<rootDir>/index.ts'],
+  coverageDirectory: '<rootDir>/coverage/unit',
+  coverageReporters: ['text', 'text-summary'],
   coverageThreshold: {
     global: {
       statements: 100,

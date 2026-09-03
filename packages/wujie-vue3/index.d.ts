@@ -1,7 +1,7 @@
-import type { App, ComponentPublicInstance, CSSProperties, DefineComponent } from "vue";
-import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp } from "wujie";
-import type { DestroyHandler, StartOptions } from "wujie";
-export type WujieVueProps = Omit<StartOptions, "el"> & {
+import type { App, ComponentPublicInstance, CSSProperties, DefineComponent } from 'vue';
+import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie';
+import type { DestroyHandler, StartOptions } from 'wujie';
+export type WujieVueProps = Omit<StartOptions, 'el'> & {
     width?: string;
     height?: string;
     style?: CSSProperties;

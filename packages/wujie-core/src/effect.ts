@@ -1,4 +1,4 @@
-import { getExternalStyleSheets, getExternalScripts } from "./entry";
+import { getExternalStyleSheets, getExternalScripts } from './entry';
 import {
   getWujieById,
   rawAppendChild,
@@ -10,7 +10,7 @@ import {
   rawDocumentQuerySelector,
   rawAddEventListener,
   rawRemoveEventListener,
-} from "./common";
+} from './common';
 import {
   isFunction,
   isHijackingTag,
@@ -23,27 +23,27 @@ import {
   setTagToScript,
   getTagFromScript,
   setAttrsToElement,
-} from "./utils";
-import { insertScriptToIframe, patchElementEffect } from "./iframe";
-import Wujie from "./sandbox";
-import { getPatchStyleElements } from "./shadow";
-import { getCssLoader, getEffectLoaders, isMatchUrl } from "./plugin";
+} from './utils';
+import { insertScriptToIframe, patchElementEffect } from './iframe';
+import Wujie from './sandbox';
+import { getPatchStyleElements } from './shadow';
+import { getCssLoader, getEffectLoaders, isMatchUrl } from './plugin';
 import {
   WUJIE_SCRIPT_ID,
   WUJIE_DATA_FLAG,
   WUJIE_TIPS_REPEAT_RENDER,
   WUJIE_TIPS_NO_SCRIPT,
   WUJIE_APP_ID,
-} from "./constant";
-import { ScriptObject, parseTagAttributes } from "./template";
-import { HandlerPipeline } from "./effect-pipeline";
-import type { PipelineHandler } from "./effect-pipeline";
-import { registerSandboxDynamicResource, scheduleSandboxDynamicScript } from "./sandbox-runtime";
-import type { SandboxDynamicResourceCancellationReason } from "./sandbox-runtime";
+} from './constant';
+import { ScriptObject, parseTagAttributes } from './template';
+import { HandlerPipeline } from './effect-pipeline';
+import type { PipelineHandler } from './effect-pipeline';
+import { registerSandboxDynamicResource, scheduleSandboxDynamicScript } from './sandbox-runtime';
+import type { SandboxDynamicResourceCancellationReason } from './sandbox-runtime';
 
 function patchCustomEvent(
   e: CustomEvent,
-  elementGetter: () => HTMLScriptElement | HTMLLinkElement | null
+  elementGetter: () => HTMLScriptElement | HTMLLinkElement | null,
 ): CustomEvent {
   Object.defineProperties(e, {
     srcElement: {
@@ -61,7 +61,7 @@ function patchCustomEvent(
  * 手动触发事件回调
  */
 type ResourceElement = HTMLLinkElement | HTMLScriptElement;
-type ResourceEventName = "load" | "error";
+type ResourceEventName = 'load' | 'error';
 
 class ElementEventForwarder {
   dispatch(element: ResourceElement, event: ResourceEventName): void {
@@ -115,12 +115,12 @@ export function patchStylesheetElement(
   stylesheetElement: HTMLStyleElement & { _hasPatchStyle?: boolean },
   cssLoader: (code: string, url: string, base: string) => string,
   sandbox: Wujie,
-  curUrl: string
+  curUrl: string,
 ) {
   if (stylesheetElement._hasPatchStyle) return;
-  const innerHTMLDesc = Object.getOwnPropertyDescriptor(Element.prototype, "innerHTML");
-  const innerTextDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "innerText");
-  const textContentDesc = Object.getOwnPropertyDescriptor(Node.prototype, "textContent");
+  const innerHTMLDesc = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+  const innerTextDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText');
+  const textContentDesc = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
   const innerHTMLGetter = innerHTMLDesc?.get;
   const innerHTMLSetter = innerHTMLDesc?.set;
   const innerTextGetter = innerTextDesc?.get;
@@ -145,7 +145,7 @@ export function patchStylesheetElement(
           return innerHTMLGetter.call(this);
         },
         set: function (this: HTMLStyleElement, code: string) {
-          innerHTMLSetter.call(this, cssLoader(code, "", curUrl));
+          innerHTMLSetter.call(this, cssLoader(code, '', curUrl));
           nextTick(() => handleStylesheetElementPatch(this, sandbox));
         },
       },
@@ -153,24 +153,24 @@ export function patchStylesheetElement(
   }
 
   if (innerTextGetter && innerTextSetter) {
-    Object.defineProperty(stylesheetElement, "innerText", {
+    Object.defineProperty(stylesheetElement, 'innerText', {
       get: function (this: HTMLStyleElement) {
         return innerTextGetter.call(this);
       },
       set: function (this: HTMLStyleElement, code: string) {
-        innerTextSetter.call(this, cssLoader(code, "", curUrl));
+        innerTextSetter.call(this, cssLoader(code, '', curUrl));
         nextTick(() => handleStylesheetElementPatch(this, sandbox));
       },
     });
   }
 
   if (textContentGetter && textContentSetter) {
-    Object.defineProperty(stylesheetElement, "textContent", {
+    Object.defineProperty(stylesheetElement, 'textContent', {
       get: function (this: HTMLStyleElement) {
         return textContentGetter.call(this);
       },
       set: function (this: HTMLStyleElement, code: string) {
-        textContentSetter.call(this, cssLoader(code, "", curUrl));
+        textContentSetter.call(this, cssLoader(code, '', curUrl));
         nextTick(() => handleStylesheetElementPatch(this, sandbox));
       },
     });
@@ -183,7 +183,7 @@ export function patchStylesheetElement(
         if (node.nodeType === Node.TEXT_NODE) {
           const res = rawAppendChild.call(
             stylesheetElement,
-            stylesheetElement.ownerDocument.createTextNode(cssLoader(node.textContent ?? "", "", curUrl))
+            stylesheetElement.ownerDocument.createTextNode(cssLoader(node.textContent ?? '', '', curUrl)),
           );
           // 当appendChild之后，样式元素的sheet对象发生改变，要重新patch
           patchSheetInsertRule();
@@ -193,7 +193,7 @@ export function patchStylesheetElement(
     },
     insertAdjacentElement: {
       value: function (this: HTMLStyleElement, position: InsertPosition, element: Element) {
-        if (element.nodeName === "STYLE") {
+        if (element.nodeName === 'STYLE') {
           // 关联 issue: https://github.com/Tencent/wujie/issues/1059
           //
           // vite dev server 第一个 css 通过 head.appendChild 插入，后续每个 css 都走
@@ -208,7 +208,7 @@ export function patchStylesheetElement(
           // 当前内容，再 patchStylesheetElement 把劫持递归装到新 style 上。
           const stylesheetElement = element as HTMLStyleElement;
           const content = stylesheetElement.innerHTML;
-          if (content) stylesheetElement.innerHTML = cssLoader(content, "", curUrl);
+          if (content) stylesheetElement.innerHTML = cssLoader(content, '', curUrl);
           const res = rawInsertAdjacentElement.call(this, position, element);
           sandbox.styleSheetElements.push(stylesheetElement);
           patchStylesheetElement(stylesheetElement, cssLoader, sandbox, curUrl);
@@ -245,17 +245,17 @@ export function deferStyleSheetByHref(opts: {
   // 部分环境（jsdom / 老浏览器）可能不支持 MutationObserver，直接放弃延迟处理
   const MutationObserverCtor = (iframeWindow as Window & { MutationObserver?: typeof MutationObserver })
     .MutationObserver;
-  if (typeof MutationObserverCtor !== "function") return;
+  if (typeof MutationObserverCtor !== 'function') return;
 
   let settled = false;
   let timer: ReturnType<typeof setTimeout> | null = null;
-  let registration: Pick<MutationObserver, "disconnect">;
+  let registration: Pick<MutationObserver, 'disconnect'>;
   let unregisterCancellation: (() => void) | undefined;
   const observer: MutationObserver = new MutationObserverCtor(() => {
     if (settled) return;
     const target = element;
     if (!target) return;
-    const attrHref = target.getAttribute("href");
+    const attrHref = target.getAttribute('href');
     if (!attrHref) return;
     const realHref = target.href || attrHref;
     finalize(() => loadStyleSheet(realHref, target));
@@ -293,7 +293,7 @@ export function deferStyleSheetByHref(opts: {
   if (!isDynamicEffectContextLive(sandbox, wujieId)) {
     const target = element;
     element = null;
-    if (target) nextTick(() => elementEventForwarder.dispatch(target, "error"));
+    if (target) nextTick(() => elementEventForwarder.dispatch(target, 'error'));
     return;
   }
   registration = { disconnect: () => finalize() };
@@ -302,19 +302,19 @@ export function deferStyleSheetByHref(opts: {
     const target = element;
     const liveSandbox = getWujieById(wujieId);
     finalize();
-    if (reason === "unmount" && target && liveSandbox) elementEventForwarder.dispatch(target, "error");
+    if (reason === 'unmount' && target && liveSandbox) elementEventForwarder.dispatch(target, 'error');
   });
-  observer.observe(element, { attributes: true, attributeFilter: ["href"] });
+  observer.observe(element, { attributes: true, attributeFilter: ['href'] });
   // 超时兜底：长时间没等到 href，放弃监听并触发 error，让上游（如 tinymce）的失败回调收尾
   timer = setTimeout(() => {
     const target = element;
     const liveSandbox = getWujieById(wujieId);
     finalize();
-    if (target && liveSandbox) elementEventForwarder.dispatch(target, "error");
+    if (target && liveSandbox) elementEventForwarder.dispatch(target, 'error');
   }, DEFER_STYLE_HREF_TIMEOUT);
 }
 
-type HijackingTagName = "LINK" | "STYLE" | "SCRIPT" | "IFRAME";
+type HijackingTagName = 'LINK' | 'STYLE' | 'SCRIPT' | 'IFRAME';
 type InsertionTarget = HTMLHeadElement | HTMLBodyElement;
 
 interface InsertionContext {
@@ -346,7 +346,7 @@ function insertNode<T extends Node>(context: InsertionContext, node: T): T {
 }
 
 function invokeInsertionHook(context: InsertionContext, element: HTMLElement): void {
-  execHooks(context.sandbox.plugins, "appendOrInsertElementHook", element, context.iframeWindow);
+  execHooks(context.sandbox.plugins, 'appendOrInsertElementHook', element, context.iframeWindow);
 }
 
 function insertElementWithHook<T extends HTMLElement>(context: InsertionContext, element: T): T {
@@ -357,7 +357,7 @@ function insertElementWithHook<T extends HTMLElement>(context: InsertionContext,
 
 function createInsertionHandler<TElement extends HTMLElement>(
   key: HijackingTagName,
-  handle: TypedInsertionHandler<TElement>
+  handle: TypedInsertionHandler<TElement>,
 ): PipelineHandler<HijackingTagName, InsertionContext, Node> {
   return {
     key,
@@ -377,7 +377,7 @@ function releaseAfter<T>(promise: Promise<T>, release: () => void): Promise<T> {
     (error: unknown) => {
       release();
       throw error;
-    }
+    },
   );
 }
 
@@ -387,7 +387,10 @@ class StylesheetResourceLoader {
   private unregisterCancellation?: () => void;
   private cancelled = false;
 
-  constructor(private readonly context: InsertionContext, linkElement: HTMLLinkElement) {
+  constructor(
+    private readonly context: InsertionContext,
+    linkElement: HTMLLinkElement,
+  ) {
     this.linkElement = linkElement;
   }
 
@@ -396,27 +399,27 @@ class StylesheetResourceLoader {
     if (!linkElement || linkElement !== requestedElement) return;
     if (!this.isLive()) {
       this.release();
-      nextTick(() => elementEventForwarder.dispatch(linkElement, "error"));
+      nextTick(() => elementEventForwarder.dispatch(linkElement, 'error'));
       return;
     }
     const { sandbox } = this.context;
     const { plugins, proxyLocation, fetch, lifecycles, replace, styleSheetElements } = sandbox;
-    const attrHref = linkElement.getAttribute("href");
+    const attrHref = linkElement.getAttribute('href');
     const styleHref = attrHref ? getAbsolutePath(attrHref, (proxyLocation as Location).href) : realHref;
-    if (!styleHref || isMatchUrl(styleHref, getEffectLoaders("cssExcludes", plugins))) return;
+    if (!styleHref || isMatchUrl(styleHref, getEffectLoaders('cssExcludes', plugins))) return;
 
-    const placeholderElement = this.context.iframeDocument.createElement("style");
+    const placeholderElement = this.context.iframeDocument.createElement('style');
     this.placeholderElement = placeholderElement;
     this.unregisterCancellation = registerSandboxDynamicResource(sandbox, (reason) => this.cancel(reason));
     setAttrsToElement(placeholderElement, parseTagAttributes(linkElement.outerHTML));
-    placeholderElement.setAttribute("data-wujie-css-href", styleHref);
+    placeholderElement.setAttribute('data-wujie-css-href', styleHref);
     insertNode(this.context, placeholderElement);
 
     getExternalStyleSheets(
-      [{ src: styleHref, ignore: isMatchUrl(styleHref, getEffectLoaders("cssIgnores", plugins)) }],
+      [{ src: styleHref, ignore: isMatchUrl(styleHref, getEffectLoaders('cssIgnores', plugins)) }],
       fetch,
       lifecycles.loadError,
-      sandbox.assetCacheScope
+      sandbox.assetCacheScope,
     ).forEach(({ src, ignore, contentPromise }) => {
       const pendingLoad = contentPromise.then(
         (content) => {
@@ -438,7 +441,7 @@ class StylesheetResourceLoader {
             placeholderElement.parentNode?.removeChild(placeholderElement);
             const shouldNotify = this.isLive();
             this.release();
-            if (shouldNotify) elementEventForwarder.dispatch(linkElement, "error");
+            if (shouldNotify) elementEventForwarder.dispatch(linkElement, 'error');
             return;
           }
           // cssLoader is user code and may synchronously unmount the app. The
@@ -452,14 +455,14 @@ class StylesheetResourceLoader {
           styleSheetElements.push(placeholderElement);
           handleStylesheetElementPatch(placeholderElement, sandbox);
           this.release();
-          elementEventForwarder.dispatch(linkElement, "load");
+          elementEventForwarder.dispatch(linkElement, 'load');
         },
         () => {
           placeholderElement.parentNode?.removeChild(placeholderElement);
           const shouldNotify = this.isLive();
           this.release();
-          if (shouldNotify) elementEventForwarder.dispatch(linkElement, "error");
-        }
+          if (shouldNotify) elementEventForwarder.dispatch(linkElement, 'error');
+        },
       );
       releaseAfter(pendingLoad, () => this.release());
     });
@@ -475,10 +478,10 @@ class StylesheetResourceLoader {
     if (!linkElement) return;
     this.cancelled = true;
     this.placeholderElement?.parentNode?.removeChild(this.placeholderElement);
-    const shouldNotify = reason === "unmount" && !this.context.sandbox.destroyed;
+    const shouldNotify = reason === 'unmount' && !this.context.sandbox.destroyed;
     this.release();
     if (shouldNotify) {
-      elementEventForwarder.dispatch(linkElement, "error");
+      elementEventForwarder.dispatch(linkElement, 'error');
     }
   }
 
@@ -491,8 +494,8 @@ class StylesheetResourceLoader {
   }
 }
 
-function toScriptCrossOrigin(value: string | null): "anonymous" | "use-credentials" | "" {
-  return (value || "") as "anonymous" | "use-credentials" | "";
+function toScriptCrossOrigin(value: string | null): 'anonymous' | 'use-credentials' | '' {
+  return (value || '') as 'anonymous' | 'use-credentials' | '';
 }
 
 class DynamicScriptScheduler {
@@ -504,7 +507,10 @@ class DynamicScriptScheduler {
   private unregisterCancellation?: () => void;
   private completionStarted = false;
 
-  constructor(private readonly context: InsertionContext, scriptElement: HTMLScriptElement) {
+  constructor(
+    private readonly context: InsertionContext,
+    scriptElement: HTMLScriptElement,
+  ) {
     this.scriptElement = scriptElement;
   }
 
@@ -514,21 +520,21 @@ class DynamicScriptScheduler {
     if (!scriptElement) return;
     if (!this.isLive()) {
       this.release();
-      nextTick(() => elementEventForwarder.dispatch(scriptElement, "error"));
+      nextTick(() => elementEventForwarder.dispatch(scriptElement, 'error'));
       return;
     }
     this.unregisterCancellation = registerSandboxDynamicResource(sandbox, (reason) => this.cancel(reason));
     const { src, text, type, crossOrigin } = scriptElement;
-    const isModule = type.toLowerCase() === "module";
+    const isModule = type.toLowerCase() === 'module';
     setTagToScript(scriptElement);
 
-    if (src && !isMatchUrl(src, getEffectLoaders("jsExcludes", sandbox.plugins))) {
+    if (src && !isMatchUrl(src, getEffectLoaders('jsExcludes', sandbox.plugins))) {
       const scriptOptions: ScriptObject = {
         src,
         module: isModule,
         crossorigin: crossOrigin !== null,
         crossoriginType: toScriptCrossOrigin(crossOrigin),
-        ignore: isMatchUrl(src, getEffectLoaders("jsIgnores", sandbox.plugins)),
+        ignore: isMatchUrl(src, getEffectLoaders('jsIgnores', sandbox.plugins)),
         attrs: parseTagAttributes(scriptElement.outerHTML),
       };
       getExternalScripts(
@@ -536,7 +542,7 @@ class DynamicScriptScheduler {
         sandbox.fetch,
         sandbox.lifecycles.loadError,
         sandbox.fiber,
-        sandbox.assetCacheScope
+        sandbox.assetCacheScope,
       ).forEach((scriptResult) => this.scheduleExternal(scriptResult));
       return;
     }
@@ -583,7 +589,7 @@ class DynamicScriptScheduler {
         const pendingElement = this.scriptElement;
         const shouldNotify = Boolean(pendingElement && this.isLive());
         this.release();
-        if (pendingElement && shouldNotify) elementEventForwarder.dispatch(pendingElement, "error");
+        if (pendingElement && shouldNotify) elementEventForwarder.dispatch(pendingElement, 'error');
       },
       cancelled: (reason) => this.cancel(reason),
     });
@@ -621,11 +627,11 @@ class DynamicScriptScheduler {
       const executionHandle = insertScriptToIframe(
         {
           ...scriptResult,
-          onload: () => complete("load"),
-          onerror: () => complete("error"),
+          onload: () => complete('load'),
+          onerror: () => complete('error'),
         },
         iframeWindow,
-        pendingElement
+        pendingElement,
       );
       if (this.scriptElement) {
         this.executionHandle = executionHandle;
@@ -638,7 +644,7 @@ class DynamicScriptScheduler {
       if (!failedElement) return;
       const shouldNotify = this.isLive();
       this.cancelQueuedTask();
-      if (shouldNotify) elementEventForwarder.dispatch(failedElement, "error");
+      if (shouldNotify) elementEventForwarder.dispatch(failedElement, 'error');
       warn(cause);
     }
   }
@@ -689,11 +695,11 @@ class DynamicScriptScheduler {
   private cancel(reason: SandboxDynamicResourceCancellationReason): void {
     const pendingElement = this.scriptElement;
     if (!pendingElement) return;
-    const shouldNotify = reason === "unmount" && !this.context.sandbox.destroyed && !this.completionStarted;
+    const shouldNotify = reason === 'unmount' && !this.context.sandbox.destroyed && !this.completionStarted;
     this.executionHandle?.cancel();
     this.release();
     if (shouldNotify) {
-      elementEventForwarder.dispatch(pendingElement, "error");
+      elementEventForwarder.dispatch(pendingElement, 'error');
     }
   }
 
@@ -728,14 +734,14 @@ class DynamicScriptScheduler {
   }
 }
 
-const linkInsertionHandler = createInsertionHandler<HTMLLinkElement>("LINK", (context, linkElement) => {
+const linkInsertionHandler = createInsertionHandler<HTMLLinkElement>('LINK', (context, linkElement) => {
   const { href, rel, type } = linkElement;
-  const isStylesheet = rel === "stylesheet" || type === "text/css" || href.endsWith(".css");
+  const isStylesheet = rel === 'stylesheet' || type === 'text/css' || href.endsWith('.css');
   if (!isStylesheet) return insertElementWithHook(context, linkElement);
 
   const resourceLoader = new StylesheetResourceLoader(context, linkElement);
   if (href) {
-    if (!isMatchUrl(href, getEffectLoaders("cssExcludes", context.sandbox.plugins))) {
+    if (!isMatchUrl(href, getEffectLoaders('cssExcludes', context.sandbox.plugins))) {
       resourceLoader.load(href, linkElement);
     }
   } else {
@@ -750,12 +756,12 @@ const linkInsertionHandler = createInsertionHandler<HTMLLinkElement>("LINK", (co
   return insertNode(context, context.iframeDocument.createComment(`dynamic link ${href} replaced by wujie`));
 });
 
-const styleInsertionHandler = createInsertionHandler<HTMLStyleElement>("STYLE", (context, stylesheetElement) => {
+const styleInsertionHandler = createInsertionHandler<HTMLStyleElement>('STYLE', (context, stylesheetElement) => {
   const { sandbox } = context;
   sandbox.styleSheetElements.push(stylesheetElement);
   const cssLoader = getCssLoader({ plugins: sandbox.plugins, replace: sandbox.replace });
   const content = stylesheetElement.innerHTML;
-  if (content) stylesheetElement.innerHTML = cssLoader(content, "", context.curUrl);
+  if (content) stylesheetElement.innerHTML = cssLoader(content, '', context.curUrl);
   const result = insertNode(context, stylesheetElement);
   patchStylesheetElement(stylesheetElement, cssLoader, sandbox, context.curUrl);
   handleStylesheetElementPatch(stylesheetElement, sandbox);
@@ -763,17 +769,17 @@ const styleInsertionHandler = createInsertionHandler<HTMLStyleElement>("STYLE", 
   return result;
 });
 
-const scriptInsertionHandler = createInsertionHandler<HTMLScriptElement>("SCRIPT", (context, scriptElement) => {
+const scriptInsertionHandler = createInsertionHandler<HTMLScriptElement>('SCRIPT', (context, scriptElement) => {
   new DynamicScriptScheduler(context, scriptElement).schedule();
   return insertNode(
     context,
-    context.iframeDocument.createComment(`dynamic script ${scriptElement.src} replaced by wujie`)
+    context.iframeDocument.createComment(`dynamic script ${scriptElement.src} replaced by wujie`),
   );
 });
 
-const iframeInsertionHandler = createInsertionHandler<HTMLIFrameElement>("IFRAME", (context, iframeElement) => {
-  if (iframeElement.getAttribute(WUJIE_DATA_FLAG) === "") {
-    const documentElement = rawDocumentQuerySelector.call(context.target.ownerDocument, "html");
+const iframeInsertionHandler = createInsertionHandler<HTMLIFrameElement>('IFRAME', (context, iframeElement) => {
+  if (iframeElement.getAttribute(WUJIE_DATA_FLAG) === '') {
+    const documentElement = rawDocumentQuerySelector.call(context.target.ownerDocument, 'html');
     return rawAppendChild.call(documentElement, iframeElement);
   }
   return insertElementWithHook(context, iframeElement);
@@ -793,7 +799,7 @@ function toHijackingTagName(tagName: string): HijackingTagName {
 function insertUnmanagedElement<T extends Node>(context: InsertionContext, element: T): T {
   const result = insertNode(context, element);
   patchElementEffect(element as unknown as HTMLElement, context.iframeWindow);
-  execHooks(context.sandbox.plugins, "appendOrInsertElementHook", element, context.iframeWindow);
+  execHooks(context.sandbox.plugins, 'appendOrInsertElementHook', element, context.iframeWindow);
   return result;
 }
 
@@ -801,7 +807,7 @@ function rewriteAppendOrInsertChild(opts: { rawDOMAppendOrInsertBefore: RawDomIn
   return function appendChildOrInsertBefore<T extends Node>(
     this: InsertionTarget,
     newChild: T,
-    refChild?: Node | null
+    refChild?: Node | null,
   ): T {
     const element = newChild as unknown as HTMLElement;
     const sandbox = getWujieById(opts.wujieId);
@@ -833,7 +839,7 @@ function rewriteAppendOrInsertChild(opts: { rawDOMAppendOrInsertBefore: RawDomIn
     }
 
     return insertionPipeline.dispatch(toHijackingTagName(element.tagName), context, (fallbackContext) =>
-      insertUnmanagedElement(fallbackContext, newChild)
+      insertUnmanagedElement(fallbackContext, newChild),
     ) as T;
   };
 }
@@ -886,17 +892,17 @@ function rewriteRemoveChild(opts: { rawElementRemoveChild: <T extends Node>(chil
  * 记录head和body的事件，等重新渲染复用head和body时需要清空事件
  */
 function captureOption(options?: boolean | AddEventListenerOptions): boolean {
-  return typeof options === "boolean" ? options : Boolean(options?.capture);
+  return typeof options === 'boolean' ? options : Boolean(options?.capture);
 }
 
 function patchEventListener(element: HTMLHeadElement | HTMLBodyElement): void {
-  const listenerMap: HTMLHeadElement["_cacheListeners"] = new Map();
+  const listenerMap: HTMLHeadElement['_cacheListeners'] = new Map();
   element._cacheListeners = listenerMap;
 
   element.addEventListener = (
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ) => {
     const listeners = listenerMap.get(type) || [];
     const capture = captureOption(options);
@@ -909,12 +915,12 @@ function patchEventListener(element: HTMLHeadElement | HTMLBodyElement): void {
   element.removeEventListener = (
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions
+    options?: boolean | AddEventListenerOptions,
   ) => {
     const typeListeners = listenerMap.get(type);
     const capture = captureOption(options);
     const index = typeListeners?.findIndex(
-      (entry) => entry.listener === listener && captureOption(entry.options) === capture
+      (entry) => entry.listener === listener && captureOption(entry.options) === capture,
     );
     if (typeListeners?.length && index !== undefined && index !== -1) {
       typeListeners.splice(index, 1);

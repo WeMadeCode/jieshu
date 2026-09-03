@@ -1,30 +1,30 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
-  entry: "./esm/index.js",
-  target: ["web", "es5"],
+  entry: './esm/index.js',
+  target: ['web', 'es2018'],
   output: {
-    publicPath: "/",
-    path: path.resolve(__dirname, "./lib"),
-    filename: "index.js",
-    library: "WujieReact",
+    publicPath: '/',
+    path: path.resolve(__dirname, './lib'),
+    filename: 'index.js',
+    library: 'WujieReact',
     libraryExport: 'default',
-    libraryTarget: "umd",
-    globalObject: "self",
+    libraryTarget: 'umd',
+    globalObject: 'self',
     umdNamedDefine: true,
   },
-  mode: "production",
+  mode: 'production',
   externals: {
     react: {
-      root: "React",
-      commonjs: "react",
-      commonjs2: "react",
-      amd: "React",
+      root: 'React',
+      commonjs: 'react',
+      commonjs2: 'react',
+      amd: 'React',
     },
   },
   devtool: 'source-map',
   resolve: {
-    extensions: [".js"],
+    extensions: ['.js'],
   },
   module: {
     rules: [
@@ -32,7 +32,7 @@ module.exports = {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
         },
       },
     ],

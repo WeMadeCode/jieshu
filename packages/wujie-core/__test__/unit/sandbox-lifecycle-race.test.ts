@@ -1,8 +1,15 @@
-import Wujie from "../../src/sandbox";
-import { createAppController, destroyApp, startApp } from "../../src/index";
-import { idToSandboxCacheMap, sandboxTeardownById } from "../../src/common";
-import { registerSandboxDynamicResource } from "../../src/sandbox-runtime";
-import { patchRenderEffect } from "../../src/effect";
+import Wujie from '../../src/sandbox';
+import { createAppController, destroyApp, startApp } from '../../src/index';
+import { idToSandboxCacheMap, sandboxTeardownById } from '../../src/common';
+import { registerSandboxDynamicResource } from '../../src/sandbox-runtime';
+import { patchRenderEffect } from '../../src/effect';
+
+type SandboxWithIframeRealm = Wujie & {
+  iframe: HTMLIFrameElement & {
+    contentDocument: Document;
+    contentWindow: Window;
+  };
+};
 
 function deferred<Value>() {
   let resolve!: (value: Value | PromiseLike<Value>) => void;
@@ -12,8 +19,8 @@ function deferred<Value>() {
   return { promise, resolve };
 }
 
-function createSandbox(name: string): Wujie {
-  const container = document.createElement("main");
+function createSandbox(name: string): SandboxWithIframeRealm {
+  const container = document.createElement('main');
   document.body.appendChild(container);
   const sandbox = new Wujie({
     name,
@@ -29,15 +36,18 @@ function createSandbox(name: string): Wujie {
   sandbox.alive = false;
   sandbox.hrefFlag = false;
   sandbox.activeFlag = true;
-  sandbox.head = sandbox.iframe.contentDocument.head;
-  sandbox.body = sandbox.iframe.contentDocument.body as HTMLBodyElement;
-  return sandbox;
+  const iframeDocument = sandbox.iframe.contentDocument;
+  const iframeWindow = sandbox.iframe.contentWindow;
+  if (!iframeDocument || !iframeWindow) throw new Error('The sandbox iframe realm must be available in tests');
+  sandbox.head = iframeDocument.head;
+  sandbox.body = iframeDocument.body as HTMLBodyElement;
+  return sandbox as SandboxWithIframeRealm;
 }
 
 function createRenderRoot(): ShadowRoot {
-  const root = document.createElement("div").attachShadow({ mode: "open" });
-  const head = document.createElement("head");
-  const body = document.createElement("body");
+  const root = document.createElement('div').attachShadow({ mode: 'open' });
+  const head = document.createElement('head');
+  const body = document.createElement('body');
   root.append(head, body);
   root.head = head;
   root.body = body;
@@ -48,15 +58,15 @@ async function flushPromises(): Promise<void> {
   for (let index = 0; index < 20; index += 1) await Promise.resolve();
 }
 
-describe("sandbox lifecycle races", () => {
+describe('sandbox lifecycle races', () => {
   beforeEach(() => {
     idToSandboxCacheMap.clear();
     sandboxTeardownById.clear();
-    document.body.innerHTML = "";
+    document.body.innerHTML = '';
   });
 
-  test("coalesces concurrent unmount calls", async () => {
-    const sandbox = createSandbox("coalesced-unmount");
+  test('coalesces concurrent unmount calls', async () => {
+    const sandbox = createSandbox('coalesced-unmount');
     const gate = (() => {
       let resolve!: () => void;
       const promise = new Promise<void>((onResolve) => {
@@ -79,8 +89,8 @@ describe("sandbox lifecycle races", () => {
     await sandbox.destroy();
   });
 
-  test("does not deactivate an already inactive alive generation twice", async () => {
-    const sandbox = createSandbox("idempotent-alive-unmount");
+  test('does not deactivate an already inactive alive generation twice', async () => {
+    const sandbox = createSandbox('idempotent-alive-unmount');
     const deactivated = jest.fn();
     sandbox.alive = true;
     sandbox.lifecycles = { deactivated };
@@ -92,8 +102,8 @@ describe("sandbox lifecycle races", () => {
     await sandbox.destroy();
   });
 
-  test("public destroy called from child unmount does not wait on its own tombstone", async () => {
-    const name = "reentrant-public-destroy";
+  test('public destroy called from child unmount does not wait on its own tombstone', async () => {
+    const name = 'reentrant-public-destroy';
     const sandbox = createSandbox(name);
     sandbox.mountFlag = true;
     const childUnmount = jest.fn(() => destroyApp(name));
@@ -106,8 +116,8 @@ describe("sandbox lifecycle races", () => {
     expect(sandboxTeardownById.has(name)).toBe(false);
   });
 
-  test("async child unmount can reenter public destroy after an await", async () => {
-    const name = "async-reentrant-public-destroy";
+  test('async child unmount can reenter public destroy after an await', async () => {
+    const name = 'async-reentrant-public-destroy';
     const sandbox = createSandbox(name);
     sandbox.mountFlag = true;
     const childUnmount = jest.fn(async () => {
@@ -132,8 +142,8 @@ describe("sandbox lifecycle races", () => {
     expect(sandboxTeardownById.has(name)).toBe(false);
   });
 
-  test("async child unmount can reenter through a host callback passed in props", async () => {
-    const name = "async-props-reentrant-destroy";
+  test('async child unmount can reenter through a host callback passed in props', async () => {
+    const name = 'async-props-reentrant-destroy';
     const sandbox = createSandbox(name);
     const hostDestroy = jest.fn(async () => {
       await Promise.resolve();
@@ -146,7 +156,7 @@ describe("sandbox lifecycle races", () => {
     sandbox.mountFlag = true;
     sandbox.iframe.contentWindow.__WUJIE_UNMOUNT = async () => {
       await Promise.resolve();
-      const getLifecycle = sandbox.provide.props?.getLifecycle as () => { destroy(): Promise<void> };
+      const getLifecycle = sandbox.provide.props?.['getLifecycle'] as () => { destroy(): Promise<void> };
       const lifecycle = getLifecycle();
       await lifecycle.destroy();
     };
@@ -158,8 +168,8 @@ describe("sandbox lifecycle races", () => {
     expect(sandboxTeardownById.has(name)).toBe(false);
   });
 
-  test("a concurrent public destroy acknowledges ownership while the first teardown continues", async () => {
-    const name = "external-concurrent-destroy";
+  test('a concurrent public destroy acknowledges ownership while the first teardown continues', async () => {
+    const name = 'external-concurrent-destroy';
     const sandbox = createSandbox(name);
     const gate = deferred<void>();
     sandbox.mountFlag = true;
@@ -179,8 +189,8 @@ describe("sandbox lifecycle races", () => {
     expect(concurrentSettled).toBe(true);
   });
 
-  test("a concurrent start stays queued until an async host cleanup really settles", async () => {
-    const name = "queued-start-after-host-cleanup";
+  test('a concurrent start stays queued until an async host cleanup really settles', async () => {
+    const name = 'queued-start-after-host-cleanup';
     const sandbox = createSandbox(name);
     const cleanupGate = deferred<void>();
     let cleanupFinished = false;
@@ -191,14 +201,14 @@ describe("sandbox lifecycle races", () => {
     sandbox.provide.props = Object.freeze({ cleanup });
     sandbox.mountFlag = true;
     sandbox.iframe.contentWindow.__WUJIE_UNMOUNT = async () => {
-      const hostCleanup = sandbox.provide.props?.cleanup as () => Promise<void>;
+      const hostCleanup = sandbox.provide.props?.['cleanup'] as () => Promise<void>;
       await hostCleanup();
     };
 
     const destroying = destroyApp(name);
     await Promise.resolve();
 
-    const replacementContainer = document.createElement("main");
+    const replacementContainer = document.createElement('main');
     document.body.appendChild(replacementContainer);
     const beforeLoad = jest.fn(() => {
       expect(cleanupFinished).toBe(true);
@@ -213,11 +223,11 @@ describe("sandbox lifecycle races", () => {
       startApp({
         name,
         url: `https://example.test/${name}/`,
-        html: "<html><head></head><body>replacement</body></html>",
+        html: '<html><head></head><body>replacement</body></html>',
         el: replacementContainer,
         beforeLoad,
         fiber: false,
-      })
+      }),
     ).resolves.toBeUndefined();
     expect(beforeLoad).not.toHaveBeenCalled();
 
@@ -229,21 +239,21 @@ describe("sandbox lifecycle races", () => {
     await destroyApp(name);
   });
 
-  test("disposing a controller cancels its completion-tracked start behind an unmount", async () => {
-    const name = "disposed-controller-behind-unmount";
+  test('disposing a controller cancels its completion-tracked start behind an unmount', async () => {
+    const name = 'disposed-controller-behind-unmount';
     const sandbox = createSandbox(name);
     const cleanupGate = deferred<void>();
     sandbox.mountFlag = true;
     sandbox.iframe.contentWindow.__WUJIE_UNMOUNT = () => cleanupGate.promise;
     const unmounting = sandbox.unmount();
-    const replacementContainer = document.createElement("main");
+    const replacementContainer = document.createElement('main');
     document.body.appendChild(replacementContainer);
     const controller = createAppController();
 
     const starting = controller.start({
       name,
       url: `https://example.test/${name}/`,
-      html: "<html><head></head><body>replacement</body></html>",
+      html: '<html><head></head><body>replacement</body></html>',
       el: replacementContainer,
       fiber: false,
     });
@@ -257,10 +267,10 @@ describe("sandbox lifecycle races", () => {
     expect(idToSandboxCacheMap.has(name)).toBe(false);
   });
 
-  test("a child realm can request a same-id start from async unmount without cycling", async () => {
-    const name = "async-reentrant-public-start";
+  test('a child realm can request a same-id start from async unmount without cycling', async () => {
+    const name = 'async-reentrant-public-start';
     const sandbox = createSandbox(name);
-    const replacementContainer = document.createElement("main");
+    const replacementContainer = document.createElement('main');
     document.body.appendChild(replacementContainer);
     sandbox.mountFlag = true;
     const childUnmount = jest.fn(async () => {
@@ -268,7 +278,7 @@ describe("sandbox lifecycle races", () => {
       await startApp({
         name,
         url: `https://example.test/${name}/`,
-        html: "<html><head></head><body>replacement</body></html>",
+        html: '<html><head></head><body>replacement</body></html>',
         el: replacementContainer,
         fiber: false,
       });
@@ -290,8 +300,8 @@ describe("sandbox lifecycle races", () => {
     await destroyApp(name);
   });
 
-  test("publishes inactive unmount state before resource error callbacks can re-enter", async () => {
-    const sandbox = createSandbox("resource-reentrant-unmount");
+  test('publishes inactive unmount state before resource error callbacks can re-enter', async () => {
+    const sandbox = createSandbox('resource-reentrant-unmount');
     let reentered: Promise<void> | undefined;
     const cancellation = jest.fn(() => {
       expect(sandbox.activeFlag).toBe(false);
@@ -307,23 +317,23 @@ describe("sandbox lifecycle races", () => {
     await sandbox.destroy();
   });
 
-  test("alive deactivation preserves a deferred stylesheet observer until href arrives", async () => {
-    const sandbox = createSandbox("alive-deferred-style");
+  test('alive deactivation preserves a deferred stylesheet observer until href arrives', async () => {
+    const sandbox = createSandbox('alive-deferred-style');
     const root = createRenderRoot();
     const loaded = jest.fn();
     const failed = jest.fn();
     const fetch = jest.fn(() =>
       Promise.resolve({
         status: 200,
-        text: () => Promise.resolve("body { color: green; }"),
-      } as Response)
+        text: () => Promise.resolve('body { color: green; }'),
+      } as Response),
     );
     sandbox.alive = true;
     sandbox.fetch = fetch;
     sandbox.replace = (code) => code;
     patchRenderEffect(root, sandbox.id, false);
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
     link.onload = loaded;
     link.onerror = failed;
     root.head.appendChild(link);
@@ -333,7 +343,7 @@ describe("sandbox lifecycle races", () => {
     expect(sandbox.activeFlag).toBe(false);
     expect(sandbox.deferredStyleObservers).toHaveLength(1);
 
-    link.href = "https://assets.example/deferred-after-deactivate.css";
+    link.href = 'https://assets.example/deferred-after-deactivate.css';
     await flushPromises();
 
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -343,8 +353,8 @@ describe("sandbox lifecycle races", () => {
     await sandbox.destroy();
   });
 
-  test("a reusable unmount rotates the pending asset cache generation", async () => {
-    const sandbox = createSandbox("rotated-asset-scope");
+  test('a reusable unmount rotates the pending asset cache generation', async () => {
+    const sandbox = createSandbox('rotated-asset-scope');
     const previousScope = sandbox.assetCacheScope;
 
     await sandbox.unmount();
@@ -353,8 +363,8 @@ describe("sandbox lifecycle races", () => {
     await sandbox.destroy();
   });
 
-  test("a destroy triggered by beforeMount prevents child mount", async () => {
-    const sandbox = createSandbox("destroy-before-mount");
+  test('a destroy triggered by beforeMount prevents child mount', async () => {
+    const sandbox = createSandbox('destroy-before-mount');
     const childMount = jest.fn();
     const afterMount = jest.fn();
     let destroying: Promise<void> | undefined;
@@ -375,8 +385,8 @@ describe("sandbox lifecycle races", () => {
     expect(afterMount).not.toHaveBeenCalled();
   });
 
-  test("an ordinary unmount triggered by beforeMount aborts the stale mount and advances its task", async () => {
-    const sandbox = createSandbox("unmount-before-mount");
+  test('an ordinary unmount triggered by beforeMount aborts the stale mount and advances its task', async () => {
+    const sandbox = createSandbox('unmount-before-mount');
     const childMount = jest.fn();
     const afterMount = jest.fn();
     const advance = jest.fn();
@@ -402,8 +412,8 @@ describe("sandbox lifecycle races", () => {
     await sandbox.destroy();
   });
 
-  test("a destroy triggered inside child mount observes mounted state and unmounts it", async () => {
-    const sandbox = createSandbox("destroy-inside-mount");
+  test('a destroy triggered inside child mount observes mounted state and unmounts it', async () => {
+    const sandbox = createSandbox('destroy-inside-mount');
     const childUnmount = jest.fn();
     const afterMount = jest.fn();
     let destroying: Promise<void> | undefined;
@@ -422,8 +432,8 @@ describe("sandbox lifecycle races", () => {
     expect(afterMount).not.toHaveBeenCalled();
   });
 
-  test("an ordinary unmount inside child mount prevents afterMount", async () => {
-    const sandbox = createSandbox("unmount-inside-mount");
+  test('an ordinary unmount inside child mount prevents afterMount', async () => {
+    const sandbox = createSandbox('unmount-inside-mount');
     const childUnmount = jest.fn();
     const afterMount = jest.fn();
     let unmounting: Promise<void> | undefined;

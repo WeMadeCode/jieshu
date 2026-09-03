@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require('path');
 
 /*
  * For a detailed explanation regarding each configuration property, visit:
@@ -12,13 +12,13 @@ const path = require("path");
  * environment implementation.
  */
 function resolveJestEnvironment() {
-  const packageRoot = path.resolve(__dirname, "../..");
-  const jestPackage = require.resolve("jest/package.json", { paths: [packageRoot] });
-  const jestCliPackage = require.resolve("jest-cli/package.json", { paths: [path.dirname(jestPackage)] });
-  const jestCorePackage = require.resolve("@jest/core/package.json", { paths: [path.dirname(jestCliPackage)] });
-  const jestConfigPackage = require.resolve("jest-config/package.json", { paths: [path.dirname(jestCorePackage)] });
+  const packageRoot = path.resolve(__dirname, '../..');
+  const jestPackage = require.resolve('jest/package.json', { paths: [packageRoot] });
+  const jestCliPackage = require.resolve('jest-cli/package.json', { paths: [path.dirname(jestPackage)] });
+  const jestCorePackage = require.resolve('@jest/core/package.json', { paths: [path.dirname(jestCliPackage)] });
+  const jestConfigPackage = require.resolve('jest-config/package.json', { paths: [path.dirname(jestCorePackage)] });
 
-  return require.resolve("jest-environment-jsdom", { paths: [path.dirname(jestConfigPackage)] });
+  return require.resolve('jest-environment-jsdom', { paths: [path.dirname(jestConfigPackage)] });
 }
 
 module.exports = {
@@ -41,7 +41,7 @@ module.exports = {
   // collectCoverageFrom: undefined,
 
   // The directory where Jest should output its coverage files
-  coverageDirectory: "coverage",
+  coverageDirectory: 'coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
   // coveragePathIgnorePatterns: [
@@ -78,11 +78,6 @@ module.exports = {
   // globalTeardown: undefined,
 
   // A set of global variables that need to be available in all test environments
-  globals: {
-    "ts-jest": {
-      tsconfig: "<rootDir>/tsconfig.json",
-    },
-  },
 
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
@@ -115,8 +110,6 @@ module.exports = {
   // notifyMode: "failure-change",
 
   // A preset that is used as a base for Jest's configuration
-  preset: "ts-jest",
-
   // Run tests from one or more projects
   // projects: undefined,
 
@@ -168,7 +161,7 @@ module.exports = {
   // testLocationInResults: false,
 
   // The glob patterns Jest uses to detect test files
-  testMatch: ["<rootDir>/*.test.ts"],
+  testMatch: ['<rootDir>/*.test.ts'],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
@@ -191,7 +184,9 @@ module.exports = {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  transform: {
+    '^.+\\.tsx?$': 'babel-jest',
+  },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [

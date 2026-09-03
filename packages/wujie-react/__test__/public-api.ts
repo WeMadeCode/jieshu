@@ -1,13 +1,9 @@
-import WujieReact, {
-  type WujieReactComponent,
-  type WujieReactProps,
-  type WujieReactRef,
-} from "wujie-react";
-import SourceWujieReact from "../index";
+import WujieReact, { type WujieReactComponent, type WujieReactProps, type WujieReactRef } from 'wujie-react';
+import SourceWujieReact from '../index';
 
 const props: WujieReactProps = {
-  name: "typed-react-consumer",
-  width: "100%",
+  name: 'typed-react-consumer',
+  width: '100%',
   style: { minHeight: 320 },
 };
 
@@ -27,12 +23,12 @@ const imperativeRef: WujieReactRef = {
   destroy: async () => undefined,
 };
 
-WujieReact.bus.$emit("typed-react-consumer-ready");
-WujieReact.setupApp({ name: props.name, url: "https://example.test/" });
-WujieReact.preloadApp({ name: props.name, url: "https://example.test/" });
+WujieReact.bus.$emit('typed-react-consumer-ready');
+WujieReact.setupApp({ name: props.name, url: 'https://example.test/' });
+WujieReact.preloadApp({ name: props.name, url: 'https://example.test/' });
 const refreshedApplication = WujieReact.refreshApp(props);
 const destroyedApplication = WujieReact.destroyApp(props.name);
-WujieReact.clearAssetsCache("https://example.test/");
+WujieReact.clearAssetsCache('https://example.test/');
 
 // @ts-expect-error propTypes was removed from the public API.
 WujieReact.propTypes;

@@ -1,26 +1,23 @@
 <script setup lang="ts">
-import { watch, ref } from "vue";
+import { watch, ref } from 'vue';
 
-const emit = defineEmits<{
-  (e: "update:url", value: string): void;
-}>();
 const props = withDefaults(
   defineProps<{
     url?: string;
     flag?: boolean;
   }>(),
-  {}
+  {},
 );
-const wujieUrl = ref<string>("https://ant.design/components/drawer-cn/");
+const wujieUrl = ref<string>('https://ant.design/components/drawer-cn/');
 
 watch(
   () => props.flag,
   () => {
-    wujieUrl.value = props.url!;
-  }
+    if (props.url) wujieUrl.value = props.url;
+  },
 );
 
-const loading = document.createElement("div");
+const loading = document.createElement('div');
 loading.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24px" height="30px" viewBox="0 0 24 30">
 <rect x="0" y="13" width="4" height="5" fill="#f16b5f">
   <animate attributeName="height" attributeType="XML" values="5;21;5" begin="0s" dur="0.6s" repeatCount="indefinite"></animate>
@@ -36,7 +33,7 @@ loading.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24px" height
 </rect>
 </svg>`;
 
-const attrs = process.env.NODE_ENV === "production" ? { src: "//wujie-micro.github.io/doc" } : {};
+const attrs = process.env['NODE_ENV'] === 'production' ? { src: '//wujie-micro.github.io/doc' } : {};
 </script>
 
 <template>

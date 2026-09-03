@@ -1,8 +1,7 @@
 <script setup>
-import Theme from "vitepress/theme";
-import { useData } from "vitepress";
-import Documate from "@documate/vue";
-import "@documate/vue/dist/style.css";
+import Theme from 'vitepress/theme';
+import { useData } from 'vitepress';
+import '@documate/vue/dist/style.css';
 // import WujieContent from "./wujie-content.vue";
 const { frontmatter } = useData();
 const { Layout } = Theme;
@@ -63,7 +62,9 @@ const { Layout } = Theme;
   font-size: 14px;
   font-weight: 500;
   background-color: var(--vp-c-bg-soft);
-  transition: color 0.5s, background-color 0.5s;
+  transition:
+    color 0.5s,
+    background-color 0.5s;
 }
 .ad-text {
   display: block;
@@ -103,11 +104,11 @@ const { Layout } = Theme;
   width: 170px;
   height: 20px;
   opacity: 0.7;
-  background: url("https://wfiles.gtimg.cn/wuji_material/starter/l13y3vdcyg.png") no-repeat center / cover;
+  background: url('https://wfiles.gtimg.cn/wuji_material/starter/l13y3vdcyg.png') no-repeat center / cover;
 }
 .dark {
   .wuji-link {
-    background-image: url("https://wfiles.gtimg.cn/wuji_material/starter/q9nr6045wn.png");
+    background-image: url('https://wfiles.gtimg.cn/wuji_material/starter/q9nr6045wn.png');
   }
 }
 

@@ -1,23 +1,11 @@
 {
-  "include": [
-    "./src"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
+  "extends": "../../tsconfig.json",
+  "include": ["./src"],
+  "exclude": ["node_modules"],
   "compilerOptions": {
     "outDir": "./esm",
     "rootDir": "./src",
-    /* 额外的检查 */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitAny": true,
-    "strict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "downlevelIteration": true,
     "declaration": true,
     "emitDeclarationOnly": true,
     "isolatedModules": true

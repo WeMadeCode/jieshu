@@ -18,9 +18,9 @@
 
 1. 默认链路下，**子应用切换不会自动 `destroy`，只会 `unmount`**——iframe / shadowRoot / Proxy / 各类缓存全部按设计保留。这是「内存不下降」的最常见原因。
 2. 即使用户 **主动调用 `destroyApp`**，仍然有以下三条链路把子应用上下文牢牢钉在主应用堆上，导致 contentWindow 永远 GC 不掉：
-    - 子应用通过 `document.addEventListener` 注册的事件被转发到 **主应用 `window.document`**，`destroy()` **没有反向解绑**。
-    - 子应用 `window.onXXX = handler` 的 setter 被改写成「直接写到主应用 `window` 上」，`destroy()` 也没有还原。
-    - `embedHTMLCache / scriptCache / styleCache / appEventObjMap` 是模块级常驻 Map，没有失效策略，也没有清理 API。
+   - 子应用通过 `document.addEventListener` 注册的事件被转发到 **主应用 `window.document`**，`destroy()` **没有反向解绑**。
+   - 子应用 `window.onXXX = handler` 的 setter 被改写成「直接写到主应用 `window` 上」，`destroy()` 也没有还原。
+   - `embedHTMLCache / scriptCache / styleCache / appEventObjMap` 是模块级常驻 Map，没有失效策略，也没有清理 API。
 3. 保活 (`alive: true`) 模式从设计上就 **完全不释放任何资源**，子应用内部的 `<video>`、WebGL、`setInterval` 仍在运行，是 #700 / #880 / #881 等"长时间累积"的根因。
 4. `deleteWujieById` 实现存在 bug：本意是 destroy 后保留 `setupApp` 的缓存 options，结果两行代码相互抵消，options 一并被删；该 bug 与 #732 现象密切相关。
 5. 源码内已有两处 `// TODO 内存泄露` / `// this may lead memory leak risk` 注释，与本文点位 §2 一致——属于已知未修。
@@ -79,7 +79,7 @@ public async unmount(): Promise<void> {
 
 ### 与 issue 的对应
 
-- **#890**：路由切换→ WujieVue 卸载 → `disconnectedCallback` → `unmount`。框架按设计不释放 iframe，所以子应用 contentWindow 内部的 V8 堆完全不下降。
+- **#890**：路由切换 → WujieVue 卸载 → `disconnectedCallback` → `unmount`。框架按设计不释放 iframe，所以子应用 contentWindow 内部的 V8 堆完全不下降。
 - **#581**：单例/重建模式下，开发者在 chrome memory profile 里看到 `shadow` 对象长期不释放——同上。
 
 ### 为什么 DOM 节点也会增长（而不仅仅是堆不下降）
@@ -330,27 +330,27 @@ public async unmount(): Promise<void> {
 
 ## 8. 轻微风险
 
-| 位置 | 描述 |
-|---|---|
-| `effect.ts:65-81` `handleStylesheetElementPatch` 内 `setTimeout(patcher, 50)` | unmount 时未清；50 ms 内 sandbox 闭包不可回收，量级很小。 |
-| `iframe.ts:720` `setTimeout(runTrick, 5e3)` | srcdoc 安全网；destroy 后 5 秒内 iframeWindow 仍被 timer 闭包持有。 |
-| `effect.ts:168` 模块级 `dynamicScriptExecStack = Promise.resolve()` 永远 `.then` 链增长 | Promise 完成后节点应可回收，但属常驻链路。 |
-| 所有 `window.addEventListener("popstate", ...)` 之类模块级监听 | 不随 sandbox 释放，但匹配不到时 `.filter` 掉，不直接泄露；高频触发对性能有影响。 |
+| 位置                                                                                    | 描述                                                                             |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `effect.ts:65-81` `handleStylesheetElementPatch` 内 `setTimeout(patcher, 50)`           | unmount 时未清；50 ms 内 sandbox 闭包不可回收，量级很小。                        |
+| `iframe.ts:720` `setTimeout(runTrick, 5e3)`                                             | srcdoc 安全网；destroy 后 5 秒内 iframeWindow 仍被 timer 闭包持有。              |
+| `effect.ts:168` 模块级 `dynamicScriptExecStack = Promise.resolve()` 永远 `.then` 链增长 | Promise 完成后节点应可回收，但属常驻链路。                                       |
+| 所有 `window.addEventListener("popstate", ...)` 之类模块级监听                          | 不随 sandbox 释放，但匹配不到时 `.filter` 掉，不直接泄露；高频触发对性能有影响。 |
 
 ---
 
 ## 与 issue 的总览映射
 
-| Issue | 主要关联条目 | 推荐立刻关注的修复 |
-|---|---|---|
-| #890 路由切换 DOM/内存持续增加 | §1 + §4 | `destroyOnUnmount` 配置、styleSheetElements 清理 |
-| #581 单例/重建模式 shadow 不释放 | §1 + §2 + §3 | §2 §3 |
-| #529 / #593 destroyApp 后内存不下降 | §2 + §3 + §5 + §6 | §2 §3 §5 §6 |
-| #732 start→destroy→start 后 dom 没了内存不下来 | §6 + §2 + §3 | §6 优先 |
-| #700 子应用播放视频泄露 | §7 | 文档 + deactivated 样板 |
-| #880 Cesium 子应用切换崩溃 | §7 + WebGL 上下文未释放 | §7 |
-| #881 几十个子应用一晚上翻一倍 | §7 + §4 + §3 + §5 | §4 §5 §7 |
-| #631 子应用资源被缓存不更新 | §4 | `clearAssetsCache` API |
+| Issue                                          | 主要关联条目            | 推荐立刻关注的修复                               |
+| ---------------------------------------------- | ----------------------- | ------------------------------------------------ |
+| #890 路由切换 DOM/内存持续增加                 | §1 + §4                 | `destroyOnUnmount` 配置、styleSheetElements 清理 |
+| #581 单例/重建模式 shadow 不释放               | §1 + §2 + §3            | §2 §3                                            |
+| #529 / #593 destroyApp 后内存不下降            | §2 + §3 + §5 + §6       | §2 §3 §5 §6                                      |
+| #732 start→destroy→start 后 dom 没了内存不下来 | §6 + §2 + §3            | §6 优先                                          |
+| #700 子应用播放视频泄露                        | §7                      | 文档 + deactivated 样板                          |
+| #880 Cesium 子应用切换崩溃                     | §7 + WebGL 上下文未释放 | §7                                               |
+| #881 几十个子应用一晚上翻一倍                  | §7 + §4 + §3 + §5       | §4 §5 §7                                         |
+| #631 子应用资源被缓存不更新                    | §4                      | `clearAssetsCache` API                           |
 
 ---
 
@@ -369,21 +369,22 @@ public async unmount(): Promise<void> {
 
 ### ✅ 批 A · 纯逻辑 bug
 
-| 项 | 测试 | 修复点 | 修复前 | 修复后 |
-|---|---|---|---|---|
-| §6 `deleteWujieById` | `__test__/unit/common.test.ts` (3 cases) | `src/common.ts` | destroy 后 `setupApp` 缓存的 options 被同步删除，下一次 startApp 必须新建 sandbox | options 在有 `setupApp` 时正确保留，sandbox 引用清除；无 setupApp 时整体删除 entry |
-| §5 `appEventObjMap.delete` | `__test__/unit/event-leak.test.ts` (3 cases) | `src/event.ts` + `src/sandbox.ts` | EventBus 没有 `$destroy`，`sandbox.destroy()` 仅 `$clear()`，map entry 永久驻留 | 新增 `EventBus.$destroy()`，`sandbox.destroy()` 调用，map 条目随 destroy 释放 |
+| 项                         | 测试                                         | 修复点                            | 修复前                                                                            | 修复后                                                                             |
+| -------------------------- | -------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| §6 `deleteWujieById`       | `__test__/unit/common.test.ts` (3 cases)     | `src/common.ts`                   | destroy 后 `setupApp` 缓存的 options 被同步删除，下一次 startApp 必须新建 sandbox | options 在有 `setupApp` 时正确保留，sandbox 引用清除；无 setupApp 时整体删除 entry |
+| §5 `appEventObjMap.delete` | `__test__/unit/event-leak.test.ts` (3 cases) | `src/event.ts` + `src/sandbox.ts` | EventBus 没有 `$destroy`，`sandbox.destroy()` 仅 `$clear()`，map entry 永久驻留   | 新增 `EventBus.$destroy()`，`sandbox.destroy()` 调用，map 条目随 destroy 释放      |
 
 测试结果：单元测试由 22 → 28 通过（+6 项新增，全部 GREEN）。
 
 ### ✅ 批 B · 销毁链路补全
 
-| 项 | 测试 | 修复点 | 修复前 | 修复后 |
-|---|---|---|---|---|
-| §2 `window.document` listener 残留 | `__test__/unit/destroy-cleanup.test.ts` (3 cases) + `destroy-cleanup-e2e.test.ts` (2 cases) | 新增 `src/effect-cleanup.ts`, 改 `src/iframe.ts` `patchDocumentEffect` + `src/sandbox.ts` `destroy()` | `patchDocumentEffect` 把 `mainDocument` 类事件转发到主 `window.document`，destroy 时仅清 iframe 自身 listener，主 document 上的转发 listener 永驻 → 闭包持有 iframeWindow，sandbox GC 失败 | sandbox 实例持有 `EventCleanupTracker`，每次转发同步登记，`destroy()` 末尾 `cleanupAll()` 反向 `removeEventListener`；`removeEventListener` 同步从 tracker 解除，避免 destroy 时重复解绑 |
-| §3 `window.onXXX` 污染未还原 | `__test__/unit/destroy-cleanup.test.ts` (3 cases) + `destroy-cleanup-e2e.test.ts` (1 case) | `src/iframe.ts` `patchWindowEffect` + `src/effect-cleanup.ts` | `patchWindowEffect` 内部 `window[e] = handler.bind(iframeWindow)`，destroy 不还原；每销毁一个子应用就在主 window 上留一个 dangling handler | 在 setter 内首次记录主 `window[e]` 原值与 `hadOwnProperty`，`destroy()` 时通过 setter 写回原值（accessor 不能用 defineProperty descriptor 还原），原本无 own property 的 key 还会 delete，确保无残留 |
+| 项                                 | 测试                                                                                        | 修复点                                                                                                | 修复前                                                                                                                                                                                     | 修复后                                                                                                                                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §2 `window.document` listener 残留 | `__test__/unit/destroy-cleanup.test.ts` (3 cases) + `destroy-cleanup-e2e.test.ts` (2 cases) | 新增 `src/effect-cleanup.ts`, 改 `src/iframe.ts` `patchDocumentEffect` + `src/sandbox.ts` `destroy()` | `patchDocumentEffect` 把 `mainDocument` 类事件转发到主 `window.document`，destroy 时仅清 iframe 自身 listener，主 document 上的转发 listener 永驻 → 闭包持有 iframeWindow，sandbox GC 失败 | sandbox 实例持有 `EventCleanupTracker`，每次转发同步登记，`destroy()` 末尾 `cleanupAll()` 反向 `removeEventListener`；`removeEventListener` 同步从 tracker 解除，避免 destroy 时重复解绑             |
+| §3 `window.onXXX` 污染未还原       | `__test__/unit/destroy-cleanup.test.ts` (3 cases) + `destroy-cleanup-e2e.test.ts` (1 case)  | `src/iframe.ts` `patchWindowEffect` + `src/effect-cleanup.ts`                                         | `patchWindowEffect` 内部 `window[e] = handler.bind(iframeWindow)`，destroy 不还原；每销毁一个子应用就在主 window 上留一个 dangling handler                                                 | 在 setter 内首次记录主 `window[e]` 原值与 `hadOwnProperty`，`destroy()` 时通过 setter 写回原值（accessor 不能用 defineProperty descriptor 还原），原本无 own property 的 key 还会 delete，确保无残留 |
 
 附带：
+
 - `src/iframe.ts`：将 `patchDocumentEffect` / `patchWindowEffect` 由 module-private 改为 `export`，便于"准集成"测试与外部 plugin 复用。
 - `src/sandbox.ts`：`destroy()` 末尾调用 `this.eventCleanupTracker.cleanupAll()`。
 
@@ -391,11 +392,11 @@ public async unmount(): Promise<void> {
 
 ### ✅ 批 C · 资源缓存与动态资源清理
 
-| 项 | 测试 | 修复点 | 修复前 | 修复后 |
-|---|---|---|---|---|
-| §4 模块级缓存永驻 | `__test__/unit/asset-cache.test.ts` (4 cases) | `src/entry.ts` 暴露 `clearAssetsCache(host?)` 并从 `src/index.ts` re-export | `styleCache / scriptCache / embedHTMLCache` 是 module-private 普通对象，destroyApp 不会清；多 host 子应用切换或热更新场景持续累积 | 公共 API：`clearAssetsCache()` 全清 / `clearAssetsCache(host)` 按 url 前缀清 / 支持数组批量。`src/entry.ts` 同时把三个 cache 改为 `export`，便于上层做 telemetry |
-| §1.2 styleSheetElements 单调增长 | `__test__/unit/stylesheet-leak.test.ts` (4 cases) | `src/sandbox.ts` 新增 `clearStyleSheetsForUnmount()` + `unmount()` 调用 | unmount 只 clearChild(head/body)，`styleSheetElements` 数组不清；非保活子应用反复进出，rebuildStyleSheets 时旧引用一并 reattach，DOM 中 style 节点 N 倍累积，废弃 style 节点也无法被 GC | 非保活时 `styleSheetElements.length = 0`（保留数组引用），保活时保持原值用于 rebuildStyleSheets。next mount 由子应用 `__WUJIE_MOUNT` 自然重建 |
-| §1.3 iframe head 动态 script 累积 | `__test__/unit/script-leak.test.ts` (5 cases) | `src/sandbox.ts` 新增 `dynamicScriptElements` 字段 + `clearDynamicScriptsForUnmount()`，`src/iframe.ts insertScriptToIframe` 在带 rawElement 时登记 | 子应用 `document.head.appendChild(<script>)` 触发的脚本，每个保留完整 textContent（数 KB ~ 几十 KB）；非保活反复 mount/unmount 在同一 iframe 上累积，体积持续上涨 | 仅登记 effect.ts 转发的动态脚本（带 rawElement），unmount（非保活）时从 iframe head 安全 removeChild 并清空数组；初始 sandbox.start 的脚本不登记，避免误删 |
+| 项                                | 测试                                              | 修复点                                                                                                                                              | 修复前                                                                                                                                                                                  | 修复后                                                                                                                                                           |
+| --------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §4 模块级缓存永驻                 | `__test__/unit/asset-cache.test.ts` (4 cases)     | `src/entry.ts` 暴露 `clearAssetsCache(host?)` 并从 `src/index.ts` re-export                                                                         | `styleCache / scriptCache / embedHTMLCache` 是 module-private 普通对象，destroyApp 不会清；多 host 子应用切换或热更新场景持续累积                                                       | 公共 API：`clearAssetsCache()` 全清 / `clearAssetsCache(host)` 按 url 前缀清 / 支持数组批量。`src/entry.ts` 同时把三个 cache 改为 `export`，便于上层做 telemetry |
+| §1.2 styleSheetElements 单调增长  | `__test__/unit/stylesheet-leak.test.ts` (4 cases) | `src/sandbox.ts` 新增 `clearStyleSheetsForUnmount()` + `unmount()` 调用                                                                             | unmount 只 clearChild(head/body)，`styleSheetElements` 数组不清；非保活子应用反复进出，rebuildStyleSheets 时旧引用一并 reattach，DOM 中 style 节点 N 倍累积，废弃 style 节点也无法被 GC | 非保活时 `styleSheetElements.length = 0`（保留数组引用），保活时保持原值用于 rebuildStyleSheets。next mount 由子应用 `__WUJIE_MOUNT` 自然重建                    |
+| §1.3 iframe head 动态 script 累积 | `__test__/unit/script-leak.test.ts` (5 cases)     | `src/sandbox.ts` 新增 `dynamicScriptElements` 字段 + `clearDynamicScriptsForUnmount()`，`src/iframe.ts insertScriptToIframe` 在带 rawElement 时登记 | 子应用 `document.head.appendChild(<script>)` 触发的脚本，每个保留完整 textContent（数 KB ~ 几十 KB）；非保活反复 mount/unmount 在同一 iframe 上累积，体积持续上涨                       | 仅登记 effect.ts 转发的动态脚本（带 rawElement），unmount（非保活）时从 iframe head 安全 removeChild 并清空数组；初始 sandbox.start 的脚本不登记，避免误删       |
 
 测试结果：9 suites / 50 tests，全部 GREEN。
 
@@ -403,8 +404,8 @@ public async unmount(): Promise<void> {
 
 > 早期方案曾引入 `destroyOnUnmount` 配置，让业务在 `setupApp/startApp` 显式传 `true` 才在 disconnect 时 destroy。但「重建模式本就该销毁」这件事属于框架职责，不应外包给业务配置；已废弃该配置，改为按运行模式自动判定。
 
-| 项 | 测试 | 修复点 | 修复前 | 修复后 |
-|---|---|---|---|---|
+| 项                                      | 测试                                                       | 修复点          | 修复前                                                                                                                                                                                                                                            | 修复后                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------------------- | ---------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | §1.1 disconnect 仅 unmount 累积 sandbox | `__test__/unit/handleWujieAppDisconnect.test.ts` (5 cases) | `src/shadow.ts` | wujie-app webcomponent 的 `disconnectedCallback` 无论何种模式都只 `unmount`；对**重建模式**（非保活、未做生命周期改造）而言 `unmount()` 因没有 `mountFlag` / `__WUJIE_UNMOUNT` 基本是空操作，sandbox / iframe / iframeWindow 一直驻留累积（#890） | `shadow.ts` 抽出独立可测的 `handleWujieAppDisconnect(sandbox)` helper，按运行模式自动判定（与 `startApp` 复用分支同一信号）：① 保活（`alive`）→ `unmount`；② 单例（非保活 + 存在 `__WUJIE_MOUNT`，做了生命周期改造）→ `unmount`；③ 重建（非保活 + 无 `__WUJIE_MOUNT`）→ 直接 `destroy`。`WujieApp.disconnectedCallback` 调用该 helper，无需任何业务配置 |
 
 > 注：该批一度涉及 `src/sandbox.ts`、`src/index.ts`、`src/utils.ts`、`packages/wujie-vue2,3/index.js`、`packages/wujie-react/index.js,.d.ts` 透传 `destroyOnUnmount`；废弃配置后这些透传已全部回收，最终落点只剩 `src/shadow.ts` 一处。
@@ -413,12 +414,13 @@ public async unmount(): Promise<void> {
 
 ### ✅ 批 E · `Object.defineProperty` 隐患（§9 §10）
 
-| 项 | 测试 | 修复点 | 修复前 | 修复后 |
-|---|---|---|---|---|
-| §9 `documentEvents` setter 多重 bug | `__test__/unit/document-events-leak.test.ts` (4 cases) | `src/iframe.ts patchDocumentEffect` | 1) `addEventListener` 与 `handlerCallbackMap.set` 各自独立 `handler.bind()` → 两个不同 bound，下次 set 永远 remove 不掉真正注册的；2) 直接调原生 `document.addEventListener`，绕开批 B 的 `eventCleanupTracker`，destroy 不解绑；3) `handler = null` 进入 `.bind()` 直接抛 `TypeError`；4) bound 闭包持有 `iframeWindow.document`，永久挂在主 document 上 → iframeWindow GC 不掉 | 维护 `propKeyToActiveListener: Map<propKey, bound>`，每次 set 时先按 propKey 取出旧 bound 解绑、untrack，再生成新 bound 并接入 `eventCleanupTracker.trackMainDocumentListener`；handler 为 null/非函数时只解绑不重绑（与原生 onXXX = null 语义一致）；事件名由 `propKey.slice(2)` 推导避免再次绕过劫持 |
-| §10 `patchElementEffect` 跨边界闭包持有 sandbox | `__test__/unit/element-patch-leak.test.ts` (3 cases) | `src/iframe.ts patchElementEffect`, `src/sandbox.ts destroy()` | 1) `proxyLocation` 在函数开头从 `iframeWindow.__WUJIE.proxyLocation` 抽取为闭包变量 → element 永久强持 proxyLocation 对象；2) `ownerDocument` getter 直接闭包持有 `iframeWindow`，element 一旦被 portal/弹窗/拖拽搬到主应用 DOM 下，destroy 之后仍把 iframeWindow 钉死；3) destroy 流程不解链 `iframeWindow.__WUJIE`，残留 element 通过 getter 仍可拿到 sandbox | 1) 用 `WeakRef<Window>` 间接持有 iframeWindow，闭包不再有强引用；2) baseURI / ownerDocument getter 通过 `weakRef.deref()?.__WUJIE?.proxyLocation` 动态访问，拿不到时降级到主 `document.baseURI` / 主 `document`；3) `sandbox.destroy()` 在 removeChild iframe 之前主动 `iframeWindow.__WUJIE = null`，让残留 getter 立即降级；同时旧环境无 `WeakRef` 时降级为强引用，保持兼容 |
+| 项                                              | 测试                                                   | 修复点                                                         | 修复前                                                                                                                                                                                                                                                                                                                                                                           | 修复后                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §9 `documentEvents` setter 多重 bug             | `__test__/unit/document-events-leak.test.ts` (4 cases) | `src/iframe.ts patchDocumentEffect`                            | 1) `addEventListener` 与 `handlerCallbackMap.set` 各自独立 `handler.bind()` → 两个不同 bound，下次 set 永远 remove 不掉真正注册的；2) 直接调原生 `document.addEventListener`，绕开批 B 的 `eventCleanupTracker`，destroy 不解绑；3) `handler = null` 进入 `.bind()` 直接抛 `TypeError`；4) bound 闭包持有 `iframeWindow.document`，永久挂在主 document 上 → iframeWindow GC 不掉 | 维护 `propKeyToActiveListener: Map<propKey, bound>`，每次 set 时先按 propKey 取出旧 bound 解绑、untrack，再生成新 bound 并接入 `eventCleanupTracker.trackMainDocumentListener`；handler 为 null/非函数时只解绑不重绑（与原生 onXXX = null 语义一致）；事件名由 `propKey.slice(2)` 推导避免再次绕过劫持                                                                        |
+| §10 `patchElementEffect` 跨边界闭包持有 sandbox | `__test__/unit/element-patch-leak.test.ts` (3 cases)   | `src/iframe.ts patchElementEffect`, `src/sandbox.ts destroy()` | 1) `proxyLocation` 在函数开头从 `iframeWindow.__WUJIE.proxyLocation` 抽取为闭包变量 → element 永久强持 proxyLocation 对象；2) `ownerDocument` getter 直接闭包持有 `iframeWindow`，element 一旦被 portal/弹窗/拖拽搬到主应用 DOM 下，destroy 之后仍把 iframeWindow 钉死；3) destroy 流程不解链 `iframeWindow.__WUJIE`，残留 element 通过 getter 仍可拿到 sandbox                  | 1) 用 `WeakRef<Window>` 间接持有 iframeWindow，闭包不再有强引用；2) baseURI / ownerDocument getter 通过 `weakRef.deref()?.__WUJIE?.proxyLocation` 动态访问，拿不到时降级到主 `document.baseURI` / 主 `document`；3) `sandbox.destroy()` 在 removeChild iframe 之前主动 `iframeWindow.__WUJIE = null`，让残留 getter 立即降级；同时旧环境无 `WeakRef` 时降级为强引用，保持兼容 |
 
 附带：
+
 - `src/sandbox.ts:575`：`window.__WUJIE.inject` 加显式 `as Wujie["inject"]` 类型断言，绕开 TS incremental 把 `__WUJIE_INJECT` spread 字面量推断错误传染到 `__WUJIE.inject` 的预先存在编译错（与本批改动无直接因果，但触发 cache 重新编译时暴露，顺手修掉）。
 
 测试结果：12 suites / 62 tests，全部 GREEN。
@@ -427,13 +429,12 @@ public async unmount(): Promise<void> {
 
 ## 总览（批 A → 批 E）
 
-| 维度 | 批 A | 批 B | 批 C | 批 D | 批 E | 累计 |
-|---|---|---|---|---|---|---|
-| 修复 src 文件数 | 3 | 4 | 4 | 1 | 2 | 9 (去重) |
-| 新增 unit 测试文件 | 2 | 2 | 3 | 1 | 2 | 10 |
-| 新增 unit 用例数 | +6 | +9 | +13 | +5 | +7 | +40 |
-| 总用例数（22 → 62） | 28 | 37 | 50 | 55 | 62 | 62/62 GREEN |
-| 关联 issue | #732 #881 | #715 #890 | #732 #715 #890 | #890 | — | — |
+| 维度                | 批 A      | 批 B      | 批 C           | 批 D | 批 E | 累计        |
+| ------------------- | --------- | --------- | -------------- | ---- | ---- | ----------- |
+| 修复 src 文件数     | 3         | 4         | 4              | 1    | 2    | 9 (去重)    |
+| 新增 unit 测试文件  | 2         | 2         | 3              | 1    | 2    | 10          |
+| 新增 unit 用例数    | +6        | +9        | +13            | +5   | +7   | +40         |
+| 总用例数（22 → 62） | 28        | 37        | 50             | 55   | 62   | 62/62 GREEN |
+| 关联 issue          | #732 #881 | #715 #890 | #732 #715 #890 | #890 | —    | —           |
 
 > 后续：在 puppeteer 集成测试里加一份 `memory.benchmark.ts`，循环 `startApp/destroyApp` N 轮，量化对比 `Page.evaluate(() => performance.memory)` + `document.querySelectorAll("*").length`，得到一份「修复前/修复后」对照表。该步骤需要重新构建 esm 并启动 8 个 example dev server，建议放在最终验收时单独跑一次。
-

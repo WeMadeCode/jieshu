@@ -1,10 +1,10 @@
-const path = require('path')
+const path = require('path');
 
 module.exports = {
   // TypeScript compilation is the single source for ESM and declarations.
   // The UMD build consumes that generated JavaScript.
   entry: './esm/index.js',
-  target: ["web", "es5"],
+  target: ['web', 'es2018'],
   output: {
     publicPath: '/',
     path: path.resolve(__dirname, './lib'),
@@ -13,19 +13,19 @@ module.exports = {
     libraryExport: 'default',
     libraryTarget: 'umd',
     globalObject: 'self',
-    umdNamedDefine: true
+    umdNamedDefine: true,
   },
-  mode: "production",
+  mode: 'production',
   externals: {
     vue: {
-      root: "Vue",
-      commonjs: "vue",
-      commonjs2: "vue",
-      amd: "vue"
-    }
+      root: 'Vue',
+      commonjs: 'vue',
+      commonjs2: 'vue',
+      amd: 'vue',
+    },
   },
   resolve: {
-    extensions: ['.js']
+    extensions: ['.js'],
   },
   devtool: 'source-map',
   module: {
@@ -35,11 +35,8 @@ module.exports = {
         exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      }
-    ]
-  }
-}
+        },
+      },
+    ],
+  },
+};

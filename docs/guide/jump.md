@@ -1,7 +1,9 @@
 # 路由跳转
+
 ::: tip 提示
 无界支持子应用间的路由的跳转，下面分场景来举例路由间如何跳转的
 :::
+
 ## 主应用为 history 模式
 
 ### 子应用 A 要打开子应用 B
@@ -31,7 +33,7 @@ export default {
 ```javascript
 // 子应用 A 点击跳转处理函数
 function handleJump() {
-  window.$wujie?.props.jump({ path: "/pathB" });
+  window.$wujie?.props.jump({ path: '/pathB' });
 }
 ```
 
@@ -46,11 +48,12 @@ function handleJump() {
 ```javascript
 // 子应用 A 点击跳转处理函数
 function handleJump() {
-  window.$wujie?.props.jump({ path: "/pathB", query: { B: "/test" } });
+  window.$wujie?.props.jump({ path: '/pathB', query: { B: '/test' } });
 }
 ```
 
 由于跳转后的链接的查询参数带上了 B 应用的路径信息，而子应用 B 开启了路由同步的能力，所以能从 url 上读回需要同步的路径，注意这种办法只有在 B 应用未曾激活过才生效。
+
 ### 子应用 B 为保活应用
 
 如果子应用 B 是保活应用并且没有被打开过，也就是还没有实例化，上述的打开指定路由的方式可以正常工作，但如果子应用 B 已经实例化，保活应用的内部数据和路由状态都会保存下来不随子应用切换而丢失。
@@ -62,7 +65,7 @@ function handleJump() {
 ```javascript
 // 子应用 A 点击跳转处理函数
 function handleJump() {
-  window.$wujie?.bus.$emit("routeChange", "/test");
+  window.$wujie?.bus.$emit('routeChange', '/test');
 }
 ```
 
@@ -70,7 +73,7 @@ function handleJump() {
 
 ```javascript
 // 子应用 B 监听并跳转
-window.$wujie?.bus.$on("routeChange", (path) => this.$router.push({ path }));
+window.$wujie?.bus.$on('routeChange', (path) => this.$router.push({ path }));
 ```
 
 ## 主应用为 hash 模式
@@ -87,7 +90,7 @@ window.$wujie?.bus.$on("routeChange", (path) => this.$router.push({ path }));
 
 ```vue
 <template>
-  <wujie-vue name="A" url="//hostA.com" :props="{jump}" ></wujie-vue>
+  <wujie-vue name="A" url="//hostA.com" :props="{ jump }"></wujie-vue>
 </template>
 
 <script>
@@ -111,7 +114,7 @@ export default {
 
 ```javascript
 function handleJump() {
-  window.$wujie?.props.jump({ path: "/pathB" } , `?B=${window.encodeURIComponent("/test")}`);
+  window.$wujie?.props.jump({ path: '/pathB' }, `?B=${window.encodeURIComponent('/test')}`);
 }
 ```
 

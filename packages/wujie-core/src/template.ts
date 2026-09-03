@@ -6,7 +6,7 @@ export interface ScriptBaseObject {
   defer?: boolean;
   module?: boolean;
   crossorigin?: boolean;
-  crossoriginType?: "anonymous" | "use-credentials" | "";
+  crossoriginType?: 'anonymous' | 'use-credentials' | '';
   attrs?: ScriptAttributes;
 }
 
@@ -35,7 +35,7 @@ export interface TemplateResult {
 }
 
 type PostProcessTemplate = (result: TemplateResult) => TemplateResult;
-type TargetTagName = "link" | "style" | "script";
+type TargetTagName = 'link' | 'style' | 'script';
 
 interface ParsedOpeningTag {
   name: string;
@@ -51,18 +51,18 @@ interface ParsedClosingTag {
 }
 
 interface TextToken {
-  kind: "text";
+  kind: 'text';
   raw: string;
 }
 
 interface LinkToken {
-  kind: "link";
+  kind: 'link';
   raw: string;
   attributes: ScriptAttributes;
 }
 
 interface BlockToken {
-  kind: "style" | "script";
+  kind: 'style' | 'script';
   raw: string;
   content: string;
   attributes: ScriptAttributes;
@@ -71,27 +71,27 @@ interface BlockToken {
 type TemplateToken = TextToken | LinkToken | BlockToken;
 
 const JAVASCRIPT_TYPES = new Set([
-  "text/javascript",
-  "module",
-  "application/javascript",
-  "text/ecmascript",
-  "application/ecmascript",
-  "importmap",
+  'text/javascript',
+  'module',
+  'application/javascript',
+  'text/ecmascript',
+  'application/ecmascript',
+  'importmap',
 ]);
-const RCDATA_TAGS = new Set(["textarea", "title"]);
-const RAW_TEXT_TAGS = new Set(["iframe", "noembed", "noframes", "noscript", "xmp"]);
-const STYLE_ATTRIBUTE_NAMES = ["media", "nonce", "title", "type", "blocking", "disabled"] as const;
+const RCDATA_TAGS = new Set(['textarea', 'title']);
+const RAW_TEXT_TAGS = new Set(['iframe', 'noembed', 'noframes', 'noscript', 'xmp']);
+const STYLE_ATTRIBUTE_NAMES = ['media', 'nonce', 'title', 'type', 'blocking', 'disabled'] as const;
 
-type ForeignNamespace = "svg" | "math";
+type ForeignNamespace = 'svg' | 'math';
 
 interface ElementContext {
   name: string;
-  namespace: "html" | ForeignNamespace;
+  namespace: 'html' | ForeignNamespace;
   htmlIntegrationPoint: boolean;
 }
 
 function isWhitespace(character: string): boolean {
-  return character === " " || character === "\n" || character === "\r" || character === "\t" || character === "\f";
+  return character === ' ' || character === '\n' || character === '\r' || character === '\t' || character === '\f';
 }
 
 function isAsciiAlpha(character: string | undefined): boolean {
@@ -107,7 +107,7 @@ function asciiLowerCharacter(character: string): string {
 
 /** HTML tag matching folds only ASCII letters and therefore never changes source offsets. */
 function toAsciiLowerCase(value: string): string {
-  let normalized = "";
+  let normalized = '';
   for (let index = 0; index < value.length; index += 1) normalized += asciiLowerCharacter(value[index]);
   return normalized;
 }
@@ -121,14 +121,14 @@ function startsWithAsciiCaseInsensitive(source: string, expected: string, start:
 }
 
 function decodeAttributeEntities(value: string): string {
-  if (!value.includes("&")) return value;
-  const decoder = Document.prototype.createElement.call(document, "div") as HTMLDivElement;
+  if (!value.includes('&')) return value;
+  const decoder = Document.prototype.createElement.call(document, 'div') as HTMLDivElement;
   // Character references have different legacy-semicolon rules in RCDATA and
   // attribute states. Parse a real quoted attribute so ambiguous ampersands
   // such as `&notit=1` remain byte-for-byte compatible with browser markup.
-  const quotedValue = value.replace(/"/g, "&quot;");
+  const quotedValue = value.replace(/"/g, '&quot;');
   decoder.innerHTML = `<span data-wujie-value="${quotedValue}"></span>`;
-  return decoder.firstElementChild?.getAttribute("data-wujie-value") ?? value;
+  return decoder.firstElementChild?.getAttribute('data-wujie-value') ?? value;
 }
 
 function findTagEnd(source: string, start: number): number {
@@ -139,7 +139,7 @@ function findTagEnd(source: string, start: number): number {
       if (character === quote) quote = null;
     } else if (character === "'" || character === '"') {
       quote = character;
-    } else if (character === ">") {
+    } else if (character === '>') {
       return index + 1;
     }
   }
@@ -147,7 +147,7 @@ function findTagEnd(source: string, start: number): number {
 }
 
 function readOpeningTag(source: string, start: number): ParsedOpeningTag | null {
-  if (source[start] !== "<") return null;
+  if (source[start] !== '<') return null;
 
   let cursor = start + 1;
   const firstCharacter = source[cursor];
@@ -156,7 +156,7 @@ function readOpeningTag(source: string, start: number): ParsedOpeningTag | null 
   const nameStart = cursor;
   while (cursor < source.length) {
     const character = source[cursor];
-    if (isWhitespace(character) || character === ">" || character === "/") break;
+    if (isWhitespace(character) || character === '>' || character === '/') break;
     cursor += 1;
   }
   if (cursor === nameStart) return null;
@@ -174,14 +174,14 @@ function readOpeningTag(source: string, start: number): ParsedOpeningTag | null 
 }
 
 function readClosingTag(source: string, start: number): ParsedClosingTag | null {
-  if (source[start] !== "<" || source[start + 1] !== "/") return null;
+  if (source[start] !== '<' || source[start + 1] !== '/') return null;
 
   let cursor = start + 2;
   if (!isAsciiAlpha(source[cursor])) return null;
   const nameStart = cursor;
   while (cursor < source.length) {
     const character = source[cursor];
-    if (isWhitespace(character) || character === ">" || character === "/") break;
+    if (isWhitespace(character) || character === '>' || character === '/') break;
     cursor += 1;
   }
   if (cursor === nameStart) return null;
@@ -193,7 +193,7 @@ function readClosingTag(source: string, start: number): ParsedClosingTag | null 
 function isSelfClosingTag(raw: string): boolean {
   let cursor = raw.length - 2;
   while (cursor >= 0 && isWhitespace(raw[cursor])) cursor -= 1;
-  return raw[cursor] === "/";
+  return raw[cursor] === '/';
 }
 
 /**
@@ -203,25 +203,25 @@ function isSelfClosingTag(raw: string): boolean {
  */
 export function parseTagAttributes(tagOuterHTML: string): ScriptAttributes {
   const tagEnd = findTagEnd(tagOuterHTML, 0);
-  if (tagOuterHTML[0] !== "<" || tagEnd < 0) return {};
+  if (tagOuterHTML[0] !== '<' || tagEnd < 0) return {};
 
   let cursor = 1;
-  if (tagOuterHTML[cursor] === "/") cursor += 1;
-  while (cursor < tagEnd && !isWhitespace(tagOuterHTML[cursor]) && tagOuterHTML[cursor] !== ">") cursor += 1;
+  if (tagOuterHTML[cursor] === '/') cursor += 1;
+  while (cursor < tagEnd && !isWhitespace(tagOuterHTML[cursor]) && tagOuterHTML[cursor] !== '>') cursor += 1;
 
   const attributes: ScriptAttributes = {};
   while (cursor < tagEnd - 1) {
     while (cursor < tagEnd - 1 && isWhitespace(tagOuterHTML[cursor])) cursor += 1;
-    if (tagOuterHTML[cursor] === ">" || (tagOuterHTML[cursor] === "/" && tagOuterHTML[cursor + 1] === ">")) break;
+    if (tagOuterHTML[cursor] === '>' || (tagOuterHTML[cursor] === '/' && tagOuterHTML[cursor + 1] === '>')) break;
 
     const nameStart = cursor;
     while (cursor < tagEnd - 1) {
       const character = tagOuterHTML[cursor];
       if (
         isWhitespace(character) ||
-        character === "=" ||
-        character === ">" ||
-        (character === "/" && tagOuterHTML[cursor + 1] === ">")
+        character === '=' ||
+        character === '>' ||
+        (character === '/' && tagOuterHTML[cursor + 1] === '>')
       ) {
         break;
       }
@@ -234,7 +234,7 @@ export function parseTagAttributes(tagOuterHTML: string): ScriptAttributes {
     }
 
     while (cursor < tagEnd - 1 && isWhitespace(tagOuterHTML[cursor])) cursor += 1;
-    if (tagOuterHTML[cursor] !== "=") {
+    if (tagOuterHTML[cursor] !== '=') {
       attributes[name] = true;
       continue;
     }
@@ -253,8 +253,8 @@ export function parseTagAttributes(tagOuterHTML: string): ScriptAttributes {
       while (
         cursor < tagEnd - 1 &&
         !isWhitespace(tagOuterHTML[cursor]) &&
-        tagOuterHTML[cursor] !== ">" &&
-        !(tagOuterHTML[cursor] === "/" && tagOuterHTML[cursor + 1] === ">")
+        tagOuterHTML[cursor] !== '>' &&
+        !(tagOuterHTML[cursor] === '/' && tagOuterHTML[cursor + 1] === '>')
       ) {
         cursor += 1;
       }
@@ -265,19 +265,19 @@ export function parseTagAttributes(tagOuterHTML: string): ScriptAttributes {
 }
 
 function isTagBoundary(character: string | undefined): boolean {
-  return character === undefined || character === ">" || character === "/" || isWhitespace(character);
+  return character === undefined || character === '>' || character === '/' || isWhitespace(character);
 }
 
 function findClosingTag(
   source: string,
   name: string,
-  start: number
+  start: number,
 ): {
   start: number;
   end: number;
 } | null {
   const prefix = `</${name}`;
-  let closeStart = source.indexOf("<", start);
+  let closeStart = source.indexOf('<', start);
   while (closeStart >= 0) {
     if (
       startsWithAsciiCaseInsensitive(source, prefix, closeStart) &&
@@ -287,7 +287,7 @@ function findClosingTag(
       if (closeEnd >= 0) return { start: closeStart, end: closeEnd };
       return null;
     }
-    closeStart = source.indexOf("<", closeStart + 1);
+    closeStart = source.indexOf('<', closeStart + 1);
   }
   return null;
 }
@@ -299,13 +299,13 @@ interface CommentConsumption {
 
 function consumeComment(source: string, start: number): CommentConsumption {
   let cursor = start + 4;
-  if (source[cursor] === ">") return { end: cursor + 1, terminated: true };
-  if (source[cursor] === "-" && source[cursor + 1] === ">") return { end: cursor + 2, terminated: true };
+  if (source[cursor] === '>') return { end: cursor + 1, terminated: true };
+  if (source[cursor] === '-' && source[cursor + 1] === '>') return { end: cursor + 2, terminated: true };
 
   while (cursor < source.length) {
-    if (source[cursor] === "-" && source[cursor + 1] === "-") {
-      if (source[cursor + 2] === ">") return { end: cursor + 3, terminated: true };
-      if (source[cursor + 2] === "!" && source[cursor + 3] === ">") {
+    if (source[cursor] === '-' && source[cursor + 1] === '-') {
+      if (source[cursor + 2] === '>') return { end: cursor + 3, terminated: true };
+      if (source[cursor + 2] === '!' && source[cursor + 3] === '>') {
         return { end: cursor + 4, terminated: true };
       }
     }
@@ -315,16 +315,16 @@ function consumeComment(source: string, start: number): CommentConsumption {
 }
 
 function consumeUntilGreaterThan(source: string, start: number): number {
-  const end = source.indexOf(">", start);
+  const end = source.indexOf('>', start);
   return end < 0 ? source.length : end + 1;
 }
 
 function consumeMarkupDeclaration(source: string, start: number, inForeignContext: boolean): number {
-  if (inForeignContext && source.startsWith("<![CDATA[", start)) {
-    const end = source.indexOf("]]>", start + 9);
+  if (inForeignContext && source.startsWith('<![CDATA[', start)) {
+    const end = source.indexOf(']]>', start + 9);
     return end < 0 ? source.length : end + 3;
   }
-  if (startsWithAsciiCaseInsensitive(source, "<!doctype", start)) {
+  if (startsWithAsciiCaseInsensitive(source, '<!doctype', start)) {
     const end = findTagEnd(source, start + 9);
     return end < 0 ? source.length : end;
   }
@@ -334,24 +334,24 @@ function consumeMarkupDeclaration(source: string, start: number, inForeignContex
 }
 
 const HTML_VOID_TAGS = new Set([
-  "area",
-  "base",
-  "br",
-  "col",
-  "embed",
-  "hr",
-  "img",
-  "input",
-  "link",
-  "meta",
-  "param",
-  "source",
-  "track",
-  "wbr",
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
 ]);
 
-function currentNamespace(stack: readonly ElementContext[]): "html" | ForeignNamespace {
-  return stack[stack.length - 1]?.namespace ?? "html";
+function currentNamespace(stack: readonly ElementContext[]): 'html' | ForeignNamespace {
+  return stack[stack.length - 1]?.namespace ?? 'html';
 }
 
 function isHtmlIntegrationPoint(context: ElementContext): boolean {
@@ -360,15 +360,15 @@ function isHtmlIntegrationPoint(context: ElementContext): boolean {
 
 function namespaceForOpeningTag(
   openingTag: ParsedOpeningTag,
-  stack: readonly ElementContext[]
-): "html" | ForeignNamespace {
+  stack: readonly ElementContext[],
+): 'html' | ForeignNamespace {
   const parent = stack[stack.length - 1];
-  const parentNamespace = parent?.namespace ?? "html";
-  const contentNamespace = parent && isHtmlIntegrationPoint(parent) ? "html" : parentNamespace;
-  if (contentNamespace === "html") {
-    if (openingTag.name === "svg") return "svg";
-    if (openingTag.name === "math") return "math";
-    return "html";
+  const parentNamespace = parent?.namespace ?? 'html';
+  const contentNamespace = parent && isHtmlIntegrationPoint(parent) ? 'html' : parentNamespace;
+  if (contentNamespace === 'html') {
+    if (openingTag.name === 'svg') return 'svg';
+    if (openingTag.name === 'math') return 'math';
+    return 'html';
   }
   return contentNamespace;
 }
@@ -376,13 +376,13 @@ function namespaceForOpeningTag(
 function openElementContext(
   stack: ElementContext[],
   openingTag: ParsedOpeningTag,
-  namespace: "html" | ForeignNamespace
+  namespace: 'html' | ForeignNamespace,
 ): void {
-  if (openingTag.selfClosing || (namespace === "html" && HTML_VOID_TAGS.has(openingTag.name))) return;
+  if (openingTag.selfClosing || (namespace === 'html' && HTML_VOID_TAGS.has(openingTag.name))) return;
   stack.push({
     name: openingTag.name,
     namespace,
-    htmlIntegrationPoint: namespace === "svg" && ["foreignobject", "desc", "title"].includes(openingTag.name),
+    htmlIntegrationPoint: namespace === 'svg' && ['foreignobject', 'desc', 'title'].includes(openingTag.name),
   });
 }
 
@@ -403,30 +403,30 @@ function closeElementContext(stack: ElementContext[], name: string): void {
 function findTemplateEnd(source: string, start: number): number {
   let depth = 1;
   let cursor = start;
-  const stack: ElementContext[] = [{ name: "template", namespace: "html", htmlIntegrationPoint: false }];
+  const stack: ElementContext[] = [{ name: 'template', namespace: 'html', htmlIntegrationPoint: false }];
   while (cursor < source.length) {
-    const tagStart = source.indexOf("<", cursor);
+    const tagStart = source.indexOf('<', cursor);
     if (tagStart < 0) return source.length;
-    if (source.startsWith("<!--", tagStart)) {
+    if (source.startsWith('<!--', tagStart)) {
       cursor = consumeComment(source, tagStart).end;
       continue;
     }
-    if (source.startsWith("<!", tagStart)) {
-      cursor = consumeMarkupDeclaration(source, tagStart, currentNamespace(stack) !== "html");
+    if (source.startsWith('<!', tagStart)) {
+      cursor = consumeMarkupDeclaration(source, tagStart, currentNamespace(stack) !== 'html');
       continue;
     }
-    if (source.startsWith("<?", tagStart)) {
+    if (source.startsWith('<?', tagStart)) {
       cursor = consumeUntilGreaterThan(source, tagStart + 2);
       continue;
     }
 
-    if (source.startsWith("</", tagStart)) {
+    if (source.startsWith('</', tagStart)) {
       const closingTag = readClosingTag(source, tagStart);
       if (!closingTag) {
         cursor = consumeUntilGreaterThan(source, tagStart + 2);
         continue;
       }
-      if (closingTag.name === "template") {
+      if (closingTag.name === 'template') {
         depth -= 1;
         if (depth === 0) return closingTag.end;
       }
@@ -444,17 +444,17 @@ function findTemplateEnd(source: string, start: number): number {
       return source.length;
     }
     const namespace = namespaceForOpeningTag(openingTag, stack);
-    if (namespace === "html" && openingTag.name === "template") {
+    if (namespace === 'html' && openingTag.name === 'template') {
       depth += 1;
       openElementContext(stack, openingTag, namespace);
       cursor = openingTag.end;
       continue;
     }
-    if (namespace === "html" && openingTag.name === "plaintext") return source.length;
+    if (namespace === 'html' && openingTag.name === 'plaintext') return source.length;
     if (
-      openingTag.name === "script" ||
-      openingTag.name === "style" ||
-      (namespace === "html" && (RCDATA_TAGS.has(openingTag.name) || RAW_TEXT_TAGS.has(openingTag.name)))
+      openingTag.name === 'script' ||
+      openingTag.name === 'style' ||
+      (namespace === 'html' && (RCDATA_TAGS.has(openingTag.name) || RAW_TEXT_TAGS.has(openingTag.name)))
     ) {
       cursor = findClosingTag(source, openingTag.name, openingTag.end)?.end ?? source.length;
       continue;
@@ -468,11 +468,11 @@ function findTemplateEnd(source: string, start: number): number {
 function findOpaqueContextEnd(
   source: string,
   openingTag: ParsedOpeningTag,
-  namespace: "html" | ForeignNamespace
+  namespace: 'html' | ForeignNamespace,
 ): number | undefined {
-  if (namespace !== "html") return undefined;
-  if (openingTag.name === "template") return findTemplateEnd(source, openingTag.end);
-  if (openingTag.name === "plaintext") return source.length;
+  if (namespace !== 'html') return undefined;
+  if (openingTag.name === 'template') return findTemplateEnd(source, openingTag.end);
+  if (openingTag.name === 'plaintext') return source.length;
   if (!RCDATA_TAGS.has(openingTag.name) && !RAW_TEXT_TAGS.has(openingTag.name)) return undefined;
   return findClosingTag(source, openingTag.name, openingTag.end)?.end ?? source.length;
 }
@@ -485,18 +485,17 @@ function tokenizeTemplate(template: string): TemplateToken[] {
   let textStart = 0;
 
   const pushText = (end: number): void => {
-    if (end > textStart) tokens.push({ kind: "text", raw: source.slice(textStart, end) });
+    if (end > textStart) tokens.push({ kind: 'text', raw: source.slice(textStart, end) });
   };
 
   while (cursor < source.length) {
-    const tagStart = source.indexOf("<", cursor);
+    const tagStart = source.indexOf('<', cursor);
     if (tagStart < 0) break;
-    if (source.startsWith("<!--", tagStart)) {
+    if (source.startsWith('<!--', tagStart)) {
       const comment = consumeComment(source, tagStart);
       if (!comment.terminated) {
         // Preserve malformed trailing markup, but never scan tags inside an
         // unterminated comment as executable resources.
-        cursor = source.length;
         break;
       }
       pushText(tagStart);
@@ -504,15 +503,15 @@ function tokenizeTemplate(template: string): TemplateToken[] {
       textStart = cursor;
       continue;
     }
-    if (source.startsWith("<!", tagStart)) {
-      cursor = consumeMarkupDeclaration(source, tagStart, currentNamespace(stack) !== "html");
+    if (source.startsWith('<!', tagStart)) {
+      cursor = consumeMarkupDeclaration(source, tagStart, currentNamespace(stack) !== 'html');
       continue;
     }
-    if (source.startsWith("<?", tagStart)) {
+    if (source.startsWith('<?', tagStart)) {
       cursor = consumeUntilGreaterThan(source, tagStart + 2);
       continue;
     }
-    if (source.startsWith("</", tagStart)) {
+    if (source.startsWith('</', tagStart)) {
       const closingTag = readClosingTag(source, tagStart);
       if (closingTag) {
         closeElementContext(stack, closingTag.name);
@@ -528,7 +527,6 @@ function tokenizeTemplate(template: string): TemplateToken[] {
     }
     const openingTag = readOpeningTag(source, tagStart);
     if (!openingTag) {
-      cursor = source.length;
       break;
     }
     const namespace = namespaceForOpeningTag(openingTag, stack);
@@ -537,26 +535,26 @@ function tokenizeTemplate(template: string): TemplateToken[] {
       cursor = opaqueContextEnd;
       continue;
     }
-    if (!(["link", "style", "script"] as TargetTagName[]).includes(openingTag.name as TargetTagName)) {
+    if (!(['link', 'style', 'script'] as TargetTagName[]).includes(openingTag.name as TargetTagName)) {
       openElementContext(stack, openingTag, namespace);
       cursor = openingTag.end;
       continue;
     }
 
     pushText(tagStart);
-    if (openingTag.name === "link") {
-      tokens.push({ kind: "link", raw: openingTag.raw, attributes: openingTag.attributes });
+    if (openingTag.name === 'link') {
+      tokens.push({ kind: 'link', raw: openingTag.raw, attributes: openingTag.attributes });
       openElementContext(stack, openingTag, namespace);
       cursor = openingTag.end;
       textStart = cursor;
       continue;
     }
 
-    const blockName = openingTag.name as "style" | "script";
+    const blockName = openingTag.name as 'style' | 'script';
     const closingTag = findClosingTag(source, blockName, openingTag.end);
     if (!closingTag) {
       // An unterminated block is left byte-for-byte intact.
-      tokens.push({ kind: "text", raw: source.slice(tagStart) });
+      tokens.push({ kind: 'text', raw: source.slice(tagStart) });
       return tokens;
     }
 
@@ -585,7 +583,7 @@ function hasAttribute(attributes: ScriptAttributes, name: string): boolean {
 
 function stringAttribute(attributes: ScriptAttributes, name: string): string | undefined {
   const value = findAttribute(attributes, name);
-  return typeof value === "string" ? value : undefined;
+  return typeof value === 'string' ? value : undefined;
 }
 
 function collectStyleAttributes(attributes: ScriptAttributes): ScriptAttributes | undefined {
@@ -603,13 +601,13 @@ function isSerializableAttributeName(name: string): boolean {
     const character = name[index];
     if (
       isWhitespace(character) ||
-      character === "\0" ||
+      character === '\0' ||
       character === '"' ||
       character === "'" ||
-      character === ">" ||
-      character === "<" ||
-      character === "/" ||
-      character === "="
+      character === '>' ||
+      character === '<' ||
+      character === '/' ||
+      character === '='
     ) {
       return false;
     }
@@ -618,24 +616,24 @@ function isSerializableAttributeName(name: string): boolean {
 }
 
 function escapeAttributeValue(value: string): string {
-  let escaped = "";
+  let escaped = '';
   for (let index = 0; index < value.length; index += 1) {
     const character = value[index];
-    if (character === "&") escaped += "&amp;";
-    else if (character === '"') escaped += "&quot;";
-    else if (character === "<") escaped += "&lt;";
-    else if (character === ">") escaped += "&gt;";
+    if (character === '&') escaped += '&amp;';
+    else if (character === '"') escaped += '&quot;';
+    else if (character === '<') escaped += '&lt;';
+    else if (character === '>') escaped += '&gt;';
     else escaped += character;
   }
   return escaped;
 }
 
 function serializeResolvedLink(attributes: ScriptAttributes, resolvedHref: string): string {
-  let serializedAttributes = "";
+  let serializedAttributes = '';
   let wroteHref = false;
   Object.keys(attributes).forEach((name) => {
     if (!isSerializableAttributeName(name)) return;
-    const isHref = toAsciiLowerCase(name) === "href";
+    const isHref = toAsciiLowerCase(name) === 'href';
     const value = isHref ? resolvedHref : attributes[name];
     if (isHref) wroteHref = true;
     if (value === false) return;
@@ -646,11 +644,11 @@ function serializeResolvedLink(attributes: ScriptAttributes, resolvedHref: strin
 }
 
 function hasRel(attributes: ScriptAttributes, relation: string): boolean {
-  return (stringAttribute(attributes, "rel") ?? "").toLowerCase().split(/\s+/).filter(Boolean).includes(relation);
+  return (stringAttribute(attributes, 'rel') ?? '').toLowerCase().split(/\s+/).filter(Boolean).includes(relation);
 }
 
 function resolveAssetUrl(url: string, baseURI: string): string {
-  if (url.startsWith("//") || url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith('//') || url.startsWith('http://') || url.startsWith('https://')) return url;
   return new URL(url, baseURI).toString();
 }
 
@@ -659,35 +657,38 @@ function isValidJavaScriptType(type: string | undefined): boolean {
 }
 
 function supportsModuleScripts(): boolean {
-  return "noModule" in window.document.createElement("script");
+  return 'noModule' in window.document.createElement('script');
 }
 
-function crossOriginType(attributes: ScriptAttributes): "anonymous" | "use-credentials" | "" {
-  const value = stringAttribute(attributes, "crossorigin")?.toLowerCase();
-  return value === "anonymous" || value === "use-credentials" ? value : "";
+function crossOriginType(attributes: ScriptAttributes): 'anonymous' | 'use-credentials' | '' {
+  const value = stringAttribute(attributes, 'crossorigin')?.toLowerCase();
+  return value === 'anonymous' || value === 'use-credentials' ? value : '';
 }
 
 export const genLinkReplaceSymbol = (linkHref: string, preloadOrPrefetch = false): string =>
-  `<!-- ${preloadOrPrefetch ? "prefetch/preload/modulepreload" : ""} link ${linkHref} replaced by wujie -->`;
+  `<!-- ${preloadOrPrefetch ? 'prefetch/preload/modulepreload' : ''} link ${linkHref} replaced by wujie -->`;
 export const getInlineStyleReplaceSymbol = (index: number): string =>
   `<!-- inline-style-${index} replaced by wujie -->`;
-export const genScriptReplaceSymbol = (scriptSrc: string, type = ""): string =>
+export const genScriptReplaceSymbol = (scriptSrc: string, type = ''): string =>
   `<!-- ${type} script ${scriptSrc} replaced by wujie -->`;
-export const inlineScriptReplaceSymbol = "<!-- inline scripts replaced by wujie -->";
+export const inlineScriptReplaceSymbol = '<!-- inline scripts replaced by wujie -->';
 export const genIgnoreAssetReplaceSymbol = (url: string): string =>
-  `<!-- ignore asset ${url || "file"} replaced by wujie -->`;
+  `<!-- ignore asset ${url || 'file'} replaced by wujie -->`;
 export const genModuleScriptReplaceSymbol = (scriptSrc: string, moduleSupport: boolean): string =>
-  `<!-- ${moduleSupport ? "nomodule" : "module"} script ${scriptSrc} ignored by wujie -->`;
+  `<!-- ${moduleSupport ? 'nomodule' : 'module'} script ${scriptSrc} ignored by wujie -->`;
 
 class TemplateCompiler {
   private readonly scripts: ScriptObject[] = [];
   private readonly styles: StyleObject[] = [];
   private explicitEntry: string | undefined;
 
-  constructor(private readonly baseURI: string, private readonly moduleSupport: boolean) {}
+  constructor(
+    private readonly baseURI: string,
+    private readonly moduleSupport: boolean,
+  ) {}
 
   compile(tokens: TemplateToken[]): TemplateResult {
-    const template = tokens.map((token) => this.compileToken(token)).join("");
+    const template = tokens.map((token) => this.compileToken(token)).join('');
     return {
       template,
       scripts: this.scripts,
@@ -697,17 +698,17 @@ class TemplateCompiler {
   }
 
   private compileToken(token: TemplateToken): string {
-    if (token.kind === "text") return token.raw;
-    if (token.kind === "link") return this.compileLink(token);
-    if (token.kind === "style") return this.compileStyle(token);
+    if (token.kind === 'text') return token.raw;
+    if (token.kind === 'link') return this.compileLink(token);
+    if (token.kind === 'style') return this.compileStyle(token);
     return this.compileScript(token);
   }
 
   private compileLink(token: LinkToken): string {
-    const href = stringAttribute(token.attributes, "href");
-    if (href && hasRel(token.attributes, "stylesheet")) {
+    const href = stringAttribute(token.attributes, 'href');
+    if (href && hasRel(token.attributes, 'stylesheet')) {
       const resolvedHref = resolveAssetUrl(href, this.baseURI);
-      if (hasAttribute(token.attributes, "ignore")) return genIgnoreAssetReplaceSymbol(resolvedHref);
+      if (hasAttribute(token.attributes, 'ignore')) return genIgnoreAssetReplaceSymbol(resolvedHref);
       const styleAttributes = collectStyleAttributes(token.attributes);
       const style: StyleObject = {
         src: resolvedHref,
@@ -718,16 +719,16 @@ class TemplateCompiler {
       return genLinkReplaceSymbol(resolvedHref);
     }
 
-    const isPreload = ["preload", "prefetch", "modulepreload"].some((relation) => hasRel(token.attributes, relation));
-    if (href && isPreload && stringAttribute(token.attributes, "as")?.toLowerCase() !== "font") {
+    const isPreload = ['preload', 'prefetch', 'modulepreload'].some((relation) => hasRel(token.attributes, relation));
+    if (href && isPreload && stringAttribute(token.attributes, 'as')?.toLowerCase() !== 'font') {
       return genLinkReplaceSymbol(href, true);
     }
     return token.raw;
   }
 
   private compileStyle(token: BlockToken): string {
-    if (hasAttribute(token.attributes, "ignore")) return genIgnoreAssetReplaceSymbol("style file");
-    const style: StyleObject = { src: "", content: token.content };
+    if (hasAttribute(token.attributes, 'ignore')) return genIgnoreAssetReplaceSymbol('style file');
+    const style: StyleObject = { src: '', content: token.content };
     const styleAttributes = collectStyleAttributes(token.attributes);
     if (styleAttributes) style.attrs = styleAttributes;
     const index = this.styles.push(style) - 1;
@@ -735,31 +736,31 @@ class TemplateCompiler {
   }
 
   private compileScript(token: BlockToken): string {
-    const scriptType = stringAttribute(token.attributes, "type");
+    const scriptType = stringAttribute(token.attributes, 'type');
     if (!isValidJavaScriptType(scriptType)) return token.raw;
 
     const normalizedScriptType = scriptType?.trim().toLowerCase();
-    const isModule = normalizedScriptType === "module";
-    const isIgnored = hasAttribute(token.attributes, "ignore");
+    const isModule = normalizedScriptType === 'module';
+    const isIgnored = hasAttribute(token.attributes, 'ignore');
     const shouldSkipForModuleSupport =
-      (this.moduleSupport && hasAttribute(token.attributes, "nomodule")) || (!this.moduleSupport && isModule);
-    const sourceAttribute = stringAttribute(token.attributes, "src");
+      (this.moduleSupport && hasAttribute(token.attributes, 'nomodule')) || (!this.moduleSupport && isModule);
+    const sourceAttribute = stringAttribute(token.attributes, 'src');
     const source = sourceAttribute ? resolveAssetUrl(sourceAttribute, this.baseURI) : undefined;
 
-    if (source && hasAttribute(token.attributes, "entry")) {
-      if (this.explicitEntry) throw new SyntaxError("You should not set multiply entry script!");
+    if (source && hasAttribute(token.attributes, 'entry')) {
+      if (this.explicitEntry) throw new SyntaxError('You should not set multiply entry script!');
       this.explicitEntry = source;
     }
 
-    if (isIgnored) return genIgnoreAssetReplaceSymbol(source ?? "js file");
-    if (shouldSkipForModuleSupport) return genModuleScriptReplaceSymbol(source ?? "js file", this.moduleSupport);
+    if (isIgnored) return genIgnoreAssetReplaceSymbol(source ?? 'js file');
+    if (shouldSkipForModuleSupport) return genModuleScriptReplaceSymbol(source ?? 'js file', this.moduleSupport);
 
-    const crossorigin = hasAttribute(token.attributes, "crossorigin");
+    const crossorigin = hasAttribute(token.attributes, 'crossorigin');
     // Execution distinguishes import maps by the canonical lower-case key and
     // value. Preserve every original attribute while supplying that contract
     // for case-insensitive HTML spellings.
     const scriptAttributes =
-      normalizedScriptType === "importmap" ? { ...token.attributes, type: "importmap" } : token.attributes;
+      normalizedScriptType === 'importmap' ? { ...token.attributes, type: 'importmap' } : token.attributes;
     const baseScript: ScriptBaseObject = {
       module: isModule,
       crossorigin,
@@ -768,16 +769,16 @@ class TemplateCompiler {
     };
 
     if (source) {
-      const async = hasAttribute(token.attributes, "async");
-      const defer = hasAttribute(token.attributes, "defer");
+      const async = hasAttribute(token.attributes, 'async');
+      const defer = hasAttribute(token.attributes, 'defer');
       this.scripts.push(async || defer ? { ...baseScript, src: source, async, defer } : { ...baseScript, src: source });
-      return genScriptReplaceSymbol(source, async ? "async" : defer ? "defer" : "");
+      return genScriptReplaceSymbol(source, async ? 'async' : defer ? 'defer' : '');
     }
 
     const isPureCommentBlock = token.content
       .split(/[\r\n]+/)
-      .every((line) => !line.trim() || line.trim().startsWith("//"));
-    if (token.content && !isPureCommentBlock) this.scripts.push({ ...baseScript, src: "", content: token.content });
+      .every((line) => !line.trim() || line.trim().startsWith('//'));
+    if (token.content && !isPureCommentBlock) this.scripts.push({ ...baseScript, src: '', content: token.content });
     return inlineScriptReplaceSymbol;
   }
 }
@@ -785,8 +786,8 @@ class TemplateCompiler {
 export default function processTpl(
   template: string,
   baseURI: string,
-  postProcessTemplate?: PostProcessTemplate
+  postProcessTemplate?: PostProcessTemplate,
 ): TemplateResult {
   const result = new TemplateCompiler(baseURI, supportsModuleScripts()).compile(tokenizeTemplate(template));
-  return typeof postProcessTemplate === "function" ? postProcessTemplate(result) : result;
+  return typeof postProcessTemplate === 'function' ? postProcessTemplate(result) : result;
 }

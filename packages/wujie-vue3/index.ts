@@ -1,24 +1,9 @@
-import {
-  defineComponent,
-  h,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from "vue";
-import type { App, ComponentPublicInstance, CSSProperties, DefineComponent, PropType } from "vue";
-import {
-  bus,
-  clearAssetsCache,
-  createAppController,
-  destroyApp,
-  preloadApp,
-  refreshApp,
-  setupApp,
-} from "wujie";
-import type { DestroyHandler, StartOptions } from "wujie";
+import { defineComponent, h, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import type { App, ComponentPublicInstance, CSSProperties, DefineComponent, PropType } from 'vue';
+import { bus, clearAssetsCache, createAppController, destroyApp, preloadApp, refreshApp, setupApp } from 'wujie';
+import type { DestroyHandler, StartOptions } from 'wujie';
 
-export type WujieVueProps = Omit<StartOptions, "el"> & {
+export type WujieVueProps = Omit<StartOptions, 'el'> & {
   width?: string;
   height?: string;
   style?: CSSProperties;
@@ -55,63 +40,67 @@ function optionalProp<T>(type: PropType<T>): OptionalProp<T> {
   return { type, default: undefined };
 }
 
-const DOM_ELEMENT_TYPE = (typeof HTMLElement === "undefined" ? Object : HTMLElement) as PropType<HTMLElement>;
+const DOM_ELEMENT_TYPE = (typeof HTMLElement === 'undefined' ? Object : HTMLElement) as PropType<HTMLElement>;
 
 const componentProps = {
-  name: { type: String, default: "" },
-  url: { type: String, default: "" },
+  name: { type: String, default: '' },
+  url: { type: String, default: '' },
   html: optionalProp<string>(String),
-  width: { type: String, default: "" },
-  height: { type: String, default: "" },
+  width: { type: String, default: '' },
+  height: { type: String, default: '' },
   style: optionalProp<CSSProperties>(Object as PropType<CSSProperties>),
   loading: optionalProp<HTMLElement>(DOM_ELEMENT_TYPE),
-  replace: optionalProp<NonNullable<StartOptions["replace"]>>(Function as PropType<NonNullable<StartOptions["replace"]>>),
-  fetch: optionalProp<NonNullable<StartOptions["fetch"]>>(Function as PropType<NonNullable<StartOptions["fetch"]>>),
-  props: optionalProp<NonNullable<StartOptions["props"]>>(Object as PropType<NonNullable<StartOptions["props"]>>),
-  attrs: optionalProp<NonNullable<StartOptions["attrs"]>>(Object as PropType<NonNullable<StartOptions["attrs"]>>),
-  degradeAttrs: optionalProp<NonNullable<StartOptions["degradeAttrs"]>>(
-    Object as PropType<NonNullable<StartOptions["degradeAttrs"]>>
+  replace: optionalProp<NonNullable<StartOptions['replace']>>(
+    Function as PropType<NonNullable<StartOptions['replace']>>,
+  ),
+  fetch: optionalProp<NonNullable<StartOptions['fetch']>>(Function as PropType<NonNullable<StartOptions['fetch']>>),
+  props: optionalProp<NonNullable<StartOptions['props']>>(Object as PropType<NonNullable<StartOptions['props']>>),
+  attrs: optionalProp<NonNullable<StartOptions['attrs']>>(Object as PropType<NonNullable<StartOptions['attrs']>>),
+  degradeAttrs: optionalProp<NonNullable<StartOptions['degradeAttrs']>>(
+    Object as PropType<NonNullable<StartOptions['degradeAttrs']>>,
   ),
   sync: optionalProp<boolean>(Boolean),
-  prefix: optionalProp<NonNullable<StartOptions["prefix"]>>(Object as PropType<NonNullable<StartOptions["prefix"]>>),
+  prefix: optionalProp<NonNullable<StartOptions['prefix']>>(Object as PropType<NonNullable<StartOptions['prefix']>>),
   fiber: optionalProp<boolean>(Boolean),
   alive: optionalProp<boolean>(Boolean),
   degrade: optionalProp<boolean>(Boolean),
-  plugins: optionalProp<NonNullable<StartOptions["plugins"]>>(Array as unknown as PropType<NonNullable<StartOptions["plugins"]>>),
-  iframeAddEventListeners: optionalProp<NonNullable<StartOptions["iframeAddEventListeners"]>>(
-    Array as unknown as PropType<NonNullable<StartOptions["iframeAddEventListeners"]>>
+  plugins: optionalProp<NonNullable<StartOptions['plugins']>>(
+    Array as unknown as PropType<NonNullable<StartOptions['plugins']>>,
   ),
-  iframeOnEvents: optionalProp<NonNullable<StartOptions["iframeOnEvents"]>>(
-    Array as unknown as PropType<NonNullable<StartOptions["iframeOnEvents"]>>
+  iframeAddEventListeners: optionalProp<NonNullable<StartOptions['iframeAddEventListeners']>>(
+    Array as unknown as PropType<NonNullable<StartOptions['iframeAddEventListeners']>>,
   ),
-  beforeLoad: optionalProp<NonNullable<StartOptions["beforeLoad"]>>(
-    Function as PropType<NonNullable<StartOptions["beforeLoad"]>>
+  iframeOnEvents: optionalProp<NonNullable<StartOptions['iframeOnEvents']>>(
+    Array as unknown as PropType<NonNullable<StartOptions['iframeOnEvents']>>,
   ),
-  beforeMount: optionalProp<NonNullable<StartOptions["beforeMount"]>>(
-    Function as PropType<NonNullable<StartOptions["beforeMount"]>>
+  beforeLoad: optionalProp<NonNullable<StartOptions['beforeLoad']>>(
+    Function as PropType<NonNullable<StartOptions['beforeLoad']>>,
   ),
-  afterMount: optionalProp<NonNullable<StartOptions["afterMount"]>>(
-    Function as PropType<NonNullable<StartOptions["afterMount"]>>
+  beforeMount: optionalProp<NonNullable<StartOptions['beforeMount']>>(
+    Function as PropType<NonNullable<StartOptions['beforeMount']>>,
   ),
-  beforeUnmount: optionalProp<NonNullable<StartOptions["beforeUnmount"]>>(
-    Function as PropType<NonNullable<StartOptions["beforeUnmount"]>>
+  afterMount: optionalProp<NonNullable<StartOptions['afterMount']>>(
+    Function as PropType<NonNullable<StartOptions['afterMount']>>,
   ),
-  afterUnmount: optionalProp<NonNullable<StartOptions["afterUnmount"]>>(
-    Function as PropType<NonNullable<StartOptions["afterUnmount"]>>
+  beforeUnmount: optionalProp<NonNullable<StartOptions['beforeUnmount']>>(
+    Function as PropType<NonNullable<StartOptions['beforeUnmount']>>,
   ),
-  activated: optionalProp<NonNullable<StartOptions["activated"]>>(
-    Function as PropType<NonNullable<StartOptions["activated"]>>
+  afterUnmount: optionalProp<NonNullable<StartOptions['afterUnmount']>>(
+    Function as PropType<NonNullable<StartOptions['afterUnmount']>>,
   ),
-  deactivated: optionalProp<NonNullable<StartOptions["deactivated"]>>(
-    Function as PropType<NonNullable<StartOptions["deactivated"]>>
+  activated: optionalProp<NonNullable<StartOptions['activated']>>(
+    Function as PropType<NonNullable<StartOptions['activated']>>,
   ),
-  loadError: optionalProp<NonNullable<StartOptions["loadError"]>>(
-    Function as PropType<NonNullable<StartOptions["loadError"]>>
+  deactivated: optionalProp<NonNullable<StartOptions['deactivated']>>(
+    Function as PropType<NonNullable<StartOptions['deactivated']>>,
+  ),
+  loadError: optionalProp<NonNullable<StartOptions['loadError']>>(
+    Function as PropType<NonNullable<StartOptions['loadError']>>,
   ),
 } as const;
 
 type ResolvedComponentProps = Readonly<{
-  [Key in keyof typeof componentProps]: Key extends "name" | "url" | "width" | "height"
+  [Key in keyof typeof componentProps]: Key extends 'name' | 'url' | 'width' | 'height'
     ? string
     : Key extends keyof WujieVueProps
       ? WujieVueProps[Key]
@@ -119,7 +108,7 @@ type ResolvedComponentProps = Readonly<{
 }>;
 
 function optionsFromProps(props: ResolvedComponentProps, container: HTMLElement | null): StartOptions {
-  if (!container) throw new Error("WujieVue cannot start before its container is mounted");
+  if (!container) throw new Error('WujieVue cannot start before its container is mounted');
 
   return {
     name: props.name,
@@ -152,11 +141,11 @@ function optionsFromProps(props: ResolvedComponentProps, container: HTMLElement 
 }
 
 function reportAutomaticFailure(error: unknown): void {
-  console.error("[wujie-vue3] failed to start application", error);
+  console.error('[wujie-vue3] failed to start application', error);
 }
 
 const component = defineComponent({
-  name: "WujieVue",
+  name: 'WujieVue',
   props: componentProps,
 
   setup(props, { emit }) {
@@ -209,8 +198,8 @@ const component = defineComponent({
   },
 
   render() {
-    return h("div", {
-      ref: "wujieContainer",
+    return h('div', {
+      ref: 'wujieContainer',
       style: { width: this.width, height: this.height, ...this.style },
     });
   },
@@ -228,7 +217,7 @@ WujieVue.destroyApp = destroyApp;
 WujieVue.refreshApp = refreshApp;
 WujieVue.clearAssetsCache = clearAssetsCache;
 WujieVue.install = (app: App): void => {
-  app.component("WujieVue", component);
+  app.component('WujieVue', component);
 };
 
 export default WujieVue;

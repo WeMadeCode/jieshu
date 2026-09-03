@@ -1,23 +1,23 @@
-import processTpl, { genLinkReplaceSymbol, getInlineStyleReplaceSymbol } from "./template";
-import type { ScriptAttributes, ScriptObject, StyleObject } from "./template";
-import { requestIdleCallback, error } from "./utils";
+import processTpl, { genLinkReplaceSymbol, getInlineStyleReplaceSymbol } from './template';
+import type { ScriptAttributes, ScriptObject, StyleObject } from './template';
+import { requestIdleCallback, error } from './utils';
 import {
   WUJIE_TIPS_NO_FETCH,
   WUJIE_TIPS_SCRIPT_ERROR_REQUESTED,
   WUJIE_TIPS_CSS_ERROR_REQUESTED,
   WUJIE_TIPS_HTML_ERROR_REQUESTED,
   WUJIE_DATA_FLAG,
-} from "./constant";
-import { getCssLoader, getEffectLoaders, isMatchUrl } from "./plugin";
-import type Wujie from "./sandbox";
-import type { LoadErrorHandler, WujiePlugin } from "./contracts";
+} from './constant';
+import { getCssLoader, getEffectLoaders, isMatchUrl } from './plugin';
+import type Wujie from './sandbox';
+import type { LoadErrorHandler, WujiePlugin } from './contracts';
 
 type FetchFunction = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
-type AssetKind = "style" | "script";
+type AssetKind = 'style' | 'script';
 type CacheRecord<Value> = Record<string, Promise<Value> | null>;
 type CacheScope = object;
-type CacheStatus = "pending" | "fulfilled" | "rejected";
-const STYLE_SOURCE_INDEX: unique symbol = Symbol("wujie.style-source-index");
+type CacheStatus = 'pending' | 'fulfilled' | 'rejected';
+const STYLE_SOURCE_INDEX: unique symbol = Symbol('wujie.style-source-index');
 
 export type ScriptResultList = Array<ScriptObject & { contentPromise: Promise<string> }>;
 
@@ -98,25 +98,25 @@ class AssetCache<Value> {
       // Settled data is reusable across sandboxes. Pending work is reusable
       // only inside the sandbox generation that started it; otherwise a stale
       // custom fetch could block a replacement forever.
-      if (!scope || !cachedMetadata || cachedMetadata.scope === scope || cachedMetadata.status === "fulfilled") {
+      if (!scope || !cachedMetadata || cachedMetadata.scope === scope || cachedMetadata.status === 'fulfilled') {
         return cached;
       }
     }
 
     let request: Promise<Value>;
-    const metadata: { scope?: CacheScope; status: CacheStatus } = { scope, status: "pending" };
+    const metadata: { scope?: CacheScope; status: CacheStatus } = { scope, status: 'pending' };
     try {
       const source = load();
       request = source.then(
         (value): Value => {
-          metadata.status = "fulfilled";
+          metadata.status = 'fulfilled';
           return value;
         },
         (reason: unknown): never => {
-          metadata.status = "rejected";
+          metadata.status = 'rejected';
           if (this.records[key] === request) delete this.records[key];
           throw reason;
-        }
+        },
       );
     } catch (reason: unknown) {
       delete this.records[key];
@@ -147,7 +147,7 @@ class AssetCache<Value> {
     Object.keys(this.records).forEach((key) => {
       const request = this.records[key];
       const metadata = request ? this.metadata.get(request) : undefined;
-      if (metadata?.scope === scope && metadata.status === "pending") delete this.records[key];
+      if (metadata?.scope === scope && metadata.status === 'pending') delete this.records[key];
     });
     this.scopedReservations.delete(scope);
   }
@@ -191,12 +191,12 @@ function currentApplicationUrl(proxyLocation: Location): string {
 
 function applyHtmlLoaders(code: string, plugins: readonly WujiePlugin[]): string {
   return plugins.reduce(
-    (result, plugin) => (typeof plugin.htmlLoader === "function" ? plugin.htmlLoader(result) : result),
-    code
+    (result, plugin) => (typeof plugin.htmlLoader === 'function' ? plugin.htmlLoader(result) : result),
+    code,
   );
 }
 
-const STYLE_ATTRIBUTE_NAMES = ["media", "nonce", "title", "type", "blocking", "disabled"] as const;
+const STYLE_ATTRIBUTE_NAMES = ['media', 'nonce', 'title', 'type', 'blocking', 'disabled'] as const;
 
 function styleAttribute(attributes: ScriptAttributes | undefined, expectedName: string): string | boolean | undefined {
   if (!attributes) return undefined;
@@ -210,13 +210,13 @@ function hasStyleAttribute(attributes: ScriptAttributes | undefined, name: strin
 }
 
 function escapeAttributeValue(value: string): string {
-  let escaped = "";
+  let escaped = '';
   for (let index = 0; index < value.length; index += 1) {
     const character = value[index];
-    if (character === "&") escaped += "&amp;";
-    else if (character === '"') escaped += "&quot;";
-    else if (character === "<") escaped += "&lt;";
-    else if (character === ">") escaped += "&gt;";
+    if (character === '&') escaped += '&amp;';
+    else if (character === '"') escaped += '&quot;';
+    else if (character === '<') escaped += '&lt;';
+    else if (character === '>') escaped += '&gt;';
     else escaped += character;
   }
   return escaped;
@@ -227,7 +227,7 @@ function serializeStyleAttributes(attributes: ScriptAttributes | undefined): str
     const value = styleAttribute(attributes, name);
     if (value === undefined || value === false) return serialized;
     return serialized + (value === true ? ` ${name}` : ` ${name}="${escapeAttributeValue(value)}"`);
-  }, "");
+  }, '');
 }
 
 function serializeNativeStyleLink(source: string, attributes: ScriptAttributes | undefined): string {
@@ -241,7 +241,7 @@ function serializeEmbeddedStyle(attributes: ScriptAttributes | undefined, conten
 export async function processCssLoader(
   sandbox: Wujie,
   template: string,
-  getExternalStyleSheets: () => StyleResultList
+  getExternalStyleSheets: () => StyleResultList,
 ): Promise<string> {
   const applicationUrl = currentApplicationUrl(sandbox.proxyLocation);
   const loadCss = getCssLoader({ plugins: sandbox.plugins });
@@ -269,14 +269,14 @@ interface StyleReplacement {
 
 async function createStyleReplacement(
   styleResult: StyleResultList[number],
-  index: number
+  index: number,
 ): Promise<StyleReplacement | null> {
   const sourceIndex = styleResult[STYLE_SOURCE_INDEX] ?? index;
   const nativeLink = styleResult.fallback ?? serializeNativeStyleLink(styleResult.src, styleResult.attrs);
   // A link stylesheet's disabled state cannot be represented by a style
   // content attribute: HTMLStyleElement.disabled is a sheet-backed IDL
   // property. Keep the native link so later `disabled = false` still works.
-  if (styleResult.src && hasStyleAttribute(styleResult.attrs, "disabled")) {
+  if (styleResult.src && hasStyleAttribute(styleResult.attrs, 'disabled')) {
     return {
       marker: genLinkReplaceSymbol(styleResult.src),
       content: nativeLink,
@@ -319,18 +319,18 @@ async function embedStyleSheets(template: string, styles: StyleResultList): Prom
   const replacements = await Promise.all(styles.map(createStyleReplacement));
   return replacements.reduce(
     (result, replacement) => (replacement ? result.replace(replacement.marker, replacement.content) : result),
-    template
+    template,
   );
 }
 
 function extractInlineCode(markup: string): string {
-  const contentStart = markup.indexOf(">") + 1;
-  const contentEnd = markup.lastIndexOf("<");
-  return contentStart > 0 && contentEnd >= contentStart ? markup.slice(contentStart, contentEnd) : "";
+  const contentStart = markup.indexOf('>') + 1;
+  const contentEnd = markup.lastIndexOf('<');
+  return contentStart > 0 && contentEnd >= contentStart ? markup.slice(contentStart, contentEnd) : '';
 }
 
 function assetErrorMessage(kind: AssetKind): string {
-  return kind === "style" ? WUJIE_TIPS_CSS_ERROR_REQUESTED : WUJIE_TIPS_SCRIPT_ERROR_REQUESTED;
+  return kind === 'style' ? WUJIE_TIPS_CSS_ERROR_REQUESTED : WUJIE_TIPS_SCRIPT_ERROR_REQUESTED;
 }
 
 function normalizeFailure(cause: unknown, fallbackMessage: string): Error {
@@ -349,7 +349,7 @@ async function requestAssetText(
   source: string,
   fetch: FetchFunction,
   kind: AssetKind,
-  loadError?: LoadErrorHandler
+  loadError?: LoadErrorHandler,
 ): Promise<string> {
   let response: Response;
   try {
@@ -375,42 +375,42 @@ function fetchAssetText(
   fetch: FetchFunction,
   kind: AssetKind,
   loadError?: LoadErrorHandler,
-  cacheScope?: CacheScope
+  cacheScope?: CacheScope,
 ): Promise<string> {
   const request = cache.getOrCreate(source, () => requestAssetText(source, fetch, kind, loadError), cacheScope);
   // Script injection uses an empty result as an explicit signal to retain the
   // original src and fall back to native loading. Stylesheet consumers need the
   // rejection itself: static HTML restores its original link, while dynamic
   // links dispatch error instead of reporting a successful empty stylesheet.
-  return kind === "script" ? request.catch(() => "") : request;
+  return kind === 'script' ? request.catch(() => '') : request;
 }
 
 export function getExternalStyleSheets(
   styles: StyleObject[],
   fetch: FetchFunction = defaultFetch,
   loadError?: LoadErrorHandler,
-  cacheScope?: CacheScope
+  cacheScope?: CacheScope,
 ): StyleResultList {
   return styles.map((style) => {
     const { src, content, ignore, attrs, fallback } = style;
-    const keepNativeDisabledLink = Boolean(src && hasStyleAttribute(attrs, "disabled"));
+    const keepNativeDisabledLink = Boolean(src && hasStyleAttribute(attrs, 'disabled'));
     const result: StyleResult =
       content !== undefined
-        ? { src: "", attrs, contentPromise: Promise.resolve(content) }
-        : src?.startsWith("<")
-        ? { src: "", attrs, contentPromise: Promise.resolve(extractInlineCode(src)) }
-        : !src
-        ? { src: "", ignore, attrs, contentPromise: Promise.resolve("") }
-        : {
-            src,
-            ignore,
-            attrs,
-            fallback,
-            contentPromise:
-              ignore || keepNativeDisabledLink
-                ? Promise.resolve("")
-                : fetchAssetText(src, styleAssets, fetch, "style", loadError, cacheScope),
-          };
+        ? { src: '', attrs, contentPromise: Promise.resolve(content) }
+        : src?.startsWith('<')
+          ? { src: '', attrs, contentPromise: Promise.resolve(extractInlineCode(src)) }
+          : !src
+            ? { src: '', ignore, attrs, contentPromise: Promise.resolve('') }
+            : {
+                src,
+                ignore,
+                attrs,
+                fallback,
+                contentPromise:
+                  ignore || keepNativeDisabledLink
+                    ? Promise.resolve('')
+                    : fetchAssetText(src, styleAssets, fetch, 'style', loadError, cacheScope),
+              };
     result[STYLE_SOURCE_INDEX] = (style as IndexedStyleObject)[STYLE_SOURCE_INDEX];
     return result;
   });
@@ -430,16 +430,16 @@ function scriptContentPromise(
   fetch: FetchFunction,
   loadError: LoadErrorHandler | undefined,
   fiber: boolean,
-  cacheScope?: CacheScope
+  cacheScope?: CacheScope,
 ): Promise<string> {
   const { src, async, defer, module, ignore } = script;
-  if ((module && src) || ignore) return Promise.resolve("");
-  if (!src) return Promise.resolve(script.content ?? "");
+  if ((module && src) || ignore) return Promise.resolve('');
+  if (!src) return Promise.resolve(script.content ?? '');
   const isCurrentReservation = scriptAssets.reserve(src, cacheScope);
   const load = () =>
     isCurrentReservation()
-      ? fetchAssetText(src, scriptAssets, fetch, "script", loadError, cacheScope)
-      : Promise.resolve("");
+      ? fetchAssetText(src, scriptAssets, fetch, 'script', loadError, cacheScope)
+      : Promise.resolve('');
   return async || defer ? scheduleScriptRequest(load, fiber) : load();
 }
 
@@ -448,7 +448,7 @@ export function getExternalScripts(
   fetch: FetchFunction = defaultFetch,
   loadError: LoadErrorHandler | undefined,
   fiber: boolean,
-  cacheScope?: CacheScope
+  cacheScope?: CacheScope,
 ): ScriptResultList {
   return scripts.map((script) => {
     const normalizedScript = script.module && !script.async ? { ...script, defer: true } : { ...script };
@@ -462,12 +462,12 @@ export function getExternalScripts(
 function resolveAssetPublicPath(entry: string): string {
   try {
     const { origin, pathname } = new URL(entry, window.location.href);
-    const pathSegments = pathname.split("/");
+    const pathSegments = pathname.split('/');
     pathSegments.pop();
-    return `${origin}${pathSegments.join("/")}/`;
+    return `${origin}${pathSegments.join('/')}/`;
   } catch (cause: unknown) {
     console.warn(cause);
-    return "";
+    return '';
   }
 }
 
@@ -510,7 +510,7 @@ async function parseHtmlDocument(
   suppliedHtml: string | undefined,
   fetch: FetchFunction,
   plugins: readonly WujiePlugin[],
-  loadError: LoadErrorHandler | undefined
+  loadError: LoadErrorHandler | undefined,
 ): Promise<ParsedHtmlDocument> {
   // Preserve the public convention that an empty `html` string means
   // "request the entry document" rather than "use an empty document".
@@ -537,12 +537,12 @@ function bindHtmlDocument(
   plugins: readonly WujiePlugin[],
   loadError: LoadErrorHandler | undefined,
   fiber: boolean,
-  cacheScope?: CacheScope
+  cacheScope?: CacheScope,
 ): HtmlParseResult {
-  const jsExclusions = getEffectLoaders("jsExcludes", plugins);
-  const cssExclusions = getEffectLoaders("cssExcludes", plugins);
-  const jsIgnores = getEffectLoaders("jsIgnores", plugins);
-  const cssIgnores = getEffectLoaders("cssIgnores", plugins);
+  const jsExclusions = getEffectLoaders('jsExcludes', plugins);
+  const cssExclusions = getEffectLoaders('cssExcludes', plugins);
+  const jsIgnores = getEffectLoaders('jsIgnores', plugins);
+  const cssIgnores = getEffectLoaders('cssIgnores', plugins);
 
   return {
     template: document.template,
@@ -555,7 +555,7 @@ function bindHtmlDocument(
         fetch,
         loadError,
         fiber,
-        cacheScope
+        cacheScope,
       ),
     getExternalStyleSheets: () =>
       getExternalStyleSheets(
@@ -571,7 +571,7 @@ function bindHtmlDocument(
           }),
         fetch,
         loadError,
-        cacheScope
+        cacheScope,
       ),
   };
 }
@@ -582,7 +582,7 @@ export default function importHTML({ url, html, opts }: ImportHtmlParameters): P
   const plugins = opts.plugins ?? [];
   const parse = () => parseHtmlDocument(url, html, fetch, plugins, opts.loadError);
   const parsedDocument =
-    Boolean(html) || plugins.some((plugin) => typeof plugin.htmlLoader === "function")
+    Boolean(html) || plugins.some((plugin) => typeof plugin.htmlLoader === 'function')
       ? parse()
       : htmlDocuments.getOrCreate(url, parse, opts.cacheScope);
 
@@ -590,7 +590,7 @@ export default function importHTML({ url, html, opts }: ImportHtmlParameters): P
   // every call so a fulfilled entry document never retains an older sandbox's
   // fetch, lifecycle hooks, or pending-request scope.
   return parsedDocument.then((document) =>
-    bindHtmlDocument(document, fetch, plugins, opts.loadError, fiber, opts.cacheScope)
+    bindHtmlDocument(document, fetch, plugins, opts.loadError, fiber, opts.cacheScope),
   );
 }
 
@@ -623,7 +623,7 @@ export function getWujieWindow(appId: string): WindowProxy | null {
     if (!targetWindow) return null;
     return withInlineEventUnscopables(targetWindow as WindowProxy);
   } catch (cause: unknown) {
-    console.warn("[wujie] Failed to get wujie window:", cause);
+    console.warn('[wujie] Failed to get wujie window:', cause);
     return null;
   }
 }
@@ -647,8 +647,8 @@ function queryWujieIframe(appId: string): HTMLIFrameElement | null {
   let currentWindow: Window = window;
   for (let depth = 0; depth < 10; depth += 1) {
     try {
-      const iframe = Array.from(currentWindow.document?.getElementsByTagName("iframe") ?? []).find(
-        (candidate) => candidate.hasAttribute(WUJIE_DATA_FLAG) && candidate.getAttribute("name") === appId
+      const iframe = Array.from(currentWindow.document?.getElementsByTagName('iframe') ?? []).find(
+        (candidate) => candidate.hasAttribute(WUJIE_DATA_FLAG) && candidate.getAttribute('name') === appId,
       );
       if (iframe) return iframe;
     } catch {

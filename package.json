@@ -4,15 +4,16 @@
   "description": "极致的微前端框架",
   "private": true,
   "packageManager": "pnpm@10.33.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "puppeteer"
-    ]
-  },
   "scripts": {
     "start": "NODE_OPTIONS=--openssl-legacy-provider lerna run start --parallel",
     "doc": "lerna run docs:dev",
     "clean": "rimraf node_modules **/*/node_modules",
+    "lint": "eslint .",
+    "lint:fix": "pnpm run lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm --filter wujie --filter wujie-react --filter wujie-vue2 --filter wujie-vue3 --filter wujie-docs run typecheck",
+    "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck",
     "test": "NODE_OPTIONS=--openssl-legacy-provider lerna run test --scope wujie",
     "test:adapters": "pnpm --filter wujie-react --filter wujie-vue2 --filter wujie-vue3 test",
     "commitlint": "commitlint -E COMMIT_EDITMSG_PATH",
@@ -26,16 +27,38 @@
   "author": "yiludege",
   "license": "MIT",
   "lint-staged": {
-    "packages/wujie-core/src/**/*.ts": "./packages/wujie-core/node_modules/.bin/eslint --fix --ext .ts --config packages/wujie-core/.eslintrc.js"
+    "{packages,docs}/**/*.{js,ts,mjs,cjs,mts,cts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "{packages,docs}/**/*.{json,md,yml,yaml,css,scss,less,html}": "prettier --write",
+    "*.{js,ts,mjs,cjs,mts,cts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": "prettier --write"
   },
   "devDependencies": {
+    "@babel/core": "7.28.4",
+    "@babel/preset-typescript": "7.27.1",
     "@commitlint/cli": "^16.2.3",
     "@commitlint/config-conventional": "^16.2.1",
+    "@eslint/js": "^10.0.1",
     "@lerna-lite/cli": "^5.6.1",
     "@lerna-lite/run": "^5.6.1",
+    "@types/node": "18.19.130",
+    "babel-jest": "27.5.1",
+    "eslint": "10.9.1",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-vue": "10.10.0",
+    "globals": "^17.12.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.4.1",
-    "rimraf": "^3.0.2"
-  },
-  "dependencies": {}
+    "prettier": "3.9.6",
+    "rimraf": "^3.0.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.69.0",
+    "vue-tsc": "3.3.11",
+    "vue-eslint-parser": "^10.4.1"
+  }
 }

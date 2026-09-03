@@ -19,11 +19,11 @@ wujie 与其他微前端方案最根本的区别：
 
 由此推出三条主线，本文的知识点全部挂在这三条线上：
 
-| 主线 | 解决什么 | 涉及的核心文件 |
-| --- | --- | --- |
-| **JS 隔离** | 子应用的全局变量、原型污染、定时器、事件监听 | `iframe.ts` `proxy.ts` `sandbox.ts` |
-| **DOM / CSS 隔离** | 样式互不干扰、DOM 挂载位置、事件冒泡边界 | `shadow.ts` `effect.ts` |
-| **状态互通** | 路由同步、应用间通信、生命周期 | `sync.ts` `event.ts` `index.ts` |
+| 主线               | 解决什么                                     | 涉及的核心文件                      |
+| ------------------ | -------------------------------------------- | ----------------------------------- |
+| **JS 隔离**        | 子应用的全局变量、原型污染、定时器、事件监听 | `iframe.ts` `proxy.ts` `sandbox.ts` |
+| **DOM / CSS 隔离** | 样式互不干扰、DOM 挂载位置、事件冒泡边界     | `shadow.ts` `effect.ts`             |
+| **状态互通**       | 路由同步、应用间通信、生命周期               | `sync.ts` `event.ts` `index.ts`     |
 
 再补一条：wujie 有**降级模式**（浏览器不支持 Proxy / webcomponent 时，用第二个 iframe 替代 Shadow DOM、用 `Object.defineProperty` 替代 Proxy）。这意味着**同一套逻辑在源码里往往有两份实现**，读代码时看到 `degrade` 分支不要慌。
 
@@ -104,7 +104,7 @@ wujie 与其他微前端方案最根本的区别：
 [iframe.ts:978-985](../packages/wujie-core/src/iframe.ts#L978-L985)：
 
 ```js
-(function(window, self, global, location) {
+(function (window, self, global, location) {
   /* 子应用代码 */
 }).bind(window.__WUJIE.proxy)(
   window.__WUJIE.proxy,
@@ -138,14 +138,14 @@ wujie 与其他微前端方案最根本的区别：
 
 **wujie 实际 patch 了哪些原型方法**（了解范围即可，不必背）：
 
-| 原型方法 | 位置 | 目的 |
-| --- | --- | --- |
-| `Node.prototype.appendChild` / `insertBefore` / `removeChild` | [iframe.ts:716-740](../packages/wujie-core/src/iframe.ts#L716-L740) | 把 iframe 里的 DOM 操作重定向到 shadowRoot |
-| `Node.prototype.getRootNode` | [iframe.ts:720](../packages/wujie-core/src/iframe.ts#L720) | 让子应用拿到正确的根节点 |
-| `Node.prototype.addEventListener` / `removeEventListener` | [iframe.ts:412-440](../packages/wujie-core/src/iframe.ts#L412-L440) | 记录监听器以便销毁时清理 |
-| `Document.prototype.addEventListener` / `removeEventListener` | [iframe.ts:520-580](../packages/wujie-core/src/iframe.ts#L520-L580) | 同上，document 级别 |
-| `Element.prototype.setAttribute` | [iframe.ts:1172-1180](../packages/wujie-core/src/iframe.ts#L1172-L1180) | 编译内联事件属性 |
-| `Event.prototype.timeStamp` | [iframe.ts:496](../packages/wujie-core/src/iframe.ts#L496) | 跨 realm 时间基准对齐 |
+| 原型方法                                                      | 位置                                                                    | 目的                                       |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------ |
+| `Node.prototype.appendChild` / `insertBefore` / `removeChild` | [iframe.ts:716-740](../packages/wujie-core/src/iframe.ts#L716-L740)     | 把 iframe 里的 DOM 操作重定向到 shadowRoot |
+| `Node.prototype.getRootNode`                                  | [iframe.ts:720](../packages/wujie-core/src/iframe.ts#L720)              | 让子应用拿到正确的根节点                   |
+| `Node.prototype.addEventListener` / `removeEventListener`     | [iframe.ts:412-440](../packages/wujie-core/src/iframe.ts#L412-L440)     | 记录监听器以便销毁时清理                   |
+| `Document.prototype.addEventListener` / `removeEventListener` | [iframe.ts:520-580](../packages/wujie-core/src/iframe.ts#L520-L580)     | 同上，document 级别                        |
+| `Element.prototype.setAttribute`                              | [iframe.ts:1172-1180](../packages/wujie-core/src/iframe.ts#L1172-L1180) | 编译内联事件属性                           |
+| `Event.prototype.timeStamp`                                   | [iframe.ts:496](../packages/wujie-core/src/iframe.ts#L496)              | 跨 realm 时间基准对齐                      |
 
 **自检**：为什么 patch `addEventListener` 时必须把监听器记录下来？不记录会导致什么后果？（提示：看 `notes/memory-leak-investigation.md`）
 
@@ -206,14 +206,14 @@ wujie 与其他微前端方案最根本的区别：
 
 ## 第三层：加分项（读得更顺，但不是门槛）
 
-| 知识点 | 为什么有用 |
-| --- | --- |
-| **打包工具的运行时机制** | webpack 的 `__webpack_public_path__`、`publicPath: auto`；Vite 的 ESM 产物形态。子应用接入报错八成出在这里 |
-| **UMD / 库打包格式** | 子应用需要暴露生命周期钩子时会用到 |
-| **事件循环、微任务/宏任务** | `execQueue` 串行执行、`MutationObserver` 回调时机、生命周期顺序 |
-| **pnpm workspace + lerna** | 本仓库是 monorepo：`wujie-core` 是内核，`wujie-vue2/vue3/react` 只是薄封装 |
-| **同源策略与 CSP** | 理解 iframe 方案的边界；某些场景 CSP 会直接禁掉 `srcdoc` |
-| **CSS 变量、`:host` / `::slotted`** | Shadow DOM 内的样式穿透手段 |
+| 知识点                              | 为什么有用                                                                                                 |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **打包工具的运行时机制**            | webpack 的 `__webpack_public_path__`、`publicPath: auto`；Vite 的 ESM 产物形态。子应用接入报错八成出在这里 |
+| **UMD / 库打包格式**                | 子应用需要暴露生命周期钩子时会用到                                                                         |
+| **事件循环、微任务/宏任务**         | `execQueue` 串行执行、`MutationObserver` 回调时机、生命周期顺序                                            |
+| **pnpm workspace + lerna**          | 本仓库是 monorepo：`wujie-core` 是内核，`wujie-vue2/vue3/react` 只是薄封装                                 |
+| **同源策略与 CSP**                  | 理解 iframe 方案的边界；某些场景 CSP 会直接禁掉 `srcdoc`                                                   |
+| **CSS 变量、`:host` / `::slotted`** | Shadow DOM 内的样式穿透手段                                                                                |
 
 ---
 
@@ -235,18 +235,18 @@ wujie 与其他微前端方案最根本的区别：
 
 按依赖关系与难度递增排列，括号内为行数：
 
-| # | 文件 | 行数 | 读它是为了 |
-| --- | --- | --- | --- |
-| 1 | [constant.ts](../packages/wujie-core/src/constant.ts) | 48 | 熟悉命名约定，后面到处出现 |
-| 2 | [utils.ts](../packages/wujie-core/src/utils.ts) | 378 | 工具函数，扫一遍知道有什么即可 |
-| 3 | [index.ts](../packages/wujie-core/src/index.ts) | 429 | `startApp` 主流程，**只看骨架，不钻细节** |
-| 4 | [template.ts](../packages/wujie-core/src/template.ts) + [entry.ts](../packages/wujie-core/src/entry.ts) | 316 + 388 | HTML/JS/CSS 如何被拆解和加载 |
-| 5 | **[iframe.ts](../packages/wujie-core/src/iframe.ts)** | 1183 | **核心**：JS 沙箱创建、脚本注入、原型 patch |
-| 6 | **[proxy.ts](../packages/wujie-core/src/proxy.ts)** | 399 | **核心**：三个 Proxy 分别拦了什么 |
-| 7 | [shadow.ts](../packages/wujie-core/src/shadow.ts) | 425 | DOM 容器与样式处理 |
-| 8 | [effect.ts](../packages/wujie-core/src/effect.ts) | 589 | 运行时副作用处理，最脏但最实用 |
-| 9 | [sandbox.ts](../packages/wujie-core/src/sandbox.ts) | 713 | `WuJie` 类：把以上全部串起来 + 生命周期 + 销毁 |
-| 10 | [sync.ts](../packages/wujie-core/src/sync.ts) / [event.ts](../packages/wujie-core/src/event.ts) / [plugin.ts](../packages/wujie-core/src/plugin.ts) / [tracker.ts](../packages/wujie-core/src/tracker.ts) | 158 / 121 / 97 / 98 | 周边能力，随时可插入阅读 |
+| #   | 文件                                                                                                                                                                                                      | 行数                | 读它是为了                                     |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------------------------------------------- |
+| 1   | [constant.ts](../packages/wujie-core/src/constant.ts)                                                                                                                                                     | 48                  | 熟悉命名约定，后面到处出现                     |
+| 2   | [utils.ts](../packages/wujie-core/src/utils.ts)                                                                                                                                                           | 378                 | 工具函数，扫一遍知道有什么即可                 |
+| 3   | [index.ts](../packages/wujie-core/src/index.ts)                                                                                                                                                           | 429                 | `startApp` 主流程，**只看骨架，不钻细节**      |
+| 4   | [template.ts](../packages/wujie-core/src/template.ts) + [entry.ts](../packages/wujie-core/src/entry.ts)                                                                                                   | 316 + 388           | HTML/JS/CSS 如何被拆解和加载                   |
+| 5   | **[iframe.ts](../packages/wujie-core/src/iframe.ts)**                                                                                                                                                     | 1183                | **核心**：JS 沙箱创建、脚本注入、原型 patch    |
+| 6   | **[proxy.ts](../packages/wujie-core/src/proxy.ts)**                                                                                                                                                       | 399                 | **核心**：三个 Proxy 分别拦了什么              |
+| 7   | [shadow.ts](../packages/wujie-core/src/shadow.ts)                                                                                                                                                         | 425                 | DOM 容器与样式处理                             |
+| 8   | [effect.ts](../packages/wujie-core/src/effect.ts)                                                                                                                                                         | 589                 | 运行时副作用处理，最脏但最实用                 |
+| 9   | [sandbox.ts](../packages/wujie-core/src/sandbox.ts)                                                                                                                                                       | 713                 | `WuJie` 类：把以上全部串起来 + 生命周期 + 销毁 |
+| 10  | [sync.ts](../packages/wujie-core/src/sync.ts) / [event.ts](../packages/wujie-core/src/event.ts) / [plugin.ts](../packages/wujie-core/src/plugin.ts) / [tracker.ts](../packages/wujie-core/src/tracker.ts) | 158 / 121 / 97 / 98 | 周边能力，随时可插入阅读                       |
 
 **关键建议：不要从头到尾顺读。**
 跑起 [examples/](../examples/)（`pnpm start`），在 `startApp` 打断点，跟着走完一次
@@ -260,28 +260,18 @@ wujie 与其他微前端方案最根本的区别：
 能顺畅回答以下问题，说明前置知识已经够了：
 
 **iframe 与时序**
+
 1. `about:blank` / `srcdoc` 的 iframe 为什么与父页面同域？
 2. 为什么 `appendChild` 之后不能立即操作 `contentWindow.document`？
 3. `document.open()` 为什么能改写 iframe 的 URL？
 
-**Proxy**
-4. 为什么用 `Proxy.revocable` 而不是 `new Proxy`？
-5. 代理不变式如何限制了对 `location` 的代理？
-6. `Symbol.hasInstance` 解决的跨 realm 问题具体长什么样？
+**Proxy** 4. 为什么用 `Proxy.revocable` 而不是 `new Proxy`？ 5. 代理不变式如何限制了对 `location` 的代理？ 6. `Symbol.hasInstance` 解决的跨 realm 问题具体长什么样？
 
-**脚本执行**
-7. `(function(window, self, global, location){...}).bind(proxy)(...)` 每个参数分别解决什么问题？
-8. 为什么 `type="module"` 必须跳过这层包裹？
-9. 动态插入的 `<script>` 默认执行顺序是什么？wujie 怎么恢复串行？
+**脚本执行** 7. `(function(window, self, global, location){...}).bind(proxy)(...)` 每个参数分别解决什么问题？ 8. 为什么 `type="module"` 必须跳过这层包裹？ 9. 动态插入的 `<script>` 默认执行顺序是什么？wujie 怎么恢复串行？
 
-**Shadow DOM**
-10. 事件穿过 shadow 边界时 `target` 会怎么变？
-11. `@font-face` 为什么必须提升到主文档？提升后如何避免多应用互相污染？
+**Shadow DOM** 10. 事件穿过 shadow 边界时 `target` 会怎么变？ 11. `@font-face` 为什么必须提升到主文档？提升后如何避免多应用互相污染？
 
-**架构**
-12. 保活 / 单例 / 重建三种模式，切换页面时各自销毁了什么？
-13. 降级模式牺牲了什么能力，为什么？
-14. `replaceState` 和 `pushState` 在路由同步里分别用在哪？
+**架构** 12. 保活 / 单例 / 重建三种模式，切换页面时各自销毁了什么？ 13. 降级模式牺牲了什么能力，为什么？ 14. `replaceState` 和 `pushState` 在路由同步里分别用在哪？
 
 ---
 
@@ -293,4 +283,4 @@ wujie 与其他微前端方案最根本的区别：
 
 ---
 
-*本文基于本地仓库代码撰写，行号引用对应当前工作副本；若源码变动请重新核对。*
+_本文基于本地仓库代码撰写，行号引用对应当前工作副本；若源码变动请重新核对。_

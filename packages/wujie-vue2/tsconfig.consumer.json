@@ -2,7 +2,6 @@
   "extends": "./tsconfig.json",
   "include": ["./__test__/node16-consumer.cts"],
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "wujie-vue2": ["./index.d.ts"]
     },

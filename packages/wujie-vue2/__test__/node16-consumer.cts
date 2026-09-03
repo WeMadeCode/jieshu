@@ -1,10 +1,5 @@
-import type { Properties as StandardCssProperties } from "csstype";
-import type {
-  WujieVueInstance,
-  WujieVueProps,
-  WujieVueStatics,
-  WujieVueStyle,
-} from "wujie-vue2";
+import type { Properties as StandardCssProperties } from 'csstype';
+import type { WujieVueInstance, WujieVueProps, WujieVueStatics, WujieVueStyle } from 'wujie-vue2';
 
 declare const standardCssProperties: StandardCssProperties;
 const style: WujieVueStyle = standardCssProperties;

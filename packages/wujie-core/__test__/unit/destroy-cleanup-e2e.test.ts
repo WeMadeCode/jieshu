@@ -8,38 +8,38 @@
 
 export {};
 
-const realWarnE2E = jest.fn();
-jest.mock("../../src/utils", () => {
-  const actual = jest.requireActual("../../src/utils");
-  return { ...actual, warn: realWarnE2E };
+const mockWarnE2E = jest.fn();
+jest.mock('../../src/utils', () => {
+  const actual = jest.requireActual('../../src/utils');
+  return { ...actual, warn: mockWarnE2E };
 });
 
-const { patchDocumentEffect, patchWindowEffect } = require("../../src/iframe");
-const { EventCleanupTracker } = require("../../src/tracker");
+const { patchDocumentEffect, patchWindowEffect } = require('../../src/iframe');
+const { EventCleanupTracker } = require('../../src/tracker');
 
 function createSandboxStub(id: string) {
   return {
     id,
     degrade: false,
     plugins: [],
-    shadowRoot: document.createElement("div"),
+    shadowRoot: document.createElement('div'),
     proxyDocument: {},
     iframeOnEvents: [],
     eventCleanupTracker: new EventCleanupTracker(),
   };
 }
 
-describe("E2E: patchDocumentEffect 端到端反向解绑", () => {
+describe('E2E: patchDocumentEffect 端到端反向解绑', () => {
   let iframe: HTMLIFrameElement;
   let iframeWindow: any;
   let sandbox: any;
 
   beforeEach(() => {
-    document.body.innerHTML = "";
-    iframe = document.createElement("iframe");
+    document.body.innerHTML = '';
+    iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
     iframeWindow = iframe.contentWindow;
-    sandbox = createSandboxStub("e2e-doc");
+    sandbox = createSandboxStub('e2e-doc');
     iframeWindow.__WUJIE = sandbox;
   });
 
@@ -51,65 +51,65 @@ describe("E2E: patchDocumentEffect 端到端反向解绑", () => {
     patchDocumentEffect(iframeWindow);
 
     const handler = jest.fn();
-    iframeWindow.document.addEventListener("keydown", handler);
+    iframeWindow.document.addEventListener('keydown', handler);
 
-    window.document.dispatchEvent(new Event("keydown"));
+    window.document.dispatchEvent(new Event('keydown'));
     expect(handler).toHaveBeenCalledTimes(1);
 
     // 模拟 destroy 阶段调用
     sandbox.eventCleanupTracker.cleanupAll();
 
     handler.mockClear();
-    window.document.dispatchEvent(new Event("keydown"));
+    window.document.dispatchEvent(new Event('keydown'));
     expect(handler).not.toHaveBeenCalled();
   });
 
-  test("子应用主动 removeEventListener 后再 cleanupAll 不应抛错", () => {
+  test('子应用主动 removeEventListener 后再 cleanupAll 不应抛错', () => {
     patchDocumentEffect(iframeWindow);
 
     const handler = jest.fn();
-    iframeWindow.document.addEventListener("keydown", handler);
-    iframeWindow.document.removeEventListener("keydown", handler);
+    iframeWindow.document.addEventListener('keydown', handler);
+    iframeWindow.document.removeEventListener('keydown', handler);
 
     expect(() => sandbox.eventCleanupTracker.cleanupAll()).not.toThrow();
     handler.mockClear();
-    window.document.dispatchEvent(new Event("keydown"));
+    window.document.dispatchEvent(new Event('keydown'));
     expect(handler).not.toHaveBeenCalled();
   });
 
-  test("同一 document listener 的 capture 与 bubble 注册可分别移除", () => {
+  test('同一 document listener 的 capture 与 bubble 注册可分别移除', () => {
     patchDocumentEffect(iframeWindow);
     const handler = jest.fn();
 
-    iframeWindow.document.addEventListener("keydown", handler, false);
-    iframeWindow.document.addEventListener("keydown", handler, true);
-    window.document.dispatchEvent(new Event("keydown"));
+    iframeWindow.document.addEventListener('keydown', handler, false);
+    iframeWindow.document.addEventListener('keydown', handler, true);
+    window.document.dispatchEvent(new Event('keydown'));
     expect(handler).toHaveBeenCalledTimes(2);
 
     handler.mockClear();
-    iframeWindow.document.removeEventListener("keydown", handler, false);
-    window.document.dispatchEvent(new Event("keydown"));
+    iframeWindow.document.removeEventListener('keydown', handler, false);
+    window.document.dispatchEvent(new Event('keydown'));
     expect(handler).toHaveBeenCalledTimes(1);
 
     handler.mockClear();
-    iframeWindow.document.removeEventListener("keydown", handler, true);
-    window.document.dispatchEvent(new Event("keydown"));
+    iframeWindow.document.removeEventListener('keydown', handler, true);
+    window.document.dispatchEvent(new Event('keydown'));
     expect(handler).not.toHaveBeenCalled();
   });
 });
 
-describe("E2E: patchWindowEffect 端到端 onXXX 还原", () => {
+describe('E2E: patchWindowEffect 端到端 onXXX 还原', () => {
   let iframe: HTMLIFrameElement;
   let iframeWindow: any;
   let sandbox: any;
   let originalOnResize: any;
 
   beforeEach(() => {
-    document.body.innerHTML = "";
-    iframe = document.createElement("iframe");
+    document.body.innerHTML = '';
+    iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
     iframeWindow = iframe.contentWindow;
-    sandbox = createSandboxStub("e2e-win");
+    sandbox = createSandboxStub('e2e-win');
     iframeWindow.__WUJIE = sandbox;
     originalOnResize = (window as any).onresize;
   });
@@ -119,30 +119,30 @@ describe("E2E: patchWindowEffect 端到端 onXXX 还原", () => {
     (window as any).onresize = originalOnResize;
   });
 
-  test("子应用 window.onresize = fn 写入主 window，destroy 后不再触发 handler", () => {
+  test('子应用 window.onresize = fn 写入主 window，destroy 后不再触发 handler', () => {
     patchWindowEffect(iframeWindow);
 
     const handler = jest.fn();
     iframeWindow.onresize = handler;
 
     // 触发主 window 的 resize 事件，handler 应被调用
-    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event('resize'));
     expect(handler).toHaveBeenCalledTimes(1);
 
     sandbox.eventCleanupTracker.cleanupAll();
 
     // 销毁后再触发，handler 不应再被调用（dangling handler 已清除）
     handler.mockClear();
-    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event('resize'));
     expect(handler).not.toHaveBeenCalled();
   });
 
-  test("多子应用交错销毁时保留最新 onresize owner 且不复活旧 iframe handler", () => {
-    const secondIframe = document.createElement("iframe");
+  test('多子应用交错销毁时保留最新 onresize owner 且不复活旧 iframe handler', () => {
+    const secondIframe = document.createElement('iframe');
     document.body.appendChild(secondIframe);
     const secondWindow = secondIframe.contentWindow as Window;
-    const secondSandbox = createSandboxStub("e2e-win-second");
-    Reflect.set(secondWindow, "__WUJIE", secondSandbox);
+    const secondSandbox = createSandboxStub('e2e-win-second');
+    Reflect.set(secondWindow, '__WUJIE', secondSandbox);
     patchWindowEffect(iframeWindow);
     patchWindowEffect(secondWindow);
     const firstHandler = jest.fn();
@@ -151,14 +151,14 @@ describe("E2E: patchWindowEffect 端到端 onXXX 还原", () => {
     iframeWindow.onresize = firstHandler;
     secondWindow.onresize = secondHandler;
     sandbox.eventCleanupTracker.cleanupAll();
-    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event('resize'));
 
     expect(firstHandler).not.toHaveBeenCalled();
     expect(secondHandler).toHaveBeenCalledTimes(1);
 
     secondSandbox.eventCleanupTracker.cleanupAll();
     secondHandler.mockClear();
-    window.dispatchEvent(new Event("resize"));
+    window.dispatchEvent(new Event('resize'));
     expect(firstHandler).not.toHaveBeenCalled();
     expect(secondHandler).not.toHaveBeenCalled();
     secondIframe.remove();

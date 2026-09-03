@@ -2,12 +2,12 @@
   "extends": "../../tsconfig.json",
   "include": ["../../index.ts", "./**/*.ts"],
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ES2018",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "outDir": "../../.test-build",
-    "declaration": false,
+    "rootDir": "../..",
     "esModuleInterop": true,
     "sourceMap": true,
-    "types": ["jest"]
+    "types": ["jest", "node"]
   }
 }

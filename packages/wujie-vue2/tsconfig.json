@@ -1,24 +1,13 @@
 {
+  "extends": "../../tsconfig.json",
   "include": ["./index.ts"],
   "exclude": ["node_modules", "esm", "lib"],
   "compilerOptions": {
-    "target": "ES5",
-    "module": "ES2015",
-    "moduleResolution": "Node",
-    "lib": ["DOM", "ES2015"],
     "outDir": "./esm",
     "rootDir": ".",
     "declaration": true,
     "sourceMap": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "downlevelIteration": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true
+    "skipLibCheck": true
   }
 }

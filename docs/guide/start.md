@@ -10,7 +10,7 @@ collapsable: false
 ### 引入
 
 ```javascript
-import { bus, setupApp, preloadApp, startApp, destroyApp, refreshApp, clearAssetsCache } from "wujie";
+import { bus, setupApp, preloadApp, startApp, destroyApp, refreshApp, clearAssetsCache } from 'wujie';
 ```
 
 ::: tip 提示
@@ -18,22 +18,23 @@ import { bus, setupApp, preloadApp, startApp, destroyApp, refreshApp, clearAsset
 :::
 
 ### 设置子应用
+
 非必须，由于`preloadApp`和`startApp`参数重复，为了避免重复输入，可以通过`setupApp`来设置默认参数。
 
 ```javascript
-setupApp({ name: "唯一id", url: "子应用地址", exec: true, el: "容器", sync: true })
+setupApp({ name: '唯一id', url: '子应用地址', exec: true, el: '容器', sync: true });
 ```
 
 ### 预加载
 
 ```javascript
-preloadApp({ name: "唯一id"});
+preloadApp({ name: '唯一id' });
 ```
 
 ### 启动子应用
 
 ```javascript
-startApp({ name: "唯一id" });
+startApp({ name: '唯一id' });
 ```
 
 ## 子应用改造
@@ -49,15 +50,16 @@ startApp({ name: "唯一id" });
 app.use((req, res, next) => {
   // 路径判断等等
   res.set({
-    "Access-Control-Allow-Credentials": true,
-    "Access-Control-Allow-Origin": req.headers.origin || "*",
-    "Access-Control-Allow-Headers": "X-Requested-With,Content-Type",
-    "Access-Control-Allow-Methods": "PUT,POST,GET,DELETE,OPTIONS",
-    "Content-Type": "application/json; charset=utf-8",
+    'Access-Control-Allow-Credentials': true,
+    'Access-Control-Allow-Origin': req.headers.origin || '*',
+    'Access-Control-Allow-Headers': 'X-Requested-With,Content-Type',
+    'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS',
+    'Content-Type': 'application/json; charset=utf-8',
   });
   // 其他操作
 });
 ```
+
 ::: warning 注意
 
 这只是一个简单示例，用户需要根据业务场景进行灵活配置
@@ -69,8 +71,8 @@ app.use((req, res, next) => {
 
 其中[保活模式](/guide/mode.html#保活模式)、[重建模式](/guide/mode.html#重建模式)子应用无需做任何改造工作，[单例模式](/guide/mode.html#单例模式)需要做生命周期改造
 
-
 ### 生命周期改造
+
 改造入口函数：
 
 - 将子应用路由的创建、实例的创建渲染挂载到`window.__WUJIE_MOUNT`函数上
@@ -86,13 +88,13 @@ if (window.__POWERED_BY_WUJIE__) {
   let instance;
   window.__WUJIE_MOUNT = () => {
     const router = new VueRouter({ routes });
-    instance = new Vue({ router, render: (h) => h(App) }).$mount("#app");
+    instance = new Vue({ router, render: (h) => h(App) }).$mount('#app');
   };
   window.__WUJIE_UNMOUNT = () => {
     instance.$destroy();
   };
 } else {
-  new Vue({ router: new VueRouter({ routes }), render: (h) => h(App) }).$mount("#app");
+  new Vue({ router: new VueRouter({ routes }), render: (h) => h(App) }).$mount('#app');
 }
 ```
 
@@ -106,13 +108,15 @@ if (window.__POWERED_BY_WUJIE__) {
     const router = createRouter({ history: createWebHistory(), routes });
     instance = createApp(App);
     instance.use(router);
-    instance.mount("#app");
+    instance.mount('#app');
   };
   window.__WUJIE_UNMOUNT = () => {
     instance.unmount();
   };
 } else {
-  createApp(App).use(createRouter({ history: createWebHistory(), routes })).mount("#app");
+  createApp(App)
+    .use(createRouter({ history: createWebHistory(), routes }))
+    .mount('#app');
 }
 ```
 
@@ -167,18 +171,18 @@ if (window.__POWERED_BY_WUJIE__) {
       <React.StrictMode>
         <App />
       </React.StrictMode>,
-      document.getElementById("root")
+      document.getElementById('root'),
     );
   };
   window.__WUJIE_UNMOUNT = () => {
-    ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+    ReactDOM.unmountComponentAtNode(document.getElementById('root'));
   };
 } else {
   ReactDOM.render(
     <React.StrictMode>
       <App />
     </React.StrictMode>,
-    document.getElementById("root")
+    document.getElementById('root'),
   );
 }
 ```

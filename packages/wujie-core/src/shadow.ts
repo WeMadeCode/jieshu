@@ -7,30 +7,30 @@ import {
   WUJIE_LOADING_STYLE,
   WUJIE_LOADING_SVG,
   WUJIE_SHADE_STYLE,
-} from "./constant";
+} from './constant';
 import {
   getWujieById,
   rawAppendChild,
   rawElementAppendChild,
   rawElementRemoveChild,
   relativeElementTagAttrMap,
-} from "./common";
-import { getExternalStyleSheets } from "./entry";
-import { patchRenderEffect } from "./effect";
-import { initBase, patchElementEffect } from "./iframe";
-import { getCssLoader, getPresetLoaders } from "./plugin";
-import type Wujie from "./sandbox";
-import type { IframeAttributes } from "./contracts";
-import type { StyleObject } from "./template";
-import { getAbsolutePath, getContainer, getCurUrl, isFunction, setAttrsToElement, warn } from "./utils";
+} from './common';
+import { getExternalStyleSheets } from './entry';
+import { patchRenderEffect } from './effect';
+import { initBase, patchElementEffect } from './iframe';
+import { getCssLoader, getPresetLoaders } from './plugin';
+import type Wujie from './sandbox';
+import type { IframeAttributes } from './contracts';
+import type { StyleObject } from './template';
+import { getAbsolutePath, getContainer, getCurUrl, isFunction, setAttrsToElement, warn } from './utils';
 
-const WUJIE_ELEMENT_NAME = "wujie-app";
-const EMPTY_IFRAME_DOCUMENT = "<!DOCTYPE html><html><head></head><body></body></html>";
-const DEFAULT_IFRAME_STYLE = "height:100%;width:100%";
+const WUJIE_ELEMENT_NAME = 'wujie-app';
+const EMPTY_IFRAME_DOCUMENT = '<!DOCTYPE html><html><head></head><body></body></html>';
+const DEFAULT_IFRAME_STYLE = 'height:100%;width:100%';
 const ROOT_SELECTOR_PATTERN = /:root/g;
 
-type DisconnectAction = "destroy" | "unmount";
-type PresetStylePosition = "before" | "after";
+type DisconnectAction = 'destroy' | 'unmount';
+type PresetStylePosition = 'before' | 'after';
 type PatchStyleElements = [HTMLStyleElement | null, HTMLStyleElement | null];
 
 interface LoadedPresetStyle {
@@ -62,7 +62,7 @@ function getElementSandbox(element: HTMLElement): Wujie | null {
 /** Decide how a detached application should release its runtime. */
 export function getDisconnectAction(sandbox: Wujie): DisconnectAction {
   const hasReusableMount = isFunction(sandbox.iframe?.contentWindow?.__WUJIE_MOUNT);
-  return sandbox.alive || hasReusableMount ? "unmount" : "destroy";
+  return sandbox.alive || hasReusableMount ? 'unmount' : 'destroy';
 }
 
 function reportDisconnectFailure(action: DisconnectAction, reason: unknown): void {
@@ -79,7 +79,7 @@ export function handleWujieAppDisconnect(sandbox: Wujie | null | undefined): voi
   const action = getDisconnectAction(sandbox);
 
   try {
-    const completion = action === "destroy" ? sandbox.destroy() : sandbox.unmount();
+    const completion = action === 'destroy' ? sandbox.destroy() : sandbox.unmount();
     completion.catch((reason: unknown) => reportDisconnectFailure(action, reason));
   } catch (reason: unknown) {
     reportDisconnectFailure(action, reason);
@@ -102,7 +102,7 @@ export function defineWujieWebComponent(): void {
         return;
       }
 
-      const root = this.attachShadow({ mode: "open" });
+      const root = this.attachShadow({ mode: 'open' });
       patchElementEffect(root, iframeWindow);
       sandbox.shadowRoot = root;
     }
@@ -130,7 +130,7 @@ function hasLoadingIndicator(container: HTMLElement): boolean {
 /** Replace a host container's contents while allowing its loading overlay to survive. */
 export function renderElementToContainer(
   element: Element | ChildNode,
-  selectorOrElement: string | HTMLElement
+  selectorOrElement: string | HTMLElement,
 ): HTMLElement {
   const container = getContainer(selectorOrElement);
   if (container.contains(element)) return container;
@@ -142,7 +142,7 @@ export function renderElementToContainer(
 
 function resetIframeDocument(iframe: HTMLIFrameElement): Document {
   const contentDocument = iframe.contentDocument;
-  if (!contentDocument) throw new Error("Unable to initialize the application iframe document");
+  if (!contentDocument) throw new Error('Unable to initialize the application iframe document');
 
   contentDocument.open();
   contentDocument.write(EMPTY_IFRAME_DOCUMENT);
@@ -154,7 +154,7 @@ function resetIframeDocument(iframe: HTMLIFrameElement): Document {
 export function initRenderIframeAndContainer(
   id: string,
   parent: string | HTMLElement,
-  degradeAttrs: IframeAttributes = {}
+  degradeAttrs: IframeAttributes = {},
 ): { iframe: HTMLIFrameElement; container: HTMLElement } {
   const iframe = createIframeContainer(id, degradeAttrs);
   const container = renderElementToContainer(iframe, parent);
@@ -167,15 +167,13 @@ async function loadPresetStyles(styles: readonly StyleObject[], sandbox: Wujie):
     [...styles],
     sandbox.fetch,
     sandbox.lifecycles.loadError,
-    sandbox.assetCacheScope
+    sandbox.assetCacheScope,
   );
   return Promise.all(
-    results.map(
-      async ({ src, contentPromise }): Promise<LoadedPresetStyle> => ({
-        src,
-        content: await contentPromise,
-      })
-    )
+    results.map(async ({ src, contentPromise }): Promise<LoadedPresetStyle> => ({
+      src,
+      content: await contentPromise,
+    })),
   );
 }
 
@@ -183,23 +181,23 @@ function createPresetStyleElement(
   ownerDocument: Document,
   style: LoadedPresetStyle,
   transform: (code: string, url: string, base: string) => string,
-  baseUrl: string
+  baseUrl: string,
 ): HTMLStyleElement | null {
   if (!style.content) return null;
 
-  const element = ownerDocument.createElement("style");
-  element.type = "text/css";
+  const element = ownerDocument.createElement('style');
+  element.type = 'text/css';
   element.appendChild(ownerDocument.createTextNode(transform(style.content, style.src, baseUrl)));
   return element;
 }
 
 function placePresetStyle(html: HTMLHtmlElement, style: HTMLStyleElement, position: PresetStylePosition): void {
-  if (position === "after") {
+  if (position === 'after') {
     rawAppendChild.call(html, style);
     return;
   }
 
-  const anchor = html.querySelector("head") || html.querySelector("body") || html.firstChild;
+  const anchor = html.querySelector('head') || html.querySelector('body') || html.firstChild;
   html.insertBefore(style, anchor);
 }
 
@@ -207,7 +205,7 @@ async function injectPresetStyleGroup(
   html: HTMLHtmlElement,
   sandbox: Wujie,
   styles: readonly StyleObject[],
-  position: PresetStylePosition
+  position: PresetStylePosition,
 ): Promise<void> {
   const loadedStyles = await loadPresetStyles(styles, sandbox);
   if (!isRenderContextLive(sandbox, sandbox.iframe?.contentWindow)) return;
@@ -224,31 +222,31 @@ async function injectPresetStyleGroup(
 
 /** Decorate a parsed template with plugin styles without coupling parsing to I/O. */
 async function decorateTemplateWithPresetStyles(sandbox: Wujie, html: HTMLHtmlElement): Promise<HTMLHtmlElement> {
-  const before = getPresetLoaders("cssBeforeLoaders", sandbox.plugins);
-  const after = getPresetLoaders("cssAfterLoaders", sandbox.plugins);
+  const before = getPresetLoaders('cssBeforeLoaders', sandbox.plugins);
+  const after = getPresetLoaders('cssAfterLoaders', sandbox.plugins);
 
   await Promise.all([
-    injectPresetStyleGroup(html, sandbox, before, "before"),
-    injectPresetStyleGroup(html, sandbox, after, "after"),
+    injectPresetStyleGroup(html, sandbox, before, 'before'),
+    injectPresetStyleGroup(html, sandbox, after, 'after'),
   ]).catch((): void => undefined);
   return html;
 }
 
 function copyDocumentElementAttributes(template: string, target: HTMLHtmlElement): void {
-  const parsed = new DOMParser().parseFromString(template, "text/html");
+  const parsed = new DOMParser().parseFromString(template, 'text/html');
   Array.from(parsed.documentElement.attributes).forEach(({ name, value }) => target.setAttribute(name, value));
 }
 
 function ensureTemplateSections(html: HTMLHtmlElement, ownerDocument: Document): TemplateSections {
-  let head = html.querySelector("head");
-  let body = html.querySelector("body");
+  let head = html.querySelector('head');
+  let body = html.querySelector('body');
 
   if (!head) {
-    head = ownerDocument.createElement("head");
+    head = ownerDocument.createElement('head');
     html.insertBefore(head, body || html.firstChild);
   }
   if (!body) {
-    body = ownerDocument.createElement("body");
+    body = ownerDocument.createElement('body');
     rawAppendChild.call(html, body);
   }
   return { head, body };
@@ -274,19 +272,19 @@ function resolveSourceSet(value: string, baseURI: string): string {
   const candidates: string[] = [];
   let cursor = 0;
   while (cursor < value.length) {
-    while (cursor < value.length && (value[cursor] === "," || /\s/.test(value[cursor]))) cursor += 1;
+    while (cursor < value.length && (value[cursor] === ',' || /\s/.test(value[cursor]))) cursor += 1;
     if (cursor >= value.length) break;
     const urlStart = cursor;
-    const dataUrl = value.slice(cursor, cursor + 5).toLowerCase() === "data:";
-    while (cursor < value.length && !/\s/.test(value[cursor]) && (dataUrl || value[cursor] !== ",")) cursor += 1;
+    const dataUrl = value.slice(cursor, cursor + 5).toLowerCase() === 'data:';
+    while (cursor < value.length && !/\s/.test(value[cursor]) && (dataUrl || value[cursor] !== ',')) cursor += 1;
     const url = value.slice(urlStart, cursor);
     while (cursor < value.length && /\s/.test(value[cursor])) cursor += 1;
     const descriptorStart = cursor;
-    while (cursor < value.length && value[cursor] !== ",") cursor += 1;
+    while (cursor < value.length && value[cursor] !== ',') cursor += 1;
     const descriptor = value.slice(descriptorStart, cursor).trim();
-    candidates.push(`${dataUrl ? url : getAbsolutePath(url, baseURI)}${descriptor ? ` ${descriptor}` : ""}`);
+    candidates.push(`${dataUrl ? url : getAbsolutePath(url, baseURI)}${descriptor ? ` ${descriptor}` : ''}`);
   }
-  return candidates.join(", ");
+  return candidates.join(', ');
 }
 
 export function repairRelativeElementUrl(element: HTMLElement): void {
@@ -295,14 +293,14 @@ export function repairRelativeElementUrl(element: HTMLElement): void {
 
   attributes.forEach(({ attribute, property = attribute, sourceSet }) => {
     if (!element.hasAttribute(attribute)) return;
-    const rawValue = element.getAttribute(attribute) ?? "";
+    const rawValue = element.getAttribute(attribute) ?? '';
     const resolvedValue = sourceSet
-      ? resolveSourceSet(rawValue, element.baseURI || "")
+      ? resolveSourceSet(rawValue, element.baseURI || '')
       : Reflect.get(element, property);
-    if (typeof resolvedValue === "string") {
+    if (typeof resolvedValue === 'string') {
       element.setAttribute(
         attribute,
-        sourceSet ? resolvedValue : getAbsolutePath(resolvedValue, element.baseURI || "")
+        sourceSet ? resolvedValue : getAbsolutePath(resolvedValue, element.baseURI || ''),
       );
     }
   });
@@ -322,7 +320,7 @@ function patchTemplateTree(html: HTMLHtmlElement, iframeWindow: Window): void {
 function buildTemplateRoot(iframeWindow: Window, template: string): HTMLHtmlElement {
   const sandbox = iframeWindow.__WUJIE;
   const ownerDocument = iframeWindow.document;
-  const html = ownerDocument.createElement("html");
+  const html = ownerDocument.createElement('html');
   html.innerHTML = template;
   copyDocumentElementAttributes(template, html);
 
@@ -341,7 +339,7 @@ async function prepareTemplateRoot(iframeWindow: Window, template: string): Prom
 }
 
 function installDocumentParentFacade(html: HTMLHtmlElement, iframeDocument: Document): void {
-  Object.defineProperty(html, "parentNode", {
+  Object.defineProperty(html, 'parentNode', {
     enumerable: true,
     configurable: true,
     get: () => iframeDocument,
@@ -350,15 +348,15 @@ function installDocumentParentFacade(html: HTMLHtmlElement, iframeDocument: Docu
 
 function installShadowRootFacades(shadowRoot: ShadowRoot, iframeWindow: Window): void {
   const shadowHtml = shadowRoot.firstElementChild as HTMLHtmlElement | null;
-  if (!shadowHtml) throw new Error("The application shadow root has no document element");
+  if (!shadowHtml) throw new Error('The application shadow root has no document element');
 
   installDocumentParentFacade(shadowHtml, iframeWindow.document);
-  Object.defineProperty(shadowHtml, "getBoundingClientRect", {
+  Object.defineProperty(shadowHtml, 'getBoundingClientRect', {
     enumerable: true,
     configurable: true,
     value: (): DOMRect => {
-      const sourceHtml = iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, "html");
-      if (!sourceHtml) throw new Error("The application iframe has no document element");
+      const sourceHtml = iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, 'html');
+      if (!sourceHtml) throw new Error('The application iframe has no document element');
       return sourceHtml.getBoundingClientRect();
     },
   });
@@ -369,7 +367,7 @@ export async function renderTemplateToShadowRoot(
   shadowRoot: ShadowRoot,
   iframeWindow: Window,
   template: string,
-  canRender: () => boolean = () => true
+  canRender: () => boolean = () => true,
 ): Promise<void> {
   const sandbox = iframeWindow.__WUJIE;
   const html = await prepareTemplateRoot(iframeWindow, template);
@@ -381,8 +379,8 @@ export async function renderTemplateToShadowRoot(
     return;
   }
 
-  const shade = document.createElement("div");
-  shade.setAttribute("style", WUJIE_SHADE_STYLE);
+  const shade = document.createElement('div');
+  shade.setAttribute('style', WUJIE_SHADE_STYLE);
   html.insertBefore(shade, html.firstChild);
 
   const { head, body } = ensureTemplateSections(html, iframeWindow.document);
@@ -393,13 +391,13 @@ export async function renderTemplateToShadowRoot(
 }
 
 function iframeStyle(attributes: Record<string, unknown>): string {
-  const configuredStyle = attributes.style;
-  if (configuredStyle === undefined || configuredStyle === null || configuredStyle === "") return DEFAULT_IFRAME_STYLE;
+  const configuredStyle = attributes['style'];
+  if (configuredStyle === undefined || configuredStyle === null || configuredStyle === '') return DEFAULT_IFRAME_STYLE;
   return `${DEFAULT_IFRAME_STYLE};${String(configuredStyle)}`;
 }
 
 export function createIframeContainer(id: string, degradeAttrs: IframeAttributes = {}): HTMLIFrameElement {
-  const iframe = document.createElement("iframe");
+  const iframe = document.createElement('iframe');
   const attributes = degradeAttrs as Record<string, unknown>;
   setAttrsToElement(iframe, {
     ...attributes,
@@ -413,7 +411,7 @@ function connectDegradeWindow(renderDocument: Document, iframeWindow: Window): v
   const renderWindow = renderDocument.defaultView;
   if (!renderWindow) return;
 
-  initBase(renderWindow, iframeWindow.__WUJIE.url, "");
+  initBase(renderWindow, iframeWindow.__WUJIE.url, '');
   renderWindow.__getWujieWindow__ = window.__getWujieWindow__;
 }
 
@@ -422,7 +420,7 @@ export async function renderTemplateToIframe(
   renderDocument: Document,
   iframeWindow: Window,
   template: string,
-  canRender: () => boolean = () => true
+  canRender: () => boolean = () => true,
 ): Promise<void> {
   const sandbox = iframeWindow.__WUJIE;
   const html = await prepareTemplateRoot(iframeWindow, template);
@@ -440,28 +438,28 @@ export function clearChild(root: ShadowRoot | Node): void {
 }
 
 function rememberOverflow(container: HTMLElement, overflow: string): void {
-  container.setAttribute(CONTAINER_OVERFLOW_DATA_FLAG, overflow === "visible" ? "" : overflow);
+  container.setAttribute(CONTAINER_OVERFLOW_DATA_FLAG, overflow === 'visible' ? '' : overflow);
 }
 
 function lockContainerLayout(container: HTMLElement, styles: CSSStyleDeclaration): void {
-  if (styles.position === "static") {
+  if (styles.position === 'static') {
     container.setAttribute(CONTAINER_POSITION_DATA_FLAG, styles.position);
     rememberOverflow(container, styles.overflow);
-    container.style.setProperty("position", "relative");
-    container.style.setProperty("overflow", "hidden");
+    container.style.setProperty('position', 'relative');
+    container.style.setProperty('overflow', 'hidden');
     return;
   }
 
-  if (styles.position === "relative" || styles.position === "sticky") {
+  if (styles.position === 'relative' || styles.position === 'sticky') {
     rememberOverflow(container, styles.overflow);
-    container.style.setProperty("overflow", "hidden");
+    container.style.setProperty('overflow', 'hidden');
   }
 }
 
 function createLoadingIndicator(loading?: HTMLElement): HTMLDivElement {
-  const indicator = document.createElement("div");
-  indicator.setAttribute(LOADING_DATA_FLAG, "");
-  indicator.setAttribute("style", WUJIE_LOADING_STYLE);
+  const indicator = document.createElement('div');
+  indicator.setAttribute(LOADING_DATA_FLAG, '');
+  indicator.setAttribute('style', WUJIE_LOADING_STYLE);
   if (loading) indicator.appendChild(loading);
   else indicator.innerHTML = WUJIE_LOADING_SVG;
   return indicator;
@@ -488,10 +486,10 @@ export function removeLoading(container: HTMLElement): void {
   const position = container.getAttribute(CONTAINER_POSITION_DATA_FLAG);
   const overflow = container.getAttribute(CONTAINER_OVERFLOW_DATA_FLAG);
 
-  if (position !== null) container.style.removeProperty("position");
+  if (position !== null) container.style.removeProperty('position');
   if (overflow !== null) {
-    if (overflow) container.style.setProperty("overflow", overflow);
-    else container.style.removeProperty("overflow");
+    if (overflow) container.style.setProperty('overflow', overflow);
+    else container.style.removeProperty('overflow');
   }
 
   container.removeAttribute(CONTAINER_POSITION_DATA_FLAG);
@@ -516,11 +514,11 @@ function collectPatchRules(styleSheets: readonly (CSSStyleSheet | null | undefin
 } {
   const rootRules: string[] = [];
   const fontRules: string[] = [];
-  const fontFaceRule = typeof CSSRule === "undefined" ? 5 : CSSRule.FONT_FACE_RULE;
+  const fontFaceRule = typeof CSSRule === 'undefined' ? 5 : CSSRule.FONT_FACE_RULE;
 
   styleSheets.forEach((styleSheet) => {
     readableRules(styleSheet).forEach((rule) => {
-      if (rule.cssText.includes(":root")) rootRules.push(rule.cssText.replace(ROOT_SELECTOR_PATTERN, ":host"));
+      if (rule.cssText.includes(':root')) rootRules.push(rule.cssText.replace(ROOT_SELECTOR_PATTERN, ':host'));
       if (rule.type === fontFaceRule) fontRules.push(rule.cssText);
     });
   });
@@ -529,14 +527,14 @@ function collectPatchRules(styleSheets: readonly (CSSStyleSheet | null | undefin
 
 function rulesToStyleElement(rules: readonly string[]): HTMLStyleElement | null {
   if (!rules.length) return null;
-  const element = window.document.createElement("style");
-  element.textContent = rules.join("");
+  const element = window.document.createElement('style');
+  element.textContent = rules.join('');
   return element;
 }
 
 /** Extract :root and @font-face rules for placement outside application stylesheets. */
 export function getPatchStyleElements(
-  rootStyleSheets: readonly (CSSStyleSheet | null | undefined)[]
+  rootStyleSheets: readonly (CSSStyleSheet | null | undefined)[],
 ): PatchStyleElements {
   const { rootRules, fontRules } = collectPatchRules(rootStyleSheets);
   return [rulesToStyleElement(rootRules), rulesToStyleElement(fontRules)];

@@ -129,16 +129,16 @@ Shadow DOM
 class UserCard extends HTMLElement {
   connectedCallback() {
     // 元素被插入 document 时触发
-    this.textContent = "用户卡片";
+    this.textContent = '用户卡片';
   }
 
   disconnectedCallback() {
     // 元素从 document 中移除时触发
-    console.log("用户卡片已卸载");
+    console.log('用户卡片已卸载');
   }
 }
 
-customElements.define("user-card", UserCard);
+customElements.define('user-card', UserCard);
 ```
 
 注册后，浏览器就认识下面的标签：
@@ -168,7 +168,7 @@ disconnectedCallback
 ```ts
 class UserCard extends HTMLElement {
   connectedCallback() {
-    const shadowRoot = this.attachShadow({ mode: "open" });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
 
     shadowRoot.innerHTML = `
       <style>
@@ -218,7 +218,7 @@ packages/wujie-core/src/shadow.ts
 ```ts
 export function defineWujieWebComponent() {
   // 同一个 Custom Element 名称不能重复注册
-  if (customElements.get("wujie-app")) return;
+  if (customElements.get('wujie-app')) return;
 
   class WujieApp extends HTMLElement {
     connectedCallback() {
@@ -228,8 +228,8 @@ export function defineWujieWebComponent() {
        */
       if (this.shadowRoot) return;
 
-      const shadowRoot = this.attachShadow({ mode: "open" });
-      const appId = this.getAttribute("data-wujie-id");
+      const shadowRoot = this.attachShadow({ mode: 'open' });
+      const appId = this.getAttribute('data-wujie-id');
       const sandbox = getWujieById(appId);
 
       // 修复 ShadowRoot 与 iframe Realm 之间的 DOM 语义
@@ -240,7 +240,7 @@ export function defineWujieWebComponent() {
     }
 
     disconnectedCallback() {
-      const appId = this.getAttribute("data-wujie-id");
+      const appId = this.getAttribute('data-wujie-id');
       const sandbox = getWujieById(appId);
 
       // 根据保活、单例或重建模式选择 unmount/destroy
@@ -248,7 +248,7 @@ export function defineWujieWebComponent() {
     }
   }
 
-  customElements.define("wujie-app", WujieApp);
+  customElements.define('wujie-app', WujieApp);
 }
 ```
 
@@ -256,11 +256,11 @@ Wujie 运行时会创建这个元素：
 
 ```ts
 export function createWujieWebComponent(id: string): HTMLElement {
-  const element = document.createElement("wujie-app");
+  const element = document.createElement('wujie-app');
 
   // 用应用 name 关联对应的 Wujie 实例
-  element.setAttribute("data-wujie-id", id);
-  element.classList.add("wujie_iframe");
+  element.setAttribute('data-wujie-id', id);
+  element.classList.add('wujie_iframe');
 
   return element;
 }
@@ -269,8 +269,8 @@ export function createWujieWebComponent(id: string): HTMLElement {
 插入主应用容器后，浏览器自动执行 `connectedCallback`：
 
 ```ts
-const webComponent = createWujieWebComponent("orders");
-const container = document.querySelector("#micro-app-container");
+const webComponent = createWujieWebComponent('orders');
+const container = document.querySelector('#micro-app-container');
 
 container.appendChild(webComponent);
 ```
@@ -353,26 +353,9 @@ export async function startApp(startOptions: StartOptions) {
   const oldSandbox = getWujieById(startOptions.name);
 
   // 合并 setupApp 缓存配置和本次 startApp 配置
-  const options = mergeOptions(
-    startOptions,
-    getOptionsById(startOptions.name)
-  );
+  const options = mergeOptions(startOptions, getOptionsById(startOptions.name));
 
-  const {
-    name,
-    url,
-    html,
-    el,
-    alive,
-    sync,
-    prefix,
-    props,
-    fetch,
-    replace,
-    plugins,
-    lifecycles,
-    fiber,
-  } = options;
+  const { name, url, html, el, alive, sync, prefix, props, fetch, replace, plugins, lifecycles, fiber } = options;
 
   /*
    * 已存在实例优先复用：
@@ -414,7 +397,7 @@ export async function startApp(startOptions: StartOptions) {
       return () => oldSandbox.destroy();
     }
 
-    if (typeof iframeWindow.__WUJIE_MOUNT === "function") {
+    if (typeof iframeWindow.__WUJIE_MOUNT === 'function') {
       await oldSandbox.unmount();
 
       await oldSandbox.active({
@@ -451,11 +434,7 @@ export async function startApp(startOptions: StartOptions) {
   });
 
   // 请求并解析入口 HTML
-  const {
-    template,
-    getExternalScripts,
-    getExternalStyleSheets,
-  } = await importHTML({
+  const { template, getExternalScripts, getExternalStyleSheets } = await importHTML({
     url,
     html,
     opts: {
@@ -466,11 +445,7 @@ export async function startApp(startOptions: StartOptions) {
   });
 
   // 下载外部 CSS，并重新嵌入模板
-  const processedHtml = await processCssLoader(
-    sandbox,
-    template,
-    getExternalStyleSheets
-  );
+  const processedHtml = await processCssLoader(sandbox, template, getExternalStyleSheets);
 
   // 创建 Web Component、ShadowRoot，并渲染 HTML
   await sandbox.active({
@@ -656,17 +631,16 @@ iframe window
 精简后的创建逻辑：
 
 ```ts
-const EMPTY_DOCUMENT =
-  "<!DOCTYPE html><html><head></head><body></body></html>";
+const EMPTY_DOCUMENT = '<!DOCTYPE html><html><head></head><body></body></html>';
 
 export function iframeGenerator(
   sandbox: Wujie,
   attrs: Record<string, unknown>,
   mainHostPath: string,
   appHostPath: string,
-  appRoutePath: string
+  appRoutePath: string,
 ): HTMLIFrameElement {
-  const iframe = document.createElement("iframe");
+  const iframe = document.createElement('iframe');
 
   /*
    * srcdoc 创建一个空白且继承主应用 origin 的文档：
@@ -676,7 +650,7 @@ export function iframeGenerator(
    * - 主应用可以访问 contentDocument
    */
   setAttrsToElement(iframe, {
-    style: "display: none",
+    style: 'display: none',
     name: sandbox.id,
     srcdoc: EMPTY_DOCUMENT,
     ...attrs,
@@ -688,7 +662,7 @@ export function iframeGenerator(
 
   // 在 iframe 初始化早期注入 Wujie 上下文
   iframeWindow.__WUJIE = sandbox;
-  iframeWindow.__WUJIE_PUBLIC_PATH__ = appHostPath + "/";
+  iframeWindow.__WUJIE_PUBLIC_PATH__ = appHostPath + '/';
   iframeWindow.__WUJIE_RAW_WINDOW__ = iframeWindow;
   iframeWindow.$wujie = sandbox.provide;
 
@@ -703,18 +677,9 @@ export function iframeGenerator(
      * - patch window/document/Node
      * - patch 相对路径和内联事件
      */
-    initIframeDom(
-      iframeWindow,
-      sandbox,
-      mainHostPath,
-      appHostPath
-    );
+    initIframeDom(iframeWindow, sandbox, mainHostPath, appHostPath);
 
-    iframeWindow.history.replaceState(
-      null,
-      "",
-      mainHostPath + appRoutePath
-    );
+    iframeWindow.history.replaceState(null, '', mainHostPath + appRoutePath);
   });
 
   return iframe;
@@ -743,25 +708,22 @@ packages/wujie-core/src/proxy.ts
 精简实现：
 
 ```ts
-const {
-  proxy: proxyWindow,
-  revoke: revokeWindow,
-} = Proxy.revocable(iframe.contentWindow, {
+const { proxy: proxyWindow, revoke: revokeWindow } = Proxy.revocable(iframe.contentWindow, {
   get(target, key) {
     // location 必须返回子应用视角的代理对象
-    if (key === "location") {
+    if (key === 'location') {
       return target.__WUJIE.proxyLocation;
     }
 
     // 保持 window.window === window 和 window.self === window
-    if (key === "window" || key === "self") {
+    if (key === 'window' || key === 'self') {
       return target.__WUJIE.proxy;
     }
 
     const value = target[key];
 
     // 修复浏览器原生方法的 this，避免 Illegal invocation
-    if (typeof value === "function") {
+    if (typeof value === 'function') {
       return value.bind(target);
     }
 
@@ -783,7 +745,7 @@ const {
 子应用执行：
 
 ```js
-window.userToken = "abc";
+window.userToken = 'abc';
 ```
 
 结果是：
@@ -802,51 +764,42 @@ JavaScript 隔离的根本来源是独立 iframe window，而不是 Proxy 自己
 真实 iframe 与主应用同源，子应用却应当认为自己运行在原来的域名和路径下，因此 Wujie 提供 `proxyLocation`。
 
 ```ts
-const {
-  proxy: proxyLocation,
-  revoke: revokeLocation,
-} = Proxy.revocable({}, {
-  get(_target, key) {
-    const realLocation = iframe.contentWindow.location;
+const { proxy: proxyLocation, revoke: revokeLocation } = Proxy.revocable(
+  {},
+  {
+    get(_target, key) {
+      const realLocation = iframe.contentWindow.location;
 
-    // 域名相关信息来自子应用入口地址
-    if (
-      key === "host" ||
-      key === "hostname" ||
-      key === "protocol" ||
-      key === "port" ||
-      key === "origin"
-    ) {
-      return childUrlElement[key];
-    }
+      // 域名相关信息来自子应用入口地址
+      if (key === 'host' || key === 'hostname' || key === 'protocol' || key === 'port' || key === 'origin') {
+        return childUrlElement[key];
+      }
 
-    // 路径来自 iframe 当前 history，但把主域名替换为子应用域名
-    if (key === "href") {
-      return realLocation.href.replace(
-        mainHostPath,
-        appHostPath
-      );
-    }
+      // 路径来自 iframe 当前 history，但把主域名替换为子应用域名
+      if (key === 'href') {
+        return realLocation.href.replace(mainHostPath, appHostPath);
+      }
 
-    if (key === "reload") {
-      return () => {
-        console.warn("Wujie 中 location.reload 被接管");
-      };
-    }
+      if (key === 'reload') {
+        return () => {
+          console.warn('Wujie 中 location.reload 被接管');
+        };
+      }
 
-    return realLocation[key];
+      return realLocation[key];
+    },
+
+    set(_target, key, value) {
+      if (key === 'href') {
+        // href 赋值属于页面级跳转，需要单独处理
+        return handleLocationHref(value);
+      }
+
+      iframe.contentWindow.location[key] = value;
+      return true;
+    },
   },
-
-  set(_target, key, value) {
-    if (key === "href") {
-      // href 赋值属于页面级跳转，需要单独处理
-      return handleLocationHref(value);
-    }
-
-    iframe.contentWindow.location[key] = value;
-    return true;
-  },
-});
+);
 ```
 
 需要区分两种跳转：
@@ -907,16 +860,16 @@ function processTpl(html: string, baseURI: string) {
     })
     .replace(STYLE_TAG_REGEX, (styleTag) => {
       styles.push({
-        src: "",
+        src: '',
         content: getInlineCode(styleTag),
       });
 
-      return "<!-- inline style replaced by wujie -->";
+      return '<!-- inline style replaced by wujie -->';
     })
     .replace(SCRIPT_TAG_REGEX, (scriptTag) => {
       scripts.push(parseScript(scriptTag, baseURI));
 
-      return "<!-- script replaced by wujie -->";
+      return '<!-- script replaced by wujie -->';
     });
 
   return {
@@ -936,10 +889,7 @@ async function embedStyles(template, styleResults) {
   for (const styleResult of styleResults) {
     const css = await styleResult.contentPromise;
 
-    result = result.replace(
-      styleResult.placeholder,
-      `<style>${css}</style>`
-    );
+    result = result.replace(styleResult.placeholder, `<style>${css}</style>`);
   }
 
   return result;
@@ -959,24 +909,14 @@ packages/wujie-core/src/shadow.ts
 ```
 
 ```ts
-export async function renderTemplateToShadowRoot(
-  shadowRoot: ShadowRoot,
-  iframeWindow: Window,
-  template: string
-) {
+export async function renderTemplateToShadowRoot(shadowRoot: ShadowRoot, iframeWindow: Window, template: string) {
   /*
    * 使用 iframe document 创建子应用节点，
    * 随后再通过补丁维持跨 Realm 语义。
    */
-  const html = renderTemplateToHtml(
-    iframeWindow,
-    template
-  );
+  const html = renderTemplateToHtml(iframeWindow, template);
 
-  const processedHtml = await processCssLoaderForTemplate(
-    iframeWindow.__WUJIE,
-    html
-  );
+  const processedHtml = await processCssLoaderForTemplate(iframeWindow.__WUJIE, html);
 
   // 可见 DOM 实际进入主页面中的 ShadowRoot
   shadowRoot.appendChild(processedHtml);
@@ -985,34 +925,24 @@ export async function renderTemplateToShadowRoot(
    * ShadowRoot 原生没有 head/body 属性。
    * Wujie 手动保存引用，供 proxyDocument 使用。
    */
-  shadowRoot.head = shadowRoot.querySelector("head");
-  shadowRoot.body = shadowRoot.querySelector("body");
+  shadowRoot.head = shadowRoot.querySelector('head');
+  shadowRoot.body = shadowRoot.querySelector('body');
 
   // 劫持后续动态插入的 script/link/style
-  patchRenderEffect(
-    shadowRoot,
-    iframeWindow.__WUJIE.id,
-    false
-  );
+  patchRenderEffect(shadowRoot, iframeWindow.__WUJIE.id, false);
 }
 ```
 
 这里的关键不是简单设置 `innerHTML`，而是需要遍历和修复元素：
 
 ```ts
-function renderTemplateToHtml(
-  iframeWindow: Window,
-  template: string
-) {
+function renderTemplateToHtml(iframeWindow: Window, template: string) {
   const iframeDocument = iframeWindow.document;
-  const html = iframeDocument.createElement("html");
+  const html = iframeDocument.createElement('html');
 
   html.innerHTML = template;
 
-  const iterator = iframeDocument.createTreeWalker(
-    html,
-    NodeFilter.SHOW_ELEMENT
-  );
+  const iterator = iframeDocument.createTreeWalker(html, NodeFilter.SHOW_ELEMENT);
 
   let element = iterator.currentNode as HTMLElement;
 
@@ -1046,7 +976,7 @@ packages/wujie-core/src/iframe.ts
 子应用执行：
 
 ```js
-document.querySelector("#app");
+document.querySelector('#app');
 document.body.appendChild(dialog);
 ```
 
@@ -1055,108 +985,96 @@ document.body.appendChild(dialog);
 精简后的 `proxyDocument`：
 
 ```ts
-const {
-  proxy: proxyDocument,
-  revoke: revokeDocument,
-} = Proxy.revocable({}, {
-  get(_target, key) {
-    const sandbox = iframe.contentWindow.__WUJIE;
-    const shadowRoot = sandbox.shadowRoot;
-    const iframeDocument = iframe.contentDocument;
+const { proxy: proxyDocument, revoke: revokeDocument } = Proxy.revocable(
+  {},
+  {
+    get(_target, key) {
+      const sandbox = iframe.contentWindow.__WUJIE;
+      const shadowRoot = sandbox.shadowRoot;
+      const iframeDocument = iframe.contentDocument;
 
-    if (key === "createElement") {
-      return function createElement(tagName: string) {
-        // 使用 iframe Realm 中的原生 Document 创建节点
-        const element = iframeDocument.createElement(tagName);
+      if (key === 'createElement') {
+        return function createElement(tagName: string) {
+          // 使用 iframe Realm 中的原生 Document 创建节点
+          const element = iframeDocument.createElement(tagName);
 
-        patchElementEffect(
-          element,
-          iframe.contentWindow
-        );
+          patchElementEffect(element, iframe.contentWindow);
 
-        return element;
-      };
-    }
+          return element;
+        };
+      }
 
-    if (key === "createTextNode") {
-      return iframeDocument.createTextNode.bind(iframeDocument);
-    }
+      if (key === 'createTextNode') {
+        return iframeDocument.createTextNode.bind(iframeDocument);
+      }
 
-    // DOM 查询转发到 ShadowRoot
-    if (key === "querySelector") {
-      return shadowRoot.querySelector.bind(shadowRoot);
-    }
+      // DOM 查询转发到 ShadowRoot
+      if (key === 'querySelector') {
+        return shadowRoot.querySelector.bind(shadowRoot);
+      }
 
-    if (key === "querySelectorAll") {
-      return shadowRoot.querySelectorAll.bind(shadowRoot);
-    }
+      if (key === 'querySelectorAll') {
+        return shadowRoot.querySelectorAll.bind(shadowRoot);
+      }
 
-    if (key === "getElementById") {
-      return function getElementById(id: string) {
-        return shadowRoot.querySelector(`[id="${id}"]`);
-      };
-    }
+      if (key === 'getElementById') {
+        return function getElementById(id: string) {
+          return shadowRoot.querySelector(`[id="${id}"]`);
+        };
+      }
 
-    if (key === "getElementsByTagName") {
-      return function getElementsByTagName(tagName: string) {
-        // JavaScript 节点实际位于 iframe document
-        if (tagName === "script") {
-          return iframeDocument.scripts;
-        }
+      if (key === 'getElementsByTagName') {
+        return function getElementsByTagName(tagName: string) {
+          // JavaScript 节点实际位于 iframe document
+          if (tagName === 'script') {
+            return iframeDocument.scripts;
+          }
 
-        return shadowRoot.querySelectorAll(tagName);
-      };
-    }
+          return shadowRoot.querySelectorAll(tagName);
+        };
+      }
 
-    if (key === "head") return shadowRoot.head;
-    if (key === "body") return shadowRoot.body;
+      if (key === 'head') return shadowRoot.head;
+      if (key === 'body') return shadowRoot.body;
 
-    if (
-      key === "documentElement" ||
-      key === "scrollingElement"
-    ) {
-      return shadowRoot.firstElementChild;
-    }
+      if (key === 'documentElement' || key === 'scrollingElement') {
+        return shadowRoot.firstElementChild;
+      }
 
-    // 其他能力按分类返回 ShadowRoot、iframe document 或主 document
-    const value = iframeDocument[key];
+      // 其他能力按分类返回 ShadowRoot、iframe document 或主 document
+      const value = iframeDocument[key];
 
-    return typeof value === "function"
-      ? value.bind(iframeDocument)
-      : value;
+      return typeof value === 'function' ? value.bind(iframeDocument) : value;
+    },
   },
-});
+);
 ```
 
-但只有 `proxyDocument` 还不够。子应用中的裸变量 `document` 首先指向 iframe 真实 document，因此 Wujie还要修改 iframe Realm 的 `Document.prototype`：
+但只有 `proxyDocument` 还不够。子应用中的裸变量 `document` 首先指向 iframe 真实 document，因此 Wujie 还要修改 iframe Realm 的 `Document.prototype`：
 
 ```ts
 export function patchDocumentEffect(iframeWindow: Window) {
   const sandbox = iframeWindow.__WUJIE;
 
   const proxyKeys = [
-    "head",
-    "body",
-    "documentElement",
-    "querySelector",
-    "querySelectorAll",
-    "getElementById",
-    "getElementsByTagName",
-    "activeElement",
-    "scrollingElement",
+    'head',
+    'body',
+    'documentElement',
+    'querySelector',
+    'querySelectorAll',
+    'getElementById',
+    'getElementsByTagName',
+    'activeElement',
+    'scrollingElement',
   ];
 
   for (const key of proxyKeys) {
-    Object.defineProperty(
-      iframeWindow.Document.prototype,
-      key,
-      {
-        configurable: true,
-        get() {
-          return sandbox.proxyDocument[key];
-        },
-      }
-    );
+    Object.defineProperty(iframeWindow.Document.prototype, key, {
+      configurable: true,
+      get() {
+        return sandbox.proxyDocument[key];
+      },
+    });
   }
 }
 ```
@@ -1191,19 +1109,11 @@ packages/wujie-core/src/sandbox.ts
 普通脚本会被包装后插入 iframe：
 
 ```ts
-export function insertScriptToIframe(
-  scriptResult: ScriptResult,
-  iframeWindow: Window
-) {
-  const {
-    src,
-    content,
-    module,
-    async,
-  } = scriptResult;
+export function insertScriptToIframe(scriptResult: ScriptResult, iframeWindow: Window) {
+  const { src, content, module, async } = scriptResult;
 
-  const script = iframeWindow.document.createElement("script");
-  let code = content || "";
+  const script = iframeWindow.document.createElement('script');
+  let code = content || '';
 
   /*
    * 普通内联脚本通过函数参数修正：
@@ -1232,10 +1142,10 @@ export function insertScriptToIframe(
   }
 
   if (module) {
-    script.type = "module";
+    script.type = 'module';
   }
 
-  const head = iframeWindow.document.querySelector("head");
+  const head = iframeWindow.document.querySelector('head');
 
   // 插入脚本时，浏览器在 iframe Realm 中执行代码
   head.appendChild(script);
@@ -1369,19 +1279,13 @@ document.head.appendChild(style);
 Wujie 会改写 ShadowRoot 中 `head/body` 的 `appendChild` 和 `insertBefore`：
 
 ```ts
-function rewriteAppendChild(
-  sandboxId: string,
-  rawAppendChild: typeof Node.prototype.appendChild
-) {
-  return function appendChild(
-    this: HTMLHeadElement,
-    node: Node
-  ) {
+function rewriteAppendChild(sandboxId: string, rawAppendChild: typeof Node.prototype.appendChild) {
+  return function appendChild(this: HTMLHeadElement, node: Node) {
     const sandbox = getWujieById(sandboxId);
     const element = node as HTMLElement;
 
     switch (element.tagName) {
-      case "SCRIPT": {
+      case 'SCRIPT': {
         const script = element as HTMLScriptElement;
 
         /*
@@ -1394,32 +1298,26 @@ function rewriteAppendChild(
               src: script.src,
               content,
               async: script.async,
-              module: script.type === "module",
+              module: script.type === 'module',
             },
             sandbox.iframe.contentWindow,
-            script
+            script,
           );
         });
 
-        return rawAppendChild.call(
-          this,
-          document.createComment(
-            "dynamic script replaced by wujie"
-          )
-        );
+        return rawAppendChild.call(this, document.createComment('dynamic script replaced by wujie'));
       }
 
-      case "LINK": {
+      case 'LINK': {
         const link = element as HTMLLinkElement;
 
-        if (link.rel !== "stylesheet") {
+        if (link.rel !== 'stylesheet') {
           return rawAppendChild.call(this, node);
         }
 
         // 下载 CSS，改写后转成 style 插入 ShadowRoot
         loadStyle(link.href).then((css) => {
-          const style = sandbox.iframe.contentDocument
-            .createElement("style");
+          const style = sandbox.iframe.contentDocument.createElement('style');
 
           style.textContent = rewriteCssUrls(css, link.href);
           sandbox.styleSheetElements.push(style);
@@ -1427,15 +1325,10 @@ function rewriteAppendChild(
           rawAppendChild.call(this, style);
         });
 
-        return rawAppendChild.call(
-          this,
-          document.createComment(
-            "dynamic stylesheet replaced by wujie"
-          )
-        );
+        return rawAppendChild.call(this, document.createComment('dynamic stylesheet replaced by wujie'));
       }
 
-      case "STYLE": {
+      case 'STYLE': {
         const style = element as HTMLStyleElement;
 
         /*
@@ -1453,10 +1346,7 @@ function rewriteAppendChild(
       }
 
       default: {
-        patchElementEffect(
-          element,
-          sandbox.iframe.contentWindow
-        );
+        patchElementEffect(element, sandbox.iframe.contentWindow);
 
         return rawAppendChild.call(this, node);
       }
@@ -1510,10 +1400,8 @@ function getPatchStyleElements(styleSheets: CSSStyleSheet[]) {
 
   for (const styleSheet of styleSheets) {
     for (const rule of styleSheet.cssRules) {
-      if (rule.cssText.includes(":root")) {
-        rootRules.push(
-          rule.cssText.replace(/:root/g, ":host")
-        );
+      if (rule.cssText.includes(':root')) {
+        rootRules.push(rule.cssText.replace(/:root/g, ':host'));
       }
 
       if (rule.type === CSSRule.FONT_FACE_RULE) {
@@ -1559,31 +1447,21 @@ Wujie 的处理方式是把子应用路由写入主应用 query：
 首先劫持 iframe history：
 
 ```ts
-function patchIframeHistory(
-  iframeWindow: Window,
-  appHostPath: string,
-  mainHostPath: string
-) {
+function patchIframeHistory(iframeWindow: Window, appHostPath: string, mainHostPath: string) {
   const history = iframeWindow.history;
   const rawPushState = history.pushState.bind(history);
   const rawReplaceState = history.replaceState.bind(history);
 
-  history.pushState = function(data, title, url) {
+  history.pushState = function (data, title, url) {
     // 将子应用域名转换为 iframe 所在的主应用域名
-    const iframeUrl = url?.replace(
-      appHostPath,
-      mainHostPath
-    );
+    const iframeUrl = url?.replace(appHostPath, mainHostPath);
 
     rawPushState(data, title, iframeUrl);
     syncUrlToWindow(iframeWindow);
   };
 
-  history.replaceState = function(data, title, url) {
-    const iframeUrl = url?.replace(
-      appHostPath,
-      mainHostPath
-    );
+  history.replaceState = function (data, title, url) {
+    const iframeUrl = url?.replace(appHostPath, mainHostPath);
 
     rawReplaceState(data, title, iframeUrl);
     syncUrlToWindow(iframeWindow);
@@ -1599,20 +1477,13 @@ export function syncUrlToWindow(iframeWindow: Window) {
 
   if (!sync) return;
 
-  const childRoute =
-    iframeWindow.location.pathname +
-    iframeWindow.location.search +
-    iframeWindow.location.hash;
+  const childRoute = iframeWindow.location.pathname + iframeWindow.location.search + iframeWindow.location.hash;
 
   const mainUrl = new URL(window.location.href);
 
   mainUrl.searchParams.set(id, childRoute);
 
-  window.history.replaceState(
-    null,
-    "",
-    mainUrl.href
-  );
+  window.history.replaceState(null, '', mainUrl.href);
 }
 ```
 
@@ -1634,11 +1505,7 @@ export function syncUrlToIframe(iframeWindow: Window) {
 
   const route = parseAppRoute(targetUrl);
 
-  iframeWindow.history.replaceState(
-    null,
-    "",
-    iframeWindow.__WUJIE.inject.mainHostPath + route
-  );
+  iframeWindow.history.replaceState(null, '', iframeWindow.__WUJIE.inject.mainHostPath + route);
 }
 ```
 
@@ -1661,7 +1528,7 @@ export function syncUrlToIframe(iframeWindow: Window) {
 子应用执行：
 
 ```js
-document.addEventListener("click", handler);
+document.addEventListener('click', handler);
 ```
 
 这个监听不能一律注册到 iframe document，因为用户点击的是 ShadowRoot 中的可见 DOM。Wujie 会按事件类型决定注册位置：
@@ -1676,20 +1543,11 @@ document.addEventListener("click", handler);
 简化逻辑：
 
 ```ts
-iframeWindow.Document.prototype.addEventListener = function(
-  type,
-  handler,
-  options
-) {
+iframeWindow.Document.prototype.addEventListener = function (type, handler, options) {
   const callback = bindHandlerToDocument(handler, this);
 
   if (shouldListenOnIframeDocument(type)) {
-    return rawAddEventListener.call(
-      this,
-      type,
-      callback,
-      options
-    );
+    return rawAddEventListener.call(this, type, callback, options);
   }
 
   if (shouldListenOnMainDocument(type)) {
@@ -1699,18 +1557,10 @@ iframeWindow.Document.prototype.addEventListener = function(
       options,
     });
 
-    return window.document.addEventListener(
-      type,
-      callback,
-      options
-    );
+    return window.document.addEventListener(type, callback, options);
   }
 
-  return sandbox.shadowRoot.addEventListener(
-    type,
-    callback,
-    options
-  );
+  return sandbox.shadowRoot.addEventListener(type, callback, options);
 };
 ```
 
@@ -1727,17 +1577,12 @@ element instanceof iframeWindow.HTMLElement;
 当前实现会为相关 DOM 构造器补充 `Symbol.hasInstance`，让两个 Realm 的对象都可以被识别：
 
 ```ts
-Object.defineProperty(
-  TargetConstructor,
-  Symbol.hasInstance,
-  {
-    configurable: true,
-    value(element) {
-      return nativeHasInstance.call(this, element) ||
-        nativeHasInstance.call(PeerConstructor, element);
-    },
-  }
-);
+Object.defineProperty(TargetConstructor, Symbol.hasInstance, {
+  configurable: true,
+  value(element) {
+    return nativeHasInstance.call(this, element) || nativeHasInstance.call(PeerConstructor, element);
+  },
+});
 ```
 
 ### 18.3 `ownerDocument` 和 `baseURI`
@@ -1751,12 +1596,7 @@ Object.defineProperties(element, {
     get() {
       const location = iframeWindow.__WUJIE.proxyLocation;
 
-      return (
-        location.protocol +
-        "//" +
-        location.host +
-        location.pathname
-      );
+      return location.protocol + '//' + location.host + location.pathname;
     },
   },
 
@@ -1834,11 +1674,9 @@ alive = false
 function handleWujieAppDisconnect(sandbox: Wujie) {
   const iframeWindow = sandbox.iframe.contentWindow;
 
-  const hasLifecycle =
-    typeof iframeWindow.__WUJIE_MOUNT === "function";
+  const hasLifecycle = typeof iframeWindow.__WUJIE_MOUNT === 'function';
 
-  const rebuildMode =
-    !sandbox.alive && !hasLifecycle;
+  const rebuildMode = !sandbox.alive && !hasLifecycle;
 
   if (rebuildMode) {
     sandbox.destroy();
@@ -1850,11 +1688,11 @@ function handleWujieAppDisconnect(sandbox: Wujie) {
 
 模式对比：
 
-| 模式 | Web Component | ShadowRoot | iframe | 业务实例 |
-| --- | --- | --- | --- | --- |
-| 保活 | 保留并热插拔 | 保留 | 保留 | 保留 |
-| 单例 | 可重新连接 | 重新渲染 | 保留 | 卸载后重建 |
-| 重建 | 销毁 | 销毁 | 销毁 | 销毁 |
+| 模式 | Web Component | ShadowRoot | iframe | 业务实例   |
+| ---- | ------------- | ---------- | ------ | ---------- |
+| 保活 | 保留并热插拔  | 保留       | 保留   | 保留       |
+| 单例 | 可重新连接    | 重新渲染   | 保留   | 卸载后重建 |
+| 重建 | 销毁          | 销毁       | 销毁   | 销毁       |
 
 ---
 
@@ -2071,13 +1909,13 @@ insertScriptToIframe
 观察以下对象：
 
 ```js
-sandbox.iframe
-sandbox.iframe.contentWindow
-sandbox.proxy
-sandbox.proxyDocument
-sandbox.proxyLocation
-sandbox.shadowRoot
-sandbox.provide
+sandbox.iframe;
+sandbox.iframe.contentWindow;
+sandbox.proxy;
+sandbox.proxyDocument;
+sandbox.proxyLocation;
+sandbox.shadowRoot;
+sandbox.provide;
 ```
 
 ### 24.2 第二组断点：观察 DOM 桥接
@@ -2085,9 +1923,9 @@ sandbox.provide
 在子应用中执行：
 
 ```js
-const div = document.createElement("div");
-div.id = "wujie-debug-node";
-div.textContent = "Wujie DOM bridge";
+const div = document.createElement('div');
+div.id = 'wujie-debug-node';
+div.textContent = 'Wujie DOM bridge';
 
 document.body.appendChild(div);
 ```
@@ -2121,7 +1959,7 @@ rewriteAppendOrInsertChild
 ### 24.3 第三组断点：观察动态资源
 
 ```js
-const style = document.createElement("style");
+const style = document.createElement('style');
 style.textContent = `
   #wujie-debug-node {
     color: red;
@@ -2150,19 +1988,15 @@ patchStylesheetElement
 在子应用执行：
 
 ```js
-history.pushState(
-  null,
-  "",
-  "/detail/100?tab=payment#result"
-);
+history.pushState(null, '', '/detail/100?tab=payment#result');
 ```
 
 同时观察：
 
 ```js
-iframe.contentWindow.location.href
-window.location.href
-sandbox.proxyLocation.href
+iframe.contentWindow.location.href;
+window.location.href;
+sandbox.proxyLocation.href;
 ```
 
 这三个地址代表三个不同视角：

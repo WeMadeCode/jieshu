@@ -1,12 +1,38 @@
 {
-  "presets": ["@babel/preset-env", "@babel/preset-react"],
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "esmodules": true
+        }
+      }
+    ],
+    "@babel/preset-react",
+    "@babel/preset-typescript"
+  ],
   "env": {
+    "test": {
+      "presets": [
+        [
+          "@babel/preset-env",
+          {
+            "targets": {
+              "node": "current"
+            }
+          }
+        ]
+      ]
+    },
     "esm": {
       "presets": [
         [
           "@babel/preset-env",
           {
-            "modules": false
+            "modules": false,
+            "targets": {
+              "esmodules": true
+            }
           }
         ]
       ]

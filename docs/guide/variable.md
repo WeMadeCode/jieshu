@@ -62,7 +62,6 @@ declare global {
 
 - **描述：** 子应用的原生 window 对象
 
-
 ## `__WUJIE`
 
 - **类型：** `Wujie`
