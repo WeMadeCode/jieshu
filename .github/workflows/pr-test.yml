@@ -5,9 +5,9 @@ on:
     branches:
       - master
     paths-ignore:
-      - "**/*.md"
-      - "docs/**"
-      - "notes/**"
+      - '**/*.md'
+      - 'docs/**'
+      - 'notes/**'
 
 # 同一 PR 连续推送时自动取消上一次未完成的运行，节省 runner 时间
 concurrency:
@@ -30,8 +30,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.x"
-          cache: "pnpm"
+          node-version: '22.x'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm i --filter "wujie-project" --filter "./packages/**" --frozen-lockfile
@@ -70,8 +70,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22.x"
-          cache: "pnpm"
+          node-version: '22.x'
+          cache: 'pnpm'
 
       # 提高 inotify watcher 上限，避免 8 个 webpack/vue/vite dev server 并行启动
       # 时触发 ENOSPC（GitHub runner 默认上限对多 dev-server 场景偏紧）
@@ -104,7 +104,7 @@ jobs:
         working-directory: packages/wujie-core
         env:
           NODE_OPTIONS: --openssl-legacy-provider
-          PUPPETEER_LAUNCH_ARGS: "--no-sandbox --disable-setuid-sandbox"
+          PUPPETEER_LAUNCH_ARGS: '--no-sandbox --disable-setuid-sandbox'
         run: pnpm run test:integration
 
       - name: Job summary

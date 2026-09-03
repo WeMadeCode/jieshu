@@ -29,16 +29,16 @@
 ## 示例
 
 ```javascript
-import { clearAssetsCache } from "wujie";
+import { clearAssetsCache } from 'wujie';
 
 // 清空全部缓存
 clearAssetsCache();
 
 // 只清理指定 host
-clearAssetsCache("https://a.com");
+clearAssetsCache('https://a.com');
 
 // 批量清理
-clearAssetsCache(["https://a.com", "https://b.com"]);
+clearAssetsCache(['https://a.com', 'https://b.com']);
 ```
 
 ::: warning 注意

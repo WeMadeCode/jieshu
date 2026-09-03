@@ -15,7 +15,7 @@
 
 export {};
 
-const Sandbox = require("../../src/sandbox").default;
+const Sandbox = require('../../src/sandbox').default;
 
 function buildUnmountReadySandbox(alive: boolean): any {
   const sandbox = Object.create(Sandbox.prototype);
@@ -28,9 +28,9 @@ function buildUnmountReadySandbox(alive: boolean): any {
   sandbox.bus = { $clear: jest.fn() };
   // shadowRoot / head / body 用普通 div 充当，clearChild 只关心 children；
   // effect.ts removeEventListener 会读 element._cacheListeners.entries()，预置空 Map
-  sandbox.shadowRoot = document.createElement("div");
-  sandbox.head = Object.assign(document.createElement("div"), { _cacheListeners: new Map() });
-  sandbox.body = Object.assign(document.createElement("div"), { _cacheListeners: new Map() });
+  sandbox.shadowRoot = document.createElement('div');
+  sandbox.head = Object.assign(document.createElement('div'), { _cacheListeners: new Map() });
+  sandbox.body = Object.assign(document.createElement('div'), { _cacheListeners: new Map() });
   sandbox.iframe = {
     contentWindow: {
       __WUJIE_UNMOUNT: jest.fn().mockResolvedValue(undefined),
@@ -41,11 +41,11 @@ function buildUnmountReadySandbox(alive: boolean): any {
   return sandbox;
 }
 
-describe("sandbox.unmount() 与 rebuildStyleSheets 的复用契约", () => {
-  test("非保活 sandbox.unmount() 后 styleSheetElements 应保留以供 rebuildStyleSheets 复用", async () => {
+describe('sandbox.unmount() 与 rebuildStyleSheets 的复用契约', () => {
+  test('非保活 sandbox.unmount() 后 styleSheetElements 应保留以供 rebuildStyleSheets 复用', async () => {
     const sandbox = buildUnmountReadySandbox(false);
-    const dynamicStyle = document.createElement("style");
-    dynamicStyle.textContent = ".pre { color: red }";
+    const dynamicStyle = document.createElement('style');
+    dynamicStyle.textContent = '.pre { color: red }';
     sandbox.styleSheetElements.push(dynamicStyle);
 
     await sandbox.unmount();
@@ -53,10 +53,10 @@ describe("sandbox.unmount() 与 rebuildStyleSheets 的复用契约", () => {
     expect(sandbox.styleSheetElements).toContain(dynamicStyle);
   });
 
-  test("非保活 sandbox.unmount() 后 dynamicScriptElements 应保留（模块只 init 一次，不会被 unmount 反复清）", async () => {
+  test('非保活 sandbox.unmount() 后 dynamicScriptElements 应保留（模块只 init 一次，不会被 unmount 反复清）', async () => {
     const sandbox = buildUnmountReadySandbox(false);
-    const dynamicScript = document.createElement("script");
-    dynamicScript.textContent = "/* webpack chunk */";
+    const dynamicScript = document.createElement('script');
+    dynamicScript.textContent = '/* webpack chunk */';
     sandbox.dynamicScriptElements.push(dynamicScript);
 
     await sandbox.unmount();
@@ -64,18 +64,18 @@ describe("sandbox.unmount() 与 rebuildStyleSheets 的复用契约", () => {
     expect(sandbox.dynamicScriptElements).toContain(dynamicScript);
   });
 
-  test("rebuildStyleSheets 在 unmount 后应能把数组中的样式节点重新 appendChild 到 shadowRoot.head", async () => {
+  test('rebuildStyleSheets 在 unmount 后应能把数组中的样式节点重新 appendChild 到 shadowRoot.head', async () => {
     const sandbox = buildUnmountReadySandbox(false);
     // 构造 minimal shadowRoot：rebuildStyleSheets 走非降级分支访问 shadowRoot.head；
     // 紧跟着 patchCssRules 会查 shadowRoot.host.hasAttribute，host 用真 div 占位即可。
-    const fakeShadowRoot: any = document.createElement("div");
-    fakeShadowRoot.head = document.createElement("div");
-    fakeShadowRoot.host = document.createElement("div");
+    const fakeShadowRoot: any = document.createElement('div');
+    fakeShadowRoot.head = document.createElement('div');
+    fakeShadowRoot.host = document.createElement('div');
     sandbox.shadowRoot = fakeShadowRoot;
     sandbox.iframe.contentDocument = { querySelectorAll: () => [] };
 
-    const styleA = document.createElement("style");
-    const styleB = document.createElement("style");
+    const styleA = document.createElement('style');
+    const styleB = document.createElement('style');
     sandbox.styleSheetElements.push(styleA, styleB);
 
     await sandbox.unmount();

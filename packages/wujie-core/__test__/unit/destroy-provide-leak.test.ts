@@ -8,22 +8,22 @@
 
 export {};
 
-import Wujie from "../../src/sandbox";
+import Wujie from '../../src/sandbox';
 
-describe("sandbox.destroy() 对 iframeWindow.$wujie 的清理契约", () => {
+describe('sandbox.destroy() 对 iframeWindow.$wujie 的清理契约', () => {
   function createDestroyableSandbox() {
-    const iframe = window.document.createElement("iframe");
+    const iframe = window.document.createElement('iframe');
     window.document.body.appendChild(iframe);
     const iframeWindow: any = iframe.contentWindow;
 
     const provide: any = { bus: {}, shadowRoot: {}, location: {} };
-    iframeWindow.__WUJIE = { id: "leak-test" };
+    iframeWindow.__WUJIE = { id: 'leak-test' };
     iframeWindow.$wujie = provide;
 
     const proxyRevoke = jest.fn();
 
     const inst: any = Object.create(Wujie.prototype);
-    inst.id = "leak-test";
+    inst.id = 'leak-test';
     inst.provide = provide;
     inst.shadowRoot = null;
     inst.proxyLocation = null;
@@ -39,7 +39,7 @@ describe("sandbox.destroy() 对 iframeWindow.$wujie 的清理契约", () => {
     return { inst, iframeWindow, proxyRevoke };
   }
 
-  test("destroy 后 iframeWindow.$wujie 与 __WUJIE 均被断链为 null", async () => {
+  test('destroy 后 iframeWindow.$wujie 与 __WUJIE 均被断链为 null', async () => {
     const { inst, iframeWindow } = createDestroyableSandbox();
 
     await inst.destroy();
@@ -48,7 +48,7 @@ describe("sandbox.destroy() 对 iframeWindow.$wujie 的清理契约", () => {
     expect(iframeWindow.__WUJIE).toBeNull();
   });
 
-  test("destroy 后 sandbox 自身 provide / shadowRoot / proxyLocation 也被置空", async () => {
+  test('destroy 后 sandbox 自身 provide / shadowRoot / proxyLocation 也被置空', async () => {
     const { inst } = createDestroyableSandbox();
 
     await inst.destroy();
@@ -58,7 +58,7 @@ describe("sandbox.destroy() 对 iframeWindow.$wujie 的清理契约", () => {
     expect(inst.proxyLocation).toBeNull();
   });
 
-  test("destroy 后调用 proxyRevoke 释放代理闭包，并将其置空", async () => {
+  test('destroy 后调用 proxyRevoke 释放代理闭包，并将其置空', async () => {
     const { inst, proxyRevoke } = createDestroyableSandbox();
 
     await inst.destroy();

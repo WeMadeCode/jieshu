@@ -7,7 +7,7 @@
 
 export {};
 
-const Sandbox = require("../../src/sandbox").default;
+const Sandbox = require('../../src/sandbox').default;
 
 function createMinimalSandbox(): any {
   const sandbox = Object.create(Sandbox.prototype);
@@ -15,21 +15,21 @@ function createMinimalSandbox(): any {
   return sandbox;
 }
 
-describe("dynamicScriptElements destroy 时的清理", () => {
-  test("Wujie 实例应有 dynamicScriptElements 字段（数组形式）", () => {
+describe('dynamicScriptElements destroy 时的清理', () => {
+  test('Wujie 实例应有 dynamicScriptElements 字段（数组形式）', () => {
     const sandbox = createMinimalSandbox();
     expect(Array.isArray(sandbox.dynamicScriptElements)).toBe(true);
   });
 
-  test("Wujie.prototype.clearDynamicScripts 应作为公开方法存在", () => {
-    expect(typeof Sandbox.prototype.clearDynamicScripts).toBe("function");
+  test('Wujie.prototype.clearDynamicScripts 应作为公开方法存在', () => {
+    expect(typeof Sandbox.prototype.clearDynamicScripts).toBe('function');
   });
 
-  test("clearDynamicScripts 应清空数组并把已挂在父节点上的 <script> 节点移除", () => {
+  test('clearDynamicScripts 应清空数组并把已挂在父节点上的 <script> 节点移除', () => {
     const sandbox = createMinimalSandbox();
-    const head = document.createElement("div");
-    const s1 = document.createElement("script");
-    const s2 = document.createElement("script");
+    const head = document.createElement('div');
+    const s1 = document.createElement('script');
+    const s2 = document.createElement('script');
     head.append(s1, s2);
     sandbox.dynamicScriptElements.push(s1, s2);
 
@@ -39,9 +39,9 @@ describe("dynamicScriptElements destroy 时的清理", () => {
     expect(head.children).toHaveLength(0);
   });
 
-  test("clearDynamicScripts 对已脱离 DOM 的 script 节点应安全跳过", () => {
+  test('clearDynamicScripts 对已脱离 DOM 的 script 节点应安全跳过', () => {
     const sandbox = createMinimalSandbox();
-    const orphan = document.createElement("script");
+    const orphan = document.createElement('script');
     sandbox.dynamicScriptElements.push(orphan);
 
     expect(() => sandbox.clearDynamicScripts()).not.toThrow();

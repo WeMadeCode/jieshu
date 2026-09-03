@@ -10,7 +10,7 @@
 
 export {};
 
-const shadow = require("../../src/shadow");
+const shadow = require('../../src/shadow');
 
 function createMockSandbox({ alive, hasMount }: { alive: boolean; hasMount: boolean }) {
   return {
@@ -25,33 +25,33 @@ function createMockSandbox({ alive, hasMount }: { alive: boolean; hasMount: bool
   } as any;
 }
 
-describe("handleWujieAppDisconnect 运行模式判定", () => {
-  test("shadow 模块应导出 handleWujieAppDisconnect helper", () => {
-    expect(typeof shadow.handleWujieAppDisconnect).toBe("function");
+describe('handleWujieAppDisconnect 运行模式判定', () => {
+  test('shadow 模块应导出 handleWujieAppDisconnect helper', () => {
+    expect(typeof shadow.handleWujieAppDisconnect).toBe('function');
   });
 
-  test("保活模式（alive=true）：应仅 unmount，不 destroy", () => {
+  test('保活模式（alive=true）：应仅 unmount，不 destroy', () => {
     const sandbox = createMockSandbox({ alive: true, hasMount: true });
     shadow.handleWujieAppDisconnect(sandbox);
     expect(sandbox.unmount).toHaveBeenCalledTimes(1);
     expect(sandbox.destroy).not.toHaveBeenCalled();
   });
 
-  test("单例模式（非保活 + 存在 __WUJIE_MOUNT）：应仅 unmount，不 destroy", () => {
+  test('单例模式（非保活 + 存在 __WUJIE_MOUNT）：应仅 unmount，不 destroy', () => {
     const sandbox = createMockSandbox({ alive: false, hasMount: true });
     shadow.handleWujieAppDisconnect(sandbox);
     expect(sandbox.unmount).toHaveBeenCalledTimes(1);
     expect(sandbox.destroy).not.toHaveBeenCalled();
   });
 
-  test("重建模式（非保活 + 无 __WUJIE_MOUNT）：应直接 destroy，不 unmount", () => {
+  test('重建模式（非保活 + 无 __WUJIE_MOUNT）：应直接 destroy，不 unmount', () => {
     const sandbox = createMockSandbox({ alive: false, hasMount: false });
     shadow.handleWujieAppDisconnect(sandbox);
     expect(sandbox.destroy).toHaveBeenCalledTimes(1);
     expect(sandbox.unmount).not.toHaveBeenCalled();
   });
 
-  test("sandbox 为 null/undefined 时 helper 不应抛错", () => {
+  test('sandbox 为 null/undefined 时 helper 不应抛错', () => {
     expect(() => shadow.handleWujieAppDisconnect(null)).not.toThrow();
     expect(() => shadow.handleWujieAppDisconnect(undefined)).not.toThrow();
   });

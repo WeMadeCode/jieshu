@@ -21,9 +21,9 @@ npm i wujie-vue3 -S
 
 ```javascript
 // vue2
-import WujieVue from "wujie-vue2";
+import WujieVue from 'wujie-vue2';
 // vue3
-import WujieVue from "wujie-vue3";
+import WujieVue from 'wujie-vue3';
 
 const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = WujieVue;
 
@@ -87,19 +87,19 @@ await this.$refs.wujie.refresh();
 ## 原理
 
 ```javascript
-import Vue from "vue";
-import { bus, setupApp, preloadApp, startApp, destroyApp } from "wujie";
-import { createApp, h, defineComponent } from "vue";
+import Vue from 'vue';
+import { bus, setupApp, preloadApp, startApp, destroyApp } from 'wujie';
+import { createApp, h, defineComponent } from 'vue';
 const vue3Flag = !!createApp;
 
 const wujieVueOptions = {
-  name: "WujieVue",
+  name: 'WujieVue',
   props: {
-    width: { type: String, default: "" },
-    height: { type: String, default: "" },
-    name: { type: String, default: "" },
+    width: { type: String, default: '' },
+    height: { type: String, default: '' },
+    name: { type: String, default: '' },
     loading: { type: HTMLElement, default: undefined },
-    url: { type: String, default: "" },
+    url: { type: String, default: '' },
     sync: { type: Boolean, default: false },
     prefix: { type: Object, default: undefined },
     alive: { type: Boolean, default: false },
@@ -131,7 +131,7 @@ const wujieVueOptions = {
     this.execStartApp();
     this.$watch(
       () => this.name + this.url,
-      () => this.execStartApp()
+      () => this.execStartApp(),
     );
   },
   methods: {
@@ -177,12 +177,12 @@ const wujieVueOptions = {
   },
   render(c) {
     const createElement = vue3Flag ? h : c;
-    return createElement("div", {
+    return createElement('div', {
       style: {
         width: this.height,
         height: this.height,
       },
-      ref: "wujie",
+      ref: 'wujie',
     });
   },
 };
@@ -194,7 +194,7 @@ WujieVue.preloadApp = preloadApp;
 WujieVue.bus = bus;
 WujieVue.destroyApp = destroyApp;
 WujieVue.install = function (Vue) {
-  Vue.component("WujieVue", WujieVue);
+  Vue.component('WujieVue', WujieVue);
 };
 
 export default WujieVue;

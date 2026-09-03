@@ -46,8 +46,8 @@ reference.ownerDocument.documentElement.getBoundingClientRect();
 曾尝试在 document 代理层直接返回 iframe 原生 document：
 
 ```ts
-if (propKey === "documentElement") return iframe.contentDocument.documentElement;
-if (propKey === "scrollingElement") return iframe.contentDocument.scrollingElement;
+if (propKey === 'documentElement') return iframe.contentDocument.documentElement;
+if (propKey === 'scrollingElement') return iframe.contentDocument.scrollingElement;
 ```
 
 这个方案希望从源头上让弹层库拿到 0 基准的原生 documentElement。
@@ -78,11 +78,11 @@ document.documentElement === shadowRoot.firstElementChild;
 只修正这个 `<html>` 的 `getBoundingClientRect()`：
 
 ```ts
-Object.defineProperty(shadowRoot.firstElementChild, "getBoundingClientRect", {
+Object.defineProperty(shadowRoot.firstElementChild, 'getBoundingClientRect', {
   enumerable: true,
   configurable: true,
   value: () =>
-    iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, "html").getBoundingClientRect(),
+    iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, 'html').getBoundingClientRect(),
 });
 ```
 
@@ -317,8 +317,8 @@ Element UI 还常见以下组合：
 不推荐：
 
 ```ts
-if (propKey === "documentElement") return iframe.contentDocument.documentElement;
-if (propKey === "scrollingElement") return iframe.contentDocument.scrollingElement;
+if (propKey === 'documentElement') return iframe.contentDocument.documentElement;
+if (propKey === 'scrollingElement') return iframe.contentDocument.scrollingElement;
 ```
 
 这个方向验证时会导致页面死循环或路由/查询链路异常。
@@ -326,11 +326,11 @@ if (propKey === "scrollingElement") return iframe.contentDocument.scrollingEleme
 更安全的补丁是在 `packages/wujie-core/src/shadow.ts` 中，仅修正 `shadowRoot.firstElementChild` 的几何读数：
 
 ```ts
-Object.defineProperty(shadowRoot.firstElementChild, "getBoundingClientRect", {
+Object.defineProperty(shadowRoot.firstElementChild, 'getBoundingClientRect', {
   enumerable: true,
   configurable: true,
   value: () =>
-    iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, "html").getBoundingClientRect(),
+    iframeWindow.__WUJIE_RAW_DOCUMENT_QUERY_SELECTOR__.call(iframeWindow.document, 'html').getBoundingClientRect(),
 });
 ```
 

@@ -1,4 +1,4 @@
-export type { SandboxCache, SandboxTeardownRegistry } from "./sandbox-registry";
+export type { SandboxCache, SandboxTeardownRegistry } from './sandbox-registry';
 export {
   idToSandboxCacheMap,
   sandboxTeardownById,
@@ -12,7 +12,7 @@ export {
   runInSandboxUnmountHook,
   invokeSandboxUnmountHook,
   isSandboxUnmountHookActive,
-} from "./sandbox-registry";
+} from './sandbox-registry';
 
 export {
   documentProxyProperties,
@@ -25,7 +25,7 @@ export {
   relativeElementTagAttrMap,
   windowProxyProperties,
   windowRegWhiteList,
-} from "./sandbox-policy";
+} from './sandbox-policy';
 
 export {
   rawElementAppendChild,
@@ -40,6 +40,6 @@ export {
   rawWindowRemoveEventListener,
   rawAppendChild,
   rawDocumentQuerySelector,
-} from "./native-dom";
+} from './native-dom';
 
 export type appAddEventListenerOptions = AddEventListenerOptions & { targetWindow?: Window };

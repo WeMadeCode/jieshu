@@ -153,7 +153,7 @@ export default class Wujie {
     attrs: {
       [key: string]: any;
     },
-    fiber: boolean
+    fiber: boolean,
   );
 }
 ```
@@ -185,7 +185,7 @@ function stopIframeLoading(iframeWindow: Window) {
     function loop() {
       setTimeout(() => {
         // location ready
-        if (iframeWindow.location.href === "about:blank") {
+        if (iframeWindow.location.href === 'about:blank') {
           loop();
         } else {
           iframeWindow.stop();
@@ -291,7 +291,7 @@ new Proxy(
       const document = window.document;
       const shadowRoot = iframe.contentWindow.__WUJIE.shadowRoot;
       // need fix
-      if (propKey === "createElement" || propKey === "createTextNode") {
+      if (propKey === 'createElement' || propKey === 'createTextNode') {
         return new Proxy(document[propKey], {
           apply(createElement, _ctx, args) {
             const element = createElement.apply(iframe.contentDocument, args);
@@ -300,39 +300,39 @@ new Proxy(
           },
         });
       }
-      if (propKey === "documentURI" || propKey === "URL") {
+      if (propKey === 'documentURI' || propKey === 'URL') {
         return (iframe.contentWindow.__WUJIE.proxyLocation as Location).href;
       }
 
       // from shadowRoot
       if (
-        propKey === "getElementsByTagName" ||
-        propKey === "getElementsByClassName" ||
-        propKey === "getElementsByName"
+        propKey === 'getElementsByTagName' ||
+        propKey === 'getElementsByClassName' ||
+        propKey === 'getElementsByName'
       ) {
         return new Proxy(shadowRoot.querySelectorAll, {
           apply(querySelectorAll, _ctx, args) {
             let arg = args[0];
-            if (propKey === "getElementsByClassName") arg += ".";
-            if (propKey === "getElementsByName") arg = `[name="${arg}"]`;
+            if (propKey === 'getElementsByClassName') arg += '.';
+            if (propKey === 'getElementsByName') arg = `[name="${arg}"]`;
             return querySelectorAll.call(shadowRoot, arg);
           },
         });
       }
-      if (propKey === "getElementById") {
+      if (propKey === 'getElementById') {
         return new Proxy(shadowRoot.querySelector, {
           apply(querySelector, _ctx, args) {
             return querySelector.call(shadowRoot, `#${args[0]}`);
           },
         });
       }
-      if (propKey === "querySelector" || propKey === "querySelectorAll") {
+      if (propKey === 'querySelector' || propKey === 'querySelectorAll') {
         return shadowRoot[propKey].bind(shadowRoot);
       }
-      if (propKey === "documentElement" || propKey === "scrollingElement") return shadowRoot.firstElementChild;
-      if (propKey === "forms") return shadowRoot.querySelectorAll("form");
-      if (propKey === "images") return shadowRoot.querySelectorAll("img");
-      if (propKey === "links") return shadowRoot.querySelectorAll("a");
+      if (propKey === 'documentElement' || propKey === 'scrollingElement') return shadowRoot.firstElementChild;
+      if (propKey === 'forms') return shadowRoot.querySelectorAll('form');
+      if (propKey === 'images') return shadowRoot.querySelectorAll('img');
+      if (propKey === 'links') return shadowRoot.querySelectorAll('a');
       const { ownerProperties, shadowProperties, shadowMethods, documentProperties, documentMethods } =
         documentProxyProperties;
       if (ownerProperties.concat(shadowProperties).includes(propKey.toString())) {
@@ -349,7 +349,7 @@ new Proxy(
         return getTargetValue(document, propKey);
       }
     },
-  }
+  },
 );
 ```
 
@@ -361,21 +361,21 @@ new Proxy(
   {
     get: function (fakeLocation, propKey) {
       const location = target.location;
-      if (propKey === "host" || propKey === "hostname" || propKey === "protocol" || propKey === "port") {
+      if (propKey === 'host' || propKey === 'hostname' || propKey === 'protocol' || propKey === 'port') {
         return urlElement[propKey];
       }
-      if (propKey === "href") {
+      if (propKey === 'href') {
         return target.location[propKey].replace(mainPublicPath, appPublicPath);
       }
-      if (propKey === "reload") {
-        warn("子应用调用reload无法生效");
+      if (propKey === 'reload') {
+        warn('子应用调用reload无法生效');
         return () => null;
       }
       return getTargetValue(location, propKey);
     },
     set: function (location, propKey, value, receiver) {
       // 如果是跳转链接的话重开一个iframe
-      if (propKey === "href") {
+      if (propKey === 'href') {
         const { shadowRoot, id } = target.__WUJIE;
         let url = value;
         if (!/^http/.test(url)) {
@@ -390,6 +390,6 @@ new Proxy(
       }
       return Reflect.set(location, propKey, value, receiver);
     },
-  }
+  },
 );
 ```

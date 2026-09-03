@@ -70,7 +70,7 @@ type startOptions = baseOptions & {
   loading?: HTMLElement;
 };
 
-type optionProperty = "url" | "el";
+type optionProperty = 'url' | 'el';
 
 /**
  * 合并 preOptions 和 startOptions，并且将 url 和 el 变成可选

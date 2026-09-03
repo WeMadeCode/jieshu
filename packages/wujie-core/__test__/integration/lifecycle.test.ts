@@ -1,10 +1,10 @@
-import { awaitConsoleLogMessage } from "./utils";
-import { reactMainAppInfoMap, vueMainAppInfoMap } from "./common";
+import { awaitConsoleLogMessage } from './utils';
+import { reactMainAppInfoMap, vueMainAppInfoMap } from './common';
 
 const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainAppInfoMap) => {
   it(`react16 entry lifecycles`, async () => {
     const lifecyclePromiseList = reactMainAppInfoMap.react16.entryLifecycles.map((lifecycle) =>
-      awaitConsoleLogMessage(page, lifecycle)
+      awaitConsoleLogMessage(page, lifecycle),
     );
     await page.click(AppInfoMap.react16.linkSelector);
     await Promise.all(lifecyclePromiseList);
@@ -91,28 +91,28 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
   });
 };
 
-describe("main react startApp", () => {
+describe('main react startApp', () => {
   beforeAll(async () => {
     await page.evaluateOnNewDocument(() => {
       // 关闭预加载
       localStorage.clear();
-      localStorage.setItem("preload", "false");
-      localStorage.setItem("degrade", "false");
+      localStorage.setItem('preload', 'false');
+      localStorage.setItem('degrade', 'false');
     });
-    await page.goto("http://localhost:7700/");
+    await page.goto('http://localhost:7700/');
   });
   generateTest(reactMainAppInfoMap);
 });
 
-describe("main vue startApp", () => {
+describe('main vue startApp', () => {
   beforeAll(async () => {
     await page.evaluateOnNewDocument(() => {
       // 关闭预加载
       localStorage.clear();
-      localStorage.setItem("preload", "false");
-      localStorage.setItem("degrade", "false");
+      localStorage.setItem('preload', 'false');
+      localStorage.setItem('degrade', 'false');
     });
-    await page.goto("http://localhost:8000/");
+    await page.goto('http://localhost:8000/');
   });
 
   generateTest(vueMainAppInfoMap);

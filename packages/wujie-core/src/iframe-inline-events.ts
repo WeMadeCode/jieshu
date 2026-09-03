@@ -1,5 +1,5 @@
-const WUJIE_INLINE_EVENT_PREFIX = "{const __WUJIE_INLINE_SCOPE__=window.__getWujieWindow__(";
-const LEGACY_INLINE_EVENT_PREFIX = "with(window.__getWujieWindow__(";
+const WUJIE_INLINE_EVENT_PREFIX = '{const __WUJIE_INLINE_SCOPE__=window.__getWujieWindow__(';
+const LEGACY_INLINE_EVENT_PREFIX = 'with(window.__getWujieWindow__(';
 const patchedWindows = new WeakSet<object>();
 
 function isInlineEventAttribute(name: string): boolean {
@@ -19,7 +19,7 @@ function compileAttributeValue(name: string, value: string, iframeWindow: Window
 export function wrapInlineEventHandler(handler: string, appId: string): string {
   if (handler.startsWith(WUJIE_INLINE_EVENT_PREFIX) || handler.startsWith(LEGACY_INLINE_EVENT_PREFIX)) return handler;
   return `${WUJIE_INLINE_EVENT_PREFIX}${JSON.stringify(
-    appId
+    appId,
   )});if(__WUJIE_INLINE_SCOPE__){with(__WUJIE_INLINE_SCOPE__){ ${handler} }}}`;
 }
 
@@ -38,7 +38,7 @@ export function compileInlineEvents(element: Element, iframeWindow: Window): voi
   Array.from(element.children).forEach((child) => compileInlineEvents(child, iframeWindow));
 }
 
-function patchMarkupSetter(iframeWindow: Window, prototype: object, property: "innerHTML" | "outerHTML"): void {
+function patchMarkupSetter(iframeWindow: Window, prototype: object, property: 'innerHTML' | 'outerHTML'): void {
   const descriptor = Object.getOwnPropertyDescriptor(prototype, property);
   if (!descriptor?.get || !descriptor.set || descriptor.configurable === false) return;
   const rawGet = descriptor.get;
@@ -49,7 +49,7 @@ function patchMarkupSetter(iframeWindow: Window, prototype: object, property: "i
       return Reflect.apply(rawGet, this, []) as string;
     },
     set: function (this: Element | ShadowRoot, markup: string): void {
-      const parent = property === "outerHTML" && this instanceof iframeWindow.Element ? this.parentElement : null;
+      const parent = property === 'outerHTML' && this instanceof iframeWindow.Element ? this.parentElement : null;
       Reflect.apply(rawSet, this, [markup]);
       const root = parent ?? this;
       if (root instanceof iframeWindow.Element) compileInlineEvents(root, iframeWindow);
@@ -77,7 +77,7 @@ export function patchInlineEventSetAttribute(iframeWindow: Window): void {
   iframeWindow.Element.prototype.setAttributeNS = function (
     namespace: string | null,
     qualifiedName: string,
-    value: string
+    value: string,
   ): void {
     const normalizedValue = String(value);
     const compiledValue = namespace
@@ -101,12 +101,12 @@ export function patchInlineEventSetAttribute(iframeWindow: Window): void {
   };
 
   iframeWindow.Element.prototype.insertAdjacentHTML = function (position: InsertPosition, text: string): void {
-    const parent = position === "beforebegin" || position === "afterend" ? this.parentElement : null;
+    const parent = position === 'beforebegin' || position === 'afterend' ? this.parentElement : null;
     rawInsertAdjacentHTML.call(this, position, text);
     compileInlineEvents(parent ?? this, iframeWindow);
   };
 
-  patchMarkupSetter(iframeWindow, iframeWindow.Element.prototype, "innerHTML");
-  patchMarkupSetter(iframeWindow, iframeWindow.Element.prototype, "outerHTML");
-  patchMarkupSetter(iframeWindow, iframeWindow.ShadowRoot.prototype, "innerHTML");
+  patchMarkupSetter(iframeWindow, iframeWindow.Element.prototype, 'innerHTML');
+  patchMarkupSetter(iframeWindow, iframeWindow.Element.prototype, 'outerHTML');
+  patchMarkupSetter(iframeWindow, iframeWindow.ShadowRoot.prototype, 'innerHTML');
 }

@@ -1,15 +1,15 @@
-export type SandboxLifecycleState = "created" | "active" | "mounted" | "inactive" | "destroying" | "destroyed";
+export type SandboxLifecycleState = 'created' | 'active' | 'mounted' | 'inactive' | 'destroying' | 'destroyed';
 
 type Cleanup = () => void;
 type ScheduledTask = () => unknown;
-export type SandboxDynamicResourceCancellationReason = "unmount" | "destroy";
+export type SandboxDynamicResourceCancellationReason = 'unmount' | 'destroy';
 
-type PromiseOutcome<Value> = { status: "fulfilled"; value: Value } | { status: "rejected"; reason: unknown };
+type PromiseOutcome<Value> = { status: 'fulfilled'; value: Value } | { status: 'rejected'; reason: unknown };
 
 function observe<Value>(promise: Promise<Value>): Promise<PromiseOutcome<Value>> {
   return promise.then<PromiseOutcome<Value>, PromiseOutcome<Value>>(
-    (value): PromiseOutcome<Value> => ({ status: "fulfilled", value }),
-    (reason: unknown): PromiseOutcome<Value> => ({ status: "rejected", reason })
+    (value): PromiseOutcome<Value> => ({ status: 'fulfilled', value }),
+    (reason: unknown): PromiseOutcome<Value> => ({ status: 'rejected', reason }),
   );
 }
 
@@ -68,18 +68,18 @@ export class SandboxPromiseSequence {
 
     const execute = async (): Promise<void> => {
       if (revision !== this.revision || !pending) {
-        entry.cancel("destroy");
+        entry.cancel('destroy');
         return;
       }
 
       const result = await Promise.race([
-        outcome.then((value) => ({ kind: "outcome" as const, value })),
-        cancellation.then(() => ({ kind: "cancelled" as const })),
+        outcome.then((value) => ({ kind: 'outcome' as const, value })),
+        cancellation.then(() => ({ kind: 'cancelled' as const })),
       ]);
-      if (result.kind === "cancelled" || revision !== this.revision || !pending) return;
+      if (result.kind === 'cancelled' || revision !== this.revision || !pending) return;
 
       try {
-        if (result.value.status === "fulfilled") handlers.fulfilled(result.value.value);
+        if (result.value.status === 'fulfilled') handlers.fulfilled(result.value.value);
         else handlers.rejected(result.value.reason);
       } finally {
         finish();
@@ -92,7 +92,7 @@ export class SandboxPromiseSequence {
     this.tail = completion.catch(() => undefined);
   }
 
-  public cancel(reason: SandboxDynamicResourceCancellationReason = "destroy"): void {
+  public cancel(reason: SandboxDynamicResourceCancellationReason = 'destroy'): void {
     this.revision += 1;
     const entries = [...this.entries];
     this.entries.clear();
@@ -111,7 +111,7 @@ const dynamicResourceCancellations = new WeakMap<object, Set<DynamicResourceCanc
 export function scheduleSandboxDynamicScript<Value>(
   sandbox: object,
   promise: Promise<Value>,
-  handlers: OrderedPromiseHandlers<Value>
+  handlers: OrderedPromiseHandlers<Value>,
 ): void {
   let sequence = dynamicScriptSequences.get(sandbox);
   if (!sequence) {
@@ -139,7 +139,7 @@ export function registerSandboxDynamicResource(sandbox: object, cancellation: Dy
 /** @internal Release one sandbox's complete pending dynamic-resource generation. */
 export function cancelSandboxDynamicResources(
   sandbox: object,
-  reason: SandboxDynamicResourceCancellationReason = "destroy"
+  reason: SandboxDynamicResourceCancellationReason = 'destroy',
 ): void {
   const sequence = dynamicScriptSequences.get(sandbox);
   if (sequence) {
@@ -162,7 +162,7 @@ export function cancelSandboxDynamicResources(
 /** @internal Backward-compatible name retained for direct internal consumers. */
 export function cancelSandboxDynamicScripts(
   sandbox: object,
-  reason: SandboxDynamicResourceCancellationReason = "destroy"
+  reason: SandboxDynamicResourceCancellationReason = 'destroy',
 ): void {
   cancelSandboxDynamicResources(sandbox, reason);
 }
@@ -173,38 +173,38 @@ export function cancelSandboxDynamicScripts(
  * explicit and independently testable.
  */
 export class SandboxLifecycleController {
-  private state: SandboxLifecycleState = "created";
+  private state: SandboxLifecycleState = 'created';
 
   public getCurrent(): SandboxLifecycleState {
     return this.state;
   }
 
   public activate(): boolean {
-    if (this.state === "destroying" || this.state === "destroyed") return false;
-    this.state = "active";
+    if (this.state === 'destroying' || this.state === 'destroyed') return false;
+    this.state = 'active';
     return true;
   }
 
   public mount(): boolean {
-    if (this.state !== "active" && this.state !== "inactive") return false;
-    this.state = "mounted";
+    if (this.state !== 'active' && this.state !== 'inactive') return false;
+    this.state = 'mounted';
     return true;
   }
 
   public deactivate(): boolean {
-    if (this.state === "destroying" || this.state === "destroyed") return false;
-    this.state = "inactive";
+    if (this.state === 'destroying' || this.state === 'destroyed') return false;
+    this.state = 'inactive';
     return true;
   }
 
   public beginDestroy(): boolean {
-    if (this.state === "destroying" || this.state === "destroyed") return false;
-    this.state = "destroying";
+    if (this.state === 'destroying' || this.state === 'destroyed') return false;
+    this.state = 'destroying';
     return true;
   }
 
   public finishDestroy(): void {
-    this.state = "destroyed";
+    this.state = 'destroyed';
   }
 }
 
@@ -250,7 +250,7 @@ export class SandboxScriptScheduler {
     private readonly queue: ScheduledTask[],
     private readonly fiber: boolean,
     private readonly scheduleIdle: (task: ScheduledTask) => unknown,
-    private readonly canExecute: () => boolean = () => true
+    private readonly canExecute: () => boolean = () => true,
   ) {}
 
   public schedule(task: ScheduledTask): void {
@@ -266,15 +266,15 @@ export class SandboxScriptScheduler {
     const outcome = observe(promise);
     this.queue.push(() =>
       outcome.then((result) =>
-        result.status === "fulfilled" ? this.executeQueued(() => task(result.value)) : this.advance()
-      )
+        result.status === 'fulfilled' ? this.executeQueued(() => task(result.value)) : this.advance(),
+      ),
     );
   }
 
   public executeAfter<Value>(promise: Promise<Value>, task: (value: Value) => unknown): void {
     if (this.cancelled) return;
     observe(promise).then((result) => {
-      if (result.status === "fulfilled" && this.canExecute()) this.execute(() => task(result.value));
+      if (result.status === 'fulfilled' && this.canExecute()) this.execute(() => task(result.value));
     });
   }
 
@@ -325,7 +325,7 @@ export class SandboxScriptScheduler {
   private executeTask(task: ScheduledTask): unknown {
     try {
       const result = task();
-      if (result && typeof (result as PromiseLike<unknown>).then === "function") {
+      if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
         void Promise.resolve(result).catch((cause: unknown) => this.fail(cause));
       }
       return result;
@@ -362,7 +362,7 @@ export interface ScriptGroups<Script extends { async?: boolean; defer?: boolean 
 }
 
 export function groupScripts<Script extends { async?: boolean; defer?: boolean }>(
-  scripts: Script[]
+  scripts: Script[],
 ): ScriptGroups<Script> {
   return scripts.reduce<ScriptGroups<Script>>(
     (groups, script) => {
@@ -373,6 +373,6 @@ export function groupScripts<Script extends { async?: boolean; defer?: boolean }
       else groups.sync.push(script);
       return groups;
     },
-    { sync: [], async: [], defer: [] }
+    { sync: [], async: [], defer: [] },
   );
 }

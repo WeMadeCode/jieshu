@@ -22,8 +22,8 @@ type WindowOverrideStacks = Map<string, WindowPropertyOverride[]>;
 const sharedWindowOverrides = new WeakMap<Window, WindowOverrideStacks>();
 
 function sameListener(left: DocumentListenerEntry, right: DocumentListenerEntry): boolean {
-  const leftCapture = typeof left.options === "boolean" ? left.options : left.options?.capture === true;
-  const rightCapture = typeof right.options === "boolean" ? right.options : right.options?.capture === true;
+  const leftCapture = typeof left.options === 'boolean' ? left.options : left.options?.capture === true;
+  const rightCapture = typeof right.options === 'boolean' ? right.options : right.options?.capture === true;
   return left.type === right.type && left.callback === right.callback && leftCapture === rightCapture;
 }
 

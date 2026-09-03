@@ -1,5 +1,5 @@
-import type Wujie from "./sandbox";
-import type { CacheOptions } from "./contracts";
+import type Wujie from './sandbox';
+import type { CacheOptions } from './contracts';
 
 export interface SandboxCache {
   wujie?: Wujie;
@@ -59,7 +59,7 @@ function resolveTeardownRegistry(): SandboxTeardownRegistry {
   if (injectedRegistry) return injectedRegistry;
 
   const registry = new Map<string, Promise<void>>();
-  window.__WUJIE_INJECT = { ...window.__WUJIE_INJECT, teardownById: registry } as Window["__WUJIE_INJECT"];
+  window.__WUJIE_INJECT = { ...window.__WUJIE_INJECT, teardownById: registry } as Window['__WUJIE_INJECT'];
   return registry;
 }
 
@@ -79,7 +79,7 @@ export function registerSandboxTeardown(id: string, teardown: Promise<void>): Pr
     (cause: unknown): never => {
       if (sandboxTeardownById.get(id) === tracked) sandboxTeardownById.delete(id);
       throw cause;
-    }
+    },
   );
   // Keep the rejecting completion in the registry so every concurrent public
   // destroy observes the same outcome. Attach a side observer solely to avoid

@@ -4,12 +4,12 @@ import {
   WUJIE_APP_ID,
   WUJIE_TIPS_STOP_APP,
   WUJIE_TIPS_STOP_APP_DETAIL,
-} from "./constant";
-import type { WujiePlugin } from "./contracts";
-import { anchorElementGenerator, getAbsolutePath } from "./url-utils";
-import { isFunction } from "./function-binding";
+} from './constant';
+import type { WujiePlugin } from './contracts';
+import { anchorElementGenerator, getAbsolutePath } from './url-utils';
+import { isFunction } from './function-binding';
 
-export { resolveOptions as mergeOptions } from "./options";
+export { resolveOptions as mergeOptions } from './options';
 export {
   anchorElementGenerator,
   defaultGetPublicPath,
@@ -18,7 +18,7 @@ export {
   getCurUrl,
   getSyncUrl,
   isMatchSyncQueryById,
-} from "./url-utils";
+} from './url-utils';
 export {
   checkProxyFunction,
   getTargetValue,
@@ -26,17 +26,17 @@ export {
   isCallable,
   isConstructable,
   isFunction,
-} from "./function-binding";
+} from './function-binding';
 
 type WujieHookName =
-  | "windowAddEventListenerHook"
-  | "windowRemoveEventListenerHook"
-  | "documentAddEventListenerHook"
-  | "documentRemoveEventListenerHook"
-  | "appendOrInsertElementHook"
-  | "patchElementHook"
-  | "windowPropertyOverride"
-  | "documentPropertyOverride";
+  | 'windowAddEventListenerHook'
+  | 'windowRemoveEventListenerHook'
+  | 'documentAddEventListenerHook'
+  | 'documentRemoveEventListenerHook'
+  | 'appendOrInsertElementHook'
+  | 'patchElementHook'
+  | 'windowPropertyOverride'
+  | 'documentPropertyOverride';
 
 export function toArray<T>(array: T | T[]): T[] {
   return Array.isArray(array) ? array : [array];
@@ -44,10 +44,10 @@ export function toArray<T>(array: T | T[]): T[] {
 
 export function isHijackingTag(tagName?: string) {
   return (
-    tagName?.toUpperCase() === "LINK" ||
-    tagName?.toUpperCase() === "STYLE" ||
-    tagName?.toUpperCase() === "SCRIPT" ||
-    tagName?.toUpperCase() === "IFRAME"
+    tagName?.toUpperCase() === 'LINK' ||
+    tagName?.toUpperCase() === 'STYLE' ||
+    tagName?.toUpperCase() === 'SCRIPT' ||
+    tagName?.toUpperCase() === 'IFRAME'
   );
 }
 
@@ -73,9 +73,9 @@ export function appRouteParse(url: string): {
     throw new Error();
   }
   const urlElement = anchorElementGenerator(url);
-  const appHostPath = urlElement.protocol + "//" + urlElement.host;
+  const appHostPath = urlElement.protocol + '//' + urlElement.host;
   let appRoutePath = urlElement.pathname + urlElement.search + urlElement.hash;
-  if (!appRoutePath.startsWith("/")) appRoutePath = "/" + appRoutePath; // hack ie
+  if (!appRoutePath.startsWith('/')) appRoutePath = '/' + appRoutePath; // hack ie
   return { urlElement, appHostPath, appRoutePath };
 }
 
@@ -92,14 +92,14 @@ export function fixElementCtrSrcOrHref(
     | typeof HTMLLinkElement
     | typeof HTMLScriptElement
     | typeof HTMLMediaElement,
-  attr: "src" | "href"
+  attr: 'src' | 'href',
 ): void {
   // patch setAttribute
   const iframeElement = (iframeWindow as Window & { Element: typeof Element }).Element;
   const rawElementSetAttribute = iframeElement.prototype.setAttribute;
   elementCtr.prototype.setAttribute = function (name: string, value: string): void {
     let targetValue = value;
-    if (name === attr) targetValue = getAbsolutePath(value, this.baseURI || "", true);
+    if (name === attr) targetValue = getAbsolutePath(value, this.baseURI || '', true);
     rawElementSetAttribute.call(this, name, targetValue);
   };
   // patch href get and set
@@ -130,7 +130,7 @@ export const requestIdleCallback: IdleScheduler = nativeIdleScheduler
   : (task) => window.setTimeout(task, 1);
 
 export function getContainer(container: string | HTMLElement): HTMLElement {
-  return typeof container === "string" ? (document.querySelector(container) as HTMLElement) : container;
+  return typeof container === 'string' ? (document.querySelector(container) as HTMLElement) : container;
 }
 
 export function warn(msg: unknown, data?: unknown): void {
@@ -142,17 +142,17 @@ export function error(msg: unknown, data?: unknown): void {
 }
 
 export function getInlineCode(match: string): string {
-  const start = match.indexOf(">") + 1;
-  const end = match.lastIndexOf("<");
+  const start = match.indexOf('>') + 1;
+  const end = match.lastIndexOf('<');
   return match.substring(start, end);
 }
 
 /** [f1, f2, f3, f4] => f4(f3(f2(f1))) 函数柯里化 */
 export function compose(
-  fnList: Array<((code: string, ...args: Array<string>) => string) | undefined>
+  fnList: Array<((code: string, ...args: Array<string>) => string) | undefined>,
 ): (...args: Array<string>) => string {
   return function (code: string, ...args: Array<string>) {
-    return fnList.reduce((newCode, fn) => (isFunction(fn) ? fn(newCode, ...args) : newCode), code || "");
+    return fnList.reduce((newCode, fn) => (isFunction(fn) ? fn(newCode, ...args) : newCode), code || '');
   };
 }
 
@@ -176,7 +176,7 @@ export function execHooks(plugins: Array<WujiePlugin>, hookName: WujieHookName, 
 }
 
 export function isScriptElement(element: HTMLElement): boolean {
-  return element.tagName?.toUpperCase() === "SCRIPT";
+  return element.tagName?.toUpperCase() === 'SCRIPT';
 }
 
 let count = 1;
@@ -199,10 +199,10 @@ export function getTagFromScript(element: HTMLScriptElement): string | null {
  */
 export function eventTrigger(el: HTMLElement | Window | Document, eventName: string, detail?: unknown) {
   let event;
-  if (typeof window.CustomEvent === "function") {
+  if (typeof window.CustomEvent === 'function') {
     event = new CustomEvent(eventName, { detail });
   } else {
-    event = document.createEvent("CustomEvent");
+    event = document.createEvent('CustomEvent');
     event.initCustomEvent(eventName, true, false, detail);
   }
   el.dispatchEvent(event);

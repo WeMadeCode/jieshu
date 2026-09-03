@@ -6,7 +6,8 @@ site
 lib
 esm
 .DS_Store
-.vscode
+.vscode/*
+!.vscode/settings.json
 yarn.lock
 coverage
 .history

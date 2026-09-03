@@ -11,27 +11,27 @@
 
 export {};
 
-import type Wujie from "../../src/sandbox";
+import type Wujie from '../../src/sandbox';
 
-const { deferStyleSheetByHref } = require("../../src/effect");
-const { addSandboxCacheWithWujie, deleteWujieById } = require("../../src/common");
+const { deferStyleSheetByHref } = require('../../src/effect');
+const { addSandboxCacheWithWujie, deleteWujieById } = require('../../src/common');
 
-const WUJIE_ID = "defer-style-href-app";
+const WUJIE_ID = 'defer-style-href-app';
 
 function createSandbox(): Wujie {
   return {
     id: WUJIE_ID,
     deferredStyleObservers: [],
     destroyed: false,
-    iframe: document.createElement("iframe"),
+    iframe: document.createElement('iframe'),
     alive: false,
     activeFlag: true,
   } as unknown as Wujie;
 }
 
 function makeLink(): HTMLLinkElement {
-  const link = document.createElement("link");
-  link.setAttribute("rel", "stylesheet");
+  const link = document.createElement('link');
+  link.setAttribute('rel', 'stylesheet');
   return link;
 }
 
@@ -56,45 +56,45 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
     expect(sandbox.deferredStyleObservers).toHaveLength(1);
 
-    link.setAttribute("href", "https://cdn.example.com/skin.min.css");
+    link.setAttribute('href', 'https://cdn.example.com/skin.min.css');
     // MutationObserver 回调在 microtask 中触发
     await Promise.resolve();
 
     expect(loadStyleSheet).toHaveBeenCalledTimes(1);
-    expect(loadStyleSheet).toHaveBeenCalledWith("https://cdn.example.com/skin.min.css", link);
+    expect(loadStyleSheet).toHaveBeenCalledWith('https://cdn.example.com/skin.min.css', link);
   });
 
-  it("后续设置相对 href 时应传入浏览器解析后的绝对 href", async () => {
+  it('后续设置相对 href 时应传入浏览器解析后的绝对 href', async () => {
     const link = makeLink();
     const loadStyleSheet = jest.fn();
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
 
-    link.setAttribute("href", "./tinymce/skins/ui/oxide/skin.min.css");
+    link.setAttribute('href', './tinymce/skins/ui/oxide/skin.min.css');
     await Promise.resolve();
 
     expect(loadStyleSheet).toHaveBeenCalledTimes(1);
     expect(loadStyleSheet).toHaveBeenCalledWith(link.href, link);
-    expect(loadStyleSheet.mock.calls[0][0]).not.toBe("./tinymce/skins/ui/oxide/skin.min.css");
+    expect(loadStyleSheet.mock.calls[0][0]).not.toBe('./tinymce/skins/ui/oxide/skin.min.css');
   });
 
-  it("命中后应 disconnect 并从 sandbox.deferredStyleObservers 出队", async () => {
+  it('命中后应 disconnect 并从 sandbox.deferredStyleObservers 出队', async () => {
     const link = makeLink();
     const loadStyleSheet = jest.fn();
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
-    link.setAttribute("href", "https://cdn.example.com/skin.min.css");
+    link.setAttribute('href', 'https://cdn.example.com/skin.min.css');
     await Promise.resolve();
 
     expect(sandbox.deferredStyleObservers).toHaveLength(0);
 
     // 再次改 href 不应重复加载（已 disconnect）
-    link.setAttribute("href", "https://cdn.example.com/other.css");
+    link.setAttribute('href', 'https://cdn.example.com/other.css');
     await Promise.resolve();
     expect(loadStyleSheet).toHaveBeenCalledTimes(1);
   });
 
-  it("超时未拿到 href 时应放弃监听、出队并触发 error 事件", () => {
+  it('超时未拿到 href 时应放弃监听、出队并触发 error 事件', () => {
     const link = makeLink();
     const loadStyleSheet = jest.fn();
     const onerror = jest.fn();
@@ -110,7 +110,7 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
     expect(sandbox.deferredStyleObservers).toHaveLength(0);
   });
 
-  it("子应用已销毁后再赋值 href 不应执行 loadStyleSheet", async () => {
+  it('子应用已销毁后再赋值 href 不应执行 loadStyleSheet', async () => {
     const link = makeLink();
     const loadStyleSheet = jest.fn();
     const onerror = jest.fn();
@@ -118,12 +118,12 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
 
     deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: window, loadStyleSheet });
     // 模拟 destroy：统一 disconnect 并移除全局缓存
-    [...sandbox.deferredStyleObservers].forEach((observer: Pick<MutationObserver, "disconnect">) =>
-      observer.disconnect()
+    [...sandbox.deferredStyleObservers].forEach((observer: Pick<MutationObserver, 'disconnect'>) =>
+      observer.disconnect(),
     );
     deleteWujieById(WUJIE_ID);
 
-    link.setAttribute("href", "https://cdn.example.com/skin.min.css");
+    link.setAttribute('href', 'https://cdn.example.com/skin.min.css');
     await Promise.resolve();
     jest.advanceTimersByTime(5000);
 
@@ -132,13 +132,13 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
     expect(sandbox.deferredStyleObservers).toHaveLength(0);
   });
 
-  it("环境不支持 MutationObserver 时应安全跳过，不抛错也不入队", () => {
+  it('环境不支持 MutationObserver 时应安全跳过，不抛错也不入队', () => {
     const link = makeLink();
     const loadStyleSheet = jest.fn();
     const fakeWindow = {} as unknown as Window;
 
     expect(() =>
-      deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: fakeWindow, loadStyleSheet })
+      deferStyleSheetByHref({ element: link, wujieId: WUJIE_ID, iframeWindow: fakeWindow, loadStyleSheet }),
     ).not.toThrow();
     expect(sandbox.deferredStyleObservers).toHaveLength(0);
   });

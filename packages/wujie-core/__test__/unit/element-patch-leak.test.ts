@@ -9,44 +9,44 @@
 
 export {};
 
-import { patchElementEffect } from "../../src/iframe";
+import { patchElementEffect } from '../../src/iframe';
 
 function createIframeWithSandbox() {
-  const iframe = document.createElement("iframe");
+  const iframe = document.createElement('iframe');
   document.body.appendChild(iframe);
   const iframeWindow: any = iframe.contentWindow;
   const sandbox: any = {
-    id: "elem-patch-test",
+    id: 'elem-patch-test',
     plugins: [],
     proxyLocation: {
-      protocol: "http:",
-      host: "child.example.com",
-      pathname: "/sub/",
+      protocol: 'http:',
+      host: 'child.example.com',
+      pathname: '/sub/',
     },
   };
   iframeWindow.__WUJIE = sandbox;
   return { iframe, iframeWindow, sandbox };
 }
 
-describe("patchElementEffect 跨边界闭包不应阻碍 sandbox GC", () => {
+describe('patchElementEffect 跨边界闭包不应阻碍 sandbox GC', () => {
   beforeEach(() => {
-    document.body.innerHTML = "";
+    document.body.innerHTML = '';
   });
 
-  test("正常路径：baseURI / ownerDocument 应反映 proxyLocation 与 iframeWindow.document", () => {
+  test('正常路径：baseURI / ownerDocument 应反映 proxyLocation 与 iframeWindow.document', () => {
     const { iframeWindow, sandbox } = createIframeWithSandbox();
-    const el = iframeWindow.document.createElement("div");
+    const el = iframeWindow.document.createElement('div');
     patchElementEffect(el, iframeWindow);
 
-    expect(el.baseURI).toBe("http://child.example.com/sub/");
+    expect(el.baseURI).toBe('http://child.example.com/sub/');
     expect(el.ownerDocument).toBe(iframeWindow.document);
 
     void sandbox; // 避免 unused
   });
 
-  test("destroy 模拟：sandbox.proxyLocation 被置 null 后，baseURI 应安全降级而非抛错", () => {
+  test('destroy 模拟：sandbox.proxyLocation 被置 null 后，baseURI 应安全降级而非抛错', () => {
     const { iframeWindow, sandbox } = createIframeWithSandbox();
-    const el = iframeWindow.document.createElement("div");
+    const el = iframeWindow.document.createElement('div');
     patchElementEffect(el, iframeWindow);
 
     // 模拟 sandbox.destroy() 中 sandbox.proxyLocation = null 且 iframeWindow.__WUJIE = null
@@ -56,12 +56,12 @@ describe("patchElementEffect 跨边界闭包不应阻碍 sandbox GC", () => {
     expect(() => el.baseURI).not.toThrow();
     expect(() => el.ownerDocument).not.toThrow();
     // 安全降级值：不应再回 iframeWindow / proxyLocation 的真值
-    expect(el.baseURI).not.toBe("http://child.example.com/sub/");
+    expect(el.baseURI).not.toBe('http://child.example.com/sub/');
   });
 
-  test("destroy 模拟：iframeWindow.__WUJIE 被置 null 后，ownerDocument 应降级为主 document", () => {
+  test('destroy 模拟：iframeWindow.__WUJIE 被置 null 后，ownerDocument 应降级为主 document', () => {
     const { iframeWindow, sandbox } = createIframeWithSandbox();
-    const el = iframeWindow.document.createElement("div");
+    const el = iframeWindow.document.createElement('div');
     patchElementEffect(el, iframeWindow);
 
     // 把 element 移到主 document 下，模拟 portal / 弹窗挂载到主应用 DOM 的场景

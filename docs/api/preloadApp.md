@@ -196,7 +196,7 @@ interface ScriptObjectLoader {
   /** 脚本是否设置crossorigin */
   crossorigin?: boolean;
   /** 脚本crossorigin的类型 */
-  crossoriginType?: "anonymous" | "use-credentials" | "";
+  crossoriginType?: 'anonymous' | 'use-credentials' | '';
   /** 内联script的代码 */
   content?: string;
   /** 执行回调钩子 */
@@ -214,7 +214,7 @@ type eventListenerHook = (
   iframeWindow: Window,
   type: string,
   handler: EventListenerOrEventListenerObject,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
 ) => void;
 
 interface plugin {

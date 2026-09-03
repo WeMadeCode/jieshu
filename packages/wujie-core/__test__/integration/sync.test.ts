@@ -3,8 +3,8 @@ import {
   getUrlSearchObject,
   triggerClickByJsSelector,
   getClassListByJsSelector,
-} from "./utils";
-import { reactMainAppInfoMap, reactMainAppInfoList, vueMainAppInfoMap, vueMainAppInfoList } from "./common";
+} from './utils';
+import { reactMainAppInfoMap, reactMainAppInfoList, vueMainAppInfoMap, vueMainAppInfoList } from './common';
 
 const generateReactAppMountedPromiseList = () =>
   reactMainAppInfoList.map((appInfo) => awaitConsoleLogMessage(page, appInfo.mountedMessage));
@@ -15,7 +15,7 @@ const generateVueAppMountedPromiseList = () =>
 const generateTest = (
   AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainAppInfoMap,
   getMountedPromiseList: typeof generateReactAppMountedPromiseList | typeof generateVueAppMountedPromiseList,
-  allLinkSelector: string
+  allLinkSelector: string,
 ) => {
   it(`test sync init`, async () => {
     let mountedPromiseList = getMountedPromiseList();
@@ -29,8 +29,8 @@ const generateTest = (
     expect(searchMap.react17).toBe(AppInfoMap.react17.homeQueryParam);
     expect(searchMap.vue2).toBe(AppInfoMap.vue2.homeQueryParam);
     expect(searchMap.vue3).toBe(AppInfoMap.vue3.homeQueryParam);
-    expect(searchMap.vite).toBe("%2Fhome");
-    expect(searchMap.angular12).toBe("%2F");
+    expect(searchMap.vite).toBe('%2Fhome');
+    expect(searchMap.angular12).toBe('%2F');
     // 跳转
     const react16DialogMountedPromise = awaitConsoleLogMessage(page, AppInfoMap.react16.dialogMountedMessage);
     await triggerClickByJsSelector(page, AppInfoMap.react16.dialogNavSelectorInAll);
@@ -78,20 +78,20 @@ const generateTest = (
     expect(newSearchMap.react17).toBe(AppInfoMap.react17.dialogQueryParam);
     expect(newSearchMap.vue2).toBe(AppInfoMap.vue2.dialogQueryParam);
     expect(newSearchMap.vue3).toBe(AppInfoMap.vue3.dialogQueryParam);
-    expect(newSearchMap.vite).toBe("%2Fhome");
-    expect(newSearchMap.angular12).toBe("%2F");
+    expect(newSearchMap.vite).toBe('%2Fhome');
+    expect(newSearchMap.angular12).toBe('%2F');
   });
 };
 
-describe("main react sync", () => {
+describe('main react sync', () => {
   beforeAll(async () => {
     await page.evaluateOnNewDocument(() => {
       // 关闭预加载
       localStorage.clear();
-      localStorage.setItem("preload", "false");
-      localStorage.setItem("degrade", "false");
+      localStorage.setItem('preload', 'false');
+      localStorage.setItem('degrade', 'false');
     });
-    await page.goto("http://localhost:7700/");
+    await page.goto('http://localhost:7700/');
   });
 
   generateTest(reactMainAppInfoMap, generateReactAppMountedPromiseList, "a[href='#/all']");
@@ -99,7 +99,7 @@ describe("main react sync", () => {
   it(`test url share`, async () => {
     let mountedPromiseList = generateReactAppMountedPromiseList();
     await page.goto(
-      "http://localhost:7700/?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vite=%2Fhome&vue2=%2F%23%2Fdialog&vue3=%2Fdialog&angular12=%2F#/all"
+      'http://localhost:7700/?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vite=%2Fhome&vue2=%2F%23%2Fdialog&vue3=%2Fdialog&angular12=%2F#/all',
     );
     await Promise.all([
       ...mountedPromiseList,
@@ -107,29 +107,29 @@ describe("main react sync", () => {
       awaitConsoleLogMessage(page, reactMainAppInfoMap.vue3.dialogMountedMessage),
     ]);
     expect(await getClassListByJsSelector(page, reactMainAppInfoMap.react16.dialogNavSelectorInAll)).toContain(
-      "active"
+      'active',
     );
     expect(await getClassListByJsSelector(page, reactMainAppInfoMap.react17.dialogNavSelectorInAll)).toContain(
-      "active"
+      'active',
     );
     expect(await getClassListByJsSelector(page, reactMainAppInfoMap.vue2.dialogNavSelectorInAll)).toContain(
-      "router-link-exact-active"
+      'router-link-exact-active',
     );
     expect(await getClassListByJsSelector(page, reactMainAppInfoMap.vue3.dialogNavSelectorInAll)).toContain(
-      "router-link-exact-active"
+      'router-link-exact-active',
     );
   });
 });
 
-describe("main vue startApp", () => {
+describe('main vue startApp', () => {
   beforeAll(async () => {
     await page.evaluateOnNewDocument(() => {
       // 关闭预加载
       localStorage.clear();
-      localStorage.setItem("preload", "false");
-      localStorage.setItem("degrade", "false");
+      localStorage.setItem('preload', 'false');
+      localStorage.setItem('degrade', 'false');
     });
-    await page.goto("http://localhost:8000/");
+    await page.goto('http://localhost:8000/');
   });
 
   generateTest(vueMainAppInfoMap, generateVueAppMountedPromiseList, "a[href='/all']");
@@ -137,20 +137,20 @@ describe("main vue startApp", () => {
   it(`test url share`, async () => {
     let mountedPromiseList = generateReactAppMountedPromiseList();
     await page.goto(
-      "http://localhost:8000/all?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vue2=%2F%23%2Fdialog&vite=%2Fhome&vue3=%2Fdialog&angular12=%2F"
+      'http://localhost:8000/all?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vue2=%2F%23%2Fdialog&vite=%2Fhome&vue3=%2Fdialog&angular12=%2F',
     );
     await Promise.all([
       ...mountedPromiseList,
       awaitConsoleLogMessage(page, vueMainAppInfoMap.vue2.dialogMountedMessage),
       awaitConsoleLogMessage(page, vueMainAppInfoMap.vue3.dialogMountedMessage),
     ]);
-    expect(await getClassListByJsSelector(page, vueMainAppInfoMap.react16.dialogNavSelectorInAll)).toContain("active");
-    expect(await getClassListByJsSelector(page, vueMainAppInfoMap.react17.dialogNavSelectorInAll)).toContain("active");
+    expect(await getClassListByJsSelector(page, vueMainAppInfoMap.react16.dialogNavSelectorInAll)).toContain('active');
+    expect(await getClassListByJsSelector(page, vueMainAppInfoMap.react17.dialogNavSelectorInAll)).toContain('active');
     expect(await getClassListByJsSelector(page, vueMainAppInfoMap.vue2.dialogNavSelectorInAll)).toContain(
-      "router-link-exact-active"
+      'router-link-exact-active',
     );
     expect(await getClassListByJsSelector(page, vueMainAppInfoMap.vue3.dialogNavSelectorInAll)).toContain(
-      "router-link-exact-active"
+      'router-link-exact-active',
     );
   });
 });

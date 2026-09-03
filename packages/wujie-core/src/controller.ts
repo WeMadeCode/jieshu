@@ -1,4 +1,4 @@
-import type { DestroyHandler, StartOptions } from "./contracts";
+import type { DestroyHandler, StartOptions } from './contracts';
 
 export interface AppRuntime {
   start(options: StartOptions): Promise<DestroyHandler | void>;
@@ -132,7 +132,7 @@ export class RuntimeAppController implements AppController {
   private async startAtRevision(
     options: StartOptions,
     revision: number,
-    previousAppsReleased?: Promise<void>
+    previousAppsReleased?: Promise<void>,
   ): Promise<DestroyHandler | void> {
     if (previousAppsReleased) await previousAppsReleased;
     if (!this.isCurrent(revision)) return;
@@ -166,7 +166,7 @@ export class RuntimeAppController implements AppController {
   private async refreshAtRevision(
     options: StartOptions,
     revision: number,
-    previousAppsReleased?: Promise<void>
+    previousAppsReleased?: Promise<void>,
   ): Promise<DestroyHandler | void> {
     if (previousAppsReleased) await previousAppsReleased;
     if (!this.isCurrent(revision)) return;

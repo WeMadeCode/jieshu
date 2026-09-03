@@ -21,7 +21,7 @@ const props = window.$wujie?.props; // {data: xxx, methods: xxx}
 主应用调用子应用的全局数据
 
 ```javascript
-window.document.querySelector("iframe[name=子应用id]").contentWindow.xxx;
+window.document.querySelector('iframe[name=子应用id]').contentWindow.xxx;
 ```
 
 子应用调用主应用的全局数据

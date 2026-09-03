@@ -11,15 +11,15 @@
 
 export {};
 
-import { patchDocumentEffect } from "../../src/iframe";
-import { EventCleanupTracker } from "../../src/tracker";
+import { patchDocumentEffect } from '../../src/iframe';
+import { EventCleanupTracker } from '../../src/tracker';
 
 function createSandboxStub(id: string) {
   return {
     id,
     degrade: false,
     plugins: [],
-    shadowRoot: document.createElement("div"),
+    shadowRoot: document.createElement('div'),
     proxyDocument: {},
     iframeOnEvents: [],
     eventCleanupTracker: new EventCleanupTracker(),
@@ -42,17 +42,17 @@ function countListenersByDispatch(type: string, dispatchTimes = 1): number {
   return count - dispatchTimes;
 }
 
-describe("patchDocumentEffect documentEvents setter 语义", () => {
+describe('patchDocumentEffect documentEvents setter 语义', () => {
   let iframe: HTMLIFrameElement;
   let iframeWindow: any;
   let sandbox: any;
 
   beforeEach(() => {
-    document.body.innerHTML = "";
-    iframe = document.createElement("iframe");
+    document.body.innerHTML = '';
+    iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
     iframeWindow = iframe.contentWindow;
-    sandbox = createSandboxStub("e2e-doc-events");
+    sandbox = createSandboxStub('e2e-doc-events');
     iframeWindow.__WUJIE = sandbox;
     patchDocumentEffect(iframeWindow);
   });
@@ -61,7 +61,7 @@ describe("patchDocumentEffect documentEvents setter 语义", () => {
     iframe.remove();
   });
 
-  test("反复重赋值 document.onfullscreenchange = fn 不应在主 document 上累加 listener", () => {
+  test('反复重赋值 document.onfullscreenchange = fn 不应在主 document 上累加 listener', () => {
     const handler1 = jest.fn();
     const handler2 = jest.fn();
 
@@ -72,46 +72,46 @@ describe("patchDocumentEffect documentEvents setter 语义", () => {
     // 触发一次 main document 上的 fullscreenchange，应只有最后被赋值的 handler1 触发一次
     handler1.mockClear();
     handler2.mockClear();
-    window.document.dispatchEvent(new Event("fullscreenchange"));
+    window.document.dispatchEvent(new Event('fullscreenchange'));
     expect(handler1).toHaveBeenCalledTimes(1);
     expect(handler2).not.toHaveBeenCalled();
   });
 
-  test("赋值 null 应能解除已注册的 listener", () => {
+  test('赋值 null 应能解除已注册的 listener', () => {
     const handler = jest.fn();
     iframeWindow.document.onfullscreenchange = handler;
     iframeWindow.document.onfullscreenchange = null;
 
     handler.mockClear();
-    window.document.dispatchEvent(new Event("fullscreenchange"));
+    window.document.dispatchEvent(new Event('fullscreenchange'));
     expect(handler).not.toHaveBeenCalled();
   });
 
-  test("destroy 阶段 eventCleanupTracker.cleanupAll() 应反向解绑 documentEvents 注册的 listener", () => {
+  test('destroy 阶段 eventCleanupTracker.cleanupAll() 应反向解绑 documentEvents 注册的 listener', () => {
     const handler = jest.fn();
     iframeWindow.document.onfullscreenchange = handler;
 
     // 验证 listener 当前生效
     handler.mockClear();
-    window.document.dispatchEvent(new Event("fullscreenchange"));
+    window.document.dispatchEvent(new Event('fullscreenchange'));
     expect(handler).toHaveBeenCalledTimes(1);
 
     sandbox.eventCleanupTracker.cleanupAll();
 
     handler.mockClear();
-    window.document.dispatchEvent(new Event("fullscreenchange"));
+    window.document.dispatchEvent(new Event('fullscreenchange'));
     expect(handler).not.toHaveBeenCalled();
   });
 
-  test("反复重赋值不同 handler N 次后，main document 上 listener 数应保持为 0 或 1（不能 N）", () => {
-    const baseline = countListenersByDispatch("visibilitychange");
+  test('反复重赋值不同 handler N 次后，main document 上 listener 数应保持为 0 或 1（不能 N）', () => {
+    const baseline = countListenersByDispatch('visibilitychange');
     expect(baseline).toBe(0);
 
     for (let i = 0; i < 10; i++) {
       iframeWindow.document.onvisibilitychange = jest.fn();
     }
 
-    const after = countListenersByDispatch("visibilitychange");
+    const after = countListenersByDispatch('visibilitychange');
     expect(after).toBeLessThanOrEqual(1);
   });
 });

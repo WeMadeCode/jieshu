@@ -5,8 +5,8 @@ import {
   insertScriptToIframe,
   patchEventTimeStamp,
   patchDegradeInstanceofAcrossRealms,
-} from "./iframe";
-import { syncUrlToWindow, syncUrlToIframe, clearInactiveAppUrl } from "./sync";
+} from './iframe';
+import { syncUrlToWindow, syncUrlToIframe, clearInactiveAppUrl } from './sync';
 import {
   createWujieWebComponent,
   clearChild,
@@ -16,12 +16,12 @@ import {
   renderTemplateToIframe,
   initRenderIframeAndContainer,
   removeLoading,
-} from "./shadow";
-import { proxyGenerator, localGenerator } from "./proxy";
-import type { ScriptResultList } from "./entry";
-import { releaseAssetCacheScope } from "./entry";
-import { getPlugins, getPresetLoaders } from "./plugin";
-import { removeEventListener } from "./effect";
+} from './shadow';
+import { proxyGenerator, localGenerator } from './proxy';
+import type { ScriptResultList } from './entry';
+import { releaseAssetCacheScope } from './entry';
+import { getPlugins, getPresetLoaders } from './plugin';
+import { removeEventListener } from './effect';
 import {
   idToSandboxCacheMap,
   getWujieById,
@@ -31,13 +31,13 @@ import {
   rawElementAppendChild,
   rawDocumentQuerySelector,
   invokeSandboxUnmountHook,
-} from "./common";
-import type { SandboxCache } from "./common";
-import { EventBus, appEventObjMap } from "./event";
-import type { EventObj } from "./event";
-import { EventCleanupTracker } from "./tracker";
-import { isFunction, wujieSupport, appRouteParse, requestIdleCallback, getAbsolutePath, eventTrigger } from "./utils";
-import { WUJIE_DATA_ATTACH_CSS_FLAG, WUJIE_APP_ID, WUJIE_FONT_STYLE_CONTAINER_ATTR } from "./constant";
+} from './common';
+import type { SandboxCache } from './common';
+import { EventBus, appEventObjMap } from './event';
+import type { EventObj } from './event';
+import { EventCleanupTracker } from './tracker';
+import { isFunction, wujieSupport, appRouteParse, requestIdleCallback, getAbsolutePath, eventTrigger } from './utils';
+import { WUJIE_DATA_ATTACH_CSS_FLAG, WUJIE_APP_ID, WUJIE_FONT_STYLE_CONTAINER_ATTR } from './constant';
 import type {
   IframeAttributes,
   InjectedWujieProps,
@@ -45,16 +45,16 @@ import type {
   ScriptObjectLoader,
   WujiePlugin,
   WujieProps,
-} from "./contracts";
+} from './contracts';
 import {
   cancelSandboxDynamicResources,
   groupScripts,
   SandboxCleanupRegistry,
   SandboxLifecycleController,
   SandboxScriptScheduler,
-} from "./sandbox-runtime";
-import type { OperationSlots } from "./operation-intent";
-import { shouldHandlePageHideTeardown } from "./sandbox-policy";
+} from './sandbox-runtime';
+import type { OperationSlots } from './operation-intent';
+import { shouldHandlePageHideTeardown } from './sandbox-policy';
 
 /**
  * A sandbox iframe is attached before its runtime is initialized. Keeping the
@@ -69,7 +69,7 @@ function getIframeDocument(iframe: HTMLIFrameElement): Document {
   return iframe.contentDocument as Document;
 }
 
-export type { Lifecycle, lifecycle } from "./contracts";
+export type { Lifecycle, lifecycle } from './contracts';
 /**
  * 基于 Proxy和iframe 实现的沙箱
  */
@@ -171,7 +171,7 @@ export default class Wujie {
    * href 的后续赋值。这些 observer 必须在 destroy 时统一 disconnect，否则游离 link
    * 会通过 node → registered observer → callback 闭包链路把已销毁的 sandbox 钉在内存中。
    */
-  public deferredStyleObservers: Array<Pick<MutationObserver, "disconnect">> = [];
+  public deferredStyleObservers: Array<Pick<MutationObserver, 'disconnect'>> = [];
   /** 子应用head元素 */
   public head!: HTMLHeadElement;
   /** 子应用body元素 */
@@ -252,7 +252,7 @@ export default class Wujie {
     const iframeWindow = getIframeWindow(this.iframe);
     const iframeFetch = fetch
       ? (input: RequestInfo, init?: RequestInit) =>
-          fetch(typeof input === "string" ? getAbsolutePath(input, (this.proxyLocation as Location).href) : input, init)
+          fetch(typeof input === 'string' ? getAbsolutePath(input, (this.proxyLocation as Location).href) : input, init)
       : this.fetch;
     if (iframeFetch) {
       iframeWindow.fetch = iframeFetch;
@@ -274,7 +274,7 @@ export default class Wujie {
 
     /* 降级处理 */
     if (this.degrade) {
-      const iframeBody = rawDocumentQuerySelector.call(iframeWindow.document, "body") as HTMLElement;
+      const iframeBody = rawDocumentQuerySelector.call(iframeWindow.document, 'body') as HTMLElement;
       this.relocating = true;
       let renderTarget: ReturnType<typeof initRenderIframeAndContainer>;
       try {
@@ -301,7 +301,7 @@ export default class Wujie {
           recoverEventListeners(renderIframeDocument.documentElement, iframeWindow);
         } else {
           await renderTemplateToIframe(renderIframeDocument, iframeWindow, this.template, () =>
-            this.isActivationCurrent(activationRevision)
+            this.isActivationCurrent(activationRevision),
           );
           if (!this.isActivationCurrent(activationRevision)) {
             iframe.parentNode?.removeChild(iframe);
@@ -312,7 +312,7 @@ export default class Wujie {
         }
       } else {
         await renderTemplateToIframe(renderIframeDocument, iframeWindow, this.template, () =>
-          this.isActivationCurrent(activationRevision)
+          this.isActivationCurrent(activationRevision),
         );
         if (!this.isActivationCurrent(activationRevision)) {
           iframe.parentNode?.removeChild(iframe);
@@ -343,12 +343,12 @@ export default class Wujie {
       if (this.alive) return;
     } else {
       // 预执行无容器，暂时插入iframe内部触发Web Component的connect
-      const iframeBody = rawDocumentQuerySelector.call(iframeWindow.document, "body") as HTMLElement;
+      const iframeBody = rawDocumentQuerySelector.call(iframeWindow.document, 'body') as HTMLElement;
       this.el = renderElementToContainer(createWujieWebComponent(this.id), el ?? iframeBody);
     }
 
     await renderTemplateToShadowRoot(this.shadowRoot, iframeWindow, this.template, () =>
-      this.isActivationCurrent(activationRevision)
+      this.isActivationCurrent(activationRevision),
     );
     if (!this.isActivationCurrent(activationRevision) || !this.shadowRoot || !this.provide) return;
     this.patchCssRules();
@@ -386,10 +386,10 @@ export default class Wujie {
       this.execQueue,
       this.fiber,
       (task) => requestIdleCallback(task),
-      () => Boolean(this.iframe) && !this.destroyed && this.activeFlag && this.isActivationCurrent(activationRevision)
+      () => Boolean(this.iframe) && !this.destroyed && this.activeFlag && this.isActivationCurrent(activationRevision),
     );
-    const beforeScripts: ScriptObjectLoader[] = getPresetLoaders("jsBeforeLoaders", this.plugins);
-    const afterScripts: ScriptObjectLoader[] = getPresetLoaders("jsAfterLoaders", this.plugins);
+    const beforeScripts: ScriptObjectLoader[] = getPresetLoaders('jsBeforeLoaders', this.plugins);
+    const afterScripts: ScriptObjectLoader[] = getPresetLoaders('jsAfterLoaders', this.plugins);
     const scripts = groupScripts(scriptResultList);
 
     const createCompletion = (): { promise: Promise<void>; resolve(): void } => {
@@ -417,7 +417,7 @@ export default class Wujie {
         (cause: unknown): never => {
           completion.resolve();
           throw cause;
-        }
+        },
       );
       scheduler.scheduleAfter(content, (resolvedContent) => {
         const handle = insertScriptToIframe({ ...script, content: resolvedContent }, iframeWindow);
@@ -455,9 +455,9 @@ export default class Wujie {
 
     // 框架主动调用mount方法
     scheduler.schedule(() => this.mount());
-    this.scheduleLifecycleEvent(scheduler, iframeWindow, "DOMContentLoaded");
+    this.scheduleLifecycleEvent(scheduler, iframeWindow, 'DOMContentLoaded');
     afterScripts.forEach((script) => schedulePreset(script));
-    this.scheduleLifecycleEvent(scheduler, iframeWindow, "load");
+    this.scheduleLifecycleEvent(scheduler, iframeWindow, 'load');
     // 由于没有办法准确定位是哪个代码做了mount，保活、重建模式提前关闭loading
     if (this.alive || !isFunction(iframeWindow.__WUJIE_UNMOUNT)) removeLoading(this.el);
     // 所有的execQueue队列执行完毕，start才算结束，保证串行的执行子应用
@@ -472,14 +472,14 @@ export default class Wujie {
   private scheduleLifecycleEvent(
     scheduler: SandboxScriptScheduler,
     iframeWindow: Window,
-    eventName: "DOMContentLoaded" | "load"
+    eventName: 'DOMContentLoaded' | 'load',
   ): void {
     scheduler.schedule(() => {
-      if (eventName === "DOMContentLoaded") {
+      if (eventName === 'DOMContentLoaded') {
         eventTrigger(iframeWindow.document, eventName);
         eventTrigger(iframeWindow, eventName);
       } else {
-        eventTrigger(iframeWindow.document, "readystatechange");
+        eventTrigger(iframeWindow.document, 'readystatechange');
         eventTrigger(iframeWindow, eventName);
       }
       scheduler.advance();
@@ -573,7 +573,7 @@ export default class Wujie {
       // started by the cancelled generation and execute its stale payload.
       releaseAssetCacheScope(this.assetCacheScope);
       this.assetCacheScope = {};
-      cancelSandboxDynamicResources(this, "unmount");
+      cancelSandboxDynamicResources(this, 'unmount');
     }
 
     void this.performUnmount().then(
@@ -585,7 +585,7 @@ export default class Wujie {
       (cause: unknown) => {
         if (this.unmountPromise === pending) this.unmountPromise = undefined;
         rejectUnmount(cause);
-      }
+      },
     );
     return pending;
   }
@@ -637,7 +637,7 @@ export default class Wujie {
     this.cancelIframeReady?.();
     this.scriptScheduler?.cancel();
     releaseAssetCacheScope(this.assetCacheScope);
-    cancelSandboxDynamicResources(this, "destroy");
+    cancelSandboxDynamicResources(this, 'destroy');
     this.getLifecycleController().beginDestroy();
     this.clearContainerOnDestroy = getWujieById(this.id) === this;
     // 同步从全局 map 移除自身：确保 await 挂起期间并发的 disconnectedCallback /
@@ -694,11 +694,11 @@ export default class Wujie {
   private clearContainer(): void {
     if (!this.el) return;
     if (!this.clearContainerOnDestroy) {
-      this.releaseReference("el");
+      this.releaseReference('el');
       return;
     }
     clearChild(this.el);
-    this.releaseReference("el");
+    this.releaseReference('el');
   }
 
   private releaseIframe(): void {
@@ -713,47 +713,47 @@ export default class Wujie {
     // getter，它们通过 iframeWindow.__WUJIE 动态读取。主动断链使残留 getter 降级到主 document。
     if (iframeWindow) {
       try {
-        Reflect.set(iframeWindow, "__WUJIE", null);
-        Reflect.set(iframeWindow, "$wujie", null);
+        Reflect.set(iframeWindow, '__WUJIE', null);
+        Reflect.set(iframeWindow, '$wujie', null);
       } catch (_) {
         /* noop: iframe 已 detach 时赋值可能抛错 */
       }
     }
     this.iframe.parentNode?.removeChild(this.iframe);
-    this.releaseReference("iframe");
+    this.releaseReference('iframe');
   }
 
   private releaseReferences(): void {
-    this.releaseReference("shadowRoot");
-    this.releaseReference("proxy");
-    this.releaseReference("proxyDocument");
-    this.releaseReference("proxyLocation");
-    this.releaseReference("execQueue");
-    this.releaseReference("degradeAttrs");
-    this.releaseReference("styleSheetElements");
-    this.releaseReference("fontStyleSheetElements");
-    this.releaseReference("dynamicScriptElements");
-    this.releaseReference("deferredStyleObservers");
-    this.releaseReference("bus");
-    this.releaseReference("replace");
-    this.releaseReference("fetch");
-    this.releaseReference("execFlag");
-    this.releaseReference("mountFlag");
-    this.releaseReference("hrefFlag");
-    this.releaseReference("document");
-    this.releaseReference("head");
-    this.releaseReference("body");
-    this.releaseReference("elementEventCacheMap");
-    this.releaseReference("lifecycles");
-    this.releaseReference("plugins");
-    this.releaseReference("provide");
-    this.releaseReference("inject");
-    this.releaseReference("prefix");
-    this.releaseReference("iframeAddEventListeners");
-    this.releaseReference("iframeOnEvents");
-    this.releaseReference("proxyRevoke");
+    this.releaseReference('shadowRoot');
+    this.releaseReference('proxy');
+    this.releaseReference('proxyDocument');
+    this.releaseReference('proxyLocation');
+    this.releaseReference('execQueue');
+    this.releaseReference('degradeAttrs');
+    this.releaseReference('styleSheetElements');
+    this.releaseReference('fontStyleSheetElements');
+    this.releaseReference('dynamicScriptElements');
+    this.releaseReference('deferredStyleObservers');
+    this.releaseReference('bus');
+    this.releaseReference('replace');
+    this.releaseReference('fetch');
+    this.releaseReference('execFlag');
+    this.releaseReference('mountFlag');
+    this.releaseReference('hrefFlag');
+    this.releaseReference('document');
+    this.releaseReference('head');
+    this.releaseReference('body');
+    this.releaseReference('elementEventCacheMap');
+    this.releaseReference('lifecycles');
+    this.releaseReference('plugins');
+    this.releaseReference('provide');
+    this.releaseReference('inject');
+    this.releaseReference('prefix');
+    this.releaseReference('iframeAddEventListeners');
+    this.releaseReference('iframeOnEvents');
+    this.releaseReference('proxyRevoke');
     this.cancelIframeReady = undefined;
-    this.releaseReference("eventCleanupTracker");
+    this.releaseReference('eventCleanupTracker');
   }
 
   /**
@@ -810,7 +810,7 @@ export default class Wujie {
         clearTimeout(timedElement._patcher);
         timedElement._patcher = undefined;
       }
-      if (element.tagName === "SCRIPT") {
+      if (element.tagName === 'SCRIPT') {
         const script = element as unknown as HTMLScriptElement;
         script.onload = null;
         script.onerror = null;
@@ -849,8 +849,8 @@ export default class Wujie {
     const container = rawDocumentQuerySelector.call(document, `[${WUJIE_FONT_STYLE_CONTAINER_ATTR}]`);
     if (container) return container as HTMLElement;
 
-    const styleElement = document.createElement("style");
-    styleElement.setAttribute(WUJIE_FONT_STYLE_CONTAINER_ATTR, "");
+    const styleElement = document.createElement('style');
+    styleElement.setAttribute(WUJIE_FONT_STYLE_CONTAINER_ATTR, '');
     document.head.appendChild(styleElement);
     return styleElement;
   }
@@ -874,9 +874,9 @@ export default class Wujie {
     if (this.degrade) return;
     if (this.shadowRoot.host.hasAttribute(WUJIE_DATA_ATTACH_CSS_FLAG)) return;
     const [hostStyleSheetElement, fontStyleSheetElement] = getPatchStyleElements(
-      Array.from(getIframeDocument(this.iframe).querySelectorAll("style")).map(
-        (styleSheetElement) => styleSheetElement.sheet
-      )
+      Array.from(getIframeDocument(this.iframe).querySelectorAll('style')).map(
+        (styleSheetElement) => styleSheetElement.sheet,
+      ),
     );
     if (hostStyleSheetElement) {
       this.shadowRoot.head.appendChild(hostStyleSheetElement);
@@ -888,7 +888,7 @@ export default class Wujie {
       this.fontStyleSheetElements.push(fontStyleSheetElement);
     }
     (hostStyleSheetElement || fontStyleSheetElement) &&
-      this.shadowRoot.host.setAttribute(WUJIE_DATA_ATTACH_CSS_FLAG, "");
+      this.shadowRoot.host.setAttribute(WUJIE_DATA_ATTACH_CSS_FLAG, '');
   }
 
   /**
@@ -908,14 +908,14 @@ export default class Wujie {
     iframeOnEvents?: Array<string>;
   }) {
     // 传递inject给嵌套子应用（显式 as：__WUJIE_INJECT 全局类型是 Partial，需断言回完整结构）
-    if (window.__POWERED_BY_WUJIE__) this.inject = window.__WUJIE.inject as Wujie["inject"];
+    if (window.__POWERED_BY_WUJIE__) this.inject = window.__WUJIE.inject as Wujie['inject'];
     else {
       this.inject = {
         idToSandboxMap: idToSandboxCacheMap,
         teardownById: window.__WUJIE_INJECT.teardownById,
         appEventObjMap,
         coreOperationSlots: window.__WUJIE_CORE_INTENTS,
-        mainHostPath: window.location.protocol + "//" + window.location.host,
+        mainHostPath: window.location.protocol + '//' + window.location.host,
         fontStyleSheetContainer: this.createFontStyleSheetContainer(),
       };
     }
@@ -945,7 +945,7 @@ export default class Wujie {
         this.iframe,
         urlElement,
         mainHostPath,
-        appHostPath
+        appHostPath,
       );
       this.proxyDocument = proxyDocument;
       this.proxyLocation = proxyLocation;
@@ -955,7 +955,7 @@ export default class Wujie {
         this.iframe,
         urlElement,
         mainHostPath,
-        appHostPath
+        appHostPath,
       );
       this.proxy = proxyWindow;
       this.proxyDocument = proxyDocument;

@@ -1,6 +1,6 @@
-import type { CacheOptions, IframeAttributes, Lifecycles, WujiePlugin, WujieProps } from "./contracts";
+import type { CacheOptions, IframeAttributes, Lifecycles, WujiePlugin, WujieProps } from './contracts';
 
-export type { Lifecycles } from "./contracts";
+export type { Lifecycles } from './contracts';
 
 export interface ResolvedOptions {
   name: string;
@@ -30,7 +30,7 @@ export function resolveOptions(options: CacheOptions, cacheOptions?: CacheOption
   return {
     name: options.name,
     el: options.el || cached?.el,
-    url: options.url || cached?.url || "",
+    url: options.url || cached?.url || '',
     html: options.html || cached?.html,
     exec: options.exec !== undefined ? options.exec : cached?.exec !== undefined ? cached.exec : false,
     replace: options.replace || cached?.replace,

@@ -1,25 +1,25 @@
 // 子应用页面事件
-import { awaitConsoleLogMessage } from "./utils";
-import { reactMainAppInfoMap, vueMainAppInfoMap } from "./common";
+import { awaitConsoleLogMessage } from './utils';
+import { reactMainAppInfoMap, vueMainAppInfoMap } from './common';
 
 const pageLiftEventConsoleLogList = [
-  "vue2 document DOMContentLoaded trigger",
-  "vue2 window DOMContentLoaded trigger",
-  "vue2 document onreadystatechange trigger",
-  "vue2 document readystatechange trigger",
-  "vue2 window onload trigger",
-  "vue2 window load trigger",
+  'vue2 document DOMContentLoaded trigger',
+  'vue2 window DOMContentLoaded trigger',
+  'vue2 document onreadystatechange trigger',
+  'vue2 document readystatechange trigger',
+  'vue2 window onload trigger',
+  'vue2 window load trigger',
 ];
 
-describe("main react pageEvent", () => {
+describe('main react pageEvent', () => {
   beforeAll(async () => {
     await page.evaluateOnNewDocument(() => {
       // 关闭预加载
       localStorage.clear();
-      localStorage.setItem("preload", "false");
-      localStorage.setItem("degrade", "false");
+      localStorage.setItem('preload', 'false');
+      localStorage.setItem('degrade', 'false');
     });
-    await page.goto("http://localhost:7700/");
+    await page.goto('http://localhost:7700/');
   });
 
   const vue2 = reactMainAppInfoMap.vue2;
@@ -28,22 +28,22 @@ describe("main react pageEvent", () => {
     const vue2MountedPromise = awaitConsoleLogMessage(page, vue2.mountedMessage);
     await page.click(vue2.linkSelector);
     const pageLiftEventConsoleLogListPromise = pageLiftEventConsoleLogList.map((message) =>
-      awaitConsoleLogMessage(page, message)
+      awaitConsoleLogMessage(page, message),
     );
     await vue2MountedPromise;
     await Promise.all(pageLiftEventConsoleLogListPromise);
   });
 });
 
-describe("main vue pageEvent", () => {
+describe('main vue pageEvent', () => {
   beforeAll(async () => {
     await page.evaluateOnNewDocument(() => {
       // 关闭预加载
       localStorage.clear();
-      localStorage.setItem("preload", "false");
-      localStorage.setItem("degrade", "false");
+      localStorage.setItem('preload', 'false');
+      localStorage.setItem('degrade', 'false');
     });
-    await page.goto("http://localhost:8000/");
+    await page.goto('http://localhost:8000/');
   });
 
   const vue2 = vueMainAppInfoMap.vue2;
@@ -52,7 +52,7 @@ describe("main vue pageEvent", () => {
     const vue2MountedPromise = awaitConsoleLogMessage(page, vue2.mountedMessage);
     await page.click(vue2.linkSelector);
     const pageLiftEventConsoleLogListPromise = pageLiftEventConsoleLogList.map((message) =>
-      awaitConsoleLogMessage(page, message)
+      awaitConsoleLogMessage(page, message),
     );
     await vue2MountedPromise;
     await Promise.all(pageLiftEventConsoleLogListPromise);

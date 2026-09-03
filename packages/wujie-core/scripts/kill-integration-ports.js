@@ -2,15 +2,15 @@
  * 集成测试启动前释放 jest-puppeteer.config.js 里占用的端口。
  * jest-dev-server 的 usedPortAction: "kill" 依赖 find-process，在 macOS 上常查不到监听进程会报错。
  */
-const { execSync } = require("child_process");
+const { execSync } = require('child_process');
 
 /** 与 jest-puppeteer.config.js 中 server[].port 保持一致 */
 const INTEGRATION_PORTS = [7600, 7100, 7200, 7300, 7500, 7400, 7700, 8000];
 
 function execQuiet(command) {
   return execSync(command, {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "ignore"],
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
   }).trim();
 }
 
@@ -18,13 +18,13 @@ function execQuiet(command) {
 function getListenerPidsOnPort(port) {
   const platform = process.platform;
 
-  if (platform === "win32") {
+  if (platform === 'win32') {
     try {
       const stdout = execQuiet(`netstat -ano | findstr :${port}`);
       const pids = stdout
-        .split("\n")
+        .split('\n')
         .map((line) => line.trim().split(/\s+/))
-        .filter((parts) => parts.length >= 5 && parts[3] === "LISTENING")
+        .filter((parts) => parts.length >= 5 && parts[3] === 'LISTENING')
         .map((parts) => parts[parts.length - 1]);
       return [...new Set(pids.filter(Boolean))];
     } catch {
@@ -35,12 +35,12 @@ function getListenerPidsOnPort(port) {
   // macOS / Linux / 其他类 Unix：优先 lsof
   try {
     const stdout = execQuiet(`lsof -nP -iTCP:${port} -sTCP:LISTEN -t`);
-    return [...new Set(stdout.split("\n").filter(Boolean))];
+    return [...new Set(stdout.split('\n').filter(Boolean))];
   } catch {
     /* lsof 未安装或 -s 语法不支持时走 Linux 常见兜底 */
   }
 
-  if (platform === "linux") {
+  if (platform === 'linux') {
     try {
       // fuser 在多数 Linux 发行版默认可用
       const stdout = execQuiet(`fuser -n tcp ${port} 2>/dev/null`);
@@ -66,10 +66,10 @@ function killListenersOnPort(port) {
   const pids = getListenerPidsOnPort(port);
   pids.forEach((pid) => {
     try {
-      process.kill(Number(pid), "SIGTERM");
+      process.kill(Number(pid), 'SIGTERM');
       console.log(`[kill-integration-ports] SIGTERM pid=${pid} port=${port}`);
     } catch (error) {
-      if (error.code !== "ESRCH") {
+      if (error.code !== 'ESRCH') {
         console.warn(`[kill-integration-ports] failed pid=${pid} port=${port}:`, error.message);
       }
     }

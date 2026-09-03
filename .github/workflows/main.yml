@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "Tag or branch to publish, for example v2.0.0"
+        description: 'Tag or branch to publish, for example v2.0.0'
         required: true
-        default: "master"
+        default: 'master'
 
 permissions:
   contents: write
@@ -30,9 +30,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "24.x"
+          node-version: '24.x'
           check-latest: true
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: Setup npm for trusted publishing
         run: |
@@ -97,7 +97,7 @@ jobs:
           publish_package packages/wujie-vue2
           publish_package packages/wujie-vue3
         env:
-          NPM_CONFIG_PROVENANCE: "true"
+          NPM_CONFIG_PROVENANCE: 'true'
 
       - name: create GitHub release
         if: startsWith(github.event.inputs.ref || github.ref_name, 'v')

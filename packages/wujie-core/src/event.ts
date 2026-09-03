@@ -1,5 +1,5 @@
-import { warn, error } from "./utils";
-import { WUJIE_ALL_EVENT, WUJIE_TIPS_NO_SUBJECT } from "./constant";
+import { warn, error } from './utils';
+import { WUJIE_ALL_EVENT, WUJIE_TIPS_NO_SUBJECT } from './constant';
 
 /**
  * EventBus does not prescribe a payload shape. The generic tuple is inferred at

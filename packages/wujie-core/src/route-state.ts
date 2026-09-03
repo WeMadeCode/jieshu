@@ -28,10 +28,10 @@ export function decodeRouteQuery(search: string): RouteQuery {
  */
 export function encodeRouteQuery(query: Readonly<RouteQuery>): string {
   return (
-    "?" +
+    '?' +
     Object.keys(query)
       .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
-      .join("&")
+      .join('&')
   );
 }
 
@@ -54,8 +54,8 @@ export function writeRouteState(state: RouteState): string {
 export function compactRoutePath(routePath: string, prefix?: RoutePrefix): string {
   if (!prefix) return routePath;
 
-  let matchedName = "";
-  let matchedPath = "";
+  let matchedName = '';
+  let matchedPath = '';
   Object.keys(prefix).forEach((shortPath) => {
     const longPath = prefix[shortPath];
     if (routePath.startsWith(longPath) && (!matchedName || longPath.length > matchedPath.length)) {
@@ -77,5 +77,5 @@ export function expandRoutePath(routePath: string, prefix?: RoutePrefix): string
 }
 
 export function getAppRoute(state: RouteState, id: string, prefix?: RoutePrefix): string {
-  return expandRoutePath(state.query[id] || "", prefix);
+  return expandRoutePath(state.query[id] || '', prefix);
 }

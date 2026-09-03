@@ -1,4 +1,4 @@
-import type { ScriptAttributes, StyleObject } from "./template";
+import type { ScriptAttributes, StyleObject } from './template';
 
 /** 销毁已启动子应用的回调。 */
 export type DestroyHandler = () => Promise<void>;
@@ -22,7 +22,7 @@ export type EventListenerHook = (
   iframeWindow: Window,
   type: string,
   handler: EventListenerOrEventListenerObject,
-  options?: boolean | AddEventListenerOptions
+  options?: boolean | AddEventListenerOptions,
 ) => void;
 
 export interface ScriptObjectLoader {
@@ -35,7 +35,7 @@ export interface ScriptObjectLoader {
   /** 脚本是否设置crossorigin */
   crossorigin?: boolean;
   /** 脚本crossorigin的类型 */
-  crossoriginType?: "anonymous" | "use-credentials" | "";
+  crossoriginType?: 'anonymous' | 'use-credentials' | '';
   /** 脚本原始属性 */
   attrs?: ScriptAttributes;
   /** 内联script的代码 */
@@ -140,13 +140,13 @@ export interface BaseOptions {
   loadError?: LoadErrorHandler;
 }
 
-export type PreOptions = Omit<BaseOptions, "url"> & {
+export type PreOptions = Omit<BaseOptions, 'url'> & {
   /** 预执行 */
   exec?: boolean;
   url?: string;
 };
 
-export type StartOptions = Omit<BaseOptions, "url"> & {
+export type StartOptions = Omit<BaseOptions, 'url'> & {
   /** 子应用地址；可由 setupApp 缓存提供。 */
   url?: string;
   /** 渲染的容器 */

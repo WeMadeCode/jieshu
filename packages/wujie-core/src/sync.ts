@@ -1,9 +1,9 @@
-import { appRouteParse, getDegradeIframe } from "./utils";
-import { renderIframeReplaceApp, patchEventTimeStamp } from "./iframe";
-import { renderElementToContainer, initRenderIframeAndContainer } from "./shadow";
-import { getWujieById, rawDocumentQuerySelector } from "./common";
-import { compactRoutePath, getAppRoute, readRouteState, writeRouteState } from "./route-state";
-import { shouldHandlePageHideTeardown } from "./sandbox-policy";
+import { appRouteParse, getDegradeIframe } from './utils';
+import { renderIframeReplaceApp, patchEventTimeStamp } from './iframe';
+import { renderElementToContainer, initRenderIframeAndContainer } from './shadow';
+import { getWujieById, rawDocumentQuerySelector } from './common';
+import { compactRoutePath, getAppRoute, readRouteState, writeRouteState } from './route-state';
+import { shouldHandlePageHideTeardown } from './sandbox-policy';
 
 /**
  * 同步子应用路由到主应用路由
@@ -24,7 +24,7 @@ export function syncUrlToWindow(iframeWindow: Window): void {
   }
   const nextHref = writeRouteState(routeState);
   if (nextHref !== window.location.href) {
-    window.history.replaceState(null, "", nextHref);
+    window.history.replaceState(null, '', nextHref);
   }
 }
 
@@ -44,7 +44,7 @@ export function syncUrlToIframe(iframeWindow: Window): void {
 
   const preAppRoutePath = pathname + search + hash;
   if (preAppRoutePath !== appRoutePath) {
-    iframeWindow.history.replaceState(null, "", inject.mainHostPath + appRoutePath);
+    iframeWindow.history.replaceState(null, '', inject.mainHostPath + appRoutePath);
   }
 }
 
@@ -75,7 +75,7 @@ export function clearInactiveAppUrl(tearingDownSandbox?: RouteSandboxState): voi
   });
   const nextHref = writeRouteState(routeState);
   if (nextHref !== window.location.href) {
-    window.history.replaceState(null, "", nextHref);
+    window.history.replaceState(null, '', nextHref);
   }
 }
 
@@ -86,14 +86,14 @@ export function pushUrlToWindow(id: string, url: string): void {
   const routeState = readRouteState(window.location.href);
   // queryMap 来自 URLSearchParams，已经是 decoded 形态；统一在写回 URL 时再 encode，避免重复 encode
   routeState.query[id] = url;
-  window.history.pushState(null, "", writeRouteState(routeState));
+  window.history.pushState(null, '', writeRouteState(routeState));
 }
 
 /**
  * 应用跳转(window.location.href)情况路由处理
  */
 export function processAppForHrefJump(): void {
-  window.addEventListener("popstate", () => {
+  window.addEventListener('popstate', () => {
     const { query } = readRouteState(window.location.href);
     Object.keys(query)
       .map((id) => getWujieById(id))
@@ -102,7 +102,7 @@ export function processAppForHrefJump(): void {
         const url = query[sandbox.id];
         const contentDocument = sandbox.iframe?.contentDocument;
         if (!contentDocument) return;
-        const iframeBody = rawDocumentQuerySelector.call(contentDocument, "body") as HTMLBodyElement | null;
+        const iframeBody = rawDocumentQuerySelector.call(contentDocument, 'body') as HTMLBodyElement | null;
         if (!iframeBody) return;
         // 前进href
         if (/^https?:\/\//i.test(url)) {

@@ -29,12 +29,12 @@
 ## 示例
 
 ```javascript
-import { refreshApp } from "wujie";
+import { refreshApp } from 'wujie';
 
 await refreshApp({
-  name: "vue3",
-  url: "https://xxx.com/",
-  el: document.querySelector("#container"),
+  name: 'vue3',
+  url: 'https://xxx.com/',
+  el: document.querySelector('#container'),
 });
 ```
 
@@ -42,8 +42,8 @@ await refreshApp({
 
 ```javascript
 // 静态方法 refreshApp，参数与 startApp 相同
-import WujieVue from "wujie-vue3";
-await WujieVue.refreshApp({ name: "vue3", url: "...", el: "..." });
+import WujieVue from 'wujie-vue3';
+await WujieVue.refreshApp({ name: 'vue3', url: '...', el: '...' });
 
 // 组件实例方法 refresh()，无需传参，自动复用组件当前 props 全量重建
 await this.$refs.wujie.refresh();
