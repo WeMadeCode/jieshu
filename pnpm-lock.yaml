@@ -364,7 +364,7 @@ importers:
       whatwg-fetch:
         specifier: ^3.6.2
         version: 3.6.20
-      wujie:
+      wujie-core:
         specifier: workspace:^2.1.0
         version: link:../../packages/wujie-core
       wujie-vue2:
@@ -1002,7 +1002,7 @@ importers:
 
   packages/wujie-react:
     dependencies:
-      wujie:
+      wujie-core:
         specifier: workspace:2.1.0
         version: link:../wujie-core
     devDependencies:
@@ -1045,7 +1045,7 @@ importers:
 
   packages/wujie-vue2:
     dependencies:
-      wujie:
+      wujie-core:
         specifier: workspace:2.1.0
         version: link:../wujie-core
     devDependencies:
@@ -1079,7 +1079,7 @@ importers:
 
   packages/wujie-vue3:
     dependencies:
-      wujie:
+      wujie-core:
         specifier: workspace:2.1.0
         version: link:../wujie-core
     devDependencies:

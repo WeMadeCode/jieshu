@@ -41,7 +41,7 @@
   "author": "yiludege",
   "license": "MIT",
   "dependencies": {
-    "wujie": "workspace:2.1.0"
+    "wujie-core": "workspace:2.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.18.6",

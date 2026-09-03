@@ -1,5 +1,5 @@
 {
-  "name": "wujie",
+  "name": "wujie-core",
   "version": "2.1.0",
   "description": "极致的微前端框架",
   "main": "./lib/index.js",
