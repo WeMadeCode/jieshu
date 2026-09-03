@@ -37,11 +37,15 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
     expect(await getTextContentByJsSelector(page, AppInfoMap.vue3.stateNumberJsSelector)).toBe('10');
 
     // react17
+    const react17ActivatedPromise = awaitConsoleLogMessage(page, AppInfoMap.react17.mountedMessage);
     await triggerClickByJsSelector(page, AppInfoMap.vue3.stateJumpReact17JsSelector);
+    await react17ActivatedPromise;
     expect(await getTextContentByJsSelector(page, AppInfoMap.react17.stateNumberJsSelector)).toBe('10');
 
     // vue3
+    const vue3ActivatedPromise = awaitConsoleLogMessage(page, AppInfoMap.vue3.mountedMessage);
     await triggerClickByJsSelector(page, AppInfoMap.react17.stateJumpVue3JsSelector);
+    await vue3ActivatedPromise;
     expect(await getTextContentByJsSelector(page, AppInfoMap.vue3.stateNumberJsSelector)).toBe('11');
   });
 };

@@ -10,5 +10,5 @@ const productionHosts = {
 export type LocalAppHost = keyof typeof productionHosts;
 
 export default function hostMap(host: LocalAppHost): string {
-  return import.meta.env.PROD ? productionHosts[host] : host;
+  return __PRODUCTION__ ? productionHosts[host] : host;
 }

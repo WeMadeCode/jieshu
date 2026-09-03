@@ -10,12 +10,11 @@ import plugins from './plugin';
 import WujieReact from './wujieReact';
 
 const { setupApp, preloadApp, bus } = WujieReact;
-const isProduction = import.meta.env.PROD;
 const degrade =
   window.localStorage.getItem('degrade') === 'true' ||
   typeof Proxy === 'undefined' ||
   typeof CustomElementRegistry === 'undefined';
-const attrs = isProduction ? { src: new URL(import.meta.env.BASE_URL, window.location.href).href } : {};
+const attrs = __PRODUCTION__ ? { src: new URL(__BASE_URL__, window.location.href).href } : {};
 
 bus.$on<[message: string]>('click', (message) => window.alert(message));
 

@@ -145,6 +145,10 @@ module.exports = function (webpackEnv) {
 
   return {
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
+    watchOptions: {
+      ignored: /node_modules/,
+      poll: 1000,
+    },
     // Stop compilation early in production
     bail: isEnvProduction,
     devtool: isEnvProduction

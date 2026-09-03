@@ -4,9 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "vite --open",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
+    "start": "rspack dev --mode development --open",
+    "integration": "rspack dev --mode development --port 7700 --no-open",
+    "build": "tsc --noEmit && rspack build --mode production",
+    "preview": "rspack preview --host 0.0.0.0 --port 7800",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -18,10 +19,13 @@
     "wujie-react": "workspace:^2.1.0"
   },
   "devDependencies": {
+    "@rspack/cli": "2.2.2",
+    "@rspack/core": "2.2.2",
+    "@rspack/dev-server": "2.2.1",
+    "@rspack/plugin-react-refresh": "2.0.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
-    "@vitejs/plugin-react": "^6.1.1",
-    "typescript": "^6.0.3",
-    "vite": "^8.2.2"
+    "react-refresh": "0.18.0",
+    "typescript": "^6.0.3"
   }
 }

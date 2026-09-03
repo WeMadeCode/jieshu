@@ -70,11 +70,7 @@ function Navigation({ onOpen }: NavigationProps) {
         {alive && <span className="alive">保活</span>}
         <CaretUpOutlined
           className={openMenus[name] ? 'main-icon active' : 'main-icon'}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            toggleMenu(name);
-          }}
+          onClick={() => toggleMenu(name)}
         />
       </NavLink>
       <div className="sub-menu" style={{ display: openMenus[name] ? 'block' : 'none' }}>
@@ -127,7 +123,7 @@ export default function App() {
         <div className={navigationOpen ? 'nav active' : 'nav'}>
           <Navigation onOpen={() => setNavigationOpen(true)} />
         </div>
-        <main className="content" onClick={() => setNavigationOpen(false)}>
+        <div className="content" onClick={() => setNavigationOpen(false)}>
           <Routes>
             <Route path="/home" element={<Home />} />
             <Route path="/react16" element={<React16 />} />
@@ -144,7 +140,7 @@ export default function App() {
             <Route path="/all" element={<All />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
-        </main>
+        </div>
       </HashRouter>
     </div>
   );

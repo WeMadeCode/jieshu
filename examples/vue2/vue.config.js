@@ -5,6 +5,12 @@
  */
 module.exports = {
   publicPath: './',
+  configureWebpack: {
+    watchOptions: {
+      ignored: /node_modules/,
+      poll: 1000,
+    },
+  },
   devServer: {
     headers: {
       'Access-Control-Allow-Origin': '*',

@@ -175,6 +175,10 @@ module.exports = function (webpackEnv) {
   return {
     target: ['browserslist'],
     mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
+    watchOptions: {
+      ignored: /node_modules/,
+      poll: 1000,
+    },
     // Stop compilation early in production
     bail: isEnvProduction,
     devtool: isEnvProduction
@@ -410,6 +414,11 @@ module.exports = function (webpackEnv) {
             // Unlike the application JS, we only compile the standard ES features.
             {
               test: /\.(js|mjs)$/,
+              resolve: {
+                // Babel 7's runtime helpers omit the file extension, while webpack 5
+                // requires fully specified imports when consuming the ESM adapter build.
+                fullySpecified: false,
+              },
               exclude: /@babel(?:\/|\\{1,2})runtime/,
               loader: require.resolve('babel-loader'),
               options: {

@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --poll 1000",
     "build": "export NODE_OPTIONS=--openssl-legacy-provider && ng build --deploy-url='/demo-angular12/'",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

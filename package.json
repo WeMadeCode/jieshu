@@ -6,7 +6,7 @@
   "packageManager": "pnpm@11.13.0",
   "scripts": {
     "build:packages": "pnpm --recursive --filter './packages/*' run build",
-    "start": "NODE_OPTIONS=--openssl-legacy-provider pnpm --recursive --parallel --if-present run start",
+    "start": "WATCHPACK_POLLING=true NODE_OPTIONS=--openssl-legacy-provider pnpm --recursive --parallel --if-present run start",
     "doc": "pnpm --filter wujie-docs run docs:dev",
     "clean": "rimraf node_modules **/*/node_modules packages/*/lib packages/*/esm packages/*/types",
     "lint": "eslint .",

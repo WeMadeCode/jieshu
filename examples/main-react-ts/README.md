@@ -1,6 +1,6 @@
 # main-react-ts
 
-基于 `examples/main-react` 改写的无界主应用示例，技术栈为 Vite、TypeScript 和 React 19。
+基于 `examples/main-react` 改写的无界主应用示例，技术栈为 Rspack、TypeScript 和 React 19。
 
 ## 使用
 

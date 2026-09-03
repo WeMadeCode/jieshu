@@ -4,6 +4,7 @@ import { defineConfig } from '@playwright/test';
 
 const repositoryRoot = fileURLToPath(new URL('../../../..', import.meta.url));
 const launchArgs = (process.env['PLAYWRIGHT_LAUNCH_ARGS'] ?? '').split(/\s+/).filter(Boolean);
+const reactMainWorkspace = process.env['WUJIE_REACT_MAIN_WORKSPACE'] ?? 'main-react';
 
 const webServer = (workspace: string, script: string, port: number) => ({
   command: `pnpm --filter ${workspace} run ${script}`,
@@ -38,7 +39,7 @@ export default defineConfig({
     webServer('vue3', 'start', 7300),
     webServer('vite', 'start', 7500),
     webServer('angular12', 'start', 7400),
-    webServer('main-react', 'integration', 7700),
+    webServer(reactMainWorkspace, 'integration', 7700),
     webServer('main-vue', 'start', 8000),
   ],
 });
