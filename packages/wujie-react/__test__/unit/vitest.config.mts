@@ -18,7 +18,7 @@ export default defineConfig({
     include: [unitTests],
     coverage: {
       provider: 'istanbul',
-      include: ['index.tsx'],
+      include: ['src/index.tsx'],
       reportsDirectory: 'coverage/unit',
       reporter: ['text', 'text-summary'],
       thresholds: {

@@ -20,7 +20,7 @@ export default defineConfig({
     include: [unitTests],
     coverage: {
       provider: 'istanbul',
-      include: ['index.ts', 'WujieVue.vue'],
+      include: ['src/index.ts', 'src/WujieVue.vue'],
       reportsDirectory: 'coverage/unit',
       reporter: ['text', 'text-summary'],
       thresholds: {

@@ -1,5 +1,5 @@
 import WujieReact, { type WujieReactComponent, type WujieReactProps, type WujieReactRef } from 'wujie-react';
-import SourceWujieReact from '../index';
+import SourceWujieReact from '../src';
 
 const props: WujieReactProps = {
   name: 'typed-react-consumer',

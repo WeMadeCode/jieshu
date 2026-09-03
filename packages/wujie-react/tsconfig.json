@@ -6,8 +6,9 @@
     "declarationMap": false,
     "emitDeclarationOnly": true,
     "jsx": "react",
+    "rootDir": "./src",
     "sourceMap": false,
     "skipLibCheck": false
   },
-  "include": ["index.tsx"]
+  "include": ["src/**/*.tsx"]
 }

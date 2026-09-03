@@ -1,7 +1,7 @@
 import { createApp, defineComponent, h, nextTick, reactive, ref, type App, type ComponentPublicInstance } from 'vue';
 import type { Mock, MockInstance } from 'vitest';
 import type { StartOptions } from 'wujie-core';
-import WujieVue, { type WujieVueExposed } from '../../index';
+import WujieVue, { type WujieVueExposed } from '../../src';
 
 interface MockController {
   start: Mock<(options: StartOptions) => Promise<void>>;
@@ -294,7 +294,7 @@ describe('WujieVue for Vue 3', () => {
           identityWatcher = callback;
         },
       }));
-      const isolatedComponent = (await import('../../index')).default as unknown as {
+      const isolatedComponent = (await import('../../src')).default as unknown as {
         setup(props: Record<string, unknown>, context: { emit: Mock }): WujieVueExposed;
       };
       const exposed = isolatedComponent.setup({ name: 'isolated', url: 'https://isolated.test/' }, { emit: vi.fn() });

@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["../../index.ts", "../../WujieVue.vue", "./**/*.ts"],
+  "include": ["../../src/**/*.ts", "../../src/**/*.vue", "./**/*.ts"],
   "compilerOptions": {
     "outDir": "../../.test-build",
     "rootDir": "../..",

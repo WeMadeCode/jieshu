@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
 import type { Mock, MockInstance } from 'vitest';
 import type { StartOptions } from 'wujie-core';
-import WujieReact, { type WujieReactRef } from '../../index';
+import WujieReact, { type WujieReactRef } from '../../src';
 
 interface MockController {
   start: Mock<(options: StartOptions) => Promise<void>>;
@@ -281,7 +281,7 @@ describe('WujieReact', () => {
     try {
       delete (globalThis as unknown as Record<string, unknown>)['window'];
       vi.resetModules();
-      const serverComponent = (await import('../../index')).default;
+      const serverComponent = (await import('../../src')).default;
       expect(serverComponent.displayName).toBe('WujieReact');
     } finally {
       Object.defineProperty(globalThis, 'window', descriptor);

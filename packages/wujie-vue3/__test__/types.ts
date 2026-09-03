@@ -1,6 +1,6 @@
 import { h, type App } from 'vue';
 import type { DestroyHandler } from 'wujie-core';
-import SourceWujieVue from '../index';
+import SourceWujieVue from '../src';
 import WujieVue, { type WujieVueComponent, type WujieVueInstance, type WujieVueProps } from 'wujie-vue3';
 
 declare const app: App;

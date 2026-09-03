@@ -2,8 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
+    "rootDir": ".",
     "paths": {
-      "wujie-react": ["./index.tsx"]
+      "wujie-react": ["./src/index.tsx"]
     }
   },
   "include": ["__test__/public-api.ts"]

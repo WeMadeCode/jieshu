@@ -35,7 +35,7 @@
     "types": "pnpm run build:types",
     "typecheck": "tsc --project tsconfig.json --noEmit && tsc --project __test__/unit/tsconfig.json --noEmit && pnpm run typecheck:public",
     "typecheck:public": "tsc --project tsconfig.test.json",
-    "lint": "eslint index.tsx __test__",
+    "lint": "eslint src __test__",
     "lint:fix": "pnpm run lint --fix",
     "start": "pnpm run build:types && vite build --mode esm --watch",
     "test:unit": "vitest run --config __test__/unit/vitest.config.mts --coverage",

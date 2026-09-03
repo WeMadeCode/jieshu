@@ -12,19 +12,19 @@ export default defineConfig({
       reportsDirectory: 'coverage/unit',
       reporter: ['text', 'text-summary'],
       thresholds: {
-        'packages/wujie-react/index.tsx': {
+        'packages/wujie-react/src/index.tsx': {
           statements: 100,
           branches: 100,
           functions: 100,
           lines: 100,
         },
-        'packages/wujie-vue3/index.ts': {
+        'packages/wujie-vue3/src/index.ts': {
           statements: 100,
           branches: 100,
           functions: 100,
           lines: 100,
         },
-        'packages/wujie-vue3/WujieVue.vue': {
+        'packages/wujie-vue3/src/WujieVue.vue': {
           statements: 100,
           branches: 100,
           functions: 100,

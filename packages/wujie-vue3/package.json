@@ -34,7 +34,7 @@
     "esm": "pnpm run build:esm",
     "start": "pnpm run build:types && vite build --mode esm --watch",
     "typecheck": "vue-tsc -p tsconfig.type-test.json && vue-tsc -p __test__/unit/tsconfig.json --noEmit",
-    "lint": "eslint index.ts WujieVue.vue __test__",
+    "lint": "eslint src __test__",
     "lint:fix": "pnpm run lint --fix",
     "test:unit": "vitest run --config __test__/unit/vitest.config.mts --coverage",
     "test:ui": "pnpm run test:unit",

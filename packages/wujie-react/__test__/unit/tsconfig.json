@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["../../index.tsx", "./**/*.ts"],
+  "include": ["../../src/**/*.tsx", "./**/*.ts"],
   "compilerOptions": {
     "outDir": "../../.test-build",
     "rootDir": "../..",
