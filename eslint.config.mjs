@@ -79,7 +79,7 @@ export default [
   },
   ...vue.configs['flat/essential'].map((config) => ({
     ...config,
-    files: ['docs/**/*.vue', 'examples/{main-vue,vite,vue3}/**/*.vue', 'packages/jieshu-vue3/**/*.vue'],
+    files: ['docs/**/*.vue', 'examples/{main-vue-vite,vite,vue3}/**/*.vue', 'packages/jieshu-vue3/**/*.vue'],
   })),
   ...vue.configs['flat/vue2-essential'].map((config) => ({
     ...config,
