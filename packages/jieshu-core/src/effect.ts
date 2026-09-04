@@ -329,6 +329,55 @@ interface InsertionContext {
   readonly curUrl: string;
 }
 
+interface VirtualScriptParent {
+  readonly parent: InsertionTarget;
+  readonly placeholder: Comment;
+}
+
+/**
+ * Dynamic scripts execute in the application iframe, while their visible
+ * insertion point is represented by a comment. Keep the original script's
+ * parent access compatible with native DOM so loaders can later clean it up
+ * through `script.parentNode.removeChild(script)`.
+ */
+const virtualScriptParents = new WeakMap<HTMLScriptElement, VirtualScriptParent>();
+
+function installVirtualScriptParent(
+  scriptElement: HTMLScriptElement,
+  parent: InsertionTarget,
+  placeholder: Comment,
+): void {
+  virtualScriptParents.set(scriptElement, { parent, placeholder });
+  try {
+    Object.defineProperties(scriptElement, {
+      parentNode: {
+        configurable: true,
+        get: () => virtualScriptParents.get(scriptElement)?.parent ?? null,
+      },
+      parentElement: {
+        configurable: true,
+        get: () => virtualScriptParents.get(scriptElement)?.parent ?? null,
+      },
+    });
+  } catch (cause: unknown) {
+    virtualScriptParents.delete(scriptElement);
+    warn(cause);
+  }
+}
+
+function releaseVirtualScriptParent(scriptElement: HTMLScriptElement): VirtualScriptParent | undefined {
+  const relationship = virtualScriptParents.get(scriptElement);
+  if (!relationship) return undefined;
+  virtualScriptParents.delete(scriptElement);
+  try {
+    Reflect.deleteProperty(scriptElement, 'parentNode');
+    Reflect.deleteProperty(scriptElement, 'parentElement');
+  } catch (cause: unknown) {
+    warn(cause);
+  }
+  return relationship;
+}
+
 /** Dynamic effects may continue while kept alive, but never after a normal inactive unmount. */
 export function isDynamicEffectContextLive(sandbox: Jieshu, jieshuId: string): boolean {
   return (
@@ -770,11 +819,11 @@ const styleInsertionHandler = createInsertionHandler<HTMLStyleElement>('STYLE', 
 });
 
 const scriptInsertionHandler = createInsertionHandler<HTMLScriptElement>('SCRIPT', (context, scriptElement) => {
+  const placeholder = context.iframeDocument.createComment(`dynamic script ${scriptElement.src} replaced by jieshu`);
+  insertNode(context, placeholder);
+  installVirtualScriptParent(scriptElement, context.target, placeholder);
   new DynamicScriptScheduler(context, scriptElement).schedule();
-  return insertNode(
-    context,
-    context.iframeDocument.createComment(`dynamic script ${scriptElement.src} replaced by jieshu`),
-  );
+  return scriptElement;
 });
 
 const iframeInsertionHandler = createInsertionHandler<HTMLIFrameElement>('IFRAME', (context, iframeElement) => {
@@ -852,6 +901,7 @@ function findScriptElementFromIframe(rawElement: HTMLScriptElement, jieshuId: st
   const iframeWindow = iframe.contentWindow;
   if (!iframeWindow) return { targetScript: null, rawHead: null };
   const rawHead = iframeWindow.__JIESHU_RAW_DOCUMENT_HEAD__;
+  if (!rawHead) return { targetScript: null, rawHead: null };
   const targetScript = rawHead.querySelector(`script[${JIESHU_SCRIPT_ID}='${jieshuTag}']`);
   if (targetScript === null) {
     warn(JIESHU_TIPS_NO_SCRIPT, `<script ${JIESHU_SCRIPT_ID}='${jieshuTag}'/>`);
@@ -860,10 +910,12 @@ function findScriptElementFromIframe(rawElement: HTMLScriptElement, jieshuId: st
 }
 
 function rewriteContains(opts: { rawElementContains: (other: Node | null) => boolean; jieshuId: string }) {
-  return function contains(other: Node | null) {
+  return function contains(this: InsertionTarget | ShadowRoot | Document, other: Node | null) {
     const element = other as HTMLElement;
     const { rawElementContains, jieshuId } = opts;
     if (element && isScriptElement(element)) {
+      const relationship = virtualScriptParents.get(element as HTMLScriptElement);
+      if (relationship && rawElementContains(relationship.parent)) return true;
       const { targetScript, rawHead } = findScriptElementFromIframe(element as HTMLScriptElement, jieshuId);
       if (!rawHead) return rawElementContains(element);
       return targetScript !== null;
@@ -873,14 +925,23 @@ function rewriteContains(opts: { rawElementContains: (other: Node | null) => boo
 }
 
 function rewriteRemoveChild(opts: { rawElementRemoveChild: <T extends Node>(child: T) => T; jieshuId: string }) {
-  return function removeChild(child: Node) {
+  return function removeChild(this: InsertionTarget, child: Node) {
     const element = child as HTMLElement;
     const { rawElementRemoveChild, jieshuId } = opts;
     if (element && isScriptElement(element)) {
+      const relationship = virtualScriptParents.get(element as HTMLScriptElement);
+      if (relationship && relationship.parent !== this) return rawElementRemoveChild(element);
       const { targetScript, rawHead } = findScriptElementFromIframe(element as HTMLScriptElement, jieshuId);
-      if (!rawHead) return rawElementRemoveChild(element);
-      if (targetScript !== null) {
-        return rawHead.removeChild(targetScript);
+      if (!rawHead && !relationship) return rawElementRemoveChild(element);
+      if (targetScript !== null && rawHead) {
+        rawHead.removeChild(targetScript);
+      }
+      if (relationship) {
+        releaseVirtualScriptParent(element as HTMLScriptElement);
+        if (relationship.placeholder.parentNode === relationship.parent) {
+          rawElementRemoveChild.call(relationship.parent, relationship.placeholder);
+        }
+        return element;
       }
       return null;
     }
@@ -981,4 +1042,12 @@ export function patchRenderEffect(render: ShadowRoot | Document, id: string, deg
     rawDOMAppendOrInsertBefore: rawBodyInsertBefore as unknown as RawDomInsertion,
     jieshuId: id,
   }) as typeof rawBodyInsertBefore;
+  render.body.removeChild = rewriteRemoveChild({
+    rawElementRemoveChild: rawElementRemoveChild.bind(render.body),
+    jieshuId: id,
+  }) as typeof rawElementRemoveChild;
+  render.body.contains = rewriteContains({
+    rawElementContains: rawElementContains.bind(render.body),
+    jieshuId: id,
+  }) as typeof rawElementContains;
 }

@@ -32,6 +32,8 @@ const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 
 const reactRefreshRuntimeEntry = require.resolve('react-refresh/runtime');
 const reactRefreshWebpackPluginRuntimeEntry = require.resolve('@pmmmwh/react-refresh-webpack-plugin');
+const appReactEntry = require.resolve('react');
+const appReactDomEntry = require.resolve('react-dom');
 const babelRuntimeEntry = require.resolve('babel-preset-react-app');
 const babelRuntimeEntryHelpers = require.resolve('@babel/runtime/helpers/esm/assertThisInitialized', {
   paths: [babelRuntimeEntry],
@@ -292,8 +294,11 @@ module.exports = function (webpackEnv) {
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
         // Allows for better profiling with ReactDevTools
+        // Workspace packages are symlinked to their source directories. Pin bare React imports
+        // to this app so jieshu-react cannot resolve its own development React installation.
+        react$: appReactEntry,
+        'react-dom$': isEnvProductionProfile ? 'react-dom/profiling' : appReactDomEntry,
         ...(isEnvProductionProfile && {
-          'react-dom$': 'react-dom/profiling',
           'scheduler/tracing': 'scheduler/tracing-profiling',
         }),
         ...(modules.webpackAliases || {}),
@@ -308,6 +313,8 @@ module.exports = function (webpackEnv) {
           paths.appPackageJson,
           reactRefreshRuntimeEntry,
           reactRefreshWebpackPluginRuntimeEntry,
+          appReactEntry,
+          appReactDomEntry,
           babelRuntimeEntry,
           babelRuntimeEntryHelpers,
           babelRuntimeRegenerator,

@@ -149,6 +149,41 @@ describe('dynamic script sequencing', () => {
     expect(calls).toEqual(['first', 'second']);
   });
 
+  test.each([
+    { degrade: false, id: 'standard-jsonp' },
+    { degrade: true, id: 'degrade-jsonp' },
+  ])('$id script can be cleaned up through its parentNode like SockJS JSONP', async ({ degrade, id }) => {
+    const sandbox = createSandbox(id, () => Promise.resolve(scriptResponse('/* jsonp */')));
+    sandbox.degrade = degrade;
+    const renderRoot = degrade
+      ? (() => {
+          const renderIframe = document.createElement('iframe');
+          document.body.appendChild(renderIframe);
+          const renderDocument = renderIframe.contentDocument as Document;
+          sandbox.document = renderDocument;
+          return renderDocument;
+        })()
+      : createRenderRoot();
+    patchRenderEffect(renderRoot, sandbox.id, degrade);
+    const appWindow = sandbox.iframe.contentWindow as Window;
+    appWindow.__JIESHU_RAW_DOCUMENT_HEAD__ = appWindow.document.head;
+    const script = appWindow.document.createElement('script');
+    script.src = 'https://assets.example/jsonp.js';
+
+    const inserted = renderRoot.head.appendChild(script);
+
+    expect(inserted).toBe(script);
+    expect(script.parentNode).toBe(renderRoot.head);
+    expect(script.parentElement).toBe(renderRoot.head);
+    expect(renderRoot.head.contains(script)).toBe(true);
+    await flushPromises();
+
+    expect(script.parentNode?.removeChild(script)).toBe(script);
+    expect(script.parentNode).toBeNull();
+    expect(script.parentElement).toBeNull();
+    expect(renderRoot.head.contains(script)).toBe(false);
+  });
+
   test('a reusable unmount rejects a pending chunk and ignores its late response after remount', async () => {
     const pending = deferred<Response>();
     const root = createRenderRoot();

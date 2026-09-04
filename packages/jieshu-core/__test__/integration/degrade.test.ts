@@ -7,6 +7,8 @@ const describe = test.describe;
 const beforeAll = test.beforeAll;
 const it = test;
 let page: Page;
+const reactMainUrl = process.env['JIESHU_REACT_MAIN_URL'] ?? 'http://localhost:7700/';
+const vueMainUrl = process.env['JIESHU_VUE_MAIN_URL'] ?? 'http://localhost:8000/';
 
 beforeAll(async ({ browser }) => {
   page = await browser.newPage();
@@ -24,7 +26,7 @@ describe('main react degrade', () => {
       localStorage.setItem('preload', 'false');
       localStorage.setItem('degrade', 'true');
     });
-    await page.goto('http://localhost:7700/');
+    await page.goto(reactMainUrl);
   });
 
   reactMainAppInfoList.forEach((appInfo) =>
@@ -45,7 +47,7 @@ describe('main vue degrade', () => {
       localStorage.setItem('preload', 'false');
       localStorage.setItem('degrade', 'true');
     });
-    await page.goto('http://localhost:8000/');
+    await page.goto(vueMainUrl);
   });
 
   vueMainAppInfoList.forEach((appInfo) =>
