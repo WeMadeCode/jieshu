@@ -14,7 +14,7 @@
     "start:children": "WATCHPACK_POLLING=true NODE_OPTIONS=--openssl-legacy-provider pnpm --recursive --parallel --if-present --filter jieshu-core --filter jieshu-react --filter jieshu-vue3 --filter react16 --filter react17 --filter vue2 --filter vue3 --filter vite --filter angular12 run start",
     "start:mains": "WATCHPACK_POLLING=true NODE_OPTIONS=--openssl-legacy-provider pnpm --recursive --parallel --if-present --filter main-react --filter main-react-ts --filter main-vue run start",
     "doc": "pnpm --filter jieshu-docs run docs:dev",
-    "clean": "rimraf node_modules **/*/node_modules packages/*/lib packages/*/esm packages/*/types",
+    "clean": "rimraf node_modules **/*/node_modules packages/*/dist packages/*/lib packages/*/esm packages/*/types",
     "lint": "eslint . --max-warnings=0",
     "check:examples": "eslint examples --max-warnings=0 && prettier --check examples",
     "lint:fix": "pnpm run lint --fix",

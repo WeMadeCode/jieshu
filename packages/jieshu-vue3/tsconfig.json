@@ -1,11 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "include": ["./src/**/*.ts", "./src/**/*.vue"],
-  "exclude": ["node_modules", "esm", "lib"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "isolatedModules": true,
     "declaration": true,
-    "declarationDir": "./types",
+    "declarationDir": "./dist/types",
     "emitDeclarationOnly": true,
     "rootDir": "./src",
     "sourceMap": false,

@@ -31,7 +31,7 @@ export function createLibraryConfig(options: LibraryBuildOptions) {
       },
       build: {
         target: 'es2018',
-        outDir: isUmd ? 'lib' : 'esm',
+        outDir: isUmd ? 'dist/lib' : 'dist/esm',
         emptyOutDir: true,
         copyPublicDir: false,
         sourcemap: true,

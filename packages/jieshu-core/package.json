@@ -2,26 +2,24 @@
   "name": "jieshu-core",
   "version": "2.1.0",
   "description": "极致的微前端框架",
-  "main": "./lib/index.umd.js",
-  "module": "./esm/index.mjs",
-  "types": "./types/index.d.ts",
+  "main": "./dist/lib/index.umd.js",
+  "module": "./dist/esm/index.mjs",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
-      "import": "./esm/index.mjs",
-      "require": "./lib/index.umd.js",
-      "default": "./esm/index.mjs"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/lib/index.umd.js",
+      "default": "./dist/esm/index.mjs"
     }
   },
-  "unpkg": "./lib/index.umd.js",
-  "jsdelivr": "./lib/index.umd.js",
+  "unpkg": "./dist/lib/index.umd.js",
+  "jsdelivr": "./dist/lib/index.umd.js",
   "files": [
-    "lib",
-    "esm",
-    "types"
+    "dist"
   ],
   "scripts": {
-    "clean": "rimraf lib esm types",
+    "clean": "rimraf dist lib esm types",
     "build": "pnpm run clean && pnpm run build:esm && pnpm run build:umd && pnpm run build:types",
     "build:esm": "vite build --mode esm",
     "build:umd": "vite build --mode umd",

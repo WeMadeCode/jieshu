@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "declarationDir": "./types",
+    "declarationDir": "./dist/types",
     "declarationMap": false,
     "emitDeclarationOnly": true,
     "jsx": "react",
