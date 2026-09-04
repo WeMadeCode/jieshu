@@ -13,8 +13,8 @@
     "vue": "^3.0.0",
     "vue-router": "4.1.6",
     "whatwg-fetch": "^3.6.2",
-    "@cloud/jieshu-core": "workspace:^2.1.0",
-    "@cloud/jieshu-vue3": "workspace:^2.1.0"
+    "@cloud/jieshu-core": "workspace:*",
+    "@cloud/jieshu-vue3": "workspace:*"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "6.0.8",

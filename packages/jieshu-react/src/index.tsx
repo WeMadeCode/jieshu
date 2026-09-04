@@ -138,9 +138,7 @@ const JieshuReactView = React.forwardRef<JieshuReactRef, JieshuReactProps>(
       return (): void => {
         const controller = controllerRef.current;
         controller?.dispose();
-        // dispose cannot replace this component's private ref; retain the guard for future re-entrant implementations.
-        /* istanbul ignore else */
-        if (controllerRef.current === controller) controllerRef.current = null;
+        controllerRef.current = null;
       };
     }, [startAutomatically]);
 

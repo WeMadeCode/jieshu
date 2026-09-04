@@ -49,13 +49,12 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@cloud/jieshu-core": "workspace:2.1.0"
+    "@cloud/jieshu-core": "workspace:*"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "6.0.8",
     "@vue/compiler-sfc": "^3.5.22",
-    "csstype": "^3.1.1",
-    "vue": "^3.0.0",
-    "vue-tsc": "3.3.11"
+    "vue": "^3.5.22",
+    "vue-tsc": "3.2.4"
   }
 }

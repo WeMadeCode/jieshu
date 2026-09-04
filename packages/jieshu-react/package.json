@@ -50,7 +50,7 @@
   "author": "yiludege",
   "license": "MIT",
   "dependencies": {
-    "@cloud/jieshu-core": "workspace:2.1.0"
+    "@cloud/jieshu-core": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",

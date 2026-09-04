@@ -16,7 +16,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3",
-    "@cloud/jieshu-react": "workspace:^2.1.0"
+    "@cloud/jieshu-react": "workspace:*"
   },
   "devDependencies": {
     "@rspack/cli": "2.2.2",
