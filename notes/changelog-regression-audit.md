@@ -70,7 +70,7 @@
 - document 转发到主 document/ShadowRoot 的 listener 会按 callback 和 capture 登记并反向解绑。
 - window.onXXX 支持多 sandbox owner，销毁时不会覆盖当前 owner 或复活旧 handler。
 - Proxy 使用 Proxy.revocable，销毁时撤销 window/document/location 代理。
-- instanceof 在主/子 realm 及降级渲染 iframe 间有专项测试。
+- instanceof 在主/子 realm 间有专项测试。
 - getSelection、ownerDocument、DataTransfer 和延迟 href 是 #1084 已覆盖的核心点，但真实 wangEditor、TinyMCE、OnlyOffice 全交互矩阵没有自动化。
 
 直接证据：destroy-cleanup-e2e、document-events-leak、iframe-event-policy、effect-listener、proxy、instanceof-patch 单元测试和 Chromium instanceof 集成测试。
@@ -88,7 +88,7 @@
 
 直接证据：entry-pipeline、dynamic-script-sequence、iframe-script、dynamic-stylesheet-failure、stylesheet-patch、defer-style-href 测试。
 
-此前出现过的 React 16/CRA 严格 ESM helper 解析失败已不再重现：React 16 example 的生产构建通过，相关 degrade、font、href 与生命周期场景也包含在本次完整 Chromium 集成结果中。
+此前出现过的 React 16/CRA 严格 ESM helper 解析失败已不再重现：React 16 example 的生产构建通过，相关 font、href 与生命周期场景也包含在本次完整 Chromium 集成结果中。
 
 ### 3.4 URL、路由、baseURI 和资源地址
 
@@ -97,8 +97,8 @@
 **结论：已验证。**
 
 - query 使用统一 codec，处理空值、加号、重复参数、原型键、百分号和主应用 hash。
-- prefix 压缩使用最长匹配；降级和 href jump 有脱离 document 保护。
-- 降级 iframe 注入 base；媒体、link、script 的动态 URL 按子应用 baseURI 归一化。
+- prefix 压缩使用最长匹配；href jump 有脱离 document 保护。
+- 执行 iframe 注入 base；媒体、link、script 的动态 URL 按子应用 baseURI 归一化。
 - CSS loader 保留 data URL，转换其他相对 URL。
 
 直接证据：route-state、sync-route、options、shadow-runtime、plugin 单元测试。
@@ -124,17 +124,17 @@
 - Vue 2 适配代码和测试已删除，不能把 Vue 3 的覆盖率作为 Vue 2 已验证的证据。
 - jieshu-react peer 不再允许 React 16；React 16 子应用 example 的生产构建和集成通过并不等于 React 16 主应用适配器重新获得支持。
 
-### 3.7 低版浏览器和降级模式
+### 3.7 运行环境支持
 
 **历史问题：** #1088、#861、#758、#648、#444、#280、#312、#302、#248、#185；另关联富文本调研中的 #489。
 
-**结论：现代 Chromium 下的主动降级逻辑有测试；IE、旧 Chrome、Safari 承诺未验证且与产物不一致。**
+**结论：运行时要求原生 `Proxy` 与 Custom Elements；不满足要求时直接报错，不提供备用渲染路径。IE、旧 Chrome、Safari 承诺未验证且与产物不一致。**
 
 具体冲突：
 
 - tsconfig.json 和 Vite library config 的 target 是 ES2018。
-- 没有 legacy plugin 或等价的 IE 语法降级产物。
-- docs 仍写降级模式“理论上可以兼容到 IE9”。
+- 没有 legacy plugin 或等价的 IE 语法转换产物。
+- docs 已明确列出 `Proxy` 与 Custom Elements 的运行环境要求。
 - Playwright 只配置 Chromium，不包含 WebKit、Firefox 或历史 Chromium。
 
 如果项目已正式放弃 IE、React 16 主应用适配和 Vue 2 主应用适配，应删除旧承诺并写入 breaking changes；如果没有放弃，这些就是发布阻断问题。React 16 / Vue 2 子应用 example 已通过不代表对应主应用适配包仍受支持。
@@ -154,7 +154,7 @@
 | setupApp / preloadApp / startApp / destroyApp | 保留            | core index 导出，options 与 public operation 有专项测试 |
 | refreshApp / clearAssetsCache                 | 保留            | core 和 React/Vue 3 静态 API 都导出                     |
 | 自定义 HTML                                   | 保留            | StartOptions.html 与 entry pipeline                     |
-| degrade / degradeAttrs                        | 保留            | options、shadow/proxy 分支仍在；仅验证现代 Chromium     |
+| 旧双 iframe 兼容配置                          | 已移除          | 公开类型、适配器、源码分支、示例与测试均已删除          |
 | sync / prefix 路由同步                        | 保留            | route-state 与 sync-route 单元测试                      |
 | importmap、async/defer/module/fiber           | 保留            | template、iframe-script 和 scheduler 测试               |
 | plugin loader、hooks、ignores、excludes       | 保留            | plugin/effect pipeline 测试                             |
@@ -182,7 +182,7 @@
     Vue 主应用：49 passed
     合计：97 passed，0 failed
 
-Vue 主应用复核时因默认端口被占用改用临时端口 18000；未修改代码语义。两套主应用下的 React 16、React 17、Vue 2、Vue 3、Vite、Angular 12，以及 degrade、font、href、head、:host 等场景均完成执行。
+Vue 主应用复核时因默认端口被占用改用临时端口 18000；未修改代码语义。两套主应用下的 React 16、React 17、Vue 2、Vue 3、Vite、Angular 12，以及 font、href、head、:host 等场景均完成执行。
 
 ### Examples 生产构建
 

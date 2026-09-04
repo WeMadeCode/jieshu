@@ -1,9 +1,8 @@
-import { appRouteParse, getDegradeIframe } from './utils';
-import { renderIframeReplaceApp, patchEventTimeStamp } from './iframe';
-import { renderElementToContainer, initRenderIframeAndContainer } from './shadow';
-import { getJieshuById, rawDocumentQuerySelector } from './common';
+import { appRouteParse } from './utils';
+import { renderIframeReplaceApp } from './iframe';
+import { renderElementToContainer } from './shadow';
+import { getJieshuById } from './common';
 import { compactRoutePath, getAppRoute, readRouteState, writeRouteState } from './route-state';
-import { shouldHandlePageHideTeardown } from './sandbox-policy';
 
 /**
  * 同步子应用路由到主应用路由
@@ -100,41 +99,16 @@ export function processAppForHrefJump(): void {
       .filter((sandbox): sandbox is NonNullable<ReturnType<typeof getJieshuById>> => sandbox !== null)
       .forEach((sandbox) => {
         const url = query[sandbox.id];
-        const contentDocument = sandbox.iframe?.contentDocument;
-        if (!contentDocument) return;
-        const iframeBody = rawDocumentQuerySelector.call(contentDocument, 'body') as HTMLBodyElement | null;
-        if (!iframeBody) return;
         // 前进href
         if (/^https?:\/\//i.test(url)) {
-          const target = sandbox.degrade
-            ? getDegradeIframe(sandbox.id)?.parentElement
-            : sandbox.shadowRoot?.host?.parentElement;
+          const target = sandbox.shadowRoot?.host?.parentElement;
           if (!target) return;
-          if (sandbox.degrade) {
-            const documentElement = sandbox.document?.documentElement;
-            if (!documentElement) return;
-            renderElementToContainer(documentElement, iframeBody);
-          }
           // URLSearchParams already decoded the route value in readRouteState.
-          renderIframeReplaceApp(url, target, sandbox.degradeAttrs);
+          renderIframeReplaceApp(url, target);
           sandbox.hrefFlag = true;
           // href后退
         } else if (sandbox.hrefFlag) {
-          if (sandbox.degrade) {
-            // 走全套流程，但是事件恢复不需要
-            const { iframe } = initRenderIframeAndContainer(sandbox.id, sandbox.el, sandbox.degradeAttrs);
-            const renderWindow = iframe.contentWindow;
-            const renderDocument = iframe.contentDocument;
-            const appWindow = sandbox.iframe.contentWindow;
-            const documentElement = iframeBody.firstElementChild;
-            if (!renderWindow || !renderDocument || !appWindow || !documentElement) return;
-            patchEventTimeStamp(renderWindow, appWindow);
-            renderWindow.onpagehide = (event) => {
-              if (shouldHandlePageHideTeardown(event)) void sandbox.unmount();
-            };
-            renderDocument.appendChild(documentElement);
-            sandbox.document = renderDocument;
-          } else if (sandbox.shadowRoot?.host) {
+          if (sandbox.shadowRoot?.host) {
             renderElementToContainer(sandbox.shadowRoot.host, sandbox.el);
           } else {
             return;

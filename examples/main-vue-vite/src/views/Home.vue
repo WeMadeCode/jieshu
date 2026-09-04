@@ -4,16 +4,6 @@
       <a-button style="visibility: hidden" class="button-gap" type="primary" icon="unordered-list" size="large" />
       <div class="button-list">
         <a-tooltip placement="top">
-          <template #title>主动降级，去除shadow+proxy</template>
-          <a-switch
-            class="switch button-gap"
-            :disabled="disable"
-            checked-children="降级开"
-            un-checked-children="降级关"
-            v-model:checked="degrade"
-          />
-        </a-tooltip>
-        <a-tooltip placement="top">
           <template #title>预加载+预执行</template>
           <a-switch
             class="switch button-gap"
@@ -82,8 +72,6 @@ export default {
   data() {
     return {
       preload: window.localStorage.getItem('preload') !== 'false',
-      degrade: window.localStorage.getItem('degrade') === 'true' || !window.Proxy || !window.CustomElementRegistry,
-      disable: !window.Proxy || !window.CustomElementRegistry,
       mainReactUrl: hostMap('//localhost:7700/'),
       docsUrl: hostMap('//localhost:5173/doc/'),
     };
@@ -91,10 +79,6 @@ export default {
   watch: {
     preload(val) {
       window.localStorage.setItem('preload', val);
-      setTimeout(() => window.location.reload(), 1000);
-    },
-    degrade(val) {
-      window.localStorage.setItem('degrade', val);
       setTimeout(() => window.location.reload(), 1000);
     },
   },

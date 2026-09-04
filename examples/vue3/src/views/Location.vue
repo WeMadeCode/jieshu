@@ -40,9 +40,7 @@ export default {
   },
   methods: {
     handleClick() {
-      if (window.__JIESHU?.degrade || !window.Proxy || !window.CustomElementRegistry) {
-        window.$jieshu.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
-      } else window.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
+      window.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
     },
   },
 };

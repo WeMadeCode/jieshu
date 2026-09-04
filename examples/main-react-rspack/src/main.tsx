@@ -10,10 +10,6 @@ import plugins from './plugin';
 import JieshuReact from './jieshuReact';
 
 const { setupApp, preloadApp, bus } = JieshuReact;
-const degrade =
-  window.localStorage.getItem('degrade') === 'true' ||
-  typeof Proxy === 'undefined' ||
-  typeof CustomElementRegistry === 'undefined';
 const attrs = __PRODUCTION__ ? { src: new URL(__BASE_URL__, window.location.href).href } : {};
 
 bus.$on<[message: string]>('click', (message) => window.alert(message));
@@ -26,7 +22,6 @@ setupApp({
   fetch: credentialsFetch,
   plugins,
   prefix: { 'prefix-dialog': '/dialog', 'prefix-location': '/location' },
-  degrade,
   ...lifecycles,
 });
 
@@ -37,7 +32,6 @@ setupApp({
   exec: true,
   alive: true,
   fetch: credentialsFetch,
-  degrade,
   ...lifecycles,
 });
 
@@ -47,7 +41,6 @@ setupApp({
   attrs,
   exec: true,
   fetch: credentialsFetch,
-  degrade,
   ...lifecycles,
 });
 
@@ -64,7 +57,6 @@ setupApp({
       ? credentialsFetch(input, init)
       : window.fetch(input, init);
   },
-  degrade,
   ...lifecycles,
 });
 
@@ -74,7 +66,6 @@ setupApp({
   attrs,
   exec: true,
   fetch: credentialsFetch,
-  degrade,
   ...lifecycles,
 });
 
@@ -84,7 +75,6 @@ setupApp({
   attrs,
   exec: true,
   fetch: credentialsFetch,
-  degrade,
   ...lifecycles,
 });
 
@@ -94,10 +84,8 @@ if (window.localStorage.getItem('preload') !== 'false') {
   preloadApp({ name: 'vue2' });
   preloadApp({ name: 'angular12' });
 
-  if (typeof Proxy !== 'undefined') {
-    preloadApp({ name: 'vue3' });
-    preloadApp({ name: 'vite' });
-  }
+  preloadApp({ name: 'vue3' });
+  preloadApp({ name: 'vite' });
 }
 
 const rootElement = document.getElementById('root');

@@ -17,16 +17,13 @@ import {
 } from './common';
 import { getExternalStyleSheets } from './entry';
 import { patchRenderEffect } from './effect';
-import { initBase, patchElementEffect } from './iframe';
+import { patchElementEffect } from './iframe';
 import { getCssLoader, getPresetLoaders } from './plugin';
 import type Jieshu from './sandbox';
-import type { IframeAttributes } from './contracts';
 import type { StyleObject } from './template';
-import { getAbsolutePath, getContainer, getCurUrl, isFunction, setAttrsToElement, warn } from './utils';
+import { getAbsolutePath, getContainer, getCurUrl, isFunction, warn } from './utils';
 
 const JIESHU_ELEMENT_NAME = 'jieshu-app';
-const EMPTY_IFRAME_DOCUMENT = '<!DOCTYPE html><html><head></head><body></body></html>';
-const DEFAULT_IFRAME_STYLE = 'height:100%;width:100%';
 const ROOT_SELECTOR_PATTERN = /:root/g;
 
 type DisconnectAction = 'destroy' | 'unmount';
@@ -89,7 +86,8 @@ export function handleJieshuAppDisconnect(sandbox: Jieshu | null | undefined): v
 /** Register the host element once and bridge its DOM lifecycle to a sandbox. */
 export function defineJieshuWebComponent(): void {
   const registry = window.customElements;
-  if (!registry || registry.get(JIESHU_ELEMENT_NAME)) return;
+  if (!registry || typeof registry.define !== 'function' || typeof registry.get !== 'function') return;
+  if (registry.get(JIESHU_ELEMENT_NAME)) return;
 
   class JieshuAppElement extends HTMLElement {
     connectedCallback(): void {
@@ -138,28 +136,6 @@ export function renderElementToContainer(
   if (!hasLoadingIndicator(container)) clearChild(container);
   rawElementAppendChild.call(container, element);
   return container;
-}
-
-function resetIframeDocument(iframe: HTMLIFrameElement): Document {
-  const contentDocument = iframe.contentDocument;
-  if (!contentDocument) throw new Error('Unable to initialize the application iframe document');
-
-  contentDocument.open();
-  contentDocument.write(EMPTY_IFRAME_DOCUMENT);
-  contentDocument.close();
-  return contentDocument;
-}
-
-/** Create and initialize the visible iframe used by degrade mode. */
-export function initRenderIframeAndContainer(
-  id: string,
-  parent: string | HTMLElement,
-  degradeAttrs: IframeAttributes = {},
-): { iframe: HTMLIFrameElement; container: HTMLElement } {
-  const iframe = createIframeContainer(id, degradeAttrs);
-  const container = renderElementToContainer(iframe, parent);
-  resetIframeDocument(iframe);
-  return { iframe, container };
 }
 
 async function loadPresetStyles(styles: readonly StyleObject[], sandbox: Jieshu): Promise<LoadedPresetStyle[]> {
@@ -387,49 +363,7 @@ export async function renderTemplateToShadowRoot(
   shadowRoot.head = head;
   shadowRoot.body = body;
   installShadowRootFacades(shadowRoot, iframeWindow);
-  patchRenderEffect(shadowRoot, sandbox.id, false);
-}
-
-function iframeStyle(attributes: Record<string, unknown>): string {
-  const configuredStyle = attributes['style'];
-  if (configuredStyle === undefined || configuredStyle === null || configuredStyle === '') return DEFAULT_IFRAME_STYLE;
-  return `${DEFAULT_IFRAME_STYLE};${String(configuredStyle)}`;
-}
-
-export function createIframeContainer(id: string, degradeAttrs: IframeAttributes = {}): HTMLIFrameElement {
-  const iframe = document.createElement('iframe');
-  const attributes = degradeAttrs as Record<string, unknown>;
-  setAttrsToElement(iframe, {
-    ...attributes,
-    style: iframeStyle(attributes),
-    [JIESHU_APP_ID]: id,
-  });
-  return iframe;
-}
-
-function connectDegradeWindow(renderDocument: Document, iframeWindow: Window): void {
-  const renderWindow = renderDocument.defaultView;
-  if (!renderWindow) return;
-
-  initBase(renderWindow, iframeWindow.__JIESHU.url, '');
-  renderWindow.__getJieshuWindow__ = window.__getJieshuWindow__;
-}
-
-/** Render a normalized application document into the visible degrade iframe. */
-export async function renderTemplateToIframe(
-  renderDocument: Document,
-  iframeWindow: Window,
-  template: string,
-  canRender: () => boolean = () => true,
-): Promise<void> {
-  const sandbox = iframeWindow.__JIESHU;
-  const html = await prepareTemplateRoot(iframeWindow, template);
-  if (!canRender() || !sandbox || !isRenderContextLive(sandbox, iframeWindow)) return;
-  renderDocument.replaceChild(html, renderDocument.documentElement);
-  if (!canRender() || !isRenderContextLive(sandbox, iframeWindow)) return;
-  installDocumentParentFacade(renderDocument.documentElement as HTMLHtmlElement, iframeWindow.document);
-  connectDegradeWindow(renderDocument, iframeWindow);
-  patchRenderEffect(renderDocument, sandbox.id, true);
+  patchRenderEffect(shadowRoot, sandbox.id);
 }
 
 /** Remove all direct children through the captured native DOM method. */

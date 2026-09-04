@@ -1,7 +1,7 @@
 import {
   JIESHU_SCRIPT_ID,
   JIESHU_TIPS_NO_URL,
-  JIESHU_APP_ID,
+  JIESHU_TIPS_NOT_SUPPORTED,
   JIESHU_TIPS_STOP_APP,
   JIESHU_TIPS_STOP_APP_DETAIL,
 } from './constant';
@@ -51,10 +51,13 @@ export function isHijackingTag(tagName?: string) {
   );
 }
 
-export const jieshuSupport = window.Proxy && window.CustomElementRegistry;
+export const jieshuSupport =
+  typeof window.Proxy === 'function' &&
+  typeof window.customElements?.define === 'function' &&
+  typeof window.customElements.get === 'function';
 
-export function getDegradeIframe(id: string): HTMLIFrameElement {
-  return window.document.querySelector<HTMLIFrameElement>(`iframe[${JIESHU_APP_ID}="${id}"]`)!;
+export function assertJieshuSupport(): void {
+  if (!jieshuSupport) throw new TypeError(JIESHU_TIPS_NOT_SUPPORTED);
 }
 
 export function setAttrsToElement(element: HTMLElement, attrs: Record<string, unknown>) {

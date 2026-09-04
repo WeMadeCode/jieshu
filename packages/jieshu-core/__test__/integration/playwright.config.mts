@@ -5,9 +5,11 @@ import { defineConfig } from '@playwright/test';
 const repositoryRoot = fileURLToPath(new URL('../../../..', import.meta.url));
 const launchArgs = (process.env['PLAYWRIGHT_LAUNCH_ARGS'] ?? '').split(/\s+/).filter(Boolean);
 const reactMainWorkspace = process.env['JIESHU_REACT_MAIN_WORKSPACE'] ?? 'main-react';
+const reactMainPort = Number(process.env['JIESHU_REACT_MAIN_PORT'] ?? 7700);
+const vueMainPort = Number(process.env['JIESHU_VUE_MAIN_PORT'] ?? 8000);
 
-const webServer = (workspace: string, script: string, port: number) => ({
-  command: `pnpm --filter ${workspace} run ${script}`,
+const webServer = (workspace: string, script: string, port: number, environment = '') => ({
+  command: `${environment}pnpm --filter ${workspace} run ${script}`,
   cwd: repositoryRoot,
   url: `http://127.0.0.1:${port}`,
   reuseExistingServer: process.env['JIESHU_REUSE_EXISTING_SERVERS'] === '1',
@@ -39,7 +41,12 @@ export default defineConfig({
     webServer('vue3', 'start', 7300),
     webServer('vite', 'start', 7500),
     webServer('angular12', 'start', 7400),
-    webServer(reactMainWorkspace, 'integration', 7700),
-    webServer('main-vue', 'start', 8000),
+    webServer(
+      reactMainWorkspace,
+      reactMainWorkspace === 'main-react' ? 'integration' : `integration --port ${reactMainPort}`,
+      reactMainPort,
+      reactMainWorkspace === 'main-react' ? `PORT=${reactMainPort} ` : '',
+    ),
+    webServer('main-vue', `start --port ${vueMainPort}`, vueMainPort),
   ],
 });

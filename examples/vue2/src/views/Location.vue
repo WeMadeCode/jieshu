@@ -42,9 +42,7 @@ export default {
   },
   methods: {
     handleClick() {
-      if (window.__JIESHU?.degrade || !window.Proxy || !window.CustomElementRegistry) {
-        window.$jieshu.location.href = 'https://v2.vuejs.org/';
-      } else window.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
+      window.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
     },
   },
 };

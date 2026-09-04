@@ -16,7 +16,6 @@ import {
   documentProxyProperties,
   rawAddEventListener,
   rawRemoveEventListener,
-  rawDocumentQuerySelector,
   mainDocumentAddEventListenerEvents,
   mainAndAppAddEventListenerEvents,
   appDocumentAddEventListenerEvents,
@@ -96,6 +95,9 @@ declare global {
 
     // iframe内原生的head
     __JIESHU_RAW_DOCUMENT_HEAD__: typeof Document.prototype.head;
+
+    // iframe内原生的body
+    __JIESHU_RAW_DOCUMENT_BODY__: typeof Document.prototype.body;
 
     // 原生的querySelector
     __JIESHU_RAW_DOCUMENT_QUERY_SELECTOR_ALL__: typeof Document.prototype.querySelectorAll;
@@ -314,7 +316,10 @@ function patchIframeHistory(iframeWindow: Window, appHostPath: string, mainHostP
  */
 function updateBase(iframeWindow: Window, appHostPath: string, mainHostPath: string) {
   const baseUrl = new URL(iframeWindow.location.href?.replace(mainHostPath, ''), appHostPath);
-  const baseElement = rawDocumentQuerySelector.call(iframeWindow.document, 'base');
+  // 路由同步发生在 Shadow Root 挂载之前，不能经由已代理的 document 查询。
+  const baseElement = Array.from(iframeWindow.__JIESHU_RAW_DOCUMENT_HEAD__.children).find(
+    (element) => element.tagName === 'BASE',
+  );
   if (baseElement) baseElement.setAttribute('href', appHostPath + baseUrl.pathname);
 }
 
@@ -344,14 +349,7 @@ export function patchWindowEffect(iframeWindow: Window): void {
     // 特殊处理
     if (key === 'getSelection') {
       Object.defineProperty(iframeWindow, key, {
-        get: () => {
-          const sandbox = iframeWindow.__JIESHU;
-          // 降级模式：可见 DOM 在渲染 iframe，getSelection 需读 sandbox.document
-          if (sandbox?.degrade && sandbox.document) {
-            return sandbox.document.getSelection.bind(sandbox.document);
-          }
-          return iframeWindow.document[key];
-        },
+        get: () => iframeWindow.document[key],
       });
       return;
     }
@@ -401,12 +399,7 @@ export function patchWindowEffect(iframeWindow: Window): void {
       warn(e instanceof Error ? e.message : e);
     }
   });
-  // 降级模式 DOM 在渲染 iframe，instanceof 需在 document 就绪后由 patchDegradeInstanceofAcrossRealms 处理
-  if (!iframeWindow.__JIESHU.degrade) {
-    patchInstanceofAcrossRealms(iframeWindow);
-  } else {
-    execHooks(iframeWindow.__JIESHU.plugins, 'windowPropertyOverride', iframeWindow);
-  }
+  patchInstanceofAcrossRealms(iframeWindow);
 }
 
 type DomConstructor = CallableFunction & { prototype?: object };
@@ -417,7 +410,6 @@ interface InstanceofPatchState {
 }
 
 const instanceofPatchStates = new WeakMap<DomConstructor, InstanceofPatchState>();
-const degradeInstanceofReleases = new WeakMap<Window, () => void>();
 const nativeHasInstance = Function.prototype[Symbol.hasInstance];
 
 function matchesPatchedInstance(state: InstanceofPatchState, receiver: unknown, element: unknown): boolean {
@@ -526,9 +518,7 @@ function isDomConstructor(name: string, ctor: DomConstructor, peerWindow: Window
 }
 
 /**
- * 让 targetWindow 上的 DOM 构造函数 instanceof 同时认可 peerWindow realm 的对象。
- * 非降级：targetWindow=子应用 JS iframe，peerWindow=主应用 window（DOM 在 shadowRoot）。
- * 降级：在 patchDegradeInstanceofAcrossRealms 中对渲染 iframe 与执行 iframe 双向调用。
+ * 让子应用 JS iframe 中的 DOM 构造函数 instanceof 同时认可主应用 realm 的对象。
  */
 export function patchInstanceofAcrossRealms(targetWindow: Window, peerWindow: Window = window): () => void {
   const releases: Array<() => void> = [];
@@ -559,138 +549,8 @@ export function patchInstanceofAcrossRealms(targetWindow: Window, peerWindow: Wi
   return () => releases.forEach((release) => release());
 }
 
-/**
- * 降级模式：DOM 在渲染 iframe、JS 在执行 iframe，对两侧 window 双向 patch instanceof。
- * 需在 sandbox.document（渲染 document）就绪后调用，勿在 patchWindowEffect 阶段调用。
- */
-export function patchDegradeInstanceofAcrossRealms(appWindow: Window, renderWindow: Window): void {
-  if (!renderWindow || appWindow === renderWindow) return;
-  degradeInstanceofReleases.get(appWindow)?.();
-  const releaseRenderPatch = patchInstanceofAcrossRealms(renderWindow, appWindow);
-  const releaseAppPatch = patchInstanceofAcrossRealms(appWindow, renderWindow);
-  degradeInstanceofReleases.set(appWindow, () => {
-    releaseRenderPatch();
-    releaseAppPatch();
-  });
-}
-
-/**
- * 记录节点的监听事件
- */
 function listenerUsesCapture(options?: boolean | EventListenerOptions): boolean {
   return typeof options === 'boolean' ? options : options?.capture === true;
-}
-
-/** @internal Exported for focused degradation-mode recovery tests. */
-export function recordEventListeners(iframeWindow: Window): void {
-  const sandbox = iframeWindow.__JIESHU;
-  iframeWindow.Node.prototype.addEventListener = function (
-    type: string,
-    handler: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions,
-  ): void {
-    // 添加事件缓存
-    const elementListenerList = sandbox.elementEventCacheMap.get(this);
-    const capture = listenerUsesCapture(options);
-    if (elementListenerList) {
-      if (
-        !elementListenerList.find(
-          (listener) =>
-            listener.type === type && listener.handler === handler && listenerUsesCapture(listener.options) === capture,
-        )
-      ) {
-        elementListenerList.push({ type, handler, options });
-      }
-    } else sandbox.elementEventCacheMap.set(this, [{ type, handler, options }]);
-    return rawAddEventListener.call(this, type, handler, options);
-  };
-
-  iframeWindow.Node.prototype.removeEventListener = function (
-    type: string,
-    handler: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions,
-  ): void {
-    // 清除缓存
-    const elementListenerList = sandbox.elementEventCacheMap.get(this);
-    if (elementListenerList) {
-      const capture = listenerUsesCapture(options);
-      const index = elementListenerList.findIndex(
-        (listener) =>
-          listener.type === type && listener.handler === handler && listenerUsesCapture(listener.options) === capture,
-      );
-      if (index >= 0) elementListenerList.splice(index, 1);
-    }
-    if (!elementListenerList?.length) {
-      sandbox.elementEventCacheMap.delete(this);
-    }
-    return rawRemoveEventListener.call(this, type, handler, options);
-  };
-}
-
-/**
- * 恢复节点的监听事件
- */
-export function recoverEventListeners(rootElement: Element | ChildNode, iframeWindow: Window) {
-  const sandbox = iframeWindow.__JIESHU;
-  const elementEventCacheMap: WeakMap<
-    Node,
-    Array<{
-      type: string;
-      handler: EventListenerOrEventListenerObject;
-      options?: boolean | AddEventListenerOptions;
-    }>
-  > = new WeakMap();
-  const ElementIterator = document.createTreeWalker(rootElement, NodeFilter.SHOW_ELEMENT, null, false);
-  let nextElement = ElementIterator.currentNode;
-  while (nextElement) {
-    const elementListenerList = sandbox.elementEventCacheMap.get(nextElement);
-    if (elementListenerList?.length) {
-      elementEventCacheMap.set(nextElement, elementListenerList);
-      elementListenerList.forEach((listener) => {
-        nextElement.addEventListener(listener.type, listener.handler, listener.options);
-      });
-    }
-    nextElement = ElementIterator.nextNode() as HTMLElement;
-  }
-  sandbox.elementEventCacheMap = elementEventCacheMap;
-}
-
-/**
- * 恢复根节点的监听事件
- */
-export function recoverDocumentListeners(
-  oldRootElement: Element | ChildNode,
-  newRootElement: Element | ChildNode,
-  iframeWindow: Window,
-) {
-  const sandbox = iframeWindow.__JIESHU;
-  const elementEventCacheMap: WeakMap<
-    Node,
-    Array<{
-      type: string;
-      handler: EventListenerOrEventListenerObject;
-      options?: boolean | AddEventListenerOptions;
-    }>
-  > = new WeakMap();
-  const elementListenerList = sandbox.elementEventCacheMap.get(oldRootElement);
-  if (elementListenerList?.length) {
-    elementEventCacheMap.set(newRootElement, elementListenerList);
-    elementListenerList.forEach((listener) => {
-      newRootElement.addEventListener(listener.type, listener.handler, listener.options);
-    });
-  }
-  sandbox.elementEventCacheMap = elementEventCacheMap;
-}
-
-/**
- * 修复vue绑定事件e.timeStamp < attachedTimestamp 的情况
- */
-export function patchEventTimeStamp(targetWindow: Window, iframeWindow: Window) {
-  Object.defineProperty(targetWindow.Event.prototype, 'timeStamp', {
-    get: () => {
-      return iframeWindow.document.createEvent('Event').timeStamp;
-    },
-  });
 }
 
 /**
@@ -736,8 +596,6 @@ export function patchDocumentEffect(iframeWindow: Window): void {
     if (appDocumentAddEventListenerEvents.includes(type)) {
       return rawAddEventListener.call(this, type, callback, options);
     }
-    // 降级统一走 sandbox.document
-    if (sandbox.degrade) return sandbox.document.addEventListener(type, callback, options);
     if (mainDocumentAddEventListenerEvents.includes(type)) {
       // 登记到清理跟踪器，destroy 时反向解绑，避免 handler 闭包永久钉住 iframeWindow
       sandbox.eventCleanupTracker?.trackMainDocumentListener({ type, callback, options });
@@ -777,7 +635,6 @@ export function patchDocumentEffect(iframeWindow: Window): void {
       if (appDocumentAddEventListenerEvents.includes(type)) {
         return rawRemoveEventListener.call(this, type, callback, options);
       }
-      if (sandbox.degrade) return sandbox.document.removeEventListener(type, callback, options);
       if (mainDocumentAddEventListenerEvents.includes(type)) {
         sandbox.eventCleanupTracker?.untrackMainDocumentListener({ type, callback, options });
         return window.document.removeEventListener(type, callback, options);
@@ -808,14 +665,14 @@ export function patchDocumentEffect(iframeWindow: Window): void {
           enumerable: descriptor.enumerable,
           configurable: true,
           get: () => {
-            const target = sandbox.degrade ? sandbox.document : sandbox.shadowRoot?.firstElementChild;
+            const target = sandbox.shadowRoot?.firstElementChild;
             return target ? Reflect.get(target, e) : descriptor.get?.call(iframeWindow.document);
           },
           set:
             descriptor.writable || descriptor.set
               ? (handler) => {
                   const val = typeof handler === 'function' ? handler.bind(iframeWindow.document) : handler;
-                  const target = sandbox.degrade ? sandbox.document : sandbox.shadowRoot?.firstElementChild;
+                  const target = sandbox.shadowRoot?.firstElementChild;
                   if (target) Reflect.set(target, e, val);
                 }
               : undefined,
@@ -884,12 +741,10 @@ export function patchDocumentEffect(iframeWindow: Window): void {
         enumerable: descriptor.enumerable,
         configurable: true,
         get: () => {
-          const targetDocument = sandbox.degrade ? sandbox.document : window.document;
-          return targetDocument ? Reflect.get(targetDocument, propKey) : descriptor.get?.call(iframeWindow.document);
+          return Reflect.get(window.document, propKey);
         },
         set: (handler) => {
-          const targetDoc = (sandbox.degrade ? sandbox : window).document;
-          if (!targetDoc) return;
+          const targetDoc = window.document;
           const previous = documentEventActiveListeners.get(propKey);
           if (previous) {
             targetDoc.removeEventListener(eventType, previous);
@@ -988,16 +843,14 @@ function patchRelativeUrlEffect(iframeWindow: Window): void {
 
 /**
  * 初始化 base 标签，供 document 内相对路径资源解析使用。
- * @param pathname 可选；降级渲染 iframe 的 location 为 about:blank，需传入 proxyLocation.pathname
  */
-export function initBase(iframeWindow: Window, url: string, pathname?: string): void {
+export function initBase(iframeWindow: Window, url: string): void {
   const iframeDocument = iframeWindow.document;
   if (!iframeDocument.head || iframeDocument.head.querySelector('base')) return;
   const baseElement = iframeDocument.createElement('base');
   const iframeUrlElement = anchorElementGenerator(iframeWindow.location.href);
   const appUrlElement = anchorElementGenerator(url);
-  const resolvedPathname = pathname ?? iframeUrlElement.pathname;
-  baseElement.setAttribute('href', appUrlElement.protocol + '//' + appUrlElement.host + resolvedPathname);
+  baseElement.setAttribute('href', appUrlElement.protocol + '//' + appUrlElement.host + iframeUrlElement.pathname);
   iframeDocument.head.insertBefore(baseElement, iframeDocument.head.firstChild);
 }
 
@@ -1016,6 +869,7 @@ function initIframeDom(iframeWindow: Window, jieshu: Jieshu, mainHostPath: strin
     ? iframeDocument.replaceChild(newDocumentElement, iframeDocument.documentElement)
     : iframeDocument.appendChild(newDocumentElement);
   iframeWindow.__JIESHU_RAW_DOCUMENT_HEAD__ = iframeDocument.head;
+  iframeWindow.__JIESHU_RAW_DOCUMENT_BODY__ = iframeDocument.body;
   iframeWindow.__JIESHU_RAW_DOCUMENT_QUERY_SELECTOR__ = iframeWindow.Document.prototype.querySelector;
   iframeWindow.__JIESHU_RAW_DOCUMENT_QUERY_SELECTOR_ALL__ = iframeWindow.Document.prototype.querySelectorAll;
   iframeWindow.__JIESHU_RAW_DOCUMENT_CREATE_ELEMENT__ = iframeWindow.Document.prototype.createElement;
@@ -1023,7 +877,6 @@ function initIframeDom(iframeWindow: Window, jieshu: Jieshu, mainHostPath: strin
   initBase(iframeWindow, jieshu.url);
   patchIframeHistory(iframeWindow, appHostPath, mainHostPath);
   patchIframeEvents(iframeWindow);
-  if (jieshu.degrade) recordEventListeners(iframeWindow);
   syncIframeUrlToWindow(iframeWindow);
 
   patchWindowEffect(iframeWindow);
@@ -1155,10 +1008,10 @@ function stopIframeLoading(iframe: HTMLIFrameElement, options: { fallbackSrc: st
  * 闭包持有策略：用 WeakRef<Window> 间接持有 iframeWindow，proxyLocation / plugins
  * 都通过 `iframeWindow.__JIESHU` 动态访问。这样一来，当子应用 element 被业务移到
  * 主应用 DOM 下（portal / 弹窗 / 拖拽等），sandbox.destroy() 把
- * `iframeWindow.__JIESHU = null` 后，getter 会自动降级到主 document，element 不会
+ * `iframeWindow.__JIESHU = null` 后，getter 会自动回退到主 document，element 不会
  * 把整个子应用上下文钉在内存中。
  *
- * WeakRef 是 ES2021 标准（Chrome 84+ / Node 14.6+）；旧环境降级为强引用以保兼容。
+ * WeakRef 是 ES2021 标准（Chrome 84+ / Node 14.6+）；旧环境使用强引用以保兼容。
  */
 export function patchElementEffect(
   element: (HTMLElement | Node | ShadowRoot) & { _hasPatch?: boolean },
@@ -1184,14 +1037,9 @@ export function patchElementEffect(
         configurable: true,
         get: () => {
           const win = iframeWindowRef.deref();
-          // win.__JIESHU 被置 null（destroy 后）或 win 本身已 GC 时降级到主 document，
+          // win.__JIESHU 被置 null（destroy 后）或 win 本身已 GC 时回退到主 document，
           // 防止 element 永久把 iframeWindow 钉在内存中。
           if (!win || !win.__JIESHU) return window.document;
-          // 降级模式：节点已挂到渲染 iframe，ownerDocument 需与可见 DOM 一致，
-          // 否则 wangEditor LO/RO（node.ownerDocument.defaultView instanceof）会失败。
-          if (win.__JIESHU.degrade && win.__JIESHU.document) {
-            return win.__JIESHU.document;
-          }
           return win.document;
         },
       },
@@ -1220,13 +1068,10 @@ export function syncIframeUrlToWindow(iframeWindow: Window): void {
  * 加载iframe替换子应用
  * @param src 地址
  * @param element
- * @param degradeAttrs
  */
-export function renderIframeReplaceApp(src: string, element: HTMLElement, degradeAttrs: IframeAttributes = {}): void {
+export function renderIframeReplaceApp(src: string, element: HTMLElement): void {
   const iframe = window.document.createElement('iframe');
-  const defaultStyle = 'height:100%;width:100%';
-  const style = (degradeAttrs as { style?: unknown }).style;
-  setAttrsToElement(iframe, { ...degradeAttrs, src, style: [defaultStyle, style].join(';') });
+  setAttrsToElement(iframe, { src, style: 'height:100%;width:100%' });
   renderElementToContainer(iframe, element);
 }
 

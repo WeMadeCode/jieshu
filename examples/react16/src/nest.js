@@ -10,7 +10,6 @@ function selfFetch(url, options) {
 
 export default function React17() {
   const react17Url = hostMap('//localhost:7100/');
-  const degrade = window.localStorage.getItem('degrade') === 'true';
   const props = {
     jump: (name) => {
       window?.$jieshu.props.jump(name);
@@ -29,7 +28,6 @@ export default function React17() {
           sync={true}
           fetch={selfFetch}
           props={props}
-          degrade={degrade}
           beforeLoad={lifecycles.beforeLoad}
           beforeMount={lifecycles.beforeMount}
           afterMount={lifecycles.afterMount}

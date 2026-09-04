@@ -130,12 +130,12 @@ function exposeInlineScriptSource(scriptElement: HTMLScriptElement, src?: string
 }
 
 function configureScriptElement(context: ScriptExecutionContext): void {
-  const { input, iframeWindow, scriptElement } = context;
+  const { input, scriptElement } = context;
   const isImportMap = String(input.attrs?.['type'] ?? '').toLowerCase() === 'importmap';
   applyForwardedAttributes(context);
 
   if (input.content) {
-    if (!iframeWindow.__JIESHU.degrade && !input.module && !isImportMap) {
+    if (!input.module && !isImportMap) {
       context.code = wrapInlineCode(context.code);
     }
     exposeInlineScriptSource(scriptElement, input.src);
@@ -146,6 +146,9 @@ function configureScriptElement(context: ScriptExecutionContext): void {
 
   if (input.module) scriptElement.setAttribute('type', 'module');
   scriptElement.textContent = context.code || '';
+}
+
+function configureQueueAdvancer(context: ScriptExecutionContext): void {
   context.queueAdvancerElement.textContent =
     'if(window.__JIESHU && window.__JIESHU.execQueue && window.__JIESHU.execQueue.length){ window.__JIESHU.execQueue.shift()()}';
 }
@@ -221,16 +224,17 @@ class IframeScriptExecutionPipeline {
       resolveCompletion('cancelled');
       return handle;
     }
+    configureQueueAdvancer(context);
+    if (/^<!DOCTYPE html/i.test(context.code)) {
+      error(JIESHU_TIPS_SCRIPT_ERROR_REQUESTED, source);
+      afterExecution('error');
+      return handle;
+    }
+
     configureScriptElement(context);
     if (!isExecutionOwnerCurrent(context)) {
       completed = true;
       resolveCompletion('cancelled');
-      return handle;
-    }
-
-    if (/^<!DOCTYPE html/i.test(context.code)) {
-      error(JIESHU_TIPS_SCRIPT_ERROR_REQUESTED, source);
-      afterExecution('error');
       return handle;
     }
 

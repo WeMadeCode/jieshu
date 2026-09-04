@@ -7,11 +7,9 @@ import hostMap from '../hostMap';
 
 export default function Home() {
   const preloadEnabled = window.localStorage.getItem('preload') !== 'false';
-  const degradeDisabled = typeof Proxy === 'undefined' || typeof CustomElementRegistry === 'undefined';
-  const degradeEnabled = window.localStorage.getItem('degrade') === 'true' || degradeDisabled;
 
-  const saveAndReload = (key: 'preload' | 'degrade', checked: boolean): void => {
-    window.localStorage.setItem(key, String(checked));
+  const saveAndReload = (checked: boolean): void => {
+    window.localStorage.setItem('preload', String(checked));
     window.setTimeout(() => window.location.reload(), 1000);
   };
 
@@ -26,23 +24,13 @@ export default function Home() {
           icon={<UnorderedListOutlined />}
         />
         <div className="button-list">
-          <Tooltip title="主动降级，去除 shadow + proxy">
-            <Switch
-              className="switch button-gap"
-              checkedChildren="降级开"
-              unCheckedChildren="降级关"
-              disabled={degradeDisabled}
-              defaultChecked={degradeEnabled}
-              onChange={(checked) => saveAndReload('degrade', checked)}
-            />
-          </Tooltip>
           <Tooltip title="预加载 + 预执行">
             <Switch
               className="switch button-gap"
               checkedChildren="预加载开"
               unCheckedChildren="预加载关"
               defaultChecked={preloadEnabled}
-              onChange={(checked) => saveAndReload('preload', checked)}
+              onChange={saveAndReload}
             />
           </Tooltip>
           <Tooltip title="主应用为 history 模式">

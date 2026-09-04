@@ -21,7 +21,6 @@ function buildUnmountReadySandbox(alive: boolean): any {
   sandbox.activeFlag = true;
   sandbox.mountFlag = true;
   sandbox.hrefFlag = false;
-  sandbox.degrade = false;
   sandbox.lifecycles = {};
   sandbox.bus = { $clear: vi.fn() };
   // shadowRoot / head / body 用普通 div 充当，clearChild 只关心 children；
@@ -64,7 +63,7 @@ describe('sandbox.unmount() 与 rebuildStyleSheets 的复用契约', () => {
 
   test('rebuildStyleSheets 在 unmount 后应能把数组中的样式节点重新 appendChild 到 shadowRoot.head', async () => {
     const sandbox = buildUnmountReadySandbox(false);
-    // 构造 minimal shadowRoot：rebuildStyleSheets 走非降级分支访问 shadowRoot.head；
+    // 构造 minimal shadowRoot：rebuildStyleSheets 访问 shadowRoot.head；
     // 紧跟着 patchCssRules 会查 shadowRoot.host.hasAttribute，host 用真 div 占位即可。
     const fakeShadowRoot: any = document.createElement('div');
     fakeShadowRoot.head = document.createElement('div');

@@ -41,7 +41,7 @@
         <router-link to="/vue2-sub/rich-text">富文本</router-link>
       </div>
       <!-- vue3相关路由 -->
-      <router-link v-if="degrade" to="/vue3">
+      <router-link to="/vue3">
         vue3
         <span class="alive">保活</span>
         <span :class="['main-icon', { active: vue3Flag }]" @click="handleFlag('vue3')">▲</span>
@@ -54,7 +54,7 @@
         <router-link to="/vue3-sub/state">state</router-link>
         <router-link to="/vue3-sub/inline-event">inline-event</router-link>
       </div>
-      <router-link v-if="degrade" to="/vite"
+      <router-link to="/vite"
         >vite <span :class="['main-icon', { active: viteFlag }]" @click="handleFlag('vite')">▲</span></router-link
       >
       <div class="sub-menu" v-show="viteFlag">
@@ -85,7 +85,6 @@ export default {
       vue2Flag: this.$route.name === 'vue2-sub',
       vue3Flag: this.$route.name === 'vue3-sub',
       viteFlag: this.$route.name === 'vite-sub',
-      degrade: window.Proxy,
     };
   },
   mounted() {

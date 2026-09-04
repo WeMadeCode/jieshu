@@ -54,7 +54,7 @@ const diagnosticText = {
   stopHostExecution: '此报错可以忽略，iframe主动中断主应用代码在子应用运行',
   emptySubject: '事件订阅数量为空',
   missingFetch: 'window上不存在fetch属性，需要自行polyfill',
-  unsupportedRuntime: '当前浏览器不支持界枢，子应用将采用iframe方式渲染',
+  unsupportedRuntime: '当前浏览器不支持界枢，运行时需要 Proxy 和 Custom Elements',
   scriptRequestFailed: '脚本请求出现错误',
   cssRequestFailed: '样式请求出现错误',
   htmlRequestFailed: 'html请求出现错误',

@@ -11,11 +11,9 @@ interface TestSandbox {
   el: HTMLElement;
   fiber: boolean;
   alive?: boolean;
-  degrade: boolean;
   sync?: boolean;
   prefix: Record<string, string>;
   replace: (code: string) => string;
-  degradeAttrs: object;
   iframeAddEventListeners?: string[];
   iframeOnEvents?: string[];
   plugins: object[];
@@ -132,11 +130,6 @@ describe('published jieshu-react UI', () => {
     const deactivated = vi.fn();
     const loadError = vi.fn();
     const attrs = { title: 'execution-frame', 'data-execution-option': 'forwarded' };
-    const degradeAttrs = {
-      title: 'render-frame',
-      'data-render-option': 'forwarded',
-      style: 'border: 0px',
-    };
     const injectedProps = { token: 'published-entry', count: 3 };
     const prefix = { '/legacy': '/current' };
     const iframeAddEventListeners = ['hashchange', 'custom-window-event'];
@@ -159,12 +152,10 @@ describe('published jieshu-react UI', () => {
       fetch: customFetch,
       props: injectedProps,
       attrs,
-      degradeAttrs,
       sync: false,
       prefix,
       fiber: false,
       alive: false,
-      degrade: true,
       plugins: [plugin],
       iframeAddEventListeners,
       iframeOnEvents,
@@ -182,7 +173,7 @@ describe('published jieshu-react UI', () => {
     const childWindow = await mounted.promise;
     const componentContainer = host.firstElementChild as HTMLDivElement;
     const executionFrame = document.body.querySelector(`iframe[name="${name}"]`) as HTMLIFrameElement;
-    const renderFrame = componentContainer.querySelector(`iframe[data-jieshu-id="${name}"]`) as HTMLIFrameElement;
+    const renderHost = componentContainer.querySelector(`jieshu-app[data-jieshu-id="${name}"]`) as HTMLElement;
     const sandbox = childWindow.__JIESHU;
 
     expect(componentContainer.style.width).toBe('80%');
@@ -192,12 +183,9 @@ describe('published jieshu-react UI', () => {
     expect(componentContainer.querySelector('[data-loading-flag]')).toBeNull();
     expect(executionFrame.getAttribute('title')).toBe('execution-frame');
     expect(executionFrame.dataset['executionOption']).toBe('forwarded');
-    expect(renderFrame.getAttribute('title')).toBe('render-frame');
-    expect(renderFrame.dataset['renderOption']).toBe('forwarded');
-    expect(renderFrame.getAttribute('style')).toContain('border: 0px');
-    expect(renderFrame.contentDocument?.querySelector('#react-child')?.textContent).toBe('child');
+    expect(renderHost.shadowRoot?.querySelector('#react-child')?.textContent).toBe('child');
     expect(
-      [...(renderFrame.contentDocument?.querySelectorAll('style') ?? [])]
+      [...(renderHost.shadowRoot?.querySelectorAll('style') ?? [])]
         .map((styleElement) => styleElement.textContent)
         .join('\n'),
     ).toContain('royalblue');
@@ -207,11 +195,9 @@ describe('published jieshu-react UI', () => {
     expect(sandbox.el).toBe(componentContainer);
     expect(sandbox.fiber).toBe(false);
     expect(sandbox.alive).toBe(false);
-    expect(sandbox.degrade).toBe(true);
     expect(sandbox.sync).toBe(false);
     expect(sandbox.prefix).toBe(prefix);
     expect(sandbox.replace).toBe(replace);
-    expect(sandbox.degradeAttrs).toBe(degradeAttrs);
     expect(sandbox.iframeAddEventListeners).toBe(iframeAddEventListeners);
     expect(sandbox.iframeOnEvents).toBe(iframeOnEvents);
     expect(sandbox.plugins).toContain(plugin);
@@ -288,7 +274,6 @@ describe('published jieshu-react UI', () => {
       props: { revision: 1 },
       style: { color: 'red' },
       alive: true,
-      degrade: true,
       fiber: false,
       beforeLoad,
       activated,
@@ -328,7 +313,7 @@ describe('published jieshu-react UI', () => {
 
     unmountComponent(host);
     expect(componentRef.current).toBeNull();
-    expect(deactivated).toHaveBeenCalledOnce();
+    expect(deactivated).toHaveBeenCalledTimes(2);
   });
 
   test('reports a synchronous lifecycle exception from real core', async () => {
@@ -348,7 +333,6 @@ describe('published jieshu-react UI', () => {
         name,
         url: 'http://localhost/react-sync-error/',
         html: '<html><body></body></html>',
-        degrade: true,
         beforeLoad,
       },
       React.createRef<JieshuReactRef>(),
@@ -377,7 +361,6 @@ describe('published jieshu-react UI', () => {
         name,
         url: 'http://localhost/react-async-error/',
         fetch: customFetch,
-        degrade: true,
         beforeLoad: prepareChildWindow,
         loadError,
       },

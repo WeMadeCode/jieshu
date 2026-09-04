@@ -40,7 +40,6 @@ function Navigation({ onOpen }: NavigationProps) {
     vue3: location.pathname.includes('vue3-sub'),
     vite: location.pathname.includes('vite-sub'),
   });
-  const supportsAdvancedMode = typeof Proxy !== 'undefined';
 
   useEffect(() => {
     const handleSubRouteChange = (name: string, path: string): void => {
@@ -95,8 +94,8 @@ function Navigation({ onOpen }: NavigationProps) {
       {renderExpandableLink('react16', 'react16')}
       {renderExpandableLink('react17', 'react17', true)}
       {renderExpandableLink('vue2', 'vue2')}
-      {supportsAdvancedMode && renderExpandableLink('vue3', 'vue3', true)}
-      {supportsAdvancedMode && renderExpandableLink('vite', 'vite')}
+      {renderExpandableLink('vue3', 'vue3', true)}
+      {renderExpandableLink('vite', 'vite')}
       <NavLink to="/angular12" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
         angular12
       </NavLink>

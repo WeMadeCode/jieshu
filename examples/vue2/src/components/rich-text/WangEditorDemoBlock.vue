@@ -15,7 +15,7 @@
         <p v-if="selectionOk" class="selection-ok">isCollapsed 表现正常</p>
       </template>
       <template v-if="showLoRoPanel">
-        <p><strong>wangEditor LO / RO</strong>（#513 降级快速输入）</p>
+        <p><strong>wangEditor LO / RO</strong>（#513 快速输入）</p>
         <p class="selection-hint">
           <code>LO</code> / <code>RO</code> 为 true 时 Slate 选区同步正常；快速输入时若变为 false 易失焦。
         </p>
@@ -121,7 +121,6 @@ export default {
               rangeCollapsed: range.collapsed,
               collapsedByOffset,
               inJieshu: Boolean(window.__POWERED_BY_JIESHU__),
-              degrade: Boolean(window.__JIESHU?.degrade),
             },
             null,
             2,
@@ -147,7 +146,6 @@ export default {
         const view = sel?.anchorNode && NO(sel.anchorNode);
         return Boolean(view && sel instanceof view.Selection);
       };
-      const renderDoc = window.__JIESHU?.document;
       const anchor = selection.anchorNode;
       const focus = selection.focusNode;
       this.loRoOk = RO(selection) && LO(anchor) && LO(focus);
@@ -156,9 +154,6 @@ export default {
           RO: RO(selection),
           LO_anchor: LO(anchor),
           LO_focus: LO(focus),
-          anchorOwnerIsRenderDoc: Boolean(renderDoc && anchor?.ownerDocument === renderDoc),
-          focusOwnerIsRenderDoc: Boolean(renderDoc && focus?.ownerDocument === renderDoc),
-          degrade: Boolean(window.__JIESHU?.degrade),
           inJieshu: Boolean(window.__POWERED_BY_JIESHU__),
         },
         null,

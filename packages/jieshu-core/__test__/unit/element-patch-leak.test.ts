@@ -4,7 +4,7 @@
  *
  * 业务把子应用 element 移到主应用 DOM 下（portal / 弹窗 / 拖拽等）后，即使
  * sandbox.destroy() 已经把 iframe 移出 DOM，element 仍然挂在主 document 上。
- * getter 必须通过 WeakRef + 动态 __JIESHU 访问安全降级，不能强持 sandbox。
+ * getter 必须通过 WeakRef + 动态 __JIESHU 安全回退，不能强持 sandbox。
  */
 
 export {};
@@ -44,7 +44,7 @@ describe('patchElementEffect 跨边界闭包不应阻碍 sandbox GC', () => {
     void sandbox; // 避免 unused
   });
 
-  test('destroy 模拟：sandbox.proxyLocation 被置 null 后，baseURI 应安全降级而非抛错', () => {
+  test('destroy 模拟：sandbox.proxyLocation 被置 null 后，baseURI 应安全回退而非抛错', () => {
     const { iframeWindow, sandbox } = createIframeWithSandbox();
     const el = iframeWindow.document.createElement('div');
     patchElementEffect(el, iframeWindow);
@@ -55,11 +55,11 @@ describe('patchElementEffect 跨边界闭包不应阻碍 sandbox GC', () => {
 
     expect(() => el.baseURI).not.toThrow();
     expect(() => el.ownerDocument).not.toThrow();
-    // 安全降级值：不应再回 iframeWindow / proxyLocation 的真值
+    // 安全回退值：不应再回 iframeWindow / proxyLocation 的真值
     expect(el.baseURI).not.toBe('http://child.example.com/sub/');
   });
 
-  test('destroy 模拟：iframeWindow.__JIESHU 被置 null 后，ownerDocument 应降级为主 document', () => {
+  test('destroy 模拟：iframeWindow.__JIESHU 被置 null 后，ownerDocument 应回退为主 document', () => {
     const { iframeWindow, sandbox } = createIframeWithSandbox();
     const el = iframeWindow.document.createElement('div');
     patchElementEffect(el, iframeWindow);
@@ -70,7 +70,7 @@ describe('patchElementEffect 跨边界闭包不应阻碍 sandbox GC', () => {
     sandbox.proxyLocation = null;
     iframeWindow.__JIESHU = null;
 
-    // getter 通过动态 __JIESHU 查不到有效 sandbox，应降级返回主 document，
+    // getter 通过动态 __JIESHU 查不到有效 sandbox，应回退返回主 document，
     // 不让 element 通过闭包把 iframeWindow / sandbox 钉在内存中。
     expect(el.ownerDocument).toBe(document);
   });

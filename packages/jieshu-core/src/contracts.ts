@@ -115,14 +115,10 @@ export interface BaseOptions {
   props?: JieshuProps;
   /** 自定义运行iframe的属性 */
   attrs?: IframeAttributes;
-  /** 自定义降级渲染iframe的属性 */
-  degradeAttrs?: IframeAttributes;
   /** 子应用采用fiber模式执行 */
   fiber?: boolean;
   /** 子应用保活，state不会丢失 */
   alive?: boolean;
-  /** 子应用采用降级iframe方案 */
-  degrade?: boolean;
   /** 子应用插件 */
   plugins?: Array<JieshuPlugin>;
   /** 子应用window监听事件 */

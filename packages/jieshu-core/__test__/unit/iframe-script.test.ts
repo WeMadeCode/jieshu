@@ -7,7 +7,6 @@ interface ScriptTestSandbox {
   replace: (code: string) => string;
   plugins: Window['__JIESHU']['plugins'];
   proxyLocation: Location;
-  degrade: boolean;
   proxy: Window;
   execQueue: Array<() => unknown>;
   dynamicScriptElements: HTMLScriptElement[];
@@ -15,7 +14,7 @@ interface ScriptTestSandbox {
   destroyed: boolean;
 }
 
-function createScriptEnvironment(degrade = false): {
+function createScriptEnvironment(): {
   iframe: HTMLIFrameElement;
   iframeWindow: Window;
   sandbox: ScriptTestSandbox;
@@ -27,7 +26,6 @@ function createScriptEnvironment(degrade = false): {
     replace: (code) => code,
     plugins: [],
     proxyLocation: iframeWindow.location,
-    degrade,
     proxy: iframeWindow,
     execQueue: [],
     dynamicScriptElements: [],
@@ -188,7 +186,7 @@ describe('iframe script execution pipeline', () => {
   });
 
   it('reports an HTML response and advances without inserting the invalid script', () => {
-    const { iframeWindow } = createScriptEnvironment(true);
+    const { iframeWindow } = createScriptEnvironment();
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const callback = vi.fn();
 

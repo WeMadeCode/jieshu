@@ -21,7 +21,7 @@
 ::: warning 注意
 
 - 刷新会销毁当前子应用实例，承载子应用的 `iframe` 和 `shadowRoot` 都会被销毁，过程中可能出现短暂白屏
-- `name`、`replace`、`fetch`、`alive`、`degrade` 等参数须与首次 `startApp` 保持一致，否则渲染可能出现异常
+- `name`、`replace`、`fetch`、`alive` 等参数须与首次 `startApp` 保持一致，否则渲染可能出现异常
 - 若子应用后续还会被打开，一般无需主动刷新；仅在需要强制重建时使用
 
 :::

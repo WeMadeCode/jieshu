@@ -1,15 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { awaitConsoleLogMessage, getTextContentByJsSelector } from './utils';
-import { reactMainAppInfoList, vueMainAppInfoList } from './common';
+import { reactMainAppInfoList, reactMainUrl, vueMainAppInfoList, vueMainUrl } from './common';
 
 const describe = test.describe;
 const beforeAll = test.beforeAll;
 const it = test;
 let page: Page;
-const reactMainUrl = process.env['JIESHU_REACT_MAIN_URL'] ?? 'http://localhost:7700/';
-const vueMainUrl = process.env['JIESHU_VUE_MAIN_URL'] ?? 'http://localhost:8000/';
-
 beforeAll(async ({ browser }) => {
   page = await browser.newPage();
 });
@@ -24,7 +21,6 @@ describe('main react startApp', () => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
     await page.goto(reactMainUrl);
   });
@@ -45,7 +41,6 @@ describe('main vue startApp', () => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
     await page.goto(vueMainUrl);
   });

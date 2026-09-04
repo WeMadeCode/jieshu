@@ -1,43 +1,16 @@
 import {
   addLoading,
-  createIframeContainer,
   getPatchStyleElements,
   repairRelativeElementUrl,
   removeLoading,
   renderElementToContainer,
 } from '../../src/shadow';
-import {
-  CONTAINER_OVERFLOW_DATA_FLAG,
-  CONTAINER_POSITION_DATA_FLAG,
-  LOADING_DATA_FLAG,
-  JIESHU_APP_ID,
-} from '../../src/constant';
+import { CONTAINER_OVERFLOW_DATA_FLAG, CONTAINER_POSITION_DATA_FLAG, LOADING_DATA_FLAG } from '../../src/constant';
 
 describe('shadow rendering primitives', () => {
   beforeEach(() => {
     document.head.innerHTML = '';
     document.body.innerHTML = '';
-  });
-
-  it('accepts a named iframe-attribute interface and composes its style', () => {
-    interface DegradeAttributes {
-      title: string;
-      sandbox: string;
-      style: string;
-    }
-
-    const attributes: DegradeAttributes = {
-      title: 'child application',
-      sandbox: 'allow-scripts',
-      style: 'border:0',
-    };
-    const iframe = createIframeContainer('catalog', attributes);
-
-    expect(iframe.getAttribute(JIESHU_APP_ID)).toBe('catalog');
-    expect(iframe.title).toBe('child application');
-    expect(iframe.getAttribute('sandbox')).toBe('allow-scripts');
-    expect(iframe.getAttribute('style')).toContain('height:100%;width:100%');
-    expect(iframe.getAttribute('style')).toContain('border:0');
   });
 
   it('keeps a loading indicator while mounting the application element', () => {

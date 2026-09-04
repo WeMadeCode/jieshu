@@ -1,3 +1,6 @@
+export const reactMainUrl = process.env['JIESHU_REACT_MAIN_URL'] ?? 'http://localhost:7700/';
+export const vueMainUrl = process.env['JIESHU_VUE_MAIN_URL'] ?? 'http://localhost:8000/';
+
 export const reactMainAppInfoMap = {
   react16: {
     name: 'react16',
@@ -20,7 +23,6 @@ export const reactMainAppInfoMap = {
     fontNavSelector: `document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#root > div > nav > a:nth-child(6)")`,
     fontMountedMessage: `react16 font mounted`,
     preloadTitleJsSelector: 'window.frames.react16.document.querySelector("#root > div > div:nth-child(3) > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='react16']").contentDocument.querySelector("#root > div > div:nth-child(3) > h2")`,
     titleJsSelector:
       'document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#root > div > div:nth-child(3) > h2")',
     titleText: 'react16示例',
@@ -46,7 +48,6 @@ export const reactMainAppInfoMap = {
     routeMountedMessage: 'react17 location mounted',
     communicationNavSelectorInAll: `document.querySelector("#root > div > div.content > div > div:nth-child(2) > div > jieshu-app").shadowRoot.querySelector("#root > div > header > div > nav > a:nth-child(4)")`,
     preloadTitleJsSelector: 'window.frames.react17.document.querySelector("#root > div > header > div > div > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='react17']").contentDocument.querySelector("#root > div > header > div > div > h2")`,
     titleJsSelector:
       'document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#root > div > header > div > div > h2")',
     titleText: 'react17示例',
@@ -69,7 +70,6 @@ export const reactMainAppInfoMap = {
     routeMountedMessage: 'vue2 location mounted',
     communicationNavSelectorInAll: `document.querySelector("#root > div > div.content > div > div:nth-child(3) > div > jieshu-app").shadowRoot.querySelector("#nav > a:nth-child(4)")`,
     preloadTitleJsSelector: 'window.frames.vue2.document.querySelector("#app > div:nth-child(2) > div.hello > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='vue2']").contentDocument.querySelector("#app > div:nth-child(2) > div.hello > h2")`,
     titleJsSelector:
       'document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div:nth-child(2) > div.hello > h2")',
     titleText: 'Vue2示例',
@@ -96,7 +96,6 @@ export const reactMainAppInfoMap = {
     routeMountedMessage: 'vue3 location mounted',
     communicationNavSelectorInAll: `document.querySelector("#root > div > div.content > div > div:nth-child(4) > div > jieshu-app").shadowRoot.querySelector("#nav > a:nth-child(4)")`,
     preloadTitleJsSelector: 'window.frames.vue3.document.querySelector("#app > div:nth-child(2) > div.hello > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='vue3']").contentDocument.querySelector("#app > div:nth-child(2) > div.hello > h2")`,
     titleJsSelector:
       'document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div:nth-child(2) > div.hello > h2")',
     titleText: 'Vue3示例',
@@ -113,7 +112,6 @@ export const reactMainAppInfoMap = {
     routeNavSelector: `document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#nav > a:nth-child(3)")`,
     routeJumpButtonSelector: `document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div.content > button")`,
     routeMountedMessage: 'vite location mounted',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='vite']").contentDocument.querySelector("#app > div:nth-child(2) > div.hello > h2")`,
     titleJsSelector:
       'document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div:nth-child(2) > div.hello > h2")',
     titleText: 'Vue3 + vite示例',
@@ -129,7 +127,6 @@ export const reactMainAppInfoMap = {
     ],
     leaveLifecycles: ['angular12 beforeUnmount 生命周期', 'angular12 afterUnmount 生命周期'],
     preloadTitleJsSelector: `window.frames.angular12.document.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")`,
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='angular12']").contentDocument.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")`,
     titleJsSelector:
       'document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")',
     titleText: 'angular12 app is running!',
@@ -160,7 +157,6 @@ export const vueMainAppInfoMap = {
     fontNavSelector: `document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("#root > div > nav > a:nth-child(6)")`,
     fontMountedMessage: `react16 font mounted`,
     preloadTitleJsSelector: 'window.frames.react16.document.querySelector("#root > div > div:nth-child(3) > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='react16']").contentDocument.querySelector("#root > div > div:nth-child(3) > h2")`,
     titleJsSelector:
       'document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("#root > div > div:nth-child(3) > h2")',
     titleText: 'react16示例',
@@ -186,7 +182,6 @@ export const vueMainAppInfoMap = {
     routeMountedMessage: 'react17 location mounted',
     communicationNavSelectorInAll: `document.querySelector("#app > div.content > div > div:nth-child(2) > jieshu-app").shadowRoot.querySelector("#root > div > header > div > nav > a:nth-child(4)")`,
     preloadTitleJsSelector: 'window.frames.react17.document.querySelector("#root > div > header > div > div > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='react17']").contentDocument.querySelector("#root > div > header > div > div > h2")`,
     titleJsSelector:
       'document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("#root > div > header > div > div > h2")',
     titleText: 'react17示例',
@@ -209,7 +204,6 @@ export const vueMainAppInfoMap = {
     routeMountedMessage: 'vue2 location mounted',
     communicationNavSelectorInAll: `document.querySelector("#app > div.content > div > div:nth-child(3) > jieshu-app").shadowRoot.querySelector("#nav > a:nth-child(4)")`,
     preloadTitleJsSelector: 'window.frames.vue2.document.querySelector("#app > div:nth-child(2) > div.hello > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='vue2']").contentDocument.querySelector("#app > div:nth-child(2) > div.hello > h2")`,
     titleJsSelector:
       'document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div:nth-child(2) > div.hello > h2")',
     titleText: 'Vue2示例',
@@ -236,7 +230,6 @@ export const vueMainAppInfoMap = {
     routeMountedMessage: 'vue3 location mounted',
     communicationNavSelectorInAll: `document.querySelector("#app > div.content > div > div:nth-child(4) > jieshu-app").shadowRoot.querySelector("#nav > a:nth-child(4)")`,
     preloadTitleJsSelector: 'window.frames.vue3.document.querySelector("#app > div:nth-child(2) > div.hello > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='vue3']").contentDocument.querySelector("#app > div:nth-child(2) > div.hello > h2")`,
     titleJsSelector:
       'document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div:nth-child(2) > div.hello > h2")',
     titleText: 'Vue3示例',
@@ -253,7 +246,6 @@ export const vueMainAppInfoMap = {
     routeJumpButtonSelector: `document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div.content > button")`,
     routeMountedMessage: 'vite location mounted',
     preloadTitleJsSelector: 'window.frames.vite.document.querySelector("#app > div:nth-child(2) > div.hello > h2")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='vite']").contentDocument.querySelector("#app > div:nth-child(2) > div.hello > h2")`,
     titleJsSelector:
       'document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div:nth-child(2) > div.hello > h2")',
     titleText: 'Vue3 + vite示例',
@@ -270,7 +262,6 @@ export const vueMainAppInfoMap = {
     leaveLifecycles: ['angular12 beforeUnmount 生命周期', 'angular12 afterUnmount 生命周期'],
     preloadTitleJsSelector:
       'window.frames.angular12.document.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")',
-    degradeTitleJsSelector: `window.document.querySelector("iframe[data-jieshu-id='angular12']").contentDocument.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")`,
     titleJsSelector:
       'document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")',
     titleText: 'angular12 app is running!',

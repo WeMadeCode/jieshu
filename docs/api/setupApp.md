@@ -25,14 +25,10 @@ type baseOptions = {
   props?: { [key: string]: any };
   /** 自定义运行iframe的属性 */
   attrs?: { [key: string]: any };
-  /** 自定义降级渲染iframe的属性 */
-  degradeAttrs?: { [key: string]: any };
   /** 子应用采用fiber模式执行 */
   fiber?: boolean;
   /** 子应用保活，state不会丢失 */
   alive?: boolean;
-  /** 子应用采用降级iframe方案 */
-  degrade?: boolean;
   /** 子应用插件 */
   plugins?: Array<plugin>;
   /** 子应用window监听事件 */

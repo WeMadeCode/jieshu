@@ -522,7 +522,6 @@ class Jieshu {
   activeFlag: boolean;
   mountFlag: boolean;
   alive: boolean;
-  degrade: boolean;
 
   // 需要在卸载或销毁阶段处理的动态副作用
   styleSheetElements: Array<HTMLStyleElement | HTMLLinkElement>;
@@ -540,7 +539,6 @@ constructor(options: JieshuOptions) {
     url,
     attrs,
     fiber,
-    degrade,
     plugins,
     lifecycles,
   } = options;
@@ -548,7 +546,6 @@ constructor(options: JieshuOptions) {
   this.id = name;
   this.url = url;
   this.fiber = fiber;
-  this.degrade = degrade || !jieshuSupport;
 
   this.execQueue = [];
   this.styleSheetElements = [];
@@ -1609,7 +1606,7 @@ Object.defineProperties(element, {
 });
 ```
 
-真实实现还使用弱引用和销毁后的降级逻辑，避免散落在主 DOM 中的元素通过 getter 永久持有 iframe。
+真实实现还使用弱引用和销毁后的安全回退，避免散落在主 DOM 中的元素通过 getter 永久持有 iframe。
 
 ---
 
@@ -1811,35 +1808,16 @@ public async destroy() {
 
 ---
 
-## 22. 降级模式
+## 22. 运行环境要求
 
-标准模式是：
+Jieshu 只有一条运行路径：
 
 ```text
 JavaScript → 隐藏 iframe
 DOM/CSS    → ShadowRoot
 ```
 
-当浏览器不支持所需能力，或者显式启用 `degrade` 时，Jieshu 会使用额外的渲染 iframe：
-
-```text
-隐藏执行 iframe
-    运行 JavaScript
-
-可见渲染 iframe
-    承载 DOM 和 CSS
-```
-
-这时可能同时存在两个 iframe Realm，因此需要额外处理：
-
-- 两个 Realm 之间的 `instanceof`；
-- `Event.timeStamp`；
-- DOM 事件恢复；
-- `ownerDocument`；
-- 内联事件作用域；
-- 渲染 iframe 的 base URL。
-
-降级模式兼容代码较多。理解主体架构时，建议先完整掌握标准模式，再阅读降级分支。
+运行时必须提供原生 `Proxy` 与 Custom Elements。`startApp` 和 `preloadApp` 会在创建沙箱前检查这两项能力；不满足要求时直接抛出明确错误。DOM 始终由 `<jieshu-app>` 的 ShadowRoot 承载，JavaScript 始终在隐藏的同源 iframe 中执行。
 
 ---
 

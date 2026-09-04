@@ -6,7 +6,14 @@ import {
   triggerClickByJsSelector,
   getClassListByJsSelector,
 } from './utils';
-import { reactMainAppInfoMap, reactMainAppInfoList, vueMainAppInfoMap, vueMainAppInfoList } from './common';
+import {
+  reactMainAppInfoMap,
+  reactMainAppInfoList,
+  reactMainUrl,
+  vueMainAppInfoMap,
+  vueMainAppInfoList,
+  vueMainUrl,
+} from './common';
 
 const describe = test.describe;
 const beforeAll = test.beforeAll;
@@ -124,9 +131,8 @@ describe('main react sync', () => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
-    await page.goto('http://localhost:7700/');
+    await page.goto(reactMainUrl);
   });
 
   generateTest(reactMainAppInfoMap, generateReactAppMountedPromiseList, "a[href='#/all']");
@@ -134,7 +140,7 @@ describe('main react sync', () => {
   it(`test url share`, async () => {
     let mountedPromiseList = generateReactAppMountedPromiseList();
     await page.goto(
-      'http://localhost:7700/?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vite=%2Fhome&vue2=%2F%23%2Fdialog&vue3=%2Fdialog&angular12=%2F#/all',
+      `${reactMainUrl}?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vite=%2Fhome&vue2=%2F%23%2Fdialog&vue3=%2Fdialog&angular12=%2F#/all`,
     );
     await Promise.all([
       ...mountedPromiseList,
@@ -162,9 +168,8 @@ describe('main vue startApp', () => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
-    await page.goto('http://localhost:8000/');
+    await page.goto(vueMainUrl);
   });
 
   generateTest(vueMainAppInfoMap, generateVueAppMountedPromiseList, "a[href='/all']");
@@ -172,7 +177,7 @@ describe('main vue startApp', () => {
   it(`test url share`, async () => {
     let mountedPromiseList = generateReactAppMountedPromiseList();
     await page.goto(
-      'http://localhost:8000/all?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vue2=%2F%23%2Fdialog&vite=%2Fhome&vue3=%2Fdialog&angular12=%2F',
+      `${vueMainUrl}all?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vue2=%2F%23%2Fdialog&vite=%2Fhome&vue3=%2Fdialog&angular12=%2F`,
     );
     await Promise.all([
       ...mountedPromiseList,

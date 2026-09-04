@@ -56,7 +56,6 @@ function createSandbox(id: string, fetch: (input: RequestInfo) => Promise<Respon
       pathname: '/index.html',
     },
     replace: (code: string) => code,
-    degrade: false,
     proxy: iframeWindow,
     styleSheetElements: [],
     dynamicScriptElements: [],
@@ -92,8 +91,8 @@ describe('dynamic script sequencing', () => {
     const secondRoot = createRenderRoot();
     createSandbox('pending-app', () => pending.promise);
     createSandbox('ready-app', () => Promise.resolve(scriptResponse('/* ready */')));
-    patchRenderEffect(firstRoot, 'pending-app', false);
-    patchRenderEffect(secondRoot, 'ready-app', false);
+    patchRenderEffect(firstRoot, 'pending-app');
+    patchRenderEffect(secondRoot, 'ready-app');
     const firstLoaded = vi.fn();
     const secondLoaded = vi.fn();
 
@@ -109,7 +108,7 @@ describe('dynamic script sequencing', () => {
     const pending = deferred<Response>();
     const staleRoot = createRenderRoot();
     const staleSandbox = createSandbox('same-name', () => pending.promise);
-    patchRenderEffect(staleRoot, 'same-name', false);
+    patchRenderEffect(staleRoot, 'same-name');
     const staleLoaded = vi.fn();
     appendExternalScript(staleRoot, 'https://assets.example/stale.js', staleLoaded);
 
@@ -117,7 +116,7 @@ describe('dynamic script sequencing', () => {
     staleSandbox.destroyed = true;
     const replacementRoot = createRenderRoot();
     createSandbox('same-name', () => Promise.resolve(scriptResponse('/* replacement */')));
-    patchRenderEffect(replacementRoot, 'same-name', false);
+    patchRenderEffect(replacementRoot, 'same-name');
     const replacementLoaded = vi.fn();
     appendExternalScript(replacementRoot, 'https://assets.example/replacement.js', replacementLoaded);
     await flushPromises();
@@ -136,7 +135,7 @@ describe('dynamic script sequencing', () => {
     createSandbox('ordered-app', (input) =>
       String(input).endsWith('first.js') ? firstResponse.promise : Promise.resolve(scriptResponse('/* second */')),
     );
-    patchRenderEffect(root, 'ordered-app', false);
+    patchRenderEffect(root, 'ordered-app');
     const calls: string[] = [];
 
     appendExternalScript(root, 'https://assets.example/first.js', () => calls.push('first'));
@@ -149,22 +148,11 @@ describe('dynamic script sequencing', () => {
     expect(calls).toEqual(['first', 'second']);
   });
 
-  test.each([
-    { degrade: false, id: 'standard-jsonp' },
-    { degrade: true, id: 'degrade-jsonp' },
-  ])('$id script can be cleaned up through its parentNode like SockJS JSONP', async ({ degrade, id }) => {
+  test('script can be cleaned up through its parentNode like SockJS JSONP', async () => {
+    const id = 'standard-jsonp';
     const sandbox = createSandbox(id, () => Promise.resolve(scriptResponse('/* jsonp */')));
-    sandbox.degrade = degrade;
-    const renderRoot = degrade
-      ? (() => {
-          const renderIframe = document.createElement('iframe');
-          document.body.appendChild(renderIframe);
-          const renderDocument = renderIframe.contentDocument as Document;
-          sandbox.document = renderDocument;
-          return renderDocument;
-        })()
-      : createRenderRoot();
-    patchRenderEffect(renderRoot, sandbox.id, degrade);
+    const renderRoot = createRenderRoot();
+    patchRenderEffect(renderRoot, sandbox.id);
     const appWindow = sandbox.iframe.contentWindow as Window;
     appWindow.__JIESHU_RAW_DOCUMENT_HEAD__ = appWindow.document.head;
     const script = appWindow.document.createElement('script');
@@ -189,7 +177,7 @@ describe('dynamic script sequencing', () => {
     const root = createRenderRoot();
     const fetch = vi.fn(() => pending.promise);
     const sandbox = createSandbox('reusable-app', fetch);
-    patchRenderEffect(root, 'reusable-app', false);
+    patchRenderEffect(root, 'reusable-app');
     const loaded = vi.fn();
     const failed = vi.fn();
     const retryFailed = vi.fn();
@@ -227,7 +215,7 @@ describe('dynamic script sequencing', () => {
   test('unmount detaches a transformed module still waiting for native completion', async () => {
     const root = createRenderRoot();
     const sandbox = createSandbox('module-app', () => Promise.resolve(scriptResponse('export default 1')));
-    patchRenderEffect(root, 'module-app', false);
+    patchRenderEffect(root, 'module-app');
     const loaded = vi.fn();
     const failed = vi.fn();
     const script = document.createElement('script');
@@ -256,7 +244,7 @@ describe('dynamic script sequencing', () => {
   test('an inline module uses native module completion and forwards its error', async () => {
     const root = createRenderRoot();
     const sandbox = createSandbox('inline-module-app', () => Promise.resolve(scriptResponse('/* next */')));
-    patchRenderEffect(root, 'inline-module-app', false);
+    patchRenderEffect(root, 'inline-module-app');
     const loaded = vi.fn();
     const failed = vi.fn();
     const nextLoaded = vi.fn();
@@ -298,7 +286,7 @@ describe('dynamic script sequencing', () => {
         idleCallbacks.push(() => callback.call(sandbox));
         return idleCallbacks.length;
       };
-      patchRenderEffect(root, 'fiber-inline-module-app', false);
+      patchRenderEffect(root, 'fiber-inline-module-app');
       const moduleScript = document.createElement('script');
       moduleScript.type = 'module';
       moduleScript.textContent = 'export const fiberModuleA = true';
@@ -333,7 +321,7 @@ describe('dynamic script sequencing', () => {
         text: () => Promise.resolve('unavailable'),
       } as Response),
     );
-    patchRenderEffect(root, 'native-script-error', false);
+    patchRenderEffect(root, 'native-script-error');
     const loaded = vi.fn();
     const failed = vi.fn();
     const script = document.createElement('script');
@@ -370,7 +358,7 @@ describe('dynamic script sequencing', () => {
         },
       },
     ];
-    patchRenderEffect(root, 'dynamic-loader-error', false);
+    patchRenderEffect(root, 'dynamic-loader-error');
     const failed = vi.fn();
     const next = vi.fn();
     const releaseDynamicTask = (): void => {
@@ -397,7 +385,7 @@ describe('dynamic script sequencing', () => {
   test('unmount resets native-pending and queued scripts before a remounted generation', async () => {
     const root = createRenderRoot();
     const sandbox = createSandbox('reset-dynamic-lane', () => Promise.resolve(scriptResponse('/* ready */')));
-    patchRenderEffect(root, 'reset-dynamic-lane', false);
+    patchRenderEffect(root, 'reset-dynamic-lane');
     const pendingModule = document.createElement('script');
     pendingModule.type = 'module';
     pendingModule.src = 'https://assets.example/pending-module.js';
@@ -436,7 +424,7 @@ describe('dynamic script sequencing', () => {
       return content;
     });
     sandbox.plugins = [{ cssLoader }];
-    patchRenderEffect(root, 'css-loader-unmount', false);
+    patchRenderEffect(root, 'css-loader-unmount');
     const loaded = vi.fn();
     const failed = vi.fn();
     const link = document.createElement('link');
@@ -460,7 +448,7 @@ describe('dynamic script sequencing', () => {
     const fetch = vi.fn(() => pending.promise);
     const root = createRenderRoot();
     const sandbox = createSandbox('style-app', fetch);
-    patchRenderEffect(root, 'style-app', false);
+    patchRenderEffect(root, 'style-app');
     const fetchingFailed = vi.fn();
     const fetchingLoaded = vi.fn();
     const fetchingLink = document.createElement('link');

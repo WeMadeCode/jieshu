@@ -71,7 +71,7 @@ describe('patchInstanceofAcrossRealms', () => {
     expect(iframeWindow.HTMLDivElement[Symbol.hasInstance]).toBe(patchedHasInstance);
   });
 
-  test('共享的 host 构造器按应用隔离并可接纳多个降级渲染 realm', () => {
+  test('共享的 host 构造器按 realm 隔离并可接纳多个 peer realm', () => {
     const appWindow = createIframeWindow();
     const firstRenderWindow = createIframeWindow();
     const secondRenderWindow = createIframeWindow();
@@ -96,47 +96,5 @@ describe('patchInstanceofAcrossRealms', () => {
     expect(secondParser instanceof isolatedConstructor).toBe(true);
     expect(window.DOMParser).toBe(hostDOMParser);
     expect(Object.getOwnPropertyDescriptor(hostDOMParser, Symbol.hasInstance)).toEqual(hostHasInstance);
-  });
-
-  test('降级模式：渲染 iframe 与执行 iframe 双向 instanceof', () => {
-    const appWindow = createIframeWindow();
-    const renderFrame = document.createElement('iframe');
-    document.body.appendChild(renderFrame);
-    const renderWindow = renderFrame.contentWindow as RealmWindow | null;
-    if (!renderWindow) throw new Error('render iframe window is unavailable');
-
-    const { patchDegradeInstanceofAcrossRealms } = iframeModule;
-
-    const appElement = appWindow.document.createElement('div');
-    const renderElement = renderWindow.document.createElement('div');
-
-    expect(appElement instanceof renderWindow.HTMLDivElement).toBe(false);
-    expect(renderElement instanceof appWindow.HTMLDivElement).toBe(false);
-
-    patchDegradeInstanceofAcrossRealms(appWindow, renderWindow);
-
-    expect(appElement instanceof renderWindow.HTMLDivElement).toBe(true);
-    expect(renderElement instanceof appWindow.HTMLDivElement).toBe(true);
-  });
-
-  test('降级应用 remount 后释放旧渲染 realm 的 instanceof registration', () => {
-    const appWindow = createIframeWindow();
-    const firstRenderWindow = createIframeWindow();
-    const secondRenderWindow = createIframeWindow();
-    const appElement = appWindow.document.createElement('div');
-    const firstRenderElement = firstRenderWindow.document.createElement('div');
-    const secondRenderElement = secondRenderWindow.document.createElement('div');
-
-    iframeModule.patchDegradeInstanceofAcrossRealms(appWindow, firstRenderWindow);
-
-    expect(firstRenderElement instanceof appWindow.HTMLDivElement).toBe(true);
-    expect(appElement instanceof firstRenderWindow.HTMLDivElement).toBe(true);
-
-    iframeModule.patchDegradeInstanceofAcrossRealms(appWindow, secondRenderWindow);
-
-    expect(firstRenderElement instanceof appWindow.HTMLDivElement).toBe(false);
-    expect(appElement instanceof firstRenderWindow.HTMLDivElement).toBe(false);
-    expect(secondRenderElement instanceof appWindow.HTMLDivElement).toBe(true);
-    expect(appElement instanceof secondRenderWindow.HTMLDivElement).toBe(true);
   });
 });

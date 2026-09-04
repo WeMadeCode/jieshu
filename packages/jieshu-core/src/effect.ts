@@ -85,7 +85,7 @@ type PatchedStyleElement = HTMLStyleElement & { _patcher?: ReturnType<typeof set
 type RawDomInsertion = <T extends Node>(newChild: T, refChild?: Node | null) => T;
 
 function handleStylesheetElementPatch(stylesheetElement: PatchedStyleElement, sandbox: Jieshu) {
-  if (!stylesheetElement.innerHTML || sandbox.degrade) return;
+  if (!stylesheetElement.innerHTML) return;
   const patcher = () => {
     stylesheetElement._patcher = undefined;
     if (sandbox.destroyed || !sandbox.shadowRoot) return;
@@ -1007,12 +1007,9 @@ export function removeEventListener(element: HTMLHeadElement | HTMLBodyElement):
  * patch head and body in render
  * intercept appendChild and insertBefore
  */
-export function patchRenderEffect(render: ShadowRoot | Document, id: string, degrade: boolean): void {
-  // 降级场景dom渲染在iframe中，iframe移动后事件自动销毁，不需要记录
-  if (!degrade) {
-    patchEventListener(render.head);
-    patchEventListener(render.body as HTMLBodyElement);
-  }
+export function patchRenderEffect(render: ShadowRoot, id: string): void {
+  patchEventListener(render.head);
+  patchEventListener(render.body);
 
   render.head.appendChild = rewriteAppendOrInsertChild({
     rawDOMAppendOrInsertBefore: rawAppendChild,

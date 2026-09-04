@@ -52,7 +52,7 @@
 
 - 重写 iframe 沙箱，使用空白同源 iframe 作为 JavaScript realm。
 - 补齐 destroy 引用断链、$jieshu 清理、适配器队列清理。
-- 修复降级 iframe 的 base URL、富文本跨 realm 与动态皮肤 CSS。
+- 修复旧双 iframe 路径的 base URL、富文本跨 realm 与动态皮肤 CSS（该路径现已移除）。
 - 处理 Popper 坐标偏移；老 Element UI 的特定 absolute 组合仍有边界，见 [popper-offset-resolved.md](./popper-offset-resolved.md)。
 
 ### 1.0.23–1.0.29：动态资源、路由与容错
@@ -64,14 +64,14 @@
 
 ### 1.0.9–1.0.22：代理、事件与执行顺序
 
-- document/window 事件、主应用 listener 销毁、降级模式 listener 恢复。
+- document/window 事件、主应用 listener 销毁、旧双 iframe 路径 listener 恢复（该路径现已移除）。
 - DOM 查询异常保护、caretPositionFromPoint、多应用全局对象缓存。
 - ESM、async、defer 和普通脚本的顺序及属性保留。
 - 加载失败的 loadError 通知与缓存重试。
 
 ### 1.0.0–1.0.8：核心兼容面形成
 
-- 降级 iframe、degradeAttrs、路由保活、键盘事件。
+- 旧双 iframe 兼容配置、路由保活、键盘事件（兼容配置现已移除）。
 - 媒体、字体、CSS 相对路径与 :root 样式适配。
 - React/Vue 容器样式、Vue 插件类型、预加载资源。
 - 1.0.0 曾声明 IE11 兼容；这一承诺与当前 ES2018/Vite 构建不一致。

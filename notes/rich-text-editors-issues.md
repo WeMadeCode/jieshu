@@ -9,7 +9,7 @@
 ## TL;DR
 
 1. 去重后约 **21 条**明确与富文本/文档编辑器相关的 Issue（Open ~16，Closed ~5），涉及 **9 类**编辑器/库（wangEditor 族算 1 类）。
-2. **wangEditor** 相关最多（约 12+ 条），共性根因集中在 `getSelection()` 代理、`instanceof Node` 跨 realm、`isCollapsed` 失真、事件 target 指向 `JIESHU-APP`、降级与非降级行为差异。
+2. **wangEditor** 相关最多（约 12+ 条），共性根因集中在 `getSelection()` 代理、`instanceof Node` 跨 realm、`isCollapsed` 失真、事件 target 指向 `JIESHU-APP`，以及已移除的旧双 iframe 路径与当前 Shadow DOM 路径之间的历史差异。
 3. **TinyMCE** 的 `#224` / `#974` 为同一问题重复上报（skin.min.css 未加载）；**框架层** `#770`（多子应用 `getSelection()` 指向第一个 shadowRoot）与大量富文本 issue 高度相关。
 4. 社区常用缓解：历史 polyfill 插件、自定义 `plugins`（`jsBeforeLoaders` / `jsLoader`）、wangEditor 官方微前端 iframe 沙箱 PR、已合并的 `#792` 全局对象缓存修复。
 
@@ -40,18 +40,18 @@
 | Issue                    | 状态   | 问题摘要                                                               |
 | ------------------------ | ------ | ---------------------------------------------------------------------- |
 | `#479`（上游历史 issue） | Closed | wangEditor 无法修改/复制粘贴；Quill 工具栏报错                         |
-| `#489`（上游历史 issue） | Closed | 降级模式 `degrade: true` 下无法复制粘贴，光标总在首位                  |
+| `#489`（上游历史 issue） | Closed | 已移除的旧双 iframe 路径下无法复制粘贴，光标总在首位                   |
 | `#218`（上游历史 issue） | Open   | 无法修改已有内容，聚焦后不能删除                                       |
 | `#450`（上游历史 issue） | Open   | `Cannot resolve a Slate range from DOM range`，疑似走了主应用 document |
 | `#513`（上游历史 issue） | Open   | v5.1.23 快速输入失焦（含 plugins workaround）                          |
-| `#598`（上游历史 issue） | Open   | 降级模式 plugins 处理方案（非降级不适用）                              |
+| `#598`（上游历史 issue） | Open   | 已移除的旧双 iframe 路径下的 plugins 处理方案                          |
 | `#638`（上游历史 issue） | Open   | Safari 下 `jsBeforeLoader` 偶发不执行（wangEditor 适配分支）           |
 | `#656`（上游历史 issue） | Open   | vue2+vite：子应用 index.html 引入；主应用注册会导致图片无法拖拽缩放    |
 | `#791`（上游历史 issue） | Open   | wangEditor/Slate 方案汇总（历史 polyfill 插件、patch 等）              |
 | `#906`（上游历史 issue） | Open   | 基座 Vue3 + 子应用 Vue2，编辑区无法操作                                |
 | `#933`（上游历史 issue） | Open   | @wangeditor-next 全屏仅子应用内，无法盖住主应用（fixed 局限）          |
 
-**共性根因（社区讨论）：** Selection / `getSelection()` 代理、`instanceof Node`、`isCollapsed` 判断、事件 target 指向 `JIESHU-APP`、降级与非降级行为差异。
+**共性根因（社区讨论）：** Selection / `getSelection()` 代理、`instanceof Node`、`isCollapsed` 判断、事件 target 指向 `JIESHU-APP`，以及旧双 iframe 实现与当前 Shadow DOM 实现的历史差异。
 
 ---
 
@@ -147,7 +147,7 @@
 | `instanceof Node` / `HTMLElement` / `DataTransfer` 跨 realm | wangEditor、Slate                               |
 | `isCollapsed` 等 Selection API 失真                         | wangEditor                                      |
 | 资源加载：CSS / 皮肤文件                                    | TinyMCE                                         |
-| 降级模式 `degrade` 行为差异                                 | wangEditor                                      |
+| 已移除的旧双 iframe 行为差异                                | wangEditor                                      |
 | 事件 target 指向 `JIESHU-APP`                               | wangEditor                                      |
 | 沙箱 / API 访问限制                                         | OnlyOffice                                      |
 | 多子应用 Selection 指向错误 shadowRoot                      | 框架层（#770）                                  |
@@ -184,16 +184,14 @@ OnlyOffice  ██                    1
 
 ## 与本仓库 demo / 修复的关联
 
-| 项                                        | 位置 / 说明                                                                                                                                                                                                    |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 富文本示例路由                            | `examples/vue2/src/views/RichText.vue`                                                                                                                                                                         |
-| wangEditor demo                           | `examples/vue2/src/components/rich-text/WangEditorDemoBlock.vue`                                                                                                                                               |
-| isCollapsed 验证 demo                     | `RichText.vue` — 「isCollapsed 判断正常」；`WangEditorDemoBlock` 的 `showSelectionPanel`                                                                                                                       |
-| TinyMCE demo                              | `examples/vue2/src/components/rich-text/TinyMceDemoBlock.vue`                                                                                                                                                  |
-| 延迟 href 的 `<link>` 处理                | `packages/jieshu-core/src/effect.ts` — `deferStyleSheetByHref`                                                                                                                                                 |
-| `DataTransfer` instanceof 跨 realm        | `packages/jieshu-core/src/iframe.ts` — `patchInstanceofAcrossRealms`；降级模式见 `examples/main-vue/src/plugins/wangEditor.js`                                                                                 |
-| 降级 `getSelection` / `ownerDocument`     | `packages/jieshu-core/src/iframe.ts` — 指向 `sandbox.document`（渲染 iframe），修复 wangEditor LO/RO（#513）                                                                                                   |
-| 降级 `patchDegradeInstanceofAcrossRealms` | `iframe.ts` + `sandbox.ts` — 渲染/执行 iframe 双向 instanceof；在 `document` 就绪后 patch，不改动 `createElement`                                                                                              |
-| 复制粘贴 demo                             | `RichText.vue` — 「复制粘贴（#479）」                                                                                                                                                                          |
-| 快速输入不失焦 demo                       | `RichText.vue` — 「快速输入不失焦（#513）」；含降级 LO/RO 面板                                                                                                                                                 |
-| 关联 issue                                | `#218`（上游历史 issue）、`#479`（上游历史 issue）、`#489`（上游历史 issue）、`#513`（上游历史 issue）、`#450`（上游历史 issue）、`#770`（上游历史 issue）、`#224`（上游历史 issue）、`#974`（上游历史 issue） |
+| 项                                 | 位置 / 说明                                                                                                                                                                                                    |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 富文本示例路由                     | `examples/vue2/src/views/RichText.vue`                                                                                                                                                                         |
+| wangEditor demo                    | `examples/vue2/src/components/rich-text/WangEditorDemoBlock.vue`                                                                                                                                               |
+| isCollapsed 验证 demo              | `RichText.vue` — 「isCollapsed 判断正常」；`WangEditorDemoBlock` 的 `showSelectionPanel`                                                                                                                       |
+| TinyMCE demo                       | `examples/vue2/src/components/rich-text/TinyMceDemoBlock.vue`                                                                                                                                                  |
+| 延迟 href 的 `<link>` 处理         | `packages/jieshu-core/src/effect.ts` — `deferStyleSheetByHref`                                                                                                                                                 |
+| `DataTransfer` instanceof 跨 realm | `packages/jieshu-core/src/iframe.ts` — `patchInstanceofAcrossRealms`                                                                                                                                           |
+| 复制粘贴 demo                      | `RichText.vue` — 「复制粘贴（#479）」                                                                                                                                                                          |
+| 快速输入不失焦 demo                | `RichText.vue` — 「快速输入不失焦（#513）」                                                                                                                                                                    |
+| 关联 issue                         | `#218`（上游历史 issue）、`#479`（上游历史 issue）、`#489`（上游历史 issue）、`#513`（上游历史 issue）、`#450`（上游历史 issue）、`#770`（上游历史 issue）、`#224`（上游历史 issue）、`#974`（上游历史 issue） |

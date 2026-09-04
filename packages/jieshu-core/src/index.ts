@@ -5,7 +5,14 @@ import Jieshu from './sandbox';
 import { defineJieshuWebComponent, addLoading, getDisconnectAction } from './shadow';
 import { processAppForHrefJump } from './sync';
 import { getPlugins } from './plugin';
-import { jieshuSupport, isFunction, requestIdleCallback, isMatchSyncQueryById, warn, stopMainAppRun } from './utils';
+import {
+  assertJieshuSupport,
+  isFunction,
+  requestIdleCallback,
+  isMatchSyncQueryById,
+  warn,
+  stopMainAppRun,
+} from './utils';
 import { assertResolvedStartOptions, resolveOptions } from './options';
 import {
   getJieshuById,
@@ -18,7 +25,6 @@ import { EventBus } from './event';
 import { RuntimeAppController } from './controller';
 import { beginOperation, isOperationCurrent, observeOperation } from './operation-intent';
 import type { OperationIntent } from './operation-intent';
-import { JIESHU_TIPS_NOT_SUPPORTED } from './constant';
 import type { CacheOptions, DestroyHandler, PreOptions, StartOptions } from './contracts';
 import type { AppController } from './controller';
 
@@ -149,9 +155,6 @@ processAppForHrefJump();
 // 定义webComponent容器
 defineJieshuWebComponent();
 
-// 如果不支持则告警
-if (!jieshuSupport) warn(JIESHU_TIPS_NOT_SUPPORTED);
-
 /**
  * 缓存子应用配置
  */
@@ -163,6 +166,7 @@ export function setupApp(options: CacheOptions): void {
  * 运行界枢app
  */
 async function startAppNow(startOptions: StartOptions, canContinue: ContinuationGuard): Promise<DestroyHandler | void> {
+  assertJieshuSupport();
   // 初始化内联事件处理器辅助函数
   initInlineEventHelper();
   const teardown = pendingTeardownCompletion(startOptions.name, canContinue);
@@ -180,10 +184,8 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
     fetch,
     props,
     attrs,
-    degradeAttrs,
     fiber,
     alive,
-    degrade,
     sync,
     prefix,
     el,
@@ -281,9 +283,7 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
     name,
     url,
     attrs,
-    degradeAttrs,
     fiber,
-    degrade,
     plugins,
     lifecycles,
     iframeAddEventListeners,
@@ -362,6 +362,7 @@ export function startApp(startOptions: StartOptions): Promise<DestroyHandler | v
  * 预加载界枢APP
  */
 export function preloadApp(preOptions: PreOptions): void {
+  assertJieshuSupport();
   const request = { ...preOptions };
   const intent = observeOperation(request.name);
   requestIdleCallback(() => {
@@ -387,9 +388,7 @@ export function preloadApp(preOptions: PreOptions): void {
         fetch,
         exec,
         attrs,
-        degradeAttrs,
         fiber,
-        degrade,
         prefix,
         plugins,
         lifecycles,
@@ -401,9 +400,7 @@ export function preloadApp(preOptions: PreOptions): void {
         name,
         url,
         attrs,
-        degradeAttrs,
         fiber,
-        degrade,
         plugins,
         lifecycles,
         iframeAddEventListeners,

@@ -5,7 +5,6 @@ import JieshuReact from '../jieshuReact';
 
 export default function All() {
   const navigate = useNavigate();
-  const supportsAdvancedMode = typeof Proxy !== 'undefined';
   const props = {
     jump: (name: string): void => {
       void navigate(`/${name}`);
@@ -31,24 +30,20 @@ export default function All() {
       <div className="all-item">
         <JieshuReact height="100%" width="100%" name="vue2" url={hostMap('//localhost:7200/')} sync props={props} />
       </div>
-      {supportsAdvancedMode && (
-        <div className="all-item">
-          <JieshuReact
-            height="100%"
-            width="100%"
-            name="vue3"
-            url={hostMap('//localhost:7300/')}
-            sync
-            props={props}
-            alive
-          />
-        </div>
-      )}
-      {supportsAdvancedMode && (
-        <div className="all-item">
-          <JieshuReact height="100%" width="100%" name="vite" url={hostMap('//localhost:7500/')} sync props={props} />
-        </div>
-      )}
+      <div className="all-item">
+        <JieshuReact
+          height="100%"
+          width="100%"
+          name="vue3"
+          url={hostMap('//localhost:7300/')}
+          sync
+          props={props}
+          alive
+        />
+      </div>
+      <div className="all-item">
+        <JieshuReact height="100%" width="100%" name="vite" url={hostMap('//localhost:7500/')} sync props={props} />
+      </div>
       <div className="all-item">
         <JieshuReact
           height="100%"

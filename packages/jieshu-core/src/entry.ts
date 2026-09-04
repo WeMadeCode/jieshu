@@ -595,7 +595,6 @@ export default function importHTML({ url, html, opts }: ImportHtmlParameters): P
 }
 
 interface InlineSandboxState {
-  degrade?: boolean;
   proxy?: WindowProxy;
 }
 
@@ -619,7 +618,7 @@ export function getJieshuWindow(appId: string): WindowProxy | null {
     }
 
     const runtimeWindow = contentWindow as unknown as InlineRuntimeWindow;
-    const targetWindow = runtimeWindow.__JIESHU?.degrade ? contentWindow : runtimeWindow.__JIESHU?.proxy;
+    const targetWindow = runtimeWindow.__JIESHU?.proxy;
     if (!targetWindow) return null;
     return withInlineEventUnscopables(targetWindow as WindowProxy);
   } catch (cause: unknown) {

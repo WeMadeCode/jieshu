@@ -146,8 +146,8 @@ export default defineConfig({
               link: '/guide/plugin',
             },
             {
-              text: '降级处理',
-              link: '/guide/degrade',
+              text: '运行环境',
+              link: '/guide/compatibility',
             },
             {
               text: '应用嵌套',

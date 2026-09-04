@@ -167,7 +167,7 @@ describe('iframe inline event compiler', () => {
     document.body.appendChild(unrelatedIframe);
     const { iframe, iframeWindow } = createIframeWindow(appId);
     iframe.setAttribute('name', appId);
-    iframeWindow.__JIESHU = { id: appId, degrade: true } as unknown as Window['__JIESHU'];
+    iframeWindow.__JIESHU = { id: appId, proxy: iframeWindow } as unknown as Window['__JIESHU'];
     const scope = getJieshuWindow(appId);
 
     expect(scope).not.toBeNull();

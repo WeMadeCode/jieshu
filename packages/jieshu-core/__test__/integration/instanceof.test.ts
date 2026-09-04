@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { vueMainAppInfoMap } from './common';
+import { vueMainAppInfoMap, vueMainUrl } from './common';
 import { awaitConsoleLogMessage } from './utils';
 
 const describe = test.describe;
@@ -21,9 +21,8 @@ describe('main vue instanceof patch', () => {
     await page.addInitScript(() => {
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
-    await page.goto('http://localhost:8000/');
+    await page.goto(vueMainUrl);
   });
 
   it('example 子应用中主应用 realm 的元素和事件应通过子应用构造函数的 instanceof 判断', async () => {

@@ -1,5 +1,5 @@
 import type Jieshu from '../../src/sandbox';
-import { localGenerator, proxyGenerator } from '../../src/proxy';
+import { proxyGenerator } from '../../src/proxy';
 
 function createIframe(src?: string): { iframe: HTMLIFrameElement; iframeWindow: Window } {
   const iframe = document.createElement('iframe');
@@ -16,13 +16,10 @@ function createIframe(src?: string): { iframe: HTMLIFrameElement; iframeWindow: 
   return { iframe, iframeWindow };
 }
 
-function createSandbox(document: Document, shadowRoot: ShadowRoot): Jieshu {
+function createSandbox(shadowRoot: ShadowRoot): Jieshu {
   return {
     id: 'child-app',
     shadowRoot,
-    document,
-    degrade: false,
-    degradeAttrs: {},
     hrefFlag: false,
     proxyLocation: { href: 'https://child.example/initial' },
   } as unknown as Jieshu;
@@ -39,7 +36,7 @@ describe('proxy generators', () => {
     const host = document.createElement('div');
     const shadowRoot = host.attachShadow({ mode: 'open' });
     shadowRoot.innerHTML = '<html><body><div class="shadow-only"></div><form></form></body></html>';
-    const sandbox = createSandbox(iframeWindow.document, shadowRoot);
+    const sandbox = createSandbox(shadowRoot);
     iframeWindow.__JIESHU = sandbox;
 
     const urlElement = document.createElement('a');
@@ -73,7 +70,7 @@ describe('proxy generators', () => {
     container.appendChild(host);
     document.body.appendChild(container);
     const shadowRoot = host.attachShadow({ mode: 'open' });
-    const sandbox = createSandbox(iframeWindow.document, shadowRoot);
+    const sandbox = createSandbox(shadowRoot);
     iframeWindow.__JIESHU = sandbox;
 
     const urlElement = document.createElement('a');
@@ -92,7 +89,7 @@ describe('proxy generators', () => {
     const host = document.createElement('div');
     const shadowRoot = host.attachShadow({ mode: 'open' });
     shadowRoot.innerHTML = '<html><body></body></html>';
-    const sandbox = createSandbox(iframeWindow.document, shadowRoot);
+    const sandbox = createSandbox(shadowRoot);
     iframeWindow.__JIESHU = sandbox;
     const generated = proxyGenerator(
       iframe,
@@ -108,38 +105,5 @@ describe('proxy generators', () => {
     expect(() => Reflect.get(generated.proxyWindow, 'location')).toThrow(TypeError);
     expect(() => Reflect.get(generated.proxyDocument, 'URL')).toThrow(TypeError);
     expect(() => Reflect.get(generated.proxyLocation, 'href')).toThrow(TypeError);
-  });
-
-  test('localGenerator descriptors release dynamic DOM references on revoke', () => {
-    const { iframe, iframeWindow } = createIframe();
-    const renderDocument = document.implementation.createHTMLDocument('child');
-    renderDocument.body.innerHTML = '<div id="from-render-document"></div>';
-    const host = document.createElement('div');
-    const shadowRoot = host.attachShadow({ mode: 'open' });
-    const sandbox = createSandbox(renderDocument, shadowRoot);
-    iframeWindow.__JIESHU = sandbox;
-    const urlElement = document.createElement('a');
-    urlElement.href = 'https://child.example:9443/entry';
-    const generated = localGenerator(iframe, urlElement, iframeWindow.location.href, 'https://child.example:9443/');
-    sandbox.proxyLocation = generated.proxyLocation;
-
-    const proxyDocument = generated.proxyDocument as Document;
-    const proxyLocation = generated.proxyLocation as Location;
-    expect(proxyDocument.getElementById('from-render-document')).not.toBeNull();
-    expect(proxyDocument.URL).toBe('https://child.example:9443/');
-    expect(proxyLocation.host).toBe('child.example:9443');
-    expect(proxyLocation.origin).toBe('https://child.example:9443');
-    expect(proxyLocation.href).toBe('https://child.example:9443/');
-    expect(proxyLocation.toString()).toBe(proxyLocation.href);
-    expect(String(proxyLocation)).toBe(proxyLocation.href);
-
-    generated.proxyRevoke();
-
-    expect(proxyDocument.URL).toBeUndefined();
-    expect(proxyDocument.readyState).toBeUndefined();
-    expect(proxyLocation.href).toBeUndefined();
-    expect(proxyLocation.host).toBe('child.example:9443');
-    expect(proxyLocation.origin).toBe('https://child.example:9443');
-    expect(() => proxyDocument.getElementById('from-render-document')).toThrow(TypeError);
   });
 });

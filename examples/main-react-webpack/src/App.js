@@ -30,7 +30,6 @@ function Nav() {
   const [vue2Flag, setVue2Flag] = useState(location.pathname.includes('vue2-sub'));
   const [vue3Flag, setVue3Flag] = useState(location.pathname.includes('vue3-sub'));
   const [viteFlag, setViteFlag] = useState(location.pathname.includes('vite-sub'));
-  const degrade = window.Proxy;
 
   // 在 xxx-sub 路由下子应用将激活路由同步给主应用，主应用跳转对应路由高亮菜单栏
   bus.$on('sub-route-change', (name, path) => {
@@ -115,12 +114,10 @@ function Nav() {
           </NavLink>
         ))}
       </div>
-      {degrade && (
-        <NavLink to="/vue3" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
-          vue3<span className="alive">保活</span>
-          <CaretUpOutlined className={vue3Flag ? 'main-icon active' : 'main-icon'} onClick={() => handleFlag('vue3')} />
-        </NavLink>
-      )}
+      <NavLink to="/vue3" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
+        vue3<span className="alive">保活</span>
+        <CaretUpOutlined className={vue3Flag ? 'main-icon active' : 'main-icon'} onClick={() => handleFlag('vue3')} />
+      </NavLink>
       <div className="sub-menu" style={{ display: vue3Flag ? 'block' : 'none' }}>
         {subMap.vue3.map((item) => (
           <NavLink to={`/vue3-sub/${item}`} key={item} className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
@@ -128,12 +125,10 @@ function Nav() {
           </NavLink>
         ))}
       </div>
-      {degrade && (
-        <NavLink to="/vite" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
-          vite
-          <CaretUpOutlined className={viteFlag ? 'main-icon active' : 'main-icon'} onClick={() => handleFlag('vite')} />
-        </NavLink>
-      )}
+      <NavLink to="/vite" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
+        vite
+        <CaretUpOutlined className={viteFlag ? 'main-icon active' : 'main-icon'} onClick={() => handleFlag('vite')} />
+      </NavLink>
       <div className="sub-menu" style={{ display: viteFlag ? 'block' : 'none' }}>
         {subMap.vite.map((item) => (
           <NavLink to={`/vite-sub/${item}`} key={item} className={({ isActive }) => (isActive ? 'active' : 'inactive')}>

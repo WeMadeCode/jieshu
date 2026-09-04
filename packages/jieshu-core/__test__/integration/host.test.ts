@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { awaitConsoleLogMessage, triggerClickByJsSelector, sleep } from './utils';
-import { reactMainAppInfoMap, vueMainAppInfoMap } from './common';
+import { reactMainAppInfoMap, reactMainUrl, vueMainAppInfoMap, vueMainUrl } from './common';
 
 const describe = test.describe;
 const beforeAll = test.beforeAll;
@@ -105,9 +105,8 @@ describe('main react startApp', () => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
-    await page.goto('http://localhost:7700/');
+    await page.goto(reactMainUrl);
   });
   generateTest(reactMainAppInfoMap);
 });
@@ -117,9 +116,8 @@ describe('main vue startApp', () => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
-    await page.goto('http://localhost:8000/');
+    await page.goto(vueMainUrl);
   });
   generateTest(vueMainAppInfoMap);
 });

@@ -26,9 +26,7 @@ function createSandbox(name: string): SandboxWithIframeRealm {
     name,
     url: `https://example.test/${name}/`,
     attrs: {},
-    degradeAttrs: {},
     fiber: false,
-    degrade: true,
     plugins: [],
     lifecycles: {},
   });
@@ -331,7 +329,7 @@ describe('sandbox lifecycle races', () => {
     sandbox.alive = true;
     sandbox.fetch = fetch;
     sandbox.replace = (code) => code;
-    patchRenderEffect(root, sandbox.id, false);
+    patchRenderEffect(root, sandbox.id);
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.onload = loaded;

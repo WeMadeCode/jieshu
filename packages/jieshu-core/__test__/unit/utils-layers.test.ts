@@ -1,4 +1,5 @@
 import {
+  assertJieshuSupport,
   checkProxyFunction,
   defaultGetPublicPath,
   getAbsolutePath,
@@ -9,6 +10,44 @@ import {
 type CallableWithMetadata = CallableFunction & { metadata?: string };
 
 describe('utils compatibility layers', () => {
+  test('accepts runtimes with Proxy and Custom Elements', () => {
+    expect(() => assertJieshuSupport()).not.toThrow();
+  });
+
+  test('rejects runtimes without Proxy instead of changing the rendering model', async () => {
+    const nativeProxy = window.Proxy;
+    Object.defineProperty(window, 'Proxy', { configurable: true, value: undefined });
+    vi.resetModules();
+
+    try {
+      const unsupportedUtils = await import('../../src/utils');
+      expect(unsupportedUtils.jieshuSupport).toBe(false);
+      expect(() => unsupportedUtils.assertJieshuSupport()).toThrow(
+        '当前浏览器不支持界枢，运行时需要 Proxy 和 Custom Elements',
+      );
+    } finally {
+      Object.defineProperty(window, 'Proxy', { configurable: true, value: nativeProxy });
+      vi.resetModules();
+    }
+  });
+
+  test('rejects runtimes without a complete Custom Elements registry', async () => {
+    const nativeDefine = window.customElements.define;
+    Object.defineProperty(window.customElements, 'define', { configurable: true, value: undefined });
+    vi.resetModules();
+
+    try {
+      const unsupportedUtils = await import('../../src/utils');
+      expect(unsupportedUtils.jieshuSupport).toBe(false);
+      expect(() => unsupportedUtils.assertJieshuSupport()).toThrow(
+        '当前浏览器不支持界枢，运行时需要 Proxy 和 Custom Elements',
+      );
+    } finally {
+      Object.defineProperty(window.customElements, 'define', { configurable: true, value: nativeDefine });
+      vi.resetModules();
+    }
+  });
+
   test('getTargetValue caches one bound callable per target and copies metadata', () => {
     const target = document.implementation.createHTMLDocument('binding-target');
     const method: CallableWithMetadata = function (this: Document): Document {

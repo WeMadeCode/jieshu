@@ -2,7 +2,7 @@
 import { test, type Page } from '@playwright/test';
 
 import { awaitConsoleLogMessage } from './utils';
-import { reactMainAppInfoMap, vueMainAppInfoMap } from './common';
+import { reactMainAppInfoMap, reactMainUrl, vueMainAppInfoMap, vueMainUrl } from './common';
 
 const describe = test.describe;
 const beforeAll = test.beforeAll;
@@ -32,9 +32,8 @@ describe('main react pageEvent', () => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
-    await page.goto('http://localhost:7700/');
+    await page.goto(reactMainUrl);
   });
 
   const vue2 = reactMainAppInfoMap.vue2;
@@ -56,9 +55,8 @@ describe('main vue pageEvent', () => {
       // 关闭预加载
       localStorage.clear();
       localStorage.setItem('preload', 'false');
-      localStorage.setItem('degrade', 'false');
     });
-    await page.goto('http://localhost:8000/');
+    await page.goto(vueMainUrl);
   });
 
   const vue2 = vueMainAppInfoMap.vue2;

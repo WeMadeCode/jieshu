@@ -29,7 +29,6 @@ bus.$on('sub-route-change', (name, path) => {
   }
 });
 
-const degrade = window.localStorage.getItem('degrade') === 'true' || !window.Proxy || !window.CustomElementRegistry;
 const props = {
   jump: (name) => {
     router.push({ name });
@@ -54,7 +53,6 @@ setupApp({
   fetch: credentialsFetch,
   plugins,
   prefix: { 'prefix-dialog': '/dialog', 'prefix-location': '/location' },
-  degrade,
   ...lifecycles,
 });
 
@@ -66,7 +64,6 @@ setupApp({
   alive: true,
   props,
   fetch: credentialsFetch,
-  degrade,
   ...lifecycles,
 });
 
@@ -78,7 +75,6 @@ setupApp({
   props,
   fetch: credentialsFetch,
   plugins: [wangEditorPlugin],
-  degrade,
   ...lifecycles,
 });
 
@@ -94,7 +90,6 @@ setupApp({
   // 引入了的第三方样式不需要添加credentials
   fetch: (url, options) =>
     url.includes(hostMap('//localhost:7300/')) ? credentialsFetch(url, options) : window.fetch(url, options),
-  degrade,
   ...lifecycles,
 });
 
@@ -105,7 +100,6 @@ setupApp({
   exec: true,
   props,
   fetch: credentialsFetch,
-  degrade,
   ...lifecycles,
 });
 
@@ -116,7 +110,6 @@ setupApp({
   exec: true,
   props,
   fetch: credentialsFetch,
-  degrade,
   ...lifecycles,
 });
 
@@ -133,14 +126,12 @@ if (window.localStorage.getItem('preload') !== 'false') {
   preloadApp({
     name: 'angular12',
   });
-  if (window.Proxy) {
-    preloadApp({
-      name: 'vue3',
-    });
-    preloadApp({
-      name: 'vite',
-    });
-  }
+  preloadApp({
+    name: 'vue3',
+  });
+  preloadApp({
+    name: 'vite',
+  });
 }
 
 createApp(App).use(router).use(JieshuVue).use(Switch).use(Tooltip).use(Button).mount('#app');

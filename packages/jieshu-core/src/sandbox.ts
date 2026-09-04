@@ -1,11 +1,4 @@
-import {
-  iframeGenerator,
-  recoverEventListeners,
-  recoverDocumentListeners,
-  insertScriptToIframe,
-  patchEventTimeStamp,
-  patchDegradeInstanceofAcrossRealms,
-} from './iframe';
+import { iframeGenerator, insertScriptToIframe } from './iframe';
 import { syncUrlToWindow, syncUrlToIframe, clearInactiveAppUrl } from './sync';
 import {
   createJieshuWebComponent,
@@ -13,11 +6,9 @@ import {
   getPatchStyleElements,
   renderElementToContainer,
   renderTemplateToShadowRoot,
-  renderTemplateToIframe,
-  initRenderIframeAndContainer,
   removeLoading,
 } from './shadow';
-import { proxyGenerator, localGenerator } from './proxy';
+import { proxyGenerator } from './proxy';
 import type { ScriptResultList } from './entry';
 import { releaseAssetCacheScope } from './entry';
 import { getPlugins, getPresetLoaders } from './plugin';
@@ -36,7 +27,14 @@ import type { SandboxCache } from './common';
 import { EventBus, appEventObjMap } from './event';
 import type { EventObj } from './event';
 import { EventCleanupTracker } from './tracker';
-import { isFunction, jieshuSupport, appRouteParse, requestIdleCallback, getAbsolutePath, eventTrigger } from './utils';
+import {
+  assertJieshuSupport,
+  isFunction,
+  appRouteParse,
+  requestIdleCallback,
+  getAbsolutePath,
+  eventTrigger,
+} from './utils';
 import { JIESHU_DATA_ATTACH_CSS_FLAG, JIESHU_APP_ID, JIESHU_FONT_STYLE_CONTAINER_ATTR } from './constant';
 import type {
   IframeAttributes,
@@ -54,7 +52,6 @@ import {
   SandboxScriptScheduler,
 } from './sandbox-runtime';
 import type { OperationSlots } from './operation-intent';
-import { shouldHandlePageHideTeardown } from './sandbox-policy';
 
 /**
  * A sandbox iframe is attached before its runtime is initialized. Keeping the
@@ -119,8 +116,6 @@ export default class Jieshu {
   public assetCacheScope: object = {};
   /** 当前实例是否完成了模板与脚本初始化，false 也表示一次 start 正在占用它。 */
   public initialized = false;
-  /** 降级时渲染iframe的属性 */
-  public degradeAttrs: IframeAttributes;
   /** 子应用js执行队列 */
   public execQueue: Array<() => unknown>;
   /** 子应用执行过标志 */
@@ -150,10 +145,6 @@ export default class Jieshu {
   public hrefFlag!: boolean;
   /** 子应用采用fiber模式执行 */
   public fiber: boolean;
-  /** 子应用降级标志 */
-  public degrade: boolean;
-  /** 子应用降级document */
-  public document!: Document;
   /** 子应用styleSheet元素 */
   public styleSheetElements: Array<HTMLLinkElement | HTMLStyleElement>;
 
@@ -176,15 +167,6 @@ export default class Jieshu {
   public head!: HTMLHeadElement;
   /** 子应用body元素 */
   public body!: HTMLBodyElement;
-  /** 子应用dom监听事件留存，当降级时用于保存元素事件 */
-  public elementEventCacheMap: WeakMap<
-    Node,
-    Array<{
-      type: string;
-      handler: EventListenerOrEventListenerObject;
-      options?: boolean | AddEventListenerOptions;
-    }>
-  > = new WeakMap();
   /** 子应用window监听事件 */
   public iframeAddEventListeners?: Array<string>;
   /** 子应用iframe on事件 */
@@ -272,61 +254,6 @@ export default class Jieshu {
     // inject template
     this.template = template ?? this.template;
 
-    /* 降级处理 */
-    if (this.degrade) {
-      const iframeBody = rawDocumentQuerySelector.call(iframeWindow.document, 'body') as HTMLElement;
-      this.relocating = true;
-      let renderTarget: ReturnType<typeof initRenderIframeAndContainer>;
-      try {
-        renderTarget = initRenderIframeAndContainer(this.id, el ?? iframeBody, this.degradeAttrs);
-      } finally {
-        this.relocating = false;
-      }
-      const { iframe, container } = renderTarget;
-      const renderIframeWindow = getIframeWindow(iframe);
-      const renderIframeDocument = getIframeDocument(iframe);
-      this.el = container;
-      // 销毁js运行iframe容器内部dom
-      if (el) clearChild(iframeBody);
-      // 修复vue的event.timeStamp问题
-      patchEventTimeStamp(renderIframeWindow, iframeWindow);
-      // pagehide 与子 frame 销毁时机一致，且不会依赖已弃用的 unload。
-      renderIframeWindow.onpagehide = (event) => {
-        if (shouldHandlePageHideTeardown(event) && !this.destroyed && !this.relocating) void this.unmount();
-      };
-      if (this.document) {
-        if (this.alive) {
-          renderIframeDocument.replaceChild(this.document.documentElement, renderIframeDocument.documentElement);
-          // 保活场景需要事件全部恢复
-          recoverEventListeners(renderIframeDocument.documentElement, iframeWindow);
-        } else {
-          await renderTemplateToIframe(renderIframeDocument, iframeWindow, this.template, () =>
-            this.isActivationCurrent(activationRevision),
-          );
-          if (!this.isActivationCurrent(activationRevision)) {
-            iframe.parentNode?.removeChild(iframe);
-            return;
-          }
-          // 非保活场景需要恢复根节点的事件，防止react16监听事件丢失
-          recoverDocumentListeners(this.document.documentElement, renderIframeDocument.documentElement, iframeWindow);
-        }
-      } else {
-        await renderTemplateToIframe(renderIframeDocument, iframeWindow, this.template, () =>
-          this.isActivationCurrent(activationRevision),
-        );
-        if (!this.isActivationCurrent(activationRevision)) {
-          iframe.parentNode?.removeChild(iframe);
-          return;
-        }
-      }
-      this.document = renderIframeDocument;
-      const renderWindow = this.document.defaultView;
-      if (renderWindow) {
-        patchDegradeInstanceofAcrossRealms(iframeWindow, renderWindow);
-      }
-      return;
-    }
-
     if (this.shadowRoot) {
       /*
        document.addEventListener was transfer to shadowRoot.addEventListener
@@ -343,8 +270,10 @@ export default class Jieshu {
       if (this.alive) return;
     } else {
       // 预执行无容器，暂时插入iframe内部触发Web Component的connect
-      const iframeBody = rawDocumentQuerySelector.call(iframeWindow.document, 'body') as HTMLElement;
-      this.el = renderElementToContainer(createJieshuWebComponent(this.id), el ?? iframeBody);
+      this.el = renderElementToContainer(
+        createJieshuWebComponent(this.id),
+        el ?? iframeWindow.__JIESHU_RAW_DOCUMENT_BODY__,
+      );
     }
 
     await renderTemplateToShadowRoot(this.shadowRoot, iframeWindow, this.template, () =>
@@ -612,12 +541,10 @@ export default class Jieshu {
       this.lifecycles?.afterUnmount?.(iframeWindow);
       this.mountFlag = false;
       this.bus?.$clear();
-      if (!this.degrade) {
-        clearChild(this.shadowRoot);
-        // head body需要复用，每次都要清空事件
-        removeEventListener(this.head);
-        removeEventListener(this.body);
-      }
+      clearChild(this.shadowRoot);
+      // head body需要复用，每次都要清空事件
+      removeEventListener(this.head);
+      removeEventListener(this.body);
       clearChild(this.head);
       clearChild(this.body);
       // styleSheetElements / dynamicScriptElements 不能在 unmount 中清空：
@@ -710,7 +637,7 @@ export default class Jieshu {
       });
     }
     // patchElementEffect 给散落到主应用 DOM 上的 element 留了 baseURI / ownerDocument
-    // getter，它们通过 iframeWindow.__JIESHU 动态读取。主动断链使残留 getter 降级到主 document。
+    // getter，它们通过 iframeWindow.__JIESHU 动态读取。主动断链使残留 getter 回退到主 document。
     if (iframeWindow) {
       try {
         Reflect.set(iframeWindow, '__JIESHU', null);
@@ -729,7 +656,6 @@ export default class Jieshu {
     this.releaseReference('proxyDocument');
     this.releaseReference('proxyLocation');
     this.releaseReference('execQueue');
-    this.releaseReference('degradeAttrs');
     this.releaseReference('styleSheetElements');
     this.releaseReference('fontStyleSheetElements');
     this.releaseReference('dynamicScriptElements');
@@ -740,10 +666,8 @@ export default class Jieshu {
     this.releaseReference('execFlag');
     this.releaseReference('mountFlag');
     this.releaseReference('hrefFlag');
-    this.releaseReference('document');
     this.releaseReference('head');
     this.releaseReference('body');
-    this.releaseReference('elementEventCacheMap');
     this.releaseReference('lifecycles');
     this.releaseReference('plugins');
     this.releaseReference('provide');
@@ -859,7 +783,7 @@ export default class Jieshu {
   public rebuildStyleSheets(): void {
     if (this.styleSheetElements && this.styleSheetElements.length) {
       this.styleSheetElements.forEach((styleSheetElement) => {
-        rawElementAppendChild.call(this.degrade ? this.document.head : this.shadowRoot.head, styleSheetElement);
+        rawElementAppendChild.call(this.shadowRoot.head, styleSheetElement);
       });
     }
     this.patchCssRules();
@@ -871,7 +795,6 @@ export default class Jieshu {
    * 2、将@font-face定义到shadowRoot外部
    */
   public patchCssRules(): void {
-    if (this.degrade) return;
     if (this.shadowRoot.host.hasAttribute(JIESHU_DATA_ATTACH_CSS_FLAG)) return;
     const [hostStyleSheetElement, fontStyleSheetElement] = getPatchStyleElements(
       Array.from(getIframeDocument(this.iframe).querySelectorAll('style')).map(
@@ -899,14 +822,13 @@ export default class Jieshu {
     name: string;
     url: string;
     attrs: IframeAttributes;
-    degradeAttrs: IframeAttributes;
     fiber: boolean;
-    degrade?: boolean;
     plugins: Array<JieshuPlugin>;
     lifecycles: Lifecycles;
     iframeAddEventListeners?: Array<string>;
     iframeOnEvents?: Array<string>;
   }) {
+    assertJieshuSupport();
     // 传递inject给嵌套子应用（显式 as：__JIESHU_INJECT 全局类型是 Partial，需断言回完整结构）
     if (window.__POWERED_BY_JIESHU__) this.inject = window.__JIESHU.inject as Jieshu['inject'];
     else {
@@ -919,13 +841,11 @@ export default class Jieshu {
         fontStyleSheetContainer: this.createFontStyleSheetContainer(),
       };
     }
-    const { name, url, attrs, fiber, degradeAttrs, degrade, lifecycles, plugins } = options;
+    const { name, url, attrs, fiber, lifecycles, plugins } = options;
     this.id = name;
     this.fiber = fiber;
-    this.degrade = degrade || !jieshuSupport;
     this.bus = new EventBus(this.id);
     this.url = url;
-    this.degradeAttrs = degradeAttrs;
     this.provide = { bus: this.bus };
     this.styleSheetElements = [];
     this.execQueue = [];
@@ -940,28 +860,16 @@ export default class Jieshu {
     // 创建iframe
     this.iframe = iframeGenerator(this, attrs, mainHostPath, appHostPath, appRoutePath);
 
-    if (this.degrade) {
-      const { proxyDocument, proxyLocation, proxyRevoke } = localGenerator(
-        this.iframe,
-        urlElement,
-        mainHostPath,
-        appHostPath,
-      );
-      this.proxyDocument = proxyDocument;
-      this.proxyLocation = proxyLocation;
-      this.proxyRevoke = proxyRevoke;
-    } else {
-      const { proxyWindow, proxyDocument, proxyLocation, proxyRevoke } = proxyGenerator(
-        this.iframe,
-        urlElement,
-        mainHostPath,
-        appHostPath,
-      );
-      this.proxy = proxyWindow;
-      this.proxyDocument = proxyDocument;
-      this.proxyLocation = proxyLocation;
-      this.proxyRevoke = proxyRevoke;
-    }
+    const { proxyWindow, proxyDocument, proxyLocation, proxyRevoke } = proxyGenerator(
+      this.iframe,
+      urlElement,
+      mainHostPath,
+      appHostPath,
+    );
+    this.proxy = proxyWindow;
+    this.proxyDocument = proxyDocument;
+    this.proxyLocation = proxyLocation;
+    this.proxyRevoke = proxyRevoke;
     this.provide.location = this.proxyLocation;
 
     addSandboxCacheWithJieshu(this.id, this);

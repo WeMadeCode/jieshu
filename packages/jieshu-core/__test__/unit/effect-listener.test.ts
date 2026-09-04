@@ -23,7 +23,7 @@ describe('render element listener cleanup', () => {
   it('removes capture listeners with their original options and clears retained references', () => {
     const root = createRenderRoot();
     const listener = vi.fn();
-    patchRenderEffect(root, 'listener-test', false);
+    patchRenderEffect(root, 'listener-test');
 
     root.head.addEventListener('click', listener, { capture: true });
     root.head.dispatchEvent(new Event('click'));
@@ -40,7 +40,7 @@ describe('render element listener cleanup', () => {
   it('tracks native listener identity by listener and capture flag', () => {
     const root = createRenderRoot();
     const listener = vi.fn();
-    patchRenderEffect(root, 'listener-identity', false);
+    patchRenderEffect(root, 'listener-identity');
 
     root.body.addEventListener('focus', listener, false);
     root.body.addEventListener('focus', listener, { capture: false, once: true });
@@ -55,7 +55,7 @@ describe('render element listener cleanup', () => {
     const root = createRenderRoot();
     const element = document.createElement('meta');
     const script = document.createElement('script');
-    patchRenderEffect(root, 'released-sandbox', false);
+    patchRenderEffect(root, 'released-sandbox');
 
     expect(root.head.appendChild(element)).toBe(element);
     expect(element.parentNode).toBe(root.head);

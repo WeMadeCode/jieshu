@@ -44,8 +44,6 @@ function createSandbox(
       pathname: '/index.html',
     },
     replace: (code: string) => code,
-    // Skip the unrelated asynchronous CSS-rule compatibility patch.
-    degrade: true,
     styleSheetElements: [],
     deferredStyleObservers: [],
   } as unknown as Jieshu;
@@ -77,7 +75,8 @@ describe('dynamic stylesheet failures', () => {
     const loadError = vi.fn((_url: string, _failure: Error): void => undefined);
     const sandbox = createSandbox(id, fetch, loadError);
     const root = createRenderRoot();
-    patchRenderEffect(root, id, false);
+    sandbox.shadowRoot = root;
+    patchRenderEffect(root, id);
 
     const failedLink = document.createElement('link');
     const failedLoad = vi.fn();
@@ -127,7 +126,8 @@ describe('dynamic stylesheet failures', () => {
       },
     ];
     const root = createRenderRoot();
-    patchRenderEffect(root, id, false);
+    sandbox.shadowRoot = root;
+    patchRenderEffect(root, id);
 
     const link = document.createElement('link');
     const load = vi.fn();

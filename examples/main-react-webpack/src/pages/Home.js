@@ -8,15 +8,9 @@ import hostMap from '../hostMap';
 export default class Home extends React.Component {
   state = {
     checkState: window.localStorage.getItem('preload') !== 'false',
-    disable: !window.Proxy || !window.CustomElementRegistry,
-    degradeState: window.localStorage.getItem('degrade') === 'true' || !window.Proxy || !window.CustomElementRegistry,
   };
   checkStateChange = (check) => {
     window.localStorage.setItem('preload', check);
-    setTimeout(() => window.location.reload(), 1000);
-  };
-  degradeStateChange = (check) => {
-    window.localStorage.setItem('degrade', check);
     setTimeout(() => window.location.reload(), 1000);
   };
   handleClick = (e) => {
@@ -30,16 +24,6 @@ export default class Home extends React.Component {
         <div className="tool">
           <Button type="primary" style={{ visibility: 'hidden' }} icon={<UnorderedListOutlined />}></Button>
           <div className="button-list">
-            <Tooltip title="主动降级，去除shadow+proxy">
-              <Switch
-                className="switch button-gap"
-                checkedChildren="降级开"
-                unCheckedChildren="降级关"
-                disabled={this.state.disable}
-                defaultChecked={this.state.degradeState}
-                onChange={this.degradeStateChange}
-              ></Switch>
-            </Tooltip>
             <Tooltip title="预加载+预执行">
               <Switch
                 className="switch button-gap"

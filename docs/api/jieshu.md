@@ -37,6 +37,4 @@
 
 - 当采用`vite`编译框架时，由于`script`的标签`type`为`module`，所以无法采用[闭包](/guide/information.html#iframe-数据劫持和注入)的方式将 `location` 劫持代理，子应用所有采用`window.location.host`的代码需要统一修改成`$jieshu.location.host`
 
-- 当子应用发生降级时，由于`proxy`无法正常工作导致`location`无法代理，子应用所有采用`window.location.host`的代码需要统一修改成`$jieshu.location.host`
-
 - 当采用非`vite`编译框架时，`proxy`代理了`window.location`，子应用代码无需做任何更改

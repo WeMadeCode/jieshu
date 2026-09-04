@@ -64,11 +64,9 @@ public async unmount(): Promise<void> {
     this.lifecycles?.afterUnmount?.(this.iframe.contentWindow);
     this.mountFlag = false;
     this.bus?.$clear();
-    if (!this.degrade) {
-      clearChild(this.shadowRoot);
-      removeEventListener(this.head);
-      removeEventListener(this.body);
-    }
+    clearChild(this.shadowRoot);
+    removeEventListener(this.head);
+    removeEventListener(this.body);
     clearChild(this.head);
     clearChild(this.body);
   }
@@ -324,7 +322,7 @@ public async unmount(): Promise<void> {
 
 - 文档明确"保活 = 永不释放，使用方需自行 pause 高耗资源"；
 - 在 `deactivated` 钩子的官方建议代码中给出 `pause()` / `cancelAnimationFrame` / 关闭 WebSocket 的样板；
-- 提供"半保活"模式：alive + 长时间不可见 N 秒后自动降级到 unmount。
+- 提供"半保活"模式：alive + 长时间不可见 N 秒后自动切换到 unmount。
 
 ---
 
@@ -414,10 +412,10 @@ public async unmount(): Promise<void> {
 
 ### ✅ 批 E · `Object.defineProperty` 隐患（§9 §10）
 
-| 项                                              | 测试                                                   | 修复点                                                         | 修复前                                                                                                                                                                                                                                                                                                                                                                           | 修复后                                                                                                                                                                                                                                                                                                                                                                          |
-| ----------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| §9 `documentEvents` setter 多重 bug             | `__test__/unit/document-events-leak.test.ts` (4 cases) | `src/iframe.ts patchDocumentEffect`                            | 1) `addEventListener` 与 `handlerCallbackMap.set` 各自独立 `handler.bind()` → 两个不同 bound，下次 set 永远 remove 不掉真正注册的；2) 直接调原生 `document.addEventListener`，绕开批 B 的 `eventCleanupTracker`，destroy 不解绑；3) `handler = null` 进入 `.bind()` 直接抛 `TypeError`；4) bound 闭包持有 `iframeWindow.document`，永久挂在主 document 上 → iframeWindow GC 不掉 | 维护 `propKeyToActiveListener: Map<propKey, bound>`，每次 set 时先按 propKey 取出旧 bound 解绑、untrack，再生成新 bound 并接入 `eventCleanupTracker.trackMainDocumentListener`；handler 为 null/非函数时只解绑不重绑（与原生 onXXX = null 语义一致）；事件名由 `propKey.slice(2)` 推导避免再次绕过劫持                                                                          |
-| §10 `patchElementEffect` 跨边界闭包持有 sandbox | `__test__/unit/element-patch-leak.test.ts` (3 cases)   | `src/iframe.ts patchElementEffect`, `src/sandbox.ts destroy()` | 1) `proxyLocation` 在函数开头从 `iframeWindow.__JIESHU.proxyLocation` 抽取为闭包变量 → element 永久强持 proxyLocation 对象；2) `ownerDocument` getter 直接闭包持有 `iframeWindow`，element 一旦被 portal/弹窗/拖拽搬到主应用 DOM 下，destroy 之后仍把 iframeWindow 钉死；3) destroy 流程不解链 `iframeWindow.__JIESHU`，残留 element 通过 getter 仍可拿到 sandbox                | 1) 用 `WeakRef<Window>` 间接持有 iframeWindow，闭包不再有强引用；2) baseURI / ownerDocument getter 通过 `weakRef.deref()?.__JIESHU?.proxyLocation` 动态访问，拿不到时降级到主 `document.baseURI` / 主 `document`；3) `sandbox.destroy()` 在 removeChild iframe 之前主动 `iframeWindow.__JIESHU = null`，让残留 getter 立即降级；同时旧环境无 `WeakRef` 时降级为强引用，保持兼容 |
+| 项                                              | 测试                                                   | 修复点                                                         | 修复前                                                                                                                                                                                                                                                                                                                                                                           | 修复后                                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| §9 `documentEvents` setter 多重 bug             | `__test__/unit/document-events-leak.test.ts` (4 cases) | `src/iframe.ts patchDocumentEffect`                            | 1) `addEventListener` 与 `handlerCallbackMap.set` 各自独立 `handler.bind()` → 两个不同 bound，下次 set 永远 remove 不掉真正注册的；2) 直接调原生 `document.addEventListener`，绕开批 B 的 `eventCleanupTracker`，destroy 不解绑；3) `handler = null` 进入 `.bind()` 直接抛 `TypeError`；4) bound 闭包持有 `iframeWindow.document`，永久挂在主 document 上 → iframeWindow GC 不掉 | 维护 `propKeyToActiveListener: Map<propKey, bound>`，每次 set 时先按 propKey 取出旧 bound 解绑、untrack，再生成新 bound 并接入 `eventCleanupTracker.trackMainDocumentListener`；handler 为 null/非函数时只解绑不重绑（与原生 onXXX = null 语义一致）；事件名由 `propKey.slice(2)` 推导避免再次绕过劫持                                                                       |
+| §10 `patchElementEffect` 跨边界闭包持有 sandbox | `__test__/unit/element-patch-leak.test.ts` (3 cases)   | `src/iframe.ts patchElementEffect`, `src/sandbox.ts destroy()` | 1) `proxyLocation` 在函数开头从 `iframeWindow.__JIESHU.proxyLocation` 抽取为闭包变量 → element 永久强持 proxyLocation 对象；2) `ownerDocument` getter 直接闭包持有 `iframeWindow`，element 一旦被 portal/弹窗/拖拽搬到主应用 DOM 下，destroy 之后仍把 iframeWindow 钉死；3) destroy 流程不解链 `iframeWindow.__JIESHU`，残留 element 通过 getter 仍可拿到 sandbox                | 1) 用 `WeakRef<Window>` 间接持有 iframeWindow，闭包不再有强引用；2) baseURI / ownerDocument getter 通过 `weakRef.deref()?.__JIESHU?.proxyLocation` 动态访问，拿不到时回退到主 `document.baseURI` / 主 `document`；3) `sandbox.destroy()` 在 removeChild iframe 之前主动 `iframeWindow.__JIESHU = null`，让残留 getter立即回退；同时旧环境无 `WeakRef` 时使用强引用以保持兼容 |
 
 附带：
 

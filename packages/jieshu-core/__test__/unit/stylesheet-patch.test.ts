@@ -25,7 +25,6 @@ import type { Mock } from 'vitest';
 interface FakeSandbox {
   styleSheetElements: HTMLStyleElement[];
   shadowRoot: { head: HTMLElement; host: HTMLElement };
-  degrade: boolean;
 }
 
 function createSandbox(): FakeSandbox {
@@ -35,7 +34,6 @@ function createSandbox(): FakeSandbox {
       head: document.createElement('div'),
       host: document.createElement('div'),
     },
-    degrade: false,
   };
 }
 

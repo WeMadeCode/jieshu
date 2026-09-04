@@ -1,30 +1,17 @@
 import { patchElementEffect, renderIframeReplaceApp } from './iframe';
-import { renderElementToContainer } from './shadow';
 import { pushUrlToWindow } from './sync';
-import { documentProxyProperties, rawDocumentQuerySelector } from './common';
+import { documentProxyProperties } from './common';
 import { JIESHU_TIPS_RELOAD_DISABLED, JIESHU_TIPS_GET_ELEMENT_BY_ID } from './constant';
 import type Jieshu from './sandbox';
-import {
-  createDescriptorPipeline,
-  createResolverPipeline,
-  defineResolvedProperties,
-  resolvedProperty,
-  unresolved,
-} from './proxy-resolver';
-import type { PropertyDescriptorResolver, PropertyResolver } from './proxy-resolver';
-import { getTargetValue, getDegradeIframe, isCallable, checkProxyFunction, warn, stopMainAppRun } from './utils';
+import { createResolverPipeline, resolvedProperty, unresolved } from './proxy-resolver';
+import type { PropertyResolver } from './proxy-resolver';
+import { getTargetValue, isCallable, checkProxyFunction, warn, stopMainAppRun } from './utils';
 
 interface DocumentResolverContext {
   iframe: HTMLIFrameElement;
   sandbox: Jieshu;
   shadowRoot: ShadowRoot;
   document: Document;
-}
-
-interface LocalProxyContext {
-  iframe: HTMLIFrameElement | null;
-  sandbox: Jieshu | null;
-  location: Location | null;
 }
 
 interface LocationResolverContext {
@@ -49,7 +36,6 @@ const documentPropertyGroups = {
 };
 
 const locationConstantKeys = new Set(['host', 'hostname', 'protocol', 'port', 'origin']);
-const localLocationConstantKeys = ['host', 'hostname', 'origin', 'port', 'protocol'];
 
 function getChildLocationHref(locationHref: string, mainHostPath: string, appHostPath: string): string {
   return locationHref.replace(mainHostPath, appHostPath);
@@ -245,205 +231,21 @@ const resolveLocationProperty = createResolverPipeline([
   locationFallbackResolver,
 ]);
 
-type LocalDescriptorFactory = (context: LocalProxyContext) => PropertyDescriptor;
-
-function requireIframe(context: LocalProxyContext): HTMLIFrameElement {
-  if (!context.iframe) throw new TypeError('Jieshu proxy has been revoked');
-  return context.iframe;
-}
-
-function requireSandbox(context: LocalProxyContext): Jieshu {
-  if (!context.sandbox) throw new TypeError('Jieshu proxy has been revoked');
-  return context.sandbox;
-}
-
-const localDocumentDescriptorFactories: { readonly [key: string]: LocalDescriptorFactory | undefined } = {
-  createElement: (context) => ({
-    get:
-      () =>
-      (...args: Parameters<Document['createElement']>) => {
-        const iframe = requireIframe(context);
-        const iframeWindow = requireIframeWindow(iframe);
-        const element = Reflect.apply(
-          iframeWindow.__JIESHU_RAW_DOCUMENT_CREATE_ELEMENT__,
-          requireIframeDocument(iframe),
-          args,
-        );
-        patchElementEffect(element, iframeWindow);
-        return element;
-      },
-  }),
-  createTextNode: (context) => ({
-    get:
-      () =>
-      (...args: Parameters<Document['createTextNode']>) => {
-        const iframe = requireIframe(context);
-        const iframeWindow = requireIframeWindow(iframe);
-        const element = Reflect.apply(
-          iframeWindow.__JIESHU_RAW_DOCUMENT_CREATE_TEXT_NODE__,
-          requireIframeDocument(iframe),
-          args,
-        );
-        patchElementEffect(element, iframeWindow);
-        return element;
-      },
-  }),
-  documentURI: (context) => ({
-    get: () => (context.sandbox?.proxyLocation as Location | undefined)?.href,
-  }),
-  URL: (context) => ({
-    get: () => (context.sandbox?.proxyLocation as Location | undefined)?.href,
-  }),
-  getElementsByTagName: (context) => ({
-    get: () => (qualifiedName: string) => {
-      const iframe = requireIframe(context);
-      if (qualifiedName === 'script') return requireIframeDocument(iframe).scripts;
-      return requireSandbox(context).document.getElementsByTagName(qualifiedName);
-    },
-  }),
-  getElementById: (context) => ({
-    get: () => (elementId: string) => {
-      const iframe = requireIframe(context);
-      return (
-        requireSandbox(context).document.getElementById(elementId) ||
-        requireIframeWindow(iframe).__JIESHU_RAW_DOCUMENT_HEAD__.querySelector(`#${elementId}`)
-      );
-    },
-  }),
-};
-
-const localForwardedDocumentKeys = new Set(
-  documentProxyProperties.modifyProperties
-    .filter((key) => !documentProxyProperties.modifyLocalProperties.includes(key))
-    .concat(
-      documentProxyProperties.ownerProperties,
-      documentProxyProperties.shadowProperties,
-      documentProxyProperties.shadowMethods,
-      documentProxyProperties.documentProperties,
-      documentProxyProperties.documentMethods,
-    ),
-);
-
-const localSpecialDocumentDescriptorResolver: PropertyDescriptorResolver<LocalProxyContext> = (context, key) => {
-  if (typeof key !== 'string') return undefined;
-  return localDocumentDescriptorFactories[key]?.(context);
-};
-
-const localForwardedDocumentDescriptorResolver: PropertyDescriptorResolver<LocalProxyContext> = (context, key) => {
-  if (typeof key !== 'string' || !localForwardedDocumentKeys.has(key)) return undefined;
-  return {
-    get: () => {
-      const sandbox = context.sandbox;
-      const value = sandbox?.document ? Reflect.get(sandbox.document, key) : undefined;
-      return isCallable(value) && sandbox ? value.bind(sandbox.document) : value;
-    },
-  };
-};
-
-const resolveLocalDocumentDescriptor = createDescriptorPipeline([
-  localSpecialDocumentDescriptorResolver,
-  localForwardedDocumentDescriptorResolver,
-]);
-
-interface LocalLocationDescriptorContext {
-  refs: LocalProxyContext;
-  constantValues: Readonly<Record<string, unknown>>;
-  mainHostPath: string;
-  appHostPath: string;
-  locationKeys: ReadonlySet<string>;
-}
-
-const localLocationSpecialDescriptorResolver: PropertyDescriptorResolver<LocalLocationDescriptorContext> = (
-  context,
-  key,
-) => {
-  if (typeof key !== 'string') return undefined;
-  if (localLocationConstantKeys.includes(key)) {
-    return {
-      configurable: true,
-      enumerable: true,
-      writable: true,
-      value: context.constantValues[key],
-    };
-  }
-  if (key === 'href') {
-    return {
-      get: () => {
-        const location = context.refs.location;
-        return location ? getChildLocationHref(location.href, context.mainHostPath, context.appHostPath) : undefined;
-      },
-      set: (value: string): void => {
-        locationHrefSet(requireIframe(context.refs), value, context.mainHostPath, context.appHostPath);
-      },
-    };
-  }
-  if (key === 'toString') {
-    return {
-      get: () => () => {
-        const location = context.refs.location;
-        if (!location) throw new TypeError('Jieshu proxy has been revoked');
-        return getChildLocationHref(location.href, context.mainHostPath, context.appHostPath);
-      },
-    };
-  }
-  if (key === 'reload') {
-    return {
-      get: () => {
-        warn(JIESHU_TIPS_RELOAD_DISABLED);
-        return (): null => null;
-      },
-    };
-  }
-  return undefined;
-};
-
-const localLocationForwardedDescriptorResolver: PropertyDescriptorResolver<LocalLocationDescriptorContext> = (
-  context,
-  key,
-) => {
-  if (
-    typeof key !== 'string' ||
-    !context.locationKeys.has(key) ||
-    localLocationConstantKeys.concat(['href', 'reload', 'toString']).includes(key)
-  ) {
-    return undefined;
-  }
-  return {
-    get: () => {
-      const location = context.refs.location;
-      const value = location ? Reflect.get(location, key) : undefined;
-      return isCallable(value) && location ? value.bind(location) : value;
-    },
-  };
-};
-
-const resolveLocalLocationDescriptor = createDescriptorPipeline([
-  localLocationSpecialDescriptorResolver,
-  localLocationForwardedDescriptorResolver,
-]);
-
 /**
  * location href 的set劫持操作
  */
 function locationHrefSet(iframe: HTMLIFrameElement, value: string, mainHostPath: string, appHostPath: string): boolean {
   const iframeWindow = requireIframeWindow(iframe);
-  const iframeDocument = requireIframeDocument(iframe);
-  const { shadowRoot, id, degrade, document, degradeAttrs } = iframeWindow.__JIESHU;
+  const { shadowRoot, id } = iframeWindow.__JIESHU;
   const currentHref = getChildLocationHref(iframeWindow.location.href, mainHostPath, appHostPath);
   const url = resolveLocationHref(value, currentHref);
   iframeWindow.__JIESHU.hrefFlag = true;
-  if (degrade) {
-    const iframeBody = requireContainer(rawDocumentQuerySelector.call(iframeDocument, 'body'));
-    renderElementToContainer(document.documentElement, iframeBody);
-    renderIframeReplaceApp(url, requireContainer(getDegradeIframe(id).parentElement), degradeAttrs);
-  } else renderIframeReplaceApp(url, requireContainer(shadowRoot.host.parentElement), degradeAttrs);
+  renderIframeReplaceApp(url, requireContainer(shadowRoot.host.parentElement));
   pushUrlToWindow(id, url);
   return true;
 }
 
-/**
- * 非降级情况下window、document、location代理
- */
+/** window、document、location 代理 */
 export function proxyGenerator(
   iframe: HTMLIFrameElement,
   urlElement: HTMLAnchorElement,
@@ -540,57 +342,4 @@ export function proxyGenerator(
     revokeLocation();
   };
   return { proxyWindow, proxyDocument, proxyLocation: proxyLocation as unknown as Location, proxyRevoke };
-}
-
-/**
- * 降级情况下document、location代理处理
- */
-export function localGenerator(
-  iframe: HTMLIFrameElement,
-  urlElement: HTMLAnchorElement,
-  mainHostPath: string,
-  appHostPath: string,
-): {
-  proxyDocument: object;
-  proxyLocation: Location;
-  proxyRevoke: () => void;
-} {
-  const iframeWindow = requireIframeWindow(iframe);
-  // 降级模式无法使用 Proxy.revocable，所有 descriptor 统一通过可清空的 refs 访问 DOM。
-  // 对 iframe 的强引用，斩断「主应用 → 代理闭包 → iframe」的引用链。
-  const refs: LocalProxyContext = {
-    iframe,
-    sandbox: iframeWindow.__JIESHU,
-    location: iframeWindow.location,
-  };
-
-  const proxyDocument = {};
-  const localDocumentKeys = Array.from(
-    new Set(documentProxyProperties.modifyLocalProperties.concat(Array.from(localForwardedDocumentKeys))),
-  );
-  defineResolvedProperties(proxyDocument, localDocumentKeys, refs, resolveLocalDocumentDescriptor);
-
-  const proxyLocation: Record<PropertyKey, unknown> = {};
-  const locationKeys = new Set(Object.keys(iframeWindow.location));
-  const constantValues: Record<string, unknown> = {};
-  for (const key of localLocationConstantKeys) constantValues[key] = Reflect.get(urlElement, key);
-  const locationDescriptorContext: LocalLocationDescriptorContext = {
-    refs,
-    constantValues,
-    mainHostPath,
-    appHostPath,
-    locationKeys,
-  };
-  const localLocationKeys = Array.from(
-    new Set(localLocationConstantKeys.concat(['href', 'reload', 'toString'], Array.from(locationKeys))),
-  );
-  defineResolvedProperties(proxyLocation, localLocationKeys, locationDescriptorContext, resolveLocalLocationDescriptor);
-
-  // 置空捕获的 DOM 引用，斩断 getter 闭包对 iframe / location / sandbox 的强引用
-  const proxyRevoke = () => {
-    refs.iframe = null;
-    refs.sandbox = null;
-    refs.location = null;
-  };
-  return { proxyDocument, proxyLocation: proxyLocation as unknown as Location, proxyRevoke };
 }

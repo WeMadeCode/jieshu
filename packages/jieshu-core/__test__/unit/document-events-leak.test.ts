@@ -17,7 +17,6 @@ import { EventCleanupTracker } from '../../src/tracker';
 function createSandboxStub(id: string) {
   return {
     id,
-    degrade: false,
     plugins: [],
     shadowRoot: document.createElement('div'),
     proxyDocument: {},

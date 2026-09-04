@@ -15,10 +15,8 @@ export interface ResolvedOptions {
   prefix?: Record<string, string>;
   loading?: HTMLElement;
   attrs: IframeAttributes;
-  degradeAttrs: IframeAttributes;
   fiber: boolean;
   alive: boolean;
-  degrade: boolean;
   plugins: Array<JieshuPlugin>;
   iframeAddEventListeners: Array<string>;
   iframeOnEvents: Array<string>;
@@ -40,10 +38,8 @@ export function resolveOptions(options: CacheOptions, cacheOptions?: CacheOption
     prefix: options.prefix || cached?.prefix,
     loading: options.loading || cached?.loading,
     attrs: options.attrs !== undefined ? options.attrs : cached?.attrs || {},
-    degradeAttrs: options.degradeAttrs !== undefined ? options.degradeAttrs : cached?.degradeAttrs || {},
     fiber: options.fiber !== undefined ? options.fiber : cached?.fiber !== undefined ? cached.fiber : true,
     alive: options.alive !== undefined ? options.alive : cached?.alive !== undefined ? cached.alive : false,
-    degrade: options.degrade !== undefined ? options.degrade : cached?.degrade !== undefined ? cached.degrade : false,
     plugins: options.plugins || cached?.plugins || [],
     iframeAddEventListeners: options.iframeAddEventListeners || cached?.iframeAddEventListeners || [],
     iframeOnEvents: options.iframeOnEvents || cached?.iframeOnEvents || [],

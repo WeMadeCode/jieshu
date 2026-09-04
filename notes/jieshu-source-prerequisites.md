@@ -25,7 +25,7 @@ jieshu 与其他微前端方案最根本的区别：
 | **DOM / CSS 隔离** | 样式互不干扰、DOM 挂载位置、事件冒泡边界       | `shadow.ts` `effect.ts` `effect-pipeline.ts` `native-dom.ts`                           |
 | **状态互通**       | 路由同步、应用间通信、生命周期与并发意图       | `route-state.ts` `sync.ts` `event.ts` `index.ts` `operation-intent.ts` `controller.ts` |
 
-再补一条：jieshu 有**降级模式**（浏览器不支持 Proxy / webcomponent 时，用第二个 iframe 替代 Shadow DOM、用 `Object.defineProperty` 替代 Proxy）。这意味着**同一套逻辑在源码里往往有两份实现**，读代码时看到 `degrade` 分支不要慌。
+再补一条：jieshu 只维护一条运行路径，依赖浏览器原生 `Proxy` 与 Custom Elements。缺少任一能力时，`startApp` / `preloadApp` 会直接抛出不支持错误，不会切换到另一套渲染实现。
 
 ---
 
@@ -82,7 +82,7 @@ Proxy 的创建集中在少数几个入口，但每一个都在要害位置。
 
 - `get` / `set` / `has` 陷阱的触发时机
 - **`Proxy.revocable`**：jieshu 的 window / document / location 三大主代理使用可撤销代理，目的是**销毁子应用时彻底断开对 iframe 的引用，防止内存泄漏**；辅助代理仍会按需使用普通 `Proxy`
-- **代理不变式（invariant）**：代理宿主对象时，若属性不可配置，`get` 必须返回与 target 一致的值，否则抛 `TypeError`。正常模式因此用空对象作为 `proxyLocation` 的 target；降级模式面向缺少 Proxy / Web Components 的环境，改用属性描述符和可清空引用
+- **代理不变式（invariant）**：代理宿主对象时，若属性不可配置，`get` 必须返回与 target 一致的值，否则抛 `TypeError`。因此 `proxyLocation` 使用空对象作为 target
 - `Reflect.get(target, p, receiver)` 中 `receiver` 的作用，以及**故意不传 `receiver`** 的场景（沿用底层 proxy 已有的取值与 `this` 绑定逻辑）
 - 两个冷门 Symbol：
   - **`Symbol.hasInstance`** —— 让跨 realm 的 DOM / Event `instanceof` 判断正确。iframe 里的 `HTMLElement`、`EventTarget` 等构造函数与主文档的**不是同一个对象**，不 patch 的话 `el instanceof HTMLElement` 会返回 `false`
@@ -91,7 +91,6 @@ Proxy 的创建集中在少数几个入口，但每一个都在要害位置。
 **源码印证：**
 
 - [proxy.ts](../packages/jieshu-core/src/proxy.ts) 中的 `proxyGenerator`：集中创建 `proxyWindow`、`proxyDocument`、`proxyLocation` 三个可撤销代理
-- [proxy.ts](../packages/jieshu-core/src/proxy.ts) 中的 `localGenerator`：降级模式不用 `Proxy.revocable`，改用可清空的引用
 - [iframe.ts](../packages/jieshu-core/src/iframe.ts) 中的 `patchInstanceofAcrossRealms`：处理 `Symbol.hasInstance` 与跨 realm 判断
 - [entry.ts](../packages/jieshu-core/src/entry.ts) 中的 `withInlineEventUnscopables`：内联事件 `onclick="fn(event)"` 里的 `event` 必须放行给原生 handler 形参，否则会被 proxy 遮蔽成 `undefined`
 
@@ -143,7 +142,6 @@ Proxy 的创建集中在少数几个入口，但每一个都在要害位置。
 | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
 | `Node.prototype.appendChild` / `insertBefore` / `removeChild` | [iframe.ts](../packages/jieshu-core/src/iframe.ts) 的 `patchNodeEffect`                                          | 修补 iframe 中后续插入或移除的节点 |
 | `Node.prototype.getRootNode`                                  | [iframe.ts](../packages/jieshu-core/src/iframe.ts) 的 `patchNodeEffect`                                          | 让子应用拿到正确的根节点           |
-| `Node.prototype.addEventListener` / `removeEventListener`     | [iframe.ts](../packages/jieshu-core/src/iframe.ts) 的 `recordEventListeners`                                     | 记录监听器以便恢复与清理           |
 | `Document.prototype.addEventListener` / `removeEventListener` | [iframe.ts](../packages/jieshu-core/src/iframe.ts) 的 `patchDocumentEffect`                                      | 处理 document 级监听器             |
 | `head/body.appendChild` / `insertBefore` / `removeChild`      | [effect.ts](../packages/jieshu-core/src/effect.ts) 的 `patchRenderEffect`                                        | 劫持动态 DOM、脚本与样式资源       |
 | `Element.prototype.setAttribute`                              | [iframe-inline-events.ts](../packages/jieshu-core/src/iframe-inline-events.ts) 的 `patchInlineEventSetAttribute` | 编译内联事件属性                   |
@@ -225,8 +223,7 @@ Proxy 的创建集中在少数几个入口，但每一个都在要害位置。
 
 1. [docs/guide/mode.md](../docs/guide/mode.md) —— **保活 / 单例 / 重建**三种运行模式。
    `index.ts` 和 `sandbox.ts` 中大量分支都在区分这三者，不先理解会完全看不懂为什么同一个操作有三套路径。
-2. [docs/guide/degrade.md](../docs/guide/degrade.md) —— 降级方案。
-   解释了为什么 `proxy.ts` / `shadow.ts` 都有"第二套实现"。
+2. [docs/guide/compatibility.md](../docs/guide/compatibility.md) —— 运行环境要求与不支持行为。
 3. `docs/guide/principle.drawio` —— 架构图（用 draw.io 或 VSCode 插件打开）。
 
 其余按需查阅：`communication.md`（通信）、`sync.md`（路由同步）、`lifecycle.md`（生命周期）、`nest.md`（嵌套）、`preload.md`（预加载）。
@@ -237,20 +234,20 @@ Proxy 的创建集中在少数几个入口，但每一个都在要害位置。
 
 按依赖关系与难度递增排列。这里使用入口符号而不是行号，源码增删时更容易重新定位：
 
-| #   | 文件组                                                                                                                                                                                                                     | 建议入口与阅读目的                                                                                                     |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| 1   | [constant.ts](../packages/jieshu-core/src/constant.ts)、[contracts.ts](../packages/jieshu-core/src/contracts.ts)、[options.ts](../packages/jieshu-core/src/options.ts)                                                     | 先熟悉常量、公开契约与 `resolveOptions`                                                                                |
-| 2   | [utils.ts](../packages/jieshu-core/src/utils.ts)、[url-utils.ts](../packages/jieshu-core/src/url-utils.ts)、[native-dom.ts](../packages/jieshu-core/src/native-dom.ts)、[common.ts](../packages/jieshu-core/src/common.ts) | 浏览通用工具、URL 处理、原生 DOM 能力快照与兼容聚合出口                                                                |
-| 3   | [index.ts](../packages/jieshu-core/src/index.ts)、[operation-intent.ts](../packages/jieshu-core/src/operation-intent.ts)、[sandbox-registry.ts](../packages/jieshu-core/src/sandbox-registry.ts)                           | 从 `startApp` / `preloadApp` / `destroyApp` 看公开流程，以及同名应用操作如何判定过期                                   |
-| 4   | [route-state.ts](../packages/jieshu-core/src/route-state.ts)、[sync.ts](../packages/jieshu-core/src/sync.ts)、[event.ts](../packages/jieshu-core/src/event.ts)                                                             | 理解路由状态编解码、History 接入与 `EventBus`                                                                          |
-| 5   | [template.ts](../packages/jieshu-core/src/template.ts)、[entry.ts](../packages/jieshu-core/src/entry.ts)                                                                                                                   | 跟踪 HTML 解析、资源提取、缓存和入口绑定                                                                               |
-| 6   | [iframe-script.ts](../packages/jieshu-core/src/iframe-script.ts)、[sandbox-runtime.ts](../packages/jieshu-core/src/sandbox-runtime.ts)                                                                                     | 从 `insertScriptToIframe` 与 `SandboxScriptScheduler` 理解脚本执行和取消                                               |
-| 7   | **[iframe.ts](../packages/jieshu-core/src/iframe.ts)**、[iframe-inline-events.ts](../packages/jieshu-core/src/iframe-inline-events.ts)                                                                                     | 从 `iframeGenerator` 开始看 JS 沙箱、跨 realm patch 与内联事件                                                         |
-| 8   | **[proxy.ts](../packages/jieshu-core/src/proxy.ts)**、[proxy-resolver.ts](../packages/jieshu-core/src/proxy-resolver.ts)、[function-binding.ts](../packages/jieshu-core/src/function-binding.ts)                           | 从 `proxyGenerator` / `localGenerator` 看代理策略，再用 `getTargetValue` / `checkProxyFunction` 理解方法的 `this` 绑定 |
-| 9   | [shadow.ts](../packages/jieshu-core/src/shadow.ts)                                                                                                                                                                         | 从 `defineJieshuWebComponent` 看 `<jieshu-app>`、ShadowRoot 与渲染容器                                                 |
-| 10  | [effect.ts](../packages/jieshu-core/src/effect.ts)、[effect-pipeline.ts](../packages/jieshu-core/src/effect-pipeline.ts)                                                                                                   | 从 `patchRenderEffect` 看动态 DOM、脚本和样式副作用                                                                    |
-| 11  | **[sandbox.ts](../packages/jieshu-core/src/sandbox.ts)**、[sandbox-policy.ts](../packages/jieshu-core/src/sandbox-policy.ts)                                                                                               | 阅读 `Jieshu` 类如何串起生命周期、资源、策略与销毁                                                                     |
-| 12  | [controller.ts](../packages/jieshu-core/src/controller.ts)、[plugin.ts](../packages/jieshu-core/src/plugin.ts)、[tracker.ts](../packages/jieshu-core/src/tracker.ts)                                                       | 最后补齐适配器控制器、插件加载器与清理追踪器                                                                           |
+| #   | 文件组                                                                                                                                                                                                                     | 建议入口与阅读目的                                                                                  |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| 1   | [constant.ts](../packages/jieshu-core/src/constant.ts)、[contracts.ts](../packages/jieshu-core/src/contracts.ts)、[options.ts](../packages/jieshu-core/src/options.ts)                                                     | 先熟悉常量、公开契约与 `resolveOptions`                                                             |
+| 2   | [utils.ts](../packages/jieshu-core/src/utils.ts)、[url-utils.ts](../packages/jieshu-core/src/url-utils.ts)、[native-dom.ts](../packages/jieshu-core/src/native-dom.ts)、[common.ts](../packages/jieshu-core/src/common.ts) | 浏览通用工具、URL 处理、原生 DOM 能力快照与兼容聚合出口                                             |
+| 3   | [index.ts](../packages/jieshu-core/src/index.ts)、[operation-intent.ts](../packages/jieshu-core/src/operation-intent.ts)、[sandbox-registry.ts](../packages/jieshu-core/src/sandbox-registry.ts)                           | 从 `startApp` / `preloadApp` / `destroyApp` 看公开流程，以及同名应用操作如何判定过期                |
+| 4   | [route-state.ts](../packages/jieshu-core/src/route-state.ts)、[sync.ts](../packages/jieshu-core/src/sync.ts)、[event.ts](../packages/jieshu-core/src/event.ts)                                                             | 理解路由状态编解码、History 接入与 `EventBus`                                                       |
+| 5   | [template.ts](../packages/jieshu-core/src/template.ts)、[entry.ts](../packages/jieshu-core/src/entry.ts)                                                                                                                   | 跟踪 HTML 解析、资源提取、缓存和入口绑定                                                            |
+| 6   | [iframe-script.ts](../packages/jieshu-core/src/iframe-script.ts)、[sandbox-runtime.ts](../packages/jieshu-core/src/sandbox-runtime.ts)                                                                                     | 从 `insertScriptToIframe` 与 `SandboxScriptScheduler` 理解脚本执行和取消                            |
+| 7   | **[iframe.ts](../packages/jieshu-core/src/iframe.ts)**、[iframe-inline-events.ts](../packages/jieshu-core/src/iframe-inline-events.ts)                                                                                     | 从 `iframeGenerator` 开始看 JS 沙箱、跨 realm patch 与内联事件                                      |
+| 8   | **[proxy.ts](../packages/jieshu-core/src/proxy.ts)**、[proxy-resolver.ts](../packages/jieshu-core/src/proxy-resolver.ts)、[function-binding.ts](../packages/jieshu-core/src/function-binding.ts)                           | 从 `proxyGenerator` 看代理策略，再用 `getTargetValue` / `checkProxyFunction` 理解方法的 `this` 绑定 |
+| 9   | [shadow.ts](../packages/jieshu-core/src/shadow.ts)                                                                                                                                                                         | 从 `defineJieshuWebComponent` 看 `<jieshu-app>`、ShadowRoot 与渲染容器                              |
+| 10  | [effect.ts](../packages/jieshu-core/src/effect.ts)、[effect-pipeline.ts](../packages/jieshu-core/src/effect-pipeline.ts)                                                                                                   | 从 `patchRenderEffect` 看动态 DOM、脚本和样式副作用                                                 |
+| 11  | **[sandbox.ts](../packages/jieshu-core/src/sandbox.ts)**、[sandbox-policy.ts](../packages/jieshu-core/src/sandbox-policy.ts)                                                                                               | 阅读 `Jieshu` 类如何串起生命周期、资源、策略与销毁                                                  |
+| 12  | [controller.ts](../packages/jieshu-core/src/controller.ts)、[plugin.ts](../packages/jieshu-core/src/plugin.ts)、[tracker.ts](../packages/jieshu-core/src/tracker.ts)                                                       | 最后补齐适配器控制器、插件加载器与清理追踪器                                                        |
 
 **关键建议：不要从头到尾顺读。**
 跑起 [examples/](../examples/)（`pnpm start`），在 `startApp` 打断点，跟着走完一次
@@ -275,7 +272,7 @@ Proxy 的创建集中在少数几个入口，但每一个都在要害位置。
 
 **Shadow DOM** 10. 事件穿过 shadow 边界时 `target` 会怎么变？ 11. `@font-face` 为什么必须提升到主文档？提升后如何避免多应用互相污染？
 
-**架构** 12. 保活 / 单例 / 重建三种模式，切换页面时各自销毁了什么？ 13. 降级模式牺牲了什么能力，为什么？ 14. `replaceState` 和 `pushState` 在路由同步里分别用在哪？
+**架构** 12. 保活 / 单例 / 重建三种模式，切换页面时各自销毁了什么？ 13. 为什么运行时同时要求 `Proxy` 与 Custom Elements？ 14. `replaceState` 和 `pushState` 在路由同步里分别用在哪？
 
 ---
 

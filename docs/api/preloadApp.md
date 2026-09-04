@@ -19,8 +19,6 @@ type preOptions  {
   props?: { [key: string]: any };
   /** 自定义运行iframe的属性 */
   attrs?: { [key: string]: any };
-  /** 自定义降级渲染iframe的属性 */
-  degradeAttrs?: { [key: string]: any };
   /** 代码替换钩子 */
   replace?: (code: string) => string;
   /** 自定义fetch，资源和接口 */
@@ -31,8 +29,6 @@ type preOptions  {
   exec?: boolean;
   /** js采用fiber模式执行 */
   fiber?: boolean;
-  /** 子应用采用降级iframe方案 */
-  degrade?: boolean;
   /** 子应用window监听事件 */
   iframeAddEventListeners?: Array<string>;
   /** 子应用iframe on事件 */
@@ -61,7 +57,7 @@ type preOptions  {
 
   - 资源的预加载会占用主应用的网络线程池
   - 资源的预执行会阻塞主应用的渲染线程
-  - `name`、`replace`、`fetch`、`alive`、`degrade`这五个参数在`preloadApp`和`startApp`中须保持严格一致，否则子应用的渲染可能出现异常
+  - `name`、`replace`、`fetch`、`alive`这四个参数在`preloadApp`和`startApp`中须保持严格一致，否则子应用的渲染可能出现异常
     :::
 
 ## name
@@ -165,20 +161,6 @@ type preOptions  {
 
   - 其他场景建议采用默认值
 
-  :::
-
-## degrade
-
-- **默认值：** `false`
-
-- **类型：** `Boolean`
-
-- **详情：**
-
-  主动降级设置，界枢方案采用了`proxy`和`webcomponent`等技术，在有些浏览器上可能出现不兼容的情况，此时界枢会自动进行降级，采用一个的`iframe`替换`webcomponent`，用`Object.defineProperty`替换`proxy`，理论上可以兼容到 IE 9，但是用户也可以将`degrade`设置为`true`来主动降级
-
-  ::: warning 警告
-  一旦采用降级方案，弹窗由于在 iframe 内部将无法覆盖整个应用
   :::
 
 ## plugins

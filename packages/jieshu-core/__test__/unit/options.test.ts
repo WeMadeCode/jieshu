@@ -27,7 +27,6 @@ describe('resolveOptions', () => {
     expect(resolved).toMatchObject({
       name: 'app',
       attrs: {},
-      degradeAttrs: {},
       fiber: true,
       iframeAddEventListeners: [],
       iframeOnEvents: [],
@@ -50,7 +49,6 @@ describe('resolveOptions', () => {
       sync: true,
       fiber: true,
       alive: true,
-      degrade: true,
     };
 
     const resolved = resolveOptions(
@@ -60,7 +58,6 @@ describe('resolveOptions', () => {
         sync: false,
         fiber: false,
         alive: false,
-        degrade: false,
       },
       cached,
     );
@@ -69,13 +66,11 @@ describe('resolveOptions', () => {
     expect(resolved.sync).toBe(false);
     expect(resolved.fiber).toBe(false);
     expect(resolved.alive).toBe(false);
-    expect(resolved.degrade).toBe(false);
   });
 
   test('显式空对象和空数组覆盖缓存值', () => {
     const props = {};
     const attrs = {};
-    const degradeAttrs = {};
     const plugins: CacheOptions['plugins'] = [];
     const iframeAddEventListeners: Array<string> = [];
     const iframeOnEvents: Array<string> = [];
@@ -83,20 +78,18 @@ describe('resolveOptions', () => {
       name: 'cached',
       props: { source: 'cache' },
       attrs: { source: 'cache' },
-      degradeAttrs: { source: 'cache' },
       plugins: [{}],
       iframeAddEventListeners: ['load'],
       iframeOnEvents: ['onload'],
     };
 
     const resolved = resolveOptions(
-      { name: 'app', props, attrs, degradeAttrs, plugins, iframeAddEventListeners, iframeOnEvents },
+      { name: 'app', props, attrs, plugins, iframeAddEventListeners, iframeOnEvents },
       cached,
     );
 
     expect(resolved.props).toBe(props);
     expect(resolved.attrs).toBe(attrs);
-    expect(resolved.degradeAttrs).toBe(degradeAttrs);
     expect(resolved.plugins).toBe(plugins);
     expect(resolved.iframeAddEventListeners).toBe(iframeAddEventListeners);
     expect(resolved.iframeOnEvents).toBe(iframeOnEvents);

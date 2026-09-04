@@ -2,16 +2,13 @@ const mockGetJieshuById = vi.hoisted(() => vi.fn());
 
 vi.mock('../../src/common', () => ({
   getJieshuById: mockGetJieshuById,
-  rawDocumentQuerySelector: vi.fn(),
 }));
 
 vi.mock('../../src/iframe', () => ({
-  patchEventTimeStamp: vi.fn(),
   renderIframeReplaceApp: vi.fn(),
 }));
 
 vi.mock('../../src/shadow', () => ({
-  initRenderIframeAndContainer: vi.fn(),
   renderElementToContainer: vi.fn(),
 }));
 
@@ -24,7 +21,6 @@ vi.mock('../../src/utils', () => ({
       appRoutePath: parsed.pathname + parsed.search + parsed.hash,
     };
   },
-  getDegradeIframe: vi.fn(),
 }));
 
 import {
@@ -135,7 +131,7 @@ describe('sync route orchestration', () => {
     expect(replaceState).toHaveBeenCalledWith(null, '', 'https://main-host.test/products/special/item');
   });
 
-  test('processAppForHrefJump 遇到已脱离 document 的 iframe 时安全跳过', () => {
+  test('processAppForHrefJump 遇到已脱离 document 的容器时安全跳过', () => {
     window.history.replaceState(null, '', '/shell?app=https%3A%2F%2Fchild.test%2Fnext#/all');
     mockGetJieshuById.mockReturnValue({
       id: 'app',
