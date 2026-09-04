@@ -1,8 +1,8 @@
-export { default } from 'jieshu-vue3';
+export { default } from '@cloud/jieshu-vue3';
 export type {
   JieshuVueComponent,
   JieshuVueExposed,
   JieshuVueInstance,
   JieshuVueProps,
   JieshuVueStatics,
-} from 'jieshu-vue3';
+} from '@cloud/jieshu-vue3';

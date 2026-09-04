@@ -13,6 +13,7 @@ import Vue3Sub from '../views/Vue3-sub.vue';
 import Angular12 from '../views/Angular12.vue';
 import Multiple from '../views/Multiple.vue';
 import PostMessage from '../views/PostMessage.vue';
+import Online from '../views/Online.vue';
 
 const basename = import.meta.env.PROD ? '/demo-main-vue/' : '/';
 
@@ -86,6 +87,11 @@ const routes = [
     path: '/postmessage',
     name: 'postmessage',
     component: PostMessage,
+  },
+  {
+    path: '/online',
+    name: 'online',
+    component: Online,
   },
   {
     path: '/',

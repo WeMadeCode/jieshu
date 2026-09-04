@@ -1,6 +1,6 @@
 import React from 'react';
 import hostMap from '../hostMap';
-import JieshuReact from 'jieshu-react';
+import JieshuReact from '@cloud/jieshu-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function React16() {

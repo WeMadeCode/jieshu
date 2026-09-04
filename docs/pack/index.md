@@ -10,14 +10,14 @@ collapsable: false
 ## 安装
 
 ```bash
-npm i jieshu-vue3 -S
+npm i @cloud/jieshu-vue3 -S
 
 ```
 
 ## 引入
 
 ```javascript
-import JieshuVue from 'jieshu-vue3';
+import JieshuVue from '@cloud/jieshu-vue3';
 
 const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = JieshuVue;
 
@@ -82,7 +82,7 @@ await this.$refs.jieshu.refresh();
 
 ```javascript
 import Vue from 'vue';
-import { bus, setupApp, preloadApp, startApp, destroyApp } from 'jieshu-core';
+import { bus, setupApp, preloadApp, startApp, destroyApp } from '@cloud/jieshu-core';
 import { createApp, h, defineComponent } from 'vue';
 const vue3Flag = !!createApp;
 

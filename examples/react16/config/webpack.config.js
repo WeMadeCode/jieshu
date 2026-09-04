@@ -295,7 +295,7 @@ module.exports = function (webpackEnv) {
         'react-native': 'react-native-web',
         // Allows for better profiling with ReactDevTools
         // Workspace packages are symlinked to their source directories. Pin bare React imports
-        // to this app so jieshu-react cannot resolve its own development React installation.
+        // to this app so @cloud/jieshu-react cannot resolve its own development React installation.
         react$: appReactEntry,
         'react-dom$': isEnvProductionProfile ? 'react-dom/profiling' : appReactDomEntry,
         ...(isEnvProductionProfile && {

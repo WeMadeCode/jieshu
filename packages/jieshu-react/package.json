@@ -1,5 +1,5 @@
 {
-  "name": "jieshu-react",
+  "name": "@cloud/jieshu-react",
   "version": "0.0.1",
   "description": "界枢微前端React组件封装",
   "repository": {
@@ -32,7 +32,7 @@
     "esm": "pnpm run build:esm",
     "types": "pnpm run build:types",
     "prepare:consumer": "node __test__/consumer/prepare.mjs",
-    "typecheck:source": "tsc --project tsconfig.json --noEmit && tsc --project __test__/unit/tsconfig.json --noEmit && tsc --project __test__/ui/tsconfig.json --noEmit",
+    "typecheck:source": "pnpm run prepare:consumer && tsc --project tsconfig.json --noEmit && tsc --project __test__/unit/tsconfig.json --noEmit && tsc --project __test__/ui/tsconfig.json --noEmit",
     "typecheck:public:built": "pnpm run prepare:consumer && tsc --project tsconfig.test.json",
     "typecheck:public": "pnpm run build && pnpm run typecheck:public:built",
     "typecheck": "pnpm run typecheck:source && pnpm run typecheck:public",
@@ -50,7 +50,7 @@
   "author": "yiludege",
   "license": "MIT",
   "dependencies": {
-    "jieshu-core": "workspace:2.1.0"
+    "@cloud/jieshu-core": "workspace:2.1.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",

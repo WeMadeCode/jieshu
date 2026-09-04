@@ -1,5 +1,5 @@
 import { HashRouter as Router, Route, Routes, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import JieshuReact from 'jieshu-react';
+import JieshuReact from '@cloud/jieshu-react';
 import React, { useState } from 'react';
 import Home from './pages/Home';
 import React16 from './pages/React16';

@@ -50,13 +50,13 @@ Web Components 是一个浏览器原生支持的组件封装技术，可以有�
 - 安装
 
 ```bash
-npm install jieshu-core -S
+npm install @cloud/jieshu-core -S
 ```
 
 - 使用
 
 ```javascript
-import { startApp } from 'jieshu-core';
+import { startApp } from '@cloud/jieshu-core';
 
 startApp({ name: '唯一id', url: '子应用路径', el: '容器', sync: true });
 ```
@@ -66,14 +66,14 @@ startApp({ name: '唯一id', url: '子应用路径', el: '容器', sync: true })
 - 安装
 
 ```bash
-npm i jieshu-vue3 -S
+npm i @cloud/jieshu-vue3 -S
 
 ```
 
 - 引入
 
 ```javascript
-import JieshuVue from 'jieshu-vue3';
+import JieshuVue from '@cloud/jieshu-vue3';
 app.use(JieshuVue);
 ```
 
@@ -103,14 +103,14 @@ app.use(JieshuVue);
 - 安装
 
 ```bash
-npm i jieshu-react -S
+npm i @cloud/jieshu-react -S
 
 ```
 
 - 引入
 
 ```javascript
-import JieshuReact from 'jieshu-react';
+import JieshuReact from '@cloud/jieshu-react';
 ```
 
 - 使用

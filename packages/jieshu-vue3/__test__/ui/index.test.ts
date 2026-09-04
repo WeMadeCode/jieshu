@@ -64,7 +64,7 @@ async function waitForCalls(mock: { mock: { calls: unknown[][] } }, count: numbe
   await vi.waitFor(() => expect(mock.mock.calls).toHaveLength(count));
 }
 
-describe('published jieshu-vue3 UI', () => {
+describe('published @cloud/jieshu-vue3 UI', () => {
   const applicationNames = new Set<string>();
   const mountedComponents = new Set<MountedComponent>();
 
@@ -336,7 +336,7 @@ describe('published jieshu-vue3 UI', () => {
     });
 
     await vi.waitFor(() =>
-      expect(consoleError).toHaveBeenCalledWith('[jieshu-vue3] failed to start application', failure),
+      expect(consoleError).toHaveBeenCalledWith('[@cloud/jieshu-vue3] failed to start application', failure),
     );
   });
 
@@ -361,7 +361,7 @@ describe('published jieshu-vue3 UI', () => {
 
     await vi.waitFor(() => expect(loadError).toHaveBeenCalledWith('http://localhost/vue-async-error/', failure));
     await vi.waitFor(() =>
-      expect(consoleError).toHaveBeenCalledWith('[jieshu-vue3] failed to start application', failure),
+      expect(consoleError).toHaveBeenCalledWith('[@cloud/jieshu-vue3] failed to start application', failure),
     );
     expect(customFetch).toHaveBeenCalledOnce();
   });

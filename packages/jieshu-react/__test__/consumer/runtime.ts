@@ -1,2 +1,2 @@
-export { default } from 'jieshu-react';
-export type { JieshuReactComponent, JieshuReactProps, JieshuReactRef, JieshuReactStatics } from 'jieshu-react';
+export { default } from '@cloud/jieshu-react';
+export type { JieshuReactComponent, JieshuReactProps, JieshuReactRef, JieshuReactStatics } from '@cloud/jieshu-react';

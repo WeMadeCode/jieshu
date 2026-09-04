@@ -1,5 +1,5 @@
 {
-  "name": "jieshu-core",
+  "name": "@cloud/jieshu-core",
   "version": "0.0.1",
   "description": "极致的微前端框架",
   "main": "./dist/lib/index.umd.js",

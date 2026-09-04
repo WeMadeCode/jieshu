@@ -359,7 +359,7 @@ public async unmount(): Promise<void> {
 
 ---
 
-> 本文为代码审计结论，未在最新仓库上跑 Playwright 量化复测；建议结合 `notes/memory-leak-investigation.md` 同时新增一份 integration 测试做实测对照。
+> 本文为代码审计结论，未在最新仓库上跑 Playwright 量化复测；建议结合 `docs/notes/memory-leak-investigation.md` 同时新增一份 integration 测试做实测对照。
 
 ---
 

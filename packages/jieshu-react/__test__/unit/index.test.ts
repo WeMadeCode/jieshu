@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
 import type { Mock, MockInstance } from 'vitest';
-import type { StartOptions } from 'jieshu-core';
+import type { StartOptions } from '@cloud/jieshu-core';
 import JieshuReact, { type JieshuReactRef } from '../../src';
 
 interface MockController {
@@ -39,7 +39,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('jieshu-core', () => ({
+vi.mock('@cloud/jieshu-core', () => ({
   bus: mocks.mockBus,
   setupApp: mocks.mockSetupApp,
   preloadApp: mocks.mockPreloadApp,
@@ -229,7 +229,7 @@ describe('JieshuReact', () => {
     renderComponent(host, { name: 'broken' }, React.createRef<JieshuReactRef>());
     await flushPromises();
 
-    expect(consoleError).toHaveBeenCalledWith('[jieshu-react] failed to start application', failure);
+    expect(consoleError).toHaveBeenCalledWith('[@cloud/jieshu-react] failed to start application', failure);
     act(() => {
       ReactDOM.unmountComponentAtNode(host);
     });
@@ -245,7 +245,7 @@ describe('JieshuReact', () => {
     renderComponent(host, { name: 'broken-controller' }, React.createRef<JieshuReactRef>());
     await flushPromises();
 
-    expect(consoleError).toHaveBeenCalledWith('[jieshu-react] failed to start application', failure);
+    expect(consoleError).toHaveBeenCalledWith('[@cloud/jieshu-react] failed to start application', failure);
     expect(() => {
       act(() => {
         ReactDOM.unmountComponentAtNode(host);

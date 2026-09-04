@@ -38,14 +38,14 @@ window.parent.xxx;
 
 ```javascript
 // 如果使用jieshu
-import { bus } from "jieshu-core";
+import { bus } from "@cloud/jieshu-core";
 
-// 如果使用jieshu-vue3
-import JieshuVue from "jieshu-vue3";
+// 如果使用 @cloud/jieshu-vue3
+import JieshuVue from "@cloud/jieshu-vue3";
 const { bus } = JieshuVue;
 
-// 如果使用jieshu-react
-import JieshuReact from "jieshu-react";
+// 如果使用 @cloud/jieshu-react
+import JieshuReact from "@cloud/jieshu-react";
 const { bus } = JieshuReact;
 
 // 主应用监听事件

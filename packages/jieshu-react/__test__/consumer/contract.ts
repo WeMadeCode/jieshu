@@ -3,7 +3,7 @@ import JieshuReact, {
   type JieshuReactProps,
   type JieshuReactRef,
   type JieshuReactStatics,
-} from 'jieshu-react';
+} from '@cloud/jieshu-react';
 
 const lifecycle = (childWindow: Window): void => {
   void childWindow.location.href;

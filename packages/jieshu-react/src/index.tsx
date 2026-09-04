@@ -10,7 +10,7 @@ import {
   type AppController,
   type DestroyHandler,
   type StartOptions,
-} from 'jieshu-core';
+} from '@cloud/jieshu-core';
 
 export type JieshuReactProps = Omit<StartOptions, 'el'> & {
   width?: string;
@@ -73,7 +73,7 @@ function createStartOptions(componentProps: JieshuReactProps, container: HTMLDiv
 }
 
 function reportAutomaticFailure(error: unknown): void {
-  console.error('[jieshu-react] failed to start application', error);
+  console.error('[@cloud/jieshu-react] failed to start application', error);
 }
 
 const useOwnershipEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;

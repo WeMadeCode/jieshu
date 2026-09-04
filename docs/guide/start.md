@@ -10,11 +10,11 @@ collapsable: false
 ### 引入
 
 ```javascript
-import { bus, setupApp, preloadApp, startApp, destroyApp, refreshApp, clearAssetsCache } from 'jieshu-core';
+import { bus, setupApp, preloadApp, startApp, destroyApp, refreshApp, clearAssetsCache } from '@cloud/jieshu-core';
 ```
 
 ::: tip 提示
-如果主应用是`vue`框架可直接使用 [jieshu-vue3](/pack/)，`react`框架可直接使用 [jieshu-react](/pack/react.html)
+如果主应用是`vue`框架可直接使用 [@cloud/jieshu-vue3](/pack/)，`react`框架可直接使用 [@cloud/jieshu-react](/pack/react.html)
 :::
 
 ### 设置子应用

@@ -1,6 +1,6 @@
 import { createApp, defineComponent, h, nextTick, reactive, ref, type App, type ComponentPublicInstance } from 'vue';
 import type { Mock, MockInstance } from 'vitest';
-import type { StartOptions } from 'jieshu-core';
+import type { StartOptions } from '@cloud/jieshu-core';
 import JieshuVue, { type JieshuVueExposed } from '../../src';
 
 interface MockController {
@@ -41,7 +41,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('jieshu-core', () => ({
+vi.mock('@cloud/jieshu-core', () => ({
   bus: mocks.mockBus,
   setupApp: mocks.mockSetupApp,
   preloadApp: mocks.mockPreloadApp,
@@ -261,7 +261,7 @@ describe('JieshuVue for Vue 3', () => {
     mountedComponents.push(mounted);
     await Promise.resolve();
 
-    expect(consoleError).toHaveBeenCalledWith('[jieshu-vue3] failed to start application', startFailure);
+    expect(consoleError).toHaveBeenCalledWith('[@cloud/jieshu-vue3] failed to start application', startFailure);
     await expect((mounted.child.value as ExposedInstance).refresh()).rejects.toBe(refreshFailure);
   });
 

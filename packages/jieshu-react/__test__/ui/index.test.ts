@@ -75,7 +75,7 @@ async function waitForCalls(mock: { mock: { calls: unknown[][] } }, count: numbe
   await vi.waitFor(() => expect(mock.mock.calls).toHaveLength(count));
 }
 
-describe('published jieshu-react UI', () => {
+describe('published @cloud/jieshu-react UI', () => {
   const applicationNames = new Set<string>();
   const hosts = new Set<HTMLDivElement>();
   const busCleanups = new Set<() => void>();
@@ -339,7 +339,7 @@ describe('published jieshu-react UI', () => {
     );
 
     await vi.waitFor(() =>
-      expect(consoleError).toHaveBeenCalledWith('[jieshu-react] failed to start application', failure),
+      expect(consoleError).toHaveBeenCalledWith('[@cloud/jieshu-react] failed to start application', failure),
     );
   });
 
@@ -369,7 +369,7 @@ describe('published jieshu-react UI', () => {
 
     await vi.waitFor(() => expect(loadError).toHaveBeenCalledWith('http://localhost/react-async-error/', failure));
     await vi.waitFor(() =>
-      expect(consoleError).toHaveBeenCalledWith('[jieshu-react] failed to start application', failure),
+      expect(consoleError).toHaveBeenCalledWith('[@cloud/jieshu-react] failed to start application', failure),
     );
     expect(customFetch).toHaveBeenCalledOnce();
   });

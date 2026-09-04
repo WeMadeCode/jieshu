@@ -5,8 +5,8 @@
 <script lang="ts">
 import { defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import type { CSSProperties, PropType } from 'vue';
-import { bus, createAppController } from 'jieshu-core';
-import type { DestroyHandler, StartOptions } from 'jieshu-core';
+import { bus, createAppController } from '@cloud/jieshu-core';
+import type { DestroyHandler, StartOptions } from '@cloud/jieshu-core';
 
 interface OptionalProp<T> {
   readonly type: PropType<T>;
@@ -112,7 +112,7 @@ function optionsFromProps(props: ResolvedComponentProps, container: HTMLElement 
 }
 
 function reportAutomaticFailure(error: unknown): void {
-  console.error('[jieshu-vue3] failed to start application', error);
+  console.error('[@cloud/jieshu-vue3] failed to start application', error);
 }
 
 export default defineComponent({

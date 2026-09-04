@@ -29,7 +29,7 @@
 ## 示例
 
 ```javascript
-import { clearAssetsCache } from 'jieshu-core';
+import { clearAssetsCache } from '@cloud/jieshu-core';
 
 // 清空全部缓存
 clearAssetsCache();

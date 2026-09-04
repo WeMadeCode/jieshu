@@ -5,7 +5,7 @@
 
 <script>
 import hostMap from '../hostMap';
-import jieshuVue from 'jieshu-vue3';
+import jieshuVue from '@cloud/jieshu-vue3';
 export default {
   data() {
     return {

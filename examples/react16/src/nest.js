@@ -1,5 +1,5 @@
 import React from 'react';
-import JieshuReact from 'jieshu-react';
+import JieshuReact from '@cloud/jieshu-react';
 import lifecycles from './lifecycle';
 import hostMap from './hostMap';
 

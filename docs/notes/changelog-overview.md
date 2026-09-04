@@ -107,4 +107,4 @@
 - 下次发布前新增明确版本，集中记录包名、exports、ES target、React/Vue 支持范围和已移除的包。
 - 根 changelog 只写 workspace 级概要；包 changelog 只写该包真实变更，不再生成空壳版本。
 - 每条 bug fix 增加稳定的回归测试名或测试文件链接。
-- 不再在源码树中保存分散的包级或第三方 changelog；后续项目发布记录统一维护在 `notes/`。
+- 不再在源码树中保存分散的包级或第三方 changelog；后续项目发布记录统一维护在 `docs/notes/`。

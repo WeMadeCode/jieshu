@@ -7,11 +7,11 @@ export default createLibraryConfig({
   entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
   plugins: [vue()],
   globalName: 'JieshuVue',
-  esmExternal: ['vue', 'jieshu-core'],
+  esmExternal: ['vue', '@cloud/jieshu-core'],
   umdExternal: ['vue'],
   umdGlobals: { vue: 'Vue' },
   umdAliases: {
-    'jieshu-core': fileURLToPath(new URL('../jieshu-core/src/index.ts', import.meta.url)),
+    '@cloud/jieshu-core': fileURLToPath(new URL('../jieshu-core/src/index.ts', import.meta.url)),
   },
   umdExports: 'default',
 });

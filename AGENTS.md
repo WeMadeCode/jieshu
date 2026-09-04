@@ -30,10 +30,10 @@
 ```bash
 pnpm install
 pnpm test
-pnpm --filter jieshu-core test:unit
-pnpm --filter jieshu-core test:integration
-pnpm --filter jieshu-react test
-pnpm --filter jieshu-vue3 test
+pnpm --filter @cloud/jieshu-core test:unit
+pnpm --filter @cloud/jieshu-core test:integration
+pnpm --filter @cloud/jieshu-react test
+pnpm --filter @cloud/jieshu-vue3 test
 pnpm --filter jieshu-docs docs:build
 pnpm start
 ```

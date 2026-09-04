@@ -66,6 +66,7 @@
       <router-link to="/angular12">angular12</router-link>
       <router-link to="/all">all</router-link>
       <router-link to="/postmessage">postmessage</router-link>
+      <router-link to="/online">在线体验</router-link>
       <a-button class="menu-icon" type="primary" size="large" @click.stop="active = !active">☰</a-button>
     </div>
     <div class="content" @click="active = false">

@@ -4,7 +4,7 @@ import 'custom-event-polyfill';
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
-import JieshuVue from 'jieshu-vue3';
+import JieshuVue from '@cloud/jieshu-vue3';
 import hostMap from './hostMap';
 import credentialsFetch from './fetch';
 import { Button, Switch, Tooltip } from 'ant-design-vue';

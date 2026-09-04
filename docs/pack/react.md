@@ -10,13 +10,13 @@ collapsable: false
 ## 安装
 
 ```bash
-npm i jieshu-react -S
+npm i @cloud/jieshu-react -S
 ```
 
 ## 引入
 
 ```javascript
-import JieshuReact from 'jieshu-react';
+import JieshuReact from '@cloud/jieshu-react';
 
 const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = JieshuReact;
 ```
@@ -77,7 +77,7 @@ await this.jieshuRef.current.refresh();
 
 ```javascript
 import React from 'react';
-import { bus, setupApp, preloadApp, startApp, destroyApp } from 'jieshu-core';
+import { bus, setupApp, preloadApp, startApp, destroyApp } from '@cloud/jieshu-core';
 
 export default class JieshuReact extends React.PureComponent {
   static bus = bus;

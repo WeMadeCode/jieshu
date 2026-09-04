@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 const fixtureRoot = dirname(fileURLToPath(import.meta.url));
 const dependencyRoot = resolve(fixtureRoot, 'node_modules');
 const packageRoot = resolve(fixtureRoot, '../..');
-const packageLink = resolve(dependencyRoot, 'jieshu-react');
+const packageLink = resolve(dependencyRoot, '@cloud/jieshu-react');
 
-await mkdir(dependencyRoot, { recursive: true });
+await mkdir(dirname(packageLink), { recursive: true });
 await rm(packageLink, { force: true, recursive: true });
 await symlink(packageRoot, packageLink, process.platform === 'win32' ? 'junction' : 'dir');

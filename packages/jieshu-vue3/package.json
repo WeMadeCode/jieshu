@@ -1,5 +1,5 @@
 {
-  "name": "jieshu-vue3",
+  "name": "@cloud/jieshu-vue3",
   "version": "0.0.1",
   "description": "界枢微前端Vue3组件封装",
   "repository": {
@@ -32,7 +32,7 @@
     "esm": "pnpm run build:esm",
     "start": "pnpm run build:types && vite build --mode esm --watch",
     "prepare:consumer": "node __test__/consumer/prepare.mjs",
-    "typecheck:source": "vue-tsc -p tsconfig.json --noEmit && vue-tsc -p __test__/unit/tsconfig.json --noEmit && vue-tsc -p __test__/ui/tsconfig.json --noEmit",
+    "typecheck:source": "pnpm run prepare:consumer && vue-tsc -p tsconfig.json --noEmit && vue-tsc -p __test__/unit/tsconfig.json --noEmit && vue-tsc -p __test__/ui/tsconfig.json --noEmit",
     "typecheck:public:built": "pnpm run prepare:consumer && vue-tsc -p tsconfig.type-test.json",
     "typecheck:public": "pnpm run build && pnpm run typecheck:public:built",
     "typecheck": "pnpm run typecheck:source && pnpm run typecheck:public",
@@ -49,7 +49,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "jieshu-core": "workspace:2.1.0"
+    "@cloud/jieshu-core": "workspace:2.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "6.0.8",

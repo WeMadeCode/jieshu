@@ -1,11 +1,11 @@
 import { h, type App } from 'vue';
-import type { DestroyHandler } from 'jieshu-core';
+import type { DestroyHandler } from '@cloud/jieshu-core';
 import JieshuVue, {
   type JieshuVueComponent,
   type JieshuVueInstance,
   type JieshuVueProps,
   type JieshuVueStatics,
-} from 'jieshu-vue3';
+} from '@cloud/jieshu-vue3';
 
 declare const app: App;
 declare const instance: JieshuVueInstance;

@@ -1,6 +1,6 @@
 import type { App, ComponentPublicInstance, CSSProperties, DefineComponent } from 'vue';
-import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp } from 'jieshu-core';
-import type { DestroyHandler, StartOptions } from 'jieshu-core';
+import { bus, clearAssetsCache, destroyApp, preloadApp, refreshApp, setupApp } from '@cloud/jieshu-core';
+import type { DestroyHandler, StartOptions } from '@cloud/jieshu-core';
 
 import component from './JieshuVue.vue';
 

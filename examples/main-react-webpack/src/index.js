@@ -3,7 +3,7 @@ import 'react-app-polyfill/ie11';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import JieshuReact from 'jieshu-react';
+import JieshuReact from '@cloud/jieshu-react';
 import 'antd/es/switch/style/css.js';
 import 'antd/es/tooltip/style/css.js';
 import 'antd/es/button/style/css.js';
