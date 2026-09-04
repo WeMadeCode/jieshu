@@ -11,6 +11,7 @@ test-results
 playwright-report
 blob-report
 
+
 node_modules
 dist
 site
