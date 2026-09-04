@@ -15,7 +15,7 @@
       <div>{{ jieshuHost }}</div>
     </blockquote>
     <h3>3、修改 $jieshu.location.href</h3>
-    <el-button type="warning" @click="handleClick">跳转无极</el-button>
+    <el-button type="warning" @click="handleClick">跳转京东</el-button>
     <p>子应用修改 $jieshu.location.href，会将当前的子应用的shadow删除并且替换成一个iframe</p>
     <blockquote>
       <div>如果子应用配置路由同步，浏览器可通过回退回到子应用</div>
@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     handleClick() {
-      window.$jieshu.location.href = 'https://wujicode.cn/xy/app/prod/official/index';
+      window.$jieshu.location.href = 'http://www.jd.com/';
     },
   },
 };

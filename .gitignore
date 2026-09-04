@@ -1,26 +1,16 @@
-.DS_Store
-node_modules
+
 .pnpm-store
-dist
-site
-lib
-esm
-packages/*/types/
 .DS_Store
 .vscode/*
 !.vscode/settings.json
-yarn.lock
+.idea
+
+cache
 coverage
 test-results
 playwright-report
 blob-report
-.history
-.npmrc
-.cursor
-.codegraph
-.worktree
 
-# Log files
-.pnpm-debug.log*
-cache
-.idea
+node_modules
+dist
+site
