@@ -10,7 +10,6 @@ export default function React16() {
   const vue2Url = hostMap('//localhost:7200/');
   const vue3Url = hostMap('//localhost:7300/');
   const vite = hostMap('//localhost:7500/');
-  const angular12Url = hostMap('//localhost:7400/');
   // 修正iframe的url，防止github pages csp报错
   const props = {
     jump: (name) => {
@@ -49,16 +48,6 @@ export default function React16() {
       </div>
       <div className="all-item">
         <JieshuReact height="100%" width="100%" name="vite" url={vite} sync={true} props={props}></JieshuReact>
-      </div>
-      <div className="all-item">
-        <JieshuReact
-          height="100%"
-          width="100%"
-          name="angular12"
-          url={angular12Url}
-          sync={true}
-          props={props}
-        ></JieshuReact>
       </div>
       <div className="all-item">
         <JieshuReact

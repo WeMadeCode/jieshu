@@ -60,7 +60,7 @@ type SearchMap = {
   vue2: string;
   vue3: string;
   vite: string;
-  angular12: string;
+  react18: string;
 };
 
 export function getUrlSearchObject(url: string): SearchMap {

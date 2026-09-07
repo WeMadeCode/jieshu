@@ -83,15 +83,6 @@ setupApp({
 });
 
 setupApp({
-  name: 'angular12',
-  url: hostMap('//localhost:7400/'),
-  attrs,
-  exec: true,
-  fetch: credentialsFetch,
-  ...lifecycles,
-});
-
-setupApp({
   name: 'vite',
   url: hostMap('//localhost:7500/'),
   attrs,
@@ -110,9 +101,6 @@ if (window.localStorage.getItem('preload') !== 'false') {
   });
   preloadApp({
     name: 'vue2',
-  });
-  preloadApp({
-    name: 'angular12',
   });
   preloadApp({
     name: 'vue3',

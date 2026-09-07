@@ -167,10 +167,10 @@ for (const host of hosts) {
       .poll(() => (host.hash ? new URL(page.url()).hash : new URL(page.url()).pathname))
       .toBe(host.hash ? '#/vue3' : '/vue3');
     await page.locator(`a[href="${host.hash ? '#' : ''}/react18"]`).click();
-    await child.getByRole('button', { name: '跳转 Angular12', exact: true }).click();
+    await child.getByRole('button', { name: '跳转 React17', exact: true }).click();
     await expect
       .poll(() => (host.hash ? new URL(page.url()).hash : new URL(page.url()).pathname))
-      .toBe(host.hash ? '#/angular12' : '/angular12');
+      .toBe(host.hash ? '#/react17' : '/react17');
   });
 
   test(`${host.name}：all 页面跨应用消息、计数与监听清理`, async ({ page }) => {

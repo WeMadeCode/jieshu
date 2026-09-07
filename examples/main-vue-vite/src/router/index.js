@@ -11,7 +11,6 @@ import Vite from '../views/Vite.vue';
 import ViteSub from '../views/Vite-sub.vue';
 import Vue3 from '../views/Vue3.vue';
 import Vue3Sub from '../views/Vue3-sub.vue';
-import Angular12 from '../views/Angular12.vue';
 import Multiple from '../views/Multiple.vue';
 import PostMessage from '../views/PostMessage.vue';
 import Online from '../views/Online.vue';
@@ -83,11 +82,6 @@ const routes = [
     path: '/vue3-sub/:path',
     name: 'vue3-sub',
     component: Vue3Sub,
-  },
-  {
-    path: '/angular12',
-    name: 'angular12',
-    component: Angular12,
   },
   {
     path: '/all',

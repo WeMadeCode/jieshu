@@ -5,7 +5,6 @@
     <JieshuVue class="item" name="vue2" :url="vue2Url" :sync="true"></JieshuVue>
     <JieshuVue class="item" name="vue3" :url="vue3Url" :sync="true"></JieshuVue>
     <JieshuVue class="item" name="vite" :url="vite" :sync="true"></JieshuVue>
-    <JieshuVue class="item" name="angular12" :url="angular12Url" :sync="true"></JieshuVue>
     <JieshuVue class="item" name="react18" :url="react18Url" :sync="true" :alive="true" />
   </div>
 </template>
@@ -23,7 +22,6 @@ export default {
       vue2Url: hostMap('//localhost:7200/'),
       vue3Url: hostMap('//localhost:7300/'),
       vite: hostMap('//localhost:7500/'),
-      angular12Url: hostMap('//localhost:7400/'),
     };
   },
   methods: {

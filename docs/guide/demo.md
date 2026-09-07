@@ -43,8 +43,7 @@ pnpm start
 | ----------------- | ------ |
 | React16 + Webpack | ✅ 🆕  |
 | React17 + Webpack | ✅ 🆕  |
-| React18 + Webpack | 🚧     |
+| React18 + Vite    | ✅     |
 | Vue3 + Vite       | ✅     |
 | Vue2 + Webpack    | ✅     |
 | Vue3 + Webpack    | ✅     |
-| Angular12         | ✅     |

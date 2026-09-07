@@ -61,4 +61,3 @@ pnpm start
 | Webpack + Vue3    | ✅  |
 | Webpack + React16 | ✅  |
 | Webpack + React17 | ✅  |
-| Angular12         | ✅  |

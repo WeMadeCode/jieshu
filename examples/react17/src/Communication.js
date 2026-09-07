@@ -24,8 +24,8 @@ export default class Communication extends React.Component {
           <p>主应用通过 props 注入 jump（跳转页面）方法，子应用通过 $jieshu.props.jump(xxx) 来使用</p>
           <p>
             <Button onClick={this.jump}>点击跳转vue3</Button>
-            <Button className="app-jump" onClick={() => window?.$jieshu.props.jump('angular12')}>
-              跳转angular
+            <Button className="app-jump" onClick={() => window?.$jieshu.props.jump('react18')}>
+              跳转React18
             </Button>
           </p>
           <h3>2、通过 window.parent 方法拿到主应用的全局方法</h3>

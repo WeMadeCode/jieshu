@@ -23,8 +23,8 @@ const Communication = () => {
         <Button disabled={!embedded} onClick={() => window.$jieshu?.props?.jump?.('vue3')}>
           跳转 Vue3
         </Button>
-        <Button disabled={!embedded} onClick={() => window.$jieshu?.props?.jump?.('angular12')}>
-          跳转 Angular12
+        <Button disabled={!embedded} onClick={() => window.$jieshu?.props?.jump?.('react17')}>
+          跳转 React17
         </Button>
         <Button disabled={!embedded} onClick={() => window.$jieshu?.props?.jump?.('home')}>
           返回主应用首页

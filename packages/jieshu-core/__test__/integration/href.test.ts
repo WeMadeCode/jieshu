@@ -26,15 +26,8 @@ describe('main react location href test', () => {
     await page.goto(reactMainUrl);
   });
 
-  reactMainAppInfoList.slice(0, 5).forEach((appInfo) =>
+  reactMainAppInfoList.forEach((appInfo) =>
     it(`${appInfo.name} location href test`, async () => {
-      if (
-        !('routeMountedMessage' in appInfo) ||
-        !('routeNavSelector' in appInfo) ||
-        !('routeJumpButtonSelector' in appInfo)
-      ) {
-        throw new Error(`Missing route test metadata for ${appInfo.name}`);
-      }
       const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
       await page.click(appInfo.linkSelector);
       await appInfoMountedPromise;
@@ -59,15 +52,8 @@ describe('main vue location href test', () => {
     await page.goto(vueMainUrl);
   });
 
-  vueMainAppInfoList.slice(0, 5).forEach((appInfo) =>
+  vueMainAppInfoList.forEach((appInfo) =>
     it(`${appInfo.name} location href test`, async () => {
-      if (
-        !('routeMountedMessage' in appInfo) ||
-        !('routeNavSelector' in appInfo) ||
-        !('routeJumpButtonSelector' in appInfo)
-      ) {
-        throw new Error(`Missing route test metadata for ${appInfo.name}`);
-      }
       const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
       await page.click(appInfo.linkSelector);
       await appInfoMountedPromise;

@@ -15,7 +15,6 @@ const outputs = [
   ['vue2', 'examples/vue2/dist', 'demo-vue2'],
   ['vue3', 'examples/vue3/dist', 'demo-vue3'],
   ['vite', 'examples/vite/dist', 'demo-vite'],
-  ['angular12', 'examples/angular12/dist', 'demo-angular12'],
   ['docs', 'docs/.vitepress/dist', 'doc'],
 ];
 

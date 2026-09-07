@@ -74,7 +74,6 @@
         <router-link to="/vite-sub/location">location</router-link>
         <router-link to="/vite-sub/contact">contact</router-link>
       </div>
-      <router-link to="/angular12">angular12</router-link>
       <router-link to="/all">all</router-link>
       <router-link to="/postmessage">postmessage</router-link>
       <router-link to="/online">在线体验</router-link>

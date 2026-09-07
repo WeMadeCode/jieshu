@@ -118,21 +118,6 @@ export const reactMainAppInfoMap = {
       'document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div:nth-child(2) > div.hello > h2")',
     titleText: 'Vue3 + vite示例',
   },
-  angular12: {
-    name: 'angular12',
-    linkSelector: "a[href='#/angular12']",
-    mountedMessage: 'angular12 afterMount 生命周期',
-    entryLifecycles: [
-      'angular12 beforeLoad 生命周期',
-      'angular12 beforeMount 生命周期',
-      'angular12 afterMount 生命周期',
-    ],
-    leaveLifecycles: ['angular12 beforeUnmount 生命周期', 'angular12 afterUnmount 生命周期'],
-    preloadTitleJsSelector: `window.frames.angular12.document.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")`,
-    titleJsSelector:
-      'document.querySelector("#root > div > div.content > div > jieshu-app").shadowRoot.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")',
-    titleText: 'angular12 app is running!',
-  },
 };
 export const reactMainAppInfoList = Object.entries(reactMainAppInfoMap).map((item) => item[1]);
 export const reactMainAppNameList = Object.entries(reactMainAppInfoMap).map((item) => item[0]);
@@ -251,22 +236,6 @@ export const vueMainAppInfoMap = {
     titleJsSelector:
       'document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("#app > div:nth-child(2) > div.hello > h2")',
     titleText: 'Vue3 + vite示例',
-  },
-  angular12: {
-    name: 'angular12',
-    linkSelector: "a[href='/angular12']",
-    mountedMessage: 'angular12 afterMount 生命周期',
-    entryLifecycles: [
-      'angular12 beforeLoad 生命周期',
-      'angular12 beforeMount 生命周期',
-      'angular12 afterMount 生命周期',
-    ],
-    leaveLifecycles: ['angular12 beforeUnmount 生命周期', 'angular12 afterUnmount 生命周期'],
-    preloadTitleJsSelector:
-      'window.frames.angular12.document.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")',
-    titleJsSelector:
-      'document.querySelector("#app > div.content > div > jieshu-app").shadowRoot.querySelector("body > app-root > div.content > div.card.highlight-card.card-small > span")',
-    titleText: 'angular12 app is running!',
   },
 };
 export const vueMainAppInfoList = Object.entries(vueMainAppInfoMap).map((item) => item[1]);

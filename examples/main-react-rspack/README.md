@@ -17,6 +17,6 @@ pnpm --filter main-react-ts typecheck
 pnpm --filter main-react-ts build
 ```
 
-单独启动主应用时，还需按需启动 `react16`、`react17`、`vue2`、`vue3`、`vite` 和 `angular12` 子应用；也可以在仓库根目录运行 `pnpm start` 一并启动所有示例。
+单独启动主应用时，还需按需启动 `react16`、`react17`、`vue2`、`vue3`、`vite` 和 `react18` 子应用；也可以在仓库根目录运行 `pnpm start` 一并启动所有示例。
 
 本示例没有 ESLint 或 Prettier 配置。

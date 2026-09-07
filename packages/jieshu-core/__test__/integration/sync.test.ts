@@ -53,7 +53,7 @@ const generateTest = (
         vue2: AppInfoMap.vue2.homeQueryParam,
         vue3: AppInfoMap.vue3.homeQueryParam,
         vite: '%2Fhome',
-        angular12: '%2F',
+        react18: '%2Fhome',
       });
     const searchMap = getUrlSearchObject(page.url());
     // 查看当前路由
@@ -62,7 +62,7 @@ const generateTest = (
     expect(searchMap.vue2).toBe(AppInfoMap.vue2.homeQueryParam);
     expect(searchMap.vue3).toBe(AppInfoMap.vue3.homeQueryParam);
     expect(searchMap.vite).toBe('%2Fhome');
-    expect(searchMap.angular12).toBe('%2F');
+    expect(searchMap.react18).toBe('%2Fhome');
     // 跳转
     const react16DialogMountedPromise = awaitConsoleLogMessage(page, AppInfoMap.react16.dialogMountedMessage);
     await triggerClickByJsSelector(page, AppInfoMap.react16.dialogNavSelectorInAll);
@@ -112,7 +112,7 @@ const generateTest = (
         vue2: AppInfoMap.vue2.dialogQueryParam,
         vue3: AppInfoMap.vue3.dialogQueryParam,
         vite: '%2Fhome',
-        angular12: '%2F',
+        react18: '%2Fhome',
       });
     const newSearchMap = getUrlSearchObject(page.url());
     // 查看当前路由
@@ -121,7 +121,7 @@ const generateTest = (
     expect(newSearchMap.vue2).toBe(AppInfoMap.vue2.dialogQueryParam);
     expect(newSearchMap.vue3).toBe(AppInfoMap.vue3.dialogQueryParam);
     expect(newSearchMap.vite).toBe('%2Fhome');
-    expect(newSearchMap.angular12).toBe('%2F');
+    expect(newSearchMap.react18).toBe('%2Fhome');
   });
 };
 
@@ -140,7 +140,7 @@ describe('main react sync', () => {
   it(`test url share`, async () => {
     let mountedPromiseList = generateReactAppMountedPromiseList();
     await page.goto(
-      `${reactMainUrl}?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vite=%2Fhome&vue2=%2F%23%2Fdialog&vue3=%2Fdialog&angular12=%2F#/all`,
+      `${reactMainUrl}?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vite=%2Fhome&vue2=%2F%23%2Fdialog&vue3=%2Fdialog&react18=%2Fhome#/all`,
     );
     await Promise.all([
       ...mountedPromiseList,
@@ -177,7 +177,7 @@ describe('main vue startApp', () => {
   it(`test url share`, async () => {
     let mountedPromiseList = generateReactAppMountedPromiseList();
     await page.goto(
-      `${vueMainUrl}all?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vue2=%2F%23%2Fdialog&vite=%2Fhome&vue3=%2Fdialog&angular12=%2F`,
+      `${vueMainUrl}all?react16=%7Bprefix-dialog%7D&react17=%2Fdialog&vue2=%2F%23%2Fdialog&vite=%2Fhome&vue3=%2Fdialog&react18=%2Fhome`,
     );
     await Promise.all([
       ...mountedPromiseList,

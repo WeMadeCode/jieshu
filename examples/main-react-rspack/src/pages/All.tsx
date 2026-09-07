@@ -48,16 +48,6 @@ export default function All() {
         <JieshuReact
           height="100%"
           width="100%"
-          name="angular12"
-          url={hostMap('//localhost:7400/')}
-          sync
-          props={props}
-        />
-      </div>
-      <div className="all-item">
-        <JieshuReact
-          height="100%"
-          width="100%"
           name="react18"
           url={hostMap('//localhost:7900/')}
           alive

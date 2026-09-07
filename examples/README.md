@@ -11,7 +11,7 @@ pnpm start
 需要分组启动时，使用两个终端依次执行：
 
 ```bash
-pnpm start:children # 框架包监听 + 子应用（7100–7600、7900）
+pnpm start:children # 框架包监听 + 子应用（7100、7200、7300、7500、7600、7900）
 pnpm start:mains    # 主应用（7700、7800、8000）
 ```
 
@@ -73,7 +73,6 @@ pnpm preview:examples
 | `examples/vue2/dist/`          | `site/demo-vue2/`          |
 | `examples/vue3/dist/`          | `site/demo-vue3/`          |
 | `examples/vite/dist/`          | `site/demo-vite/`          |
-| `examples/angular12/dist/`     | `site/demo-angular12/`     |
 | `docs/.vitepress/dist/`        | `site/doc/`                |
 
 `assemble:examples` 会先检查每个输出目录的 `index.html`，缺少任何构建产物时立即失败。每次组装都会重建 `site/`，不要直接编辑其中的文件。

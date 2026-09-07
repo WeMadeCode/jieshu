@@ -8,7 +8,6 @@ import React18 from './pages/React18';
 import Vue2 from './pages/Vue2';
 import Vue3 from './pages/Vue3';
 import Vite from './pages/Vite';
-import Angular12 from './pages/Angular12';
 import All from './pages/All';
 import Button from 'antd/es/button';
 import { UnorderedListOutlined, CaretUpOutlined } from '@ant-design/icons';
@@ -160,9 +159,6 @@ function Nav() {
           </NavLink>
         ))}
       </div>
-      <NavLink to="/angular12" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
-        angular12
-      </NavLink>
       <NavLink to="/all" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
         all
       </NavLink>
@@ -200,7 +196,6 @@ class App extends React.PureComponent {
               <Route exact path="/vue3-sub/:path" element={<Vue3 />} />
               <Route exact path="/vite" element={<Vite />} />
               <Route exact path="/vite-sub/:path" element={<Vite />} />
-              <Route exact path="/angular12" element={<Angular12 />} />
               <Route exact path="/all" element={<All />} />
               <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>

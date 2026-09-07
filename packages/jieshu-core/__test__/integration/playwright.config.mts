@@ -40,7 +40,7 @@ export default defineConfig({
     webServer('vue2', 'start', 7200),
     webServer('vue3', 'start', 7300),
     webServer('vite', 'start', 7500),
-    webServer('angular12', 'start', 7400),
+    webServer('react18', 'start', 7900),
     webServer(
       reactMainWorkspace,
       reactMainWorkspace === 'main-react' ? 'integration' : `integration --port ${reactMainPort}`,

@@ -18,11 +18,6 @@ export default defineConfig({
   webServer: [
     ...(Array.isArray(integrationConfig.webServer) ? integrationConfig.webServer : []),
     {
-      command: 'pnpm --filter react18 start',
-      url: 'http://localhost:7900',
-      reuseExistingServer,
-    },
-    {
       command: 'pnpm --filter main-react-ts exec rspack dev --mode development --port 7801 --no-open',
       url: 'http://localhost:7801',
       reuseExistingServer,

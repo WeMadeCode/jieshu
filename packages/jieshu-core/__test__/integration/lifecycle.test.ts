@@ -53,16 +53,9 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
     await page.click(AppInfoMap.vite.linkSelector);
     await Promise.all(lifecyclePromiseList);
   });
-  it(`angular12 entry lifecycles`, async () => {
-    const lifecyclePromiseList = AppInfoMap.vite.leaveLifecycles
-      .concat(AppInfoMap.angular12.entryLifecycles)
-      .map((lifecycle) => awaitConsoleLogMessage(page, lifecycle));
-    await page.click(AppInfoMap.angular12.linkSelector);
-    await Promise.all(lifecyclePromiseList);
-  });
 
   it(`react16 entry again lifecycles`, async () => {
-    const lifecyclePromiseList = AppInfoMap.angular12.leaveLifecycles
+    const lifecyclePromiseList = AppInfoMap.vite.leaveLifecycles
       .concat(AppInfoMap.react16.entryLifecycles.slice(1))
       .map((lifecycle) => awaitConsoleLogMessage(page, lifecycle));
     await page.click(AppInfoMap.react16.linkSelector);
@@ -95,13 +88,6 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
       .concat(AppInfoMap.vite.entryLifecycles.slice(1))
       .map((lifecycle) => awaitConsoleLogMessage(page, lifecycle));
     await page.click(AppInfoMap.vite.linkSelector);
-    await Promise.all(lifecyclePromiseList);
-  });
-  it(`angular12 entry again lifecycles`, async () => {
-    const lifecyclePromiseList = AppInfoMap.vite.leaveLifecycles
-      .concat(AppInfoMap.angular12.entryLifecycles.slice(1))
-      .map((lifecycle) => awaitConsoleLogMessage(page, lifecycle));
-    await page.click(AppInfoMap.angular12.linkSelector);
     await Promise.all(lifecyclePromiseList);
   });
 };
