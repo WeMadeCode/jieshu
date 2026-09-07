@@ -13,7 +13,6 @@ import {
 } from './common';
 import {
   isFunction,
-  isHijackingTag,
   warn,
   nextTick,
   getCurUrl,
@@ -82,7 +81,7 @@ const elementEventForwarder = new ElementEventForwarder();
  * 样式元素的css变量处理，每个stylesheetElement单独节流
  */
 type PatchedStyleElement = HTMLStyleElement & { _patcher?: ReturnType<typeof setTimeout> };
-type RawDomInsertion = <T extends Node>(newChild: T, refChild?: Node | null) => T;
+type RawDomInsertion = typeof rawAppendChild | typeof rawHeadInsertBefore;
 
 function handleStylesheetElementPatch(stylesheetElement: PatchedStyleElement, sandbox: Jieshu) {
   if (!stylesheetElement.innerHTML) return;
@@ -390,9 +389,10 @@ export function isDynamicEffectContextLive(sandbox: Jieshu, jieshuId: string): b
 
 type TypedInsertionHandler<TElement extends HTMLElement> = (context: InsertionContext, element: TElement) => Node;
 
-function insertNode<T extends Node>(context: InsertionContext, node: T): T {
-  return context.rawInsert.call(context.target, node, context.refChild) as T;
-}
+const insertNode = <T extends Node>(context: InsertionContext, node: T) => {
+  context.rawInsert.call(context.target, node, context.refChild ?? null);
+  return node;
+};
 
 function invokeInsertionHook(context: InsertionContext, element: HTMLElement): void {
   execHooks(context.sandbox.plugins, 'appendOrInsertElementHook', element, context.iframeWindow);
@@ -842,98 +842,156 @@ const insertionPipeline = new HandlerPipeline<HijackingTagName, InsertionContext
   iframeInsertionHandler,
 ]);
 
-function toHijackingTagName(tagName: string): HijackingTagName {
-  return tagName.toUpperCase() as HijackingTagName;
-}
+const toHijackingTagName = (tagName: string) => {
+  const normalized = tagName.toUpperCase();
+  if (normalized === 'LINK' || normalized === 'STYLE' || normalized === 'SCRIPT' || normalized === 'IFRAME') {
+    return normalized;
+  }
+  return null;
+};
 
-function insertUnmanagedElement<T extends Node>(context: InsertionContext, element: T): T {
+const insertUnmanagedElement = <T extends Node>(context: InsertionContext, element: T) => {
   const result = insertNode(context, element);
-  patchElementEffect(element as unknown as HTMLElement, context.iframeWindow);
+  patchElementEffect(element, context.iframeWindow);
   execHooks(context.sandbox.plugins, 'appendOrInsertElementHook', element, context.iframeWindow);
   return result;
+};
+
+// Node kind and namespace identify HTML elements across host and iframe realms.
+const isHtmlElement = (node: Node): node is HTMLElement => {
+  return (
+    node.nodeType === Node.ELEMENT_NODE &&
+    'namespaceURI' in node &&
+    node.namespaceURI === 'http://www.w3.org/1999/xhtml'
+  );
+};
+
+interface RenderEffectOwner {
+  jieshuId: string;
+  token: symbol;
 }
 
-function rewriteAppendOrInsertChild(opts: { rawDOMAppendOrInsertBefore: RawDomInsertion; jieshuId: string }) {
-  return function appendChildOrInsertBefore<T extends Node>(
-    this: InsertionTarget,
-    newChild: T,
-    refChild?: Node | null,
-  ): T {
-    const element = newChild as unknown as HTMLElement;
-    const sandbox = getJieshuById(opts.jieshuId);
-    // Patched head/body nodes can outlive their sandbox briefly. In that
-    // window, preserve native DOM behavior instead of dereferencing a released
-    // iframe through the stale patch closure.
-    if (!sandbox?.iframe) {
-      return opts.rawDOMAppendOrInsertBefore.call(this, newChild, refChild) as T;
-    }
-    const iframeDocument = sandbox.iframe.contentDocument;
-    const iframeWindow = sandbox.iframe.contentWindow;
-    if (!iframeDocument || !iframeWindow) {
-      return opts.rawDOMAppendOrInsertBefore.call(this, newChild, refChild) as T;
-    }
-    const context: InsertionContext = {
-      target: this,
-      element,
-      refChild,
-      rawInsert: opts.rawDOMAppendOrInsertBefore,
-      jieshuId: opts.jieshuId,
-      sandbox,
-      iframeDocument,
-      iframeWindow,
-      curUrl: getCurUrl(sandbox.proxyLocation),
-    };
+// Ownership metadata in DOM patches retains only an opaque token, never the sandbox or its iframe.
+// A live instance keeps its token across renders; a same-name replacement cannot inherit it.
+const renderEffectOwnerTokens = new WeakMap<Jieshu, symbol>();
 
-    if (!isHijackingTag(element.tagName) || !opts.jieshuId) {
-      return insertUnmanagedElement(context, newChild);
-    }
-
-    return insertionPipeline.dispatch(toHijackingTagName(element.tagName), context, (fallbackContext) =>
-      insertUnmanagedElement(fallbackContext, newChild),
-    ) as T;
-  };
-}
-
-function findScriptElementFromIframe(rawElement: HTMLScriptElement, jieshuId: string) {
-  const jieshuTag = getTagFromScript(rawElement);
+const captureRenderEffectOwner = (jieshuId: string) => {
   const sandbox = getJieshuById(jieshuId);
-  if (!sandbox?.iframe) return { targetScript: null, rawHead: null };
+  const token = (sandbox && renderEffectOwnerTokens.get(sandbox)) || Symbol(jieshuId);
+  if (sandbox) {
+    renderEffectOwnerTokens.set(sandbox, token);
+  }
+  return { jieshuId, token };
+};
+
+const getRenderEffectSandbox = (owner: RenderEffectOwner) => {
+  const sandbox = getJieshuById(owner.jieshuId);
+  if (!sandbox || sandbox.destroyed || renderEffectOwnerTokens.get(sandbox) !== owner.token) {
+    return null;
+  }
+  return sandbox;
+};
+
+const rewriteAppendOrInsertChild = <TInsertion extends RawDomInsertion>(opts: {
+  rawDOMAppendOrInsertBefore: TInsertion;
+  owner: RenderEffectOwner;
+}) => {
+  // An apply trap keeps native call/bind receiver semantics with an arrow callback.
+  return new Proxy(opts.rawDOMAppendOrInsertBefore, {
+    apply: (rawInsert, target: InsertionTarget, [newChild, refChild = null]: Parameters<RawDomInsertion>) => {
+      const sandbox = getRenderEffectSandbox(opts.owner);
+      // Stale patches keep native DOM behavior on their receiver, without
+      // borrowing another instance's iframe, fetch, plugins or resource queues.
+      if (!sandbox?.iframe) {
+        return rawInsert.call(target, newChild, refChild);
+      }
+      const iframeDocument = sandbox.iframe.contentDocument;
+      const iframeWindow = sandbox.iframe.contentWindow;
+      if (!iframeDocument || !iframeWindow) {
+        return rawInsert.call(target, newChild, refChild);
+      }
+      const element = isHtmlElement(newChild) ? newChild : null;
+      const context: InsertionContext = {
+        target,
+        element,
+        refChild,
+        rawInsert,
+        jieshuId: opts.owner.jieshuId,
+        sandbox,
+        iframeDocument,
+        iframeWindow,
+        curUrl: getCurUrl(sandbox.proxyLocation),
+      };
+      const tagName = element && toHijackingTagName(element.tagName);
+      if (!tagName || !opts.owner.jieshuId) {
+        return insertUnmanagedElement(context, newChild);
+      }
+
+      return insertionPipeline.dispatch(tagName, context, (fallbackContext) =>
+        insertUnmanagedElement(fallbackContext, newChild),
+      );
+    },
+  });
+};
+
+const findScriptElementFromIframe = (rawElement: HTMLScriptElement, owner: RenderEffectOwner) => {
+  const jieshuTag = getTagFromScript(rawElement);
+  const sandbox = getRenderEffectSandbox(owner);
+  if (!sandbox?.iframe) {
+    return { targetScript: null, rawHead: null };
+  }
   const { iframe } = sandbox;
   const iframeWindow = iframe.contentWindow;
-  if (!iframeWindow) return { targetScript: null, rawHead: null };
+  if (!iframeWindow) {
+    return { targetScript: null, rawHead: null };
+  }
   const rawHead = iframeWindow.__JIESHU_RAW_DOCUMENT_HEAD__;
-  if (!rawHead) return { targetScript: null, rawHead: null };
+  if (!rawHead) {
+    return { targetScript: null, rawHead: null };
+  }
   const targetScript = rawHead.querySelector(`script[${JIESHU_SCRIPT_ID}='${jieshuTag}']`);
   if (targetScript === null) {
     warn(JIESHU_TIPS_NO_SCRIPT, `<script ${JIESHU_SCRIPT_ID}='${jieshuTag}'/>`);
   }
   return { targetScript, rawHead };
-}
+};
 
-function rewriteContains(opts: { rawElementContains: (other: Node | null) => boolean; jieshuId: string }) {
-  return function contains(this: InsertionTarget | ShadowRoot | Document, other: Node | null) {
+const rewriteContains = (opts: { rawElementContains: (other: Node | null) => boolean; owner: RenderEffectOwner }) => {
+  return (other: Node | null) => {
     const element = other as HTMLElement;
-    const { rawElementContains, jieshuId } = opts;
+    const { rawElementContains, owner } = opts;
     if (element && isScriptElement(element)) {
       const relationship = virtualScriptParents.get(element as HTMLScriptElement);
-      if (relationship && rawElementContains(relationship.parent)) return true;
-      const { targetScript, rawHead } = findScriptElementFromIframe(element as HTMLScriptElement, jieshuId);
-      if (!rawHead) return rawElementContains(element);
+      if (relationship && rawElementContains(relationship.parent)) {
+        return true;
+      }
+      const { targetScript, rawHead } = findScriptElementFromIframe(element as HTMLScriptElement, owner);
+      if (!rawHead) {
+        return rawElementContains(element);
+      }
       return targetScript !== null;
     }
     return rawElementContains(element);
   };
-}
+};
 
-function rewriteRemoveChild(opts: { rawElementRemoveChild: <T extends Node>(child: T) => T; jieshuId: string }) {
+const rewriteRemoveChild = (opts: {
+  rawElementRemoveChild: <T extends Node>(child: T) => T;
+  owner: RenderEffectOwner;
+}) => {
+  // The receiver must match the original script's virtual parent before removal.
   return function removeChild(this: InsertionTarget, child: Node) {
     const element = child as HTMLElement;
-    const { rawElementRemoveChild, jieshuId } = opts;
+    const { rawElementRemoveChild, owner } = opts;
     if (element && isScriptElement(element)) {
       const relationship = virtualScriptParents.get(element as HTMLScriptElement);
-      if (relationship && relationship.parent !== this) return rawElementRemoveChild(element);
-      const { targetScript, rawHead } = findScriptElementFromIframe(element as HTMLScriptElement, jieshuId);
-      if (!rawHead && !relationship) return rawElementRemoveChild(element);
+      if (relationship && relationship.parent !== this) {
+        return rawElementRemoveChild(element);
+      }
+      const { targetScript, rawHead } = findScriptElementFromIframe(element as HTMLScriptElement, owner);
+      if (!rawHead && !relationship) {
+        return rawElementRemoveChild(element);
+      }
       if (targetScript !== null && rawHead) {
         rawHead.removeChild(targetScript);
       }
@@ -948,7 +1006,7 @@ function rewriteRemoveChild(opts: { rawElementRemoveChild: <T extends Node>(chil
     }
     return rawElementRemoveChild(element);
   };
-}
+};
 
 /**
  * 记录head和body的事件，等重新渲染复用head和body时需要清空事件
@@ -1008,44 +1066,45 @@ export function removeEventListener(element: HTMLHeadElement | HTMLBodyElement):
  * patch head and body in render
  * intercept appendChild and insertBefore
  */
-export function patchRenderEffect(render: ShadowRoot, id: string): void {
+export const patchRenderEffect = (render: ShadowRoot, id: string) => {
+  const owner = captureRenderEffectOwner(id);
   patchEventListener(render.head);
   patchEventListener(render.body);
 
   render.head.appendChild = rewriteAppendOrInsertChild({
     rawDOMAppendOrInsertBefore: rawAppendChild,
-    jieshuId: id,
-  }) as typeof rawAppendChild;
+    owner,
+  });
   render.head.insertBefore = rewriteAppendOrInsertChild({
-    rawDOMAppendOrInsertBefore: rawHeadInsertBefore as unknown as RawDomInsertion,
-    jieshuId: id,
-  }) as typeof rawHeadInsertBefore;
+    rawDOMAppendOrInsertBefore: rawHeadInsertBefore,
+    owner,
+  });
   render.head.removeChild = rewriteRemoveChild({
     rawElementRemoveChild: rawElementRemoveChild.bind(render.head),
-    jieshuId: id,
+    owner,
   }) as typeof rawElementRemoveChild;
   render.head.contains = rewriteContains({
     rawElementContains: rawElementContains.bind(render.head),
-    jieshuId: id,
+    owner,
   }) as typeof rawElementContains;
   render.contains = rewriteContains({
     rawElementContains: rawElementContains.bind(render),
-    jieshuId: id,
+    owner,
   }) as typeof rawElementContains;
   render.body.appendChild = rewriteAppendOrInsertChild({
     rawDOMAppendOrInsertBefore: rawAppendChild,
-    jieshuId: id,
-  }) as typeof rawAppendChild;
+    owner,
+  });
   render.body.insertBefore = rewriteAppendOrInsertChild({
-    rawDOMAppendOrInsertBefore: rawBodyInsertBefore as unknown as RawDomInsertion,
-    jieshuId: id,
-  }) as typeof rawBodyInsertBefore;
+    rawDOMAppendOrInsertBefore: rawBodyInsertBefore,
+    owner,
+  });
   render.body.removeChild = rewriteRemoveChild({
     rawElementRemoveChild: rawElementRemoveChild.bind(render.body),
-    jieshuId: id,
+    owner,
   }) as typeof rawElementRemoveChild;
   render.body.contains = rewriteContains({
     rawElementContains: rawElementContains.bind(render.body),
-    jieshuId: id,
+    owner,
   }) as typeof rawElementContains;
-}
+};

@@ -1,4 +1,5 @@
-import { addSandboxCacheWithJieshu, idToSandboxCacheMap } from '../../src/common';
+import { addSandboxCacheWithJieshu, deleteJieshuById, idToSandboxCacheMap } from '../../src/common';
+import { JIESHU_SCRIPT_ID } from '../../src/constant';
 import { clearAssetsCache } from '../../src/entry';
 import { patchRenderEffect } from '../../src/effect';
 import { cancelSandboxDynamicResources, cancelSandboxDynamicScripts } from '../../src/sandbox-runtime';
@@ -146,6 +147,248 @@ describe('dynamic script sequencing', () => {
     firstResponse.resolve(scriptResponse('/* first */'));
     await flushPromises();
     expect(calls).toEqual(['first', 'second']);
+  });
+
+  const renderSections: Array<'head' | 'body'> = ['head', 'body'];
+  const insertionMethods: Array<'appendChild' | 'insertBefore'> = ['appendChild', 'insertBefore'];
+
+  test.each(insertionMethods)('%s preserves the receiver when a head method is called on body', async (method) => {
+    const id = `borrowed-${method}`;
+    const root = createRenderRoot();
+    const sandbox = createSandbox(id, () => Promise.resolve(scriptResponse('/* child realm script */')));
+    patchRenderEffect(root, id);
+    const iframeDocument = sandbox.iframe.contentDocument;
+    if (!iframeDocument) {
+      throw new Error('The sandbox must have an iframe document');
+    }
+    const reference = document.createElement('meta');
+    root.body.appendChild(reference);
+    const script = iframeDocument.createElement('script');
+    script.src = `https://assets.example/${id}.js`;
+    const loaded = vi.fn();
+    script.onload = loaded;
+
+    expect(root.head[method].call(root.body, script, reference)).toBe(script);
+    expect(script.parentNode).toBe(root.body);
+    expect(root.head.childNodes.length).toBe(0);
+    expect(root.body.childNodes.length).toBe(2);
+    expect(root.body.firstChild === reference).toBe(method === 'appendChild');
+    await flushPromises();
+
+    expect(loaded).toHaveBeenCalledTimes(1);
+    expect(sandbox.dynamicScriptElements).toHaveLength(1);
+  });
+
+  test('non-HTML nodes retain native return values and insertion hooks across realms', () => {
+    const id = 'unmanaged-node-types';
+    const root = createRenderRoot();
+    const fetch = vi.fn(() => Promise.resolve(scriptResponse('/* must not load */')));
+    const sandbox = createSandbox(id, fetch);
+    const hook = vi.fn();
+    sandbox.plugins = [{ appendOrInsertElementHook: hook }];
+    patchRenderEffect(root, id);
+    const iframeDocument = sandbox.iframe.contentDocument;
+    if (!iframeDocument) {
+      throw new Error('The sandbox must have an iframe document');
+    }
+
+    for (const sourceDocument of [document, iframeDocument]) {
+      const nodes: Node[] = [
+        sourceDocument.createTextNode('text'),
+        sourceDocument.createComment('comment'),
+        sourceDocument.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+        sourceDocument.createElementNS('http://www.w3.org/2000/svg', 'script'),
+      ];
+      for (const node of nodes) {
+        expect(root.body.appendChild(node)).toBe(node);
+        expect(node.parentNode).toBe(root.body);
+        expect(hook).toHaveBeenLastCalledWith(node, sandbox.iframe.contentWindow);
+      }
+      const fragment = sourceDocument.createDocumentFragment();
+      const span = sourceDocument.createElement('span');
+      fragment.appendChild(span);
+      const insertedFragment: DocumentFragment = root.body.appendChild(fragment);
+      expect(insertedFragment).toBe(fragment);
+      expect(fragment.childNodes.length).toBe(0);
+      expect(span.parentNode).toBe(root.body);
+      expect(hook).toHaveBeenLastCalledWith(fragment, sandbox.iframe.contentWindow);
+      const insertedSpan: HTMLSpanElement = root.body.insertBefore(span, root.body.firstChild);
+      expect(insertedSpan).toBe(span);
+      expect(root.body.firstChild).toBe(span);
+      expect(hook).toHaveBeenLastCalledWith(span, sandbox.iframe.contentWindow);
+    }
+
+    expect(fetch).not.toHaveBeenCalled();
+    expect(sandbox.dynamicScriptElements).toEqual([]);
+    expect(sandbox.styleSheetElements).toEqual([]);
+  });
+
+  describe.each(renderSections)('stale %s ownership', (section) => {
+    test.each(insertionMethods)('%s cannot adopt a same-name replacement', async (method) => {
+      const id = `stale-${section}-${method}`;
+      const oldParents: Array<HTMLHeadElement | HTMLBodyElement> = [];
+      const savedInsertions: Array<(child: Node) => Node> = [];
+      const fetch = vi.fn(() => Promise.resolve(scriptResponse('/* replacement resource */')));
+      const hook = vi.fn();
+
+      for (let generation = 0; generation < 2; generation += 1) {
+        const root = createRenderRoot();
+        const sandbox = createSandbox(id, fetch);
+        patchRenderEffect(root, id);
+        const parent = root[section];
+        oldParents.push(parent);
+        const insert = parent[method];
+        savedInsertions.push((child) => insert.call(parent, child, null));
+        sandbox.destroyed = true;
+        cancelSandboxDynamicResources(sandbox, 'destroy');
+        deleteJieshuById(id, sandbox);
+        sandbox.iframe.remove();
+      }
+
+      const root = createRenderRoot();
+      const replacement = createSandbox(id, fetch);
+      replacement.plugins = [{ appendOrInsertElementHook: hook }];
+      patchRenderEffect(root, id);
+
+      for (const [index, parent] of oldParents.entries()) {
+        const script = document.createElement('script');
+        script.src = `https://assets.example/${id}-${index}.js`;
+        expect(parent[method](script, null)).toBe(script);
+        const inline = document.createElement('script');
+        inline.textContent = 'window.__staleInline = true';
+        expect(savedInsertions[index]?.(inline)).toBe(inline);
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://assets.example/${id}-${index}.css`;
+        expect(parent[method](link, null)).toBe(link);
+        const deferredLink = document.createElement('link');
+        deferredLink.rel = 'stylesheet';
+        expect(savedInsertions[index]?.(deferredLink)).toBe(deferredLink);
+        const style = document.createElement('style');
+        style.textContent = 'body { color: red; }';
+        expect(parent[method](style, null)).toBe(style);
+        const element = document.createElement('div');
+        expect(savedInsertions[index]?.(element)).toBe(element);
+        expect(Reflect.has(style, '_hasPatchStyle')).toBe(false);
+        expect(parent.childNodes.length).toBe(6);
+        expect(script.parentNode).toBe(parent);
+        expect(inline.parentNode).toBe(parent);
+      }
+
+      await flushPromises();
+
+      expect(fetch).not.toHaveBeenCalled();
+      expect(hook).not.toHaveBeenCalled();
+      expect(replacement.execQueue).toEqual([]);
+      expect(replacement.dynamicScriptElements).toEqual([]);
+      expect(replacement.styleSheetElements).toEqual([]);
+      expect(replacement.deferredStyleObservers).toEqual([]);
+      expect(root.head.childNodes.length).toBe(0);
+      expect(root.body.childNodes.length).toBe(0);
+
+      const loaded = vi.fn();
+      appendExternalScript(root, `https://assets.example/${id}-current.js`, loaded);
+      await flushPromises();
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(loaded).toHaveBeenCalledTimes(1);
+      expect(replacement.dynamicScriptElements).toHaveLength(1);
+    });
+
+    test('contains and removeChild cannot query or remove replacement scripts', async () => {
+      const id = `stale-${section}-cleanup`;
+      const oldRoot = createRenderRoot();
+      const oldSandbox = createSandbox(id, () => Promise.resolve(scriptResponse('/* old */')));
+      patchRenderEffect(oldRoot, id);
+      const oldParent = oldRoot[section];
+      const oldScript = document.createElement('script');
+      oldScript.textContent = '/* old */';
+      oldParent.appendChild(oldScript);
+      await flushPromises();
+      const savedContains = oldParent.contains.bind(oldParent);
+      const savedRemove = oldParent.removeChild.bind(oldParent);
+      oldSandbox.destroyed = true;
+      cancelSandboxDynamicResources(oldSandbox, 'destroy');
+      deleteJieshuById(id, oldSandbox);
+      oldSandbox.iframe.remove();
+
+      const root = createRenderRoot();
+      const replacement = createSandbox(id, () => Promise.resolve(scriptResponse('/* current */')));
+      patchRenderEffect(root, id);
+      const iframeWindow = replacement.iframe.contentWindow;
+      if (!iframeWindow) {
+        throw new Error('The replacement iframe must have a window');
+      }
+      const rawHead = iframeWindow.document.head;
+      iframeWindow.__JIESHU_RAW_DOCUMENT_HEAD__ = rawHead;
+      const currentScript = document.createElement('script');
+      currentScript.setAttribute(JIESHU_SCRIPT_ID, oldScript.getAttribute(JIESHU_SCRIPT_ID) ?? 'missing-tag');
+      rawHead.appendChild(currentScript);
+
+      expect(oldParent.contains(currentScript)).toBe(false);
+      expect(savedContains(currentScript)).toBe(false);
+      expect(oldRoot.contains(currentScript)).toBe(false);
+      expect(oldParent.contains(oldScript)).toBe(true);
+      expect(savedRemove(oldScript)).toBe(oldScript);
+      expect(rawHead.contains(currentScript)).toBe(true);
+      expect(oldScript.parentNode).toBeNull();
+      expect(oldParent.contains(oldScript)).toBe(false);
+      expect(() => savedRemove(currentScript)).toThrow();
+      expect(rawHead.contains(currentScript)).toBe(true);
+
+      const localScript = document.createElement('script');
+      oldParent.appendChild(localScript);
+      expect(oldParent.contains(localScript)).toBe(true);
+      expect(oldParent.removeChild(localScript)).toBe(localScript);
+    });
+  });
+
+  test('patching again within the same live instance preserves saved insertion methods', async () => {
+    const id = 'same-instance-render';
+    const root = createRenderRoot();
+    const sandbox = createSandbox(id, () => Promise.resolve(scriptResponse('/* live */')));
+    patchRenderEffect(root, id);
+    const append = root.head.appendChild.bind(root.head);
+    sandbox.activeFlag = false;
+    sandbox.activeFlag = true;
+    patchRenderEffect(root, id);
+    const loaded = vi.fn();
+    const script = document.createElement('script');
+    script.src = 'https://assets.example/same-instance.js';
+    script.onload = loaded;
+
+    append(script);
+    await flushPromises();
+
+    expect(loaded).toHaveBeenCalledTimes(1);
+    expect(sandbox.dynamicScriptElements).toHaveLength(1);
+  });
+
+  test.each(['unregistered', 'destroyed'])('a patch with an %s owner keeps native behavior', async (state) => {
+    const id = `invalid-owner-${state}`;
+    const root = createRenderRoot();
+    const fetch = vi.fn(() => Promise.resolve(scriptResponse('/* must not load */')));
+    const sandbox = createSandbox(id, fetch);
+    if (state === 'unregistered') {
+      deleteJieshuById(id, sandbox);
+    }
+    patchRenderEffect(root, id);
+    if (state === 'unregistered') {
+      addSandboxCacheWithJieshu(id, sandbox);
+    } else {
+      sandbox.destroyed = true;
+    }
+
+    const script = document.createElement('script');
+    script.src = `https://assets.example/${id}.js`;
+    const reference = document.createElement('meta');
+    root.head.appendChild(reference);
+    expect(root.head.insertBefore(script, reference)).toBe(script);
+    expect(script.nextSibling).toBe(reference);
+    expect(root.contains(script)).toBe(true);
+    expect(root.head.removeChild(script)).toBe(script);
+    await flushPromises();
+    expect(fetch).not.toHaveBeenCalled();
+    expect(sandbox.dynamicScriptElements).toEqual([]);
   });
 
   test('script can be cleaned up through its parentNode like SockJS JSONP', async () => {
