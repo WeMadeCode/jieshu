@@ -16,9 +16,6 @@ test.afterAll(async () => {
   await page.close();
 });
 
-interface LooseObject {
-  [key: string]: any;
-}
 describe('main react location href test', () => {
   beforeAll(async () => {
     await page.addInitScript(() => {
@@ -31,13 +28,20 @@ describe('main react location href test', () => {
 
   reactMainAppInfoList.slice(0, 5).forEach((appInfo) =>
     it(`${appInfo.name} location href test`, async () => {
+      if (
+        !('routeMountedMessage' in appInfo) ||
+        !('routeNavSelector' in appInfo) ||
+        !('routeJumpButtonSelector' in appInfo)
+      ) {
+        throw new Error(`Missing route test metadata for ${appInfo.name}`);
+      }
       const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
       await page.click(appInfo.linkSelector);
       await appInfoMountedPromise;
-      const appInfoRouteMountedPromise = awaitConsoleLogMessage(page, (appInfo as LooseObject)['routeMountedMessage']);
-      await triggerClickByJsSelector(page, (appInfo as LooseObject)['routeNavSelector']);
+      const appInfoRouteMountedPromise = awaitConsoleLogMessage(page, appInfo.routeMountedMessage);
+      await triggerClickByJsSelector(page, appInfo.routeNavSelector);
       await appInfoRouteMountedPromise;
-      await triggerClickByJsSelector(page, (appInfo as LooseObject)['routeJumpButtonSelector']);
+      await triggerClickByJsSelector(page, appInfo.routeJumpButtonSelector);
       await page.waitForSelector('iframe:not([name])');
       await page.goBack();
       await page.waitForSelector('jieshu-app');
@@ -57,13 +61,20 @@ describe('main vue location href test', () => {
 
   vueMainAppInfoList.slice(0, 5).forEach((appInfo) =>
     it(`${appInfo.name} location href test`, async () => {
+      if (
+        !('routeMountedMessage' in appInfo) ||
+        !('routeNavSelector' in appInfo) ||
+        !('routeJumpButtonSelector' in appInfo)
+      ) {
+        throw new Error(`Missing route test metadata for ${appInfo.name}`);
+      }
       const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
       await page.click(appInfo.linkSelector);
       await appInfoMountedPromise;
-      const appInfoRouteMountedPromise = awaitConsoleLogMessage(page, (appInfo as LooseObject)['routeMountedMessage']);
-      await triggerClickByJsSelector(page, (appInfo as LooseObject)['routeNavSelector']);
+      const appInfoRouteMountedPromise = awaitConsoleLogMessage(page, appInfo.routeMountedMessage);
+      await triggerClickByJsSelector(page, appInfo.routeNavSelector);
       await appInfoRouteMountedPromise;
-      await triggerClickByJsSelector(page, (appInfo as LooseObject)['routeJumpButtonSelector']);
+      await triggerClickByJsSelector(page, appInfo.routeJumpButtonSelector);
       await page.waitForSelector('iframe:not([name])');
       await page.goBack();
       await page.waitForSelector('jieshu-app');

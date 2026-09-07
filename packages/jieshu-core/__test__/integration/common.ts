@@ -1,5 +1,7 @@
-export const reactMainUrl = process.env['JIESHU_REACT_MAIN_URL'] ?? 'http://localhost:7700/';
-export const vueMainUrl = process.env['JIESHU_VUE_MAIN_URL'] ?? 'http://localhost:8000/';
+const { JIESHU_REACT_MAIN_URL, JIESHU_VUE_MAIN_URL } = process.env;
+
+export const reactMainUrl = JIESHU_REACT_MAIN_URL ?? 'http://localhost:7700/';
+export const vueMainUrl = JIESHU_VUE_MAIN_URL ?? 'http://localhost:8000/';
 
 export const reactMainAppInfoMap = {
   react16: {

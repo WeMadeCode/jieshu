@@ -135,10 +135,14 @@ export class RuntimeAppController implements AppController {
     previousAppsReleased?: Promise<void>,
   ): Promise<DestroyHandler | void> {
     if (previousAppsReleased) await previousAppsReleased;
-    if (!this.isCurrent(revision)) return;
+    if (!this.isCurrent(revision)) {
+      return undefined;
+    }
 
     const owner = this.ownedApplication;
-    if (!owner || owner.revision !== revision) return;
+    if (!owner || owner.revision !== revision) {
+      return undefined;
+    }
     owner.runtimeStarted = true;
     owner.preserveOnDisconnect = options.alive === true;
     this.pendingNames.set(revision, options.name);
@@ -158,7 +162,7 @@ export class RuntimeAppController implements AppController {
 
     if (!this.isCurrent(revision)) {
       if (destroy) await destroy();
-      return;
+      return undefined;
     }
     return destroy;
   }
@@ -169,10 +173,14 @@ export class RuntimeAppController implements AppController {
     previousAppsReleased?: Promise<void>,
   ): Promise<DestroyHandler | void> {
     if (previousAppsReleased) await previousAppsReleased;
-    if (!this.isCurrent(revision)) return;
+    if (!this.isCurrent(revision)) {
+      return undefined;
+    }
 
     const owner = this.ownedApplication;
-    if (!owner || owner.revision !== revision) return;
+    if (!owner || owner.revision !== revision) {
+      return undefined;
+    }
     owner.runtimeStarted = true;
     owner.preserveOnDisconnect = options.alive === true;
     this.pendingNames.set(revision, options.name);
@@ -184,7 +192,7 @@ export class RuntimeAppController implements AppController {
       }
       if (!this.isCurrent(revision)) {
         if (destroy) await destroy();
-        return;
+        return undefined;
       }
       return destroy;
     } catch (cause: unknown) {

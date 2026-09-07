@@ -772,7 +772,13 @@ class TemplateCompiler {
       const async = hasAttribute(token.attributes, 'async');
       const defer = hasAttribute(token.attributes, 'defer');
       this.scripts.push(async || defer ? { ...baseScript, src: source, async, defer } : { ...baseScript, src: source });
-      return genScriptReplaceSymbol(source, async ? 'async' : defer ? 'defer' : '');
+      let executionMode = '';
+      if (async) {
+        executionMode = 'async';
+      } else if (defer) {
+        executionMode = 'defer';
+      }
+      return genScriptReplaceSymbol(source, executionMode);
     }
 
     const isPureCommentBlock = token.content

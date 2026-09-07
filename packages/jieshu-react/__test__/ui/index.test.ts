@@ -108,7 +108,7 @@ describe('published @cloud/jieshu-react UI', () => {
     const componentRef = React.createRef<JieshuReactRef>();
     const mounted = signal<TestChildWindow>();
     const loading = document.createElement('span');
-    loading.dataset['testLoading'] = 'custom';
+    loading.setAttribute('data-test-loading', 'custom');
     loading.textContent = 'Loading child';
     const childMount = vi.fn();
     const childUnmount = vi.fn(async (): Promise<void> => undefined);
@@ -182,7 +182,7 @@ describe('published @cloud/jieshu-react UI', () => {
     expect(loadingSnapshots).toEqual([true]);
     expect(componentContainer.querySelector('[data-loading-flag]')).toBeNull();
     expect(executionFrame.getAttribute('title')).toBe('execution-frame');
-    expect(executionFrame.dataset['executionOption']).toBe('forwarded');
+    expect(executionFrame.getAttribute('data-execution-option')).toBe('forwarded');
     expect(renderHost.shadowRoot?.querySelector('#react-child')?.textContent).toBe('child');
     expect(
       [...(renderHost.shadowRoot?.querySelectorAll('style') ?? [])]

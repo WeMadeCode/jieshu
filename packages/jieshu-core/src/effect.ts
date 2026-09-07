@@ -630,7 +630,8 @@ class DynamicScriptScheduler {
       fulfilled: (content) => {
         if (!this.isLive()) {
           this.release();
-          return warn(JIESHU_TIPS_REPEAT_RENDER);
+          warn(JIESHU_TIPS_REPEAT_RENDER);
+          return;
         }
         this.enqueue(() => this.executeWithForwardedOutcome({ ...scriptResult, content }));
       },

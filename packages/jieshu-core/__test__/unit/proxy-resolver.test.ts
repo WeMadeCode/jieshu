@@ -24,12 +24,12 @@ describe('proxy property resolver pipelines', () => {
     const special: PropertyDescriptorResolver<typeof context> = (current, key) =>
       key === 'value' ? { get: () => current.value } : undefined;
     const fallback: PropertyDescriptorResolver<typeof context> = () => ({ value: 'fallback' });
-    const target: Record<string, unknown> = {};
+    const target: { value?: unknown } = {};
 
     defineResolvedProperties(target, ['value'], context, createDescriptorPipeline([special, fallback]));
-    expect(target['value']).toBe('before');
+    expect(target.value).toBe('before');
 
     context.value = 'after';
-    expect(target['value']).toBe('after');
+    expect(target.value).toBe('after');
   });
 });

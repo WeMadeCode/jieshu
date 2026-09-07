@@ -84,7 +84,7 @@ export class EventBus {
     }
   }
 
-  public $on<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): EventBus {
+  public $on<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): this {
     const storedCallback = eraseCallbackArguments(callback);
     const currentListeners = this.eventObj[event];
 
@@ -97,7 +97,7 @@ export class EventBus {
   }
 
   /** Listen to every emitted event; the first callback argument is its name. */
-  public $onAll<Arguments extends unknown[]>(callback: EventCallback<[event: string, ...args: Arguments]>): EventBus {
+  public $onAll<Arguments extends unknown[]>(callback: EventCallback<[event: string, ...args: Arguments]>): this {
     return this.$on(JIESHU_ALL_EVENT, callback);
   }
 
@@ -109,7 +109,7 @@ export class EventBus {
     this.$on(event, onceCallback);
   }
 
-  public $off<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): EventBus {
+  public $off<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): this {
     const currentListeners = this.eventObj[event];
     if (!event || !currentListeners?.length) {
       warn(`${event} ${JIESHU_TIPS_NO_SUBJECT}`);
@@ -118,15 +118,17 @@ export class EventBus {
 
     const storedCallback = eraseCallbackArguments(callback);
     const callbackIndex = currentListeners.lastIndexOf(storedCallback);
-    if (callbackIndex >= 0) currentListeners.splice(callbackIndex, 1);
+    if (callbackIndex >= 0) {
+      currentListeners.splice(callbackIndex, 1);
+    }
     return this;
   }
 
-  public $offAll<Arguments extends unknown[]>(callback: EventCallback<[event: string, ...args: Arguments]>): EventBus {
+  public $offAll<Arguments extends unknown[]>(callback: EventCallback<[event: string, ...args: Arguments]>): this {
     return this.$off(JIESHU_ALL_EVENT, callback);
   }
 
-  public $emit<Arguments extends unknown[]>(event: string, ...args: Arguments): EventBus {
+  public $emit<Arguments extends unknown[]>(event: string, ...args: Arguments): this {
     const eventListeners: StoredEventCallback[] = [];
     const allEventListeners: StoredEventCallback[] = [];
 
@@ -143,9 +145,13 @@ export class EventBus {
     }
 
     try {
-      for (const callback of eventListeners) invoke(callback, args);
+      for (const callback of eventListeners) {
+        invoke(callback, args);
+      }
       const allArgs: readonly unknown[] = [event, ...args];
-      for (const callback of allEventListeners) invoke(callback, allArgs);
+      for (const callback of allEventListeners) {
+        invoke(callback, allArgs);
+      }
     } catch (caughtError: unknown) {
       // Keep the historical fail-fast behavior: one failing listener aborts
       // the remainder of this emission, but the error never escapes $emit.
@@ -154,7 +160,7 @@ export class EventBus {
     return this;
   }
 
-  public $clear(): EventBus {
+  public $clear(): this {
     Object.keys(this.eventObj).forEach((event) => delete this.eventObj[event]);
     return this;
   }

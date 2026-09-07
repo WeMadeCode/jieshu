@@ -38,14 +38,16 @@ describe('route-state query codec', () => {
 
     expect(Object.getPrototypeOf(query)).toBeNull();
     expect(query['a&b=c']).toBe('/route');
-    expect(query['__proto__']).toBe('/proto');
-    expect(query['constructor']).toBe('/ctor');
+    const { __proto__: prototypeRoute, constructor: constructorRoute } = query;
+    expect(prototypeRoute).toBe('/proto');
+    expect(constructorRoute).toBe('/ctor');
     expect(encodeRouteQuery(query)).toBe('?a%26b%3Dc=%2Froute&__proto__=%2Fproto&constructor=%2Fctor');
   });
 
   test('读写一轮不会重复编码已经编码在参数值中的百分号', () => {
     const state = readRouteState('https://host.test/shell?app=%252Fdeep#/all');
-    expect(state.query['app']).toBe('%2Fdeep');
+    const { app } = state.query;
+    expect(app).toBe('%2Fdeep');
     expect(writeRouteState(state)).toBe('https://host.test/shell?app=%252Fdeep#/all');
   });
 

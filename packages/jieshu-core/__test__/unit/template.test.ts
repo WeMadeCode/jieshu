@@ -119,7 +119,8 @@ describe('template tokenizer and compiler', () => {
       '<script src="./app.js?one=1&notit=2&copy=3&ampfoo=4&amp;ok=5" data-title="say &quot;hi&quot;"></script>',
     );
 
-    expect(attributes['src']).toBe('./app.js?one=1&notit=2&copy=3&ampfoo=4&ok=5');
+    const { src } = attributes;
+    expect(src).toBe('./app.js?one=1&notit=2&copy=3&ampfoo=4&ok=5');
     expect(attributes['data-title']).toBe('say "hi"');
   });
 

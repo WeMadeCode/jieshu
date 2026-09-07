@@ -70,7 +70,8 @@ function createExecutionContext(
   const { replace, plugins, proxyLocation } = owner;
   const jsLoader = getJsLoader({ plugins, replace });
   const container = rawDocumentQuerySelector.call(iframeWindow.document, 'head') as HTMLHeadElement;
-  const isImportMap = String(input.attrs?.['type'] ?? '').toLowerCase() === 'importmap';
+  const { type } = input.attrs ?? {};
+  const isImportMap = String(type ?? '').toLowerCase() === 'importmap';
 
   return {
     input,
@@ -131,7 +132,8 @@ function exposeInlineScriptSource(scriptElement: HTMLScriptElement, src?: string
 
 function configureScriptElement(context: ScriptExecutionContext): void {
   const { input, scriptElement } = context;
-  const isImportMap = String(input.attrs?.['type'] ?? '').toLowerCase() === 'importmap';
+  const { type } = input.attrs ?? {};
+  const isImportMap = String(type ?? '').toLowerCase() === 'importmap';
   applyForwardedAttributes(context);
 
   if (input.content) {

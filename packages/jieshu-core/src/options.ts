@@ -23,6 +23,13 @@ export interface ResolvedOptions {
   lifecycles: Lifecycles;
 }
 
+const resolveBooleanOption = (value: boolean | undefined, cached: boolean | undefined, fallback: boolean) => {
+  if (value !== undefined) {
+    return value;
+  }
+  return cached !== undefined ? cached : fallback;
+};
+
 export function resolveOptions(options: CacheOptions, cacheOptions?: CacheOptions | null): ResolvedOptions {
   const cached = cacheOptions ?? undefined;
   return {
@@ -30,16 +37,16 @@ export function resolveOptions(options: CacheOptions, cacheOptions?: CacheOption
     el: options.el || cached?.el,
     url: options.url || cached?.url || '',
     html: options.html || cached?.html,
-    exec: options.exec !== undefined ? options.exec : cached?.exec !== undefined ? cached.exec : false,
+    exec: resolveBooleanOption(options.exec, cached?.exec, false),
     replace: options.replace || cached?.replace,
     fetch: options.fetch || cached?.fetch,
     props: options.props || cached?.props,
-    sync: options.sync !== undefined ? options.sync : cached?.sync !== undefined ? cached.sync : false,
+    sync: resolveBooleanOption(options.sync, cached?.sync, false),
     prefix: options.prefix || cached?.prefix,
     loading: options.loading || cached?.loading,
     attrs: options.attrs !== undefined ? options.attrs : cached?.attrs || {},
-    fiber: options.fiber !== undefined ? options.fiber : cached?.fiber !== undefined ? cached.fiber : true,
-    alive: options.alive !== undefined ? options.alive : cached?.alive !== undefined ? cached.alive : false,
+    fiber: resolveBooleanOption(options.fiber, cached?.fiber, true),
+    alive: resolveBooleanOption(options.alive, cached?.alive, false),
     plugins: options.plugins || cached?.plugins || [],
     iframeAddEventListeners: options.iframeAddEventListeners || cached?.iframeAddEventListeners || [],
     iframeOnEvents: options.iframeOnEvents || cached?.iframeOnEvents || [],

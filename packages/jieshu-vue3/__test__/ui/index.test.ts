@@ -40,7 +40,7 @@ interface MountedComponent {
   app: App;
   componentRef: { value: (ComponentPublicInstance & JieshuVueExposed) | null };
   host: HTMLDivElement;
-  state: Record<string, unknown>;
+  state: JieshuVueProps;
   unmount(): void;
 }
 
@@ -74,7 +74,7 @@ describe('published @cloud/jieshu-vue3 UI', () => {
   ): MountedComponent {
     const host = document.createElement('div');
     document.body.appendChild(host);
-    const state = reactive({ ...initialProps }) as Record<string, unknown>;
+    const state = reactive({ ...initialProps });
     const componentRef = ref<(ComponentPublicInstance & JieshuVueExposed) | null>(null);
     const Root = defineComponent({
       setup() {
@@ -114,7 +114,7 @@ describe('published @cloud/jieshu-vue3 UI', () => {
     applicationNames.add(name);
     const mountedSignal = signal<TestChildWindow>();
     const loading = document.createElement('span');
-    loading.dataset['testLoading'] = 'custom';
+    loading.setAttribute('data-test-loading', 'custom');
     loading.textContent = 'Loading child';
     const childMount = vi.fn();
     const childUnmount = vi.fn(async (): Promise<void> => undefined);
@@ -189,7 +189,7 @@ describe('published @cloud/jieshu-vue3 UI', () => {
     expect(loadingSnapshots).toEqual([true]);
     expect(componentContainer.querySelector('[data-loading-flag]')).toBeNull();
     expect(executionFrame.getAttribute('title')).toBe('execution-frame');
-    expect(executionFrame.dataset['executionOption']).toBe('forwarded');
+    expect(executionFrame.getAttribute('data-execution-option')).toBe('forwarded');
     expect(renderHost.shadowRoot?.querySelector('#vue-child')?.textContent).toBe('child');
     expect(
       [...(renderHost.shadowRoot?.querySelectorAll('style') ?? [])]
@@ -287,9 +287,9 @@ describe('published @cloud/jieshu-vue3 UI', () => {
     firstWindow.$jieshu.bus.$emit('identityEvent', 'first');
     expect(eventHandler).toHaveBeenCalledWith('first');
 
-    mounted.state['html'] = '<html><body>ignored</body></html>';
-    mounted.state['props'] = { revision: 2 };
-    mounted.state['style'] = { color: 'blue' };
+    mounted.state.html = '<html><body>ignored</body></html>';
+    mounted.state.props = { revision: 2 };
+    mounted.state.style = { color: 'blue' };
     await nextTick();
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(beforeLoad).toHaveBeenCalledOnce();
@@ -297,16 +297,16 @@ describe('published @cloud/jieshu-vue3 UI', () => {
     expect(firstWindow.$jieshu.props).toEqual({ revision: 1 });
     expect((mounted.host.firstElementChild as HTMLDivElement).style.color).toBe('blue');
 
-    mounted.state['url'] = 'http://localhost/vue-second/';
-    mounted.state['props'] = { revision: 3 };
+    mounted.state.url = 'http://localhost/vue-second/';
+    mounted.state.props = { revision: 3 };
     await nextTick();
     await waitForCalls(activated, 2);
     expect(beforeLoad).toHaveBeenCalledOnce();
     expect(firstWindow.__JIESHU.url).toBe('http://localhost/vue-second/');
     expect(firstWindow.$jieshu.props).toEqual({ revision: 3 });
 
-    mounted.state['name'] = secondName;
-    mounted.state['url'] = 'http://localhost/vue-third/';
+    mounted.state.name = secondName;
+    mounted.state.url = 'http://localhost/vue-third/';
     await nextTick();
     await waitForCalls(beforeLoad, 2);
     await waitForCalls(activated, 3);

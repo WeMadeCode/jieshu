@@ -154,8 +154,19 @@ describe('sandbox lifecycle races', () => {
     sandbox.mountFlag = true;
     sandbox.iframe.contentWindow.__JIESHU_UNMOUNT = async () => {
       await Promise.resolve();
-      const getLifecycle = sandbox.provide.props?.['getLifecycle'] as () => { destroy(): Promise<void> };
-      const lifecycle = getLifecycle();
+      const { getLifecycle } = sandbox.provide.props ?? {};
+      if (typeof getLifecycle !== 'function') {
+        throw new TypeError('Expected the injected lifecycle callback');
+      }
+      const lifecycle: unknown = getLifecycle();
+      if (
+        typeof lifecycle !== 'object' ||
+        lifecycle === null ||
+        !('destroy' in lifecycle) ||
+        typeof lifecycle.destroy !== 'function'
+      ) {
+        throw new TypeError('Expected the injected destroy callback');
+      }
       await lifecycle.destroy();
     };
 
@@ -199,7 +210,10 @@ describe('sandbox lifecycle races', () => {
     sandbox.provide.props = Object.freeze({ cleanup });
     sandbox.mountFlag = true;
     sandbox.iframe.contentWindow.__JIESHU_UNMOUNT = async () => {
-      const hostCleanup = sandbox.provide.props?.['cleanup'] as () => Promise<void>;
+      const { cleanup: hostCleanup } = sandbox.provide.props ?? {};
+      if (typeof hostCleanup !== 'function') {
+        throw new TypeError('Expected the injected cleanup callback');
+      }
       await hostCleanup();
     };
 

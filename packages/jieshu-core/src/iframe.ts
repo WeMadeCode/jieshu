@@ -196,7 +196,9 @@ function patchPolicyControlledUnloadProperty(iframeWindow: Window): void {
       get: (): unknown => Reflect.apply(rawGet, iframeWindow, []),
       set: (handler: unknown): void => {
         // null/undefined 只移除已有 handler，不受 unload 注册策略限制。
-        if (handler != null && !isWindowEventAllowedByPolicy(iframeWindow, 'unload')) return;
+        if (handler !== null && handler !== undefined && !isWindowEventAllowedByPolicy(iframeWindow, 'unload')) {
+          return;
+        }
         Reflect.apply(rawSet, iframeWindow, [handler]);
       },
     });
@@ -253,7 +255,7 @@ export function patchIframeEvents(iframeWindow: Window) {
     );
     iframeWindow.__JIESHU_EVENTLISTENER__.forEach((o) => {
       // 这里严格一点，确保子应用销毁的时候都能销毁
-      if (o.listener === eventListener && o.type === type && options == o.options) {
+      if (o.listener === eventListener && o.type === type && options === o.options) {
         iframeWindow.__JIESHU_EVENTLISTENER__.delete(o);
       }
     });
@@ -999,7 +1001,7 @@ function stopIframeLoading(iframe: HTMLIFrameElement, options: { fallbackSrc: st
         } catch {
           newDoc = null;
         }
-        if ((!newDoc || newDoc == oldDoc) && Date.now() < loopDeadline) {
+        if ((!newDoc || newDoc === oldDoc) && Date.now() < loopDeadline) {
           loop();
           return;
         }

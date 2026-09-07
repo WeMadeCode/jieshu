@@ -1,7 +1,7 @@
 import { createApp, defineComponent, h, nextTick, reactive, ref, type App, type ComponentPublicInstance } from 'vue';
 import type { Mock, MockInstance } from 'vitest';
 import type { StartOptions } from '@cloud/jieshu-core';
-import JieshuVue, { type JieshuVueExposed } from '../../src';
+import JieshuVue, { type JieshuVueExposed, type JieshuVueProps } from '../../src';
 
 interface MockController {
   start: Mock<(options: StartOptions) => Promise<void>>;
@@ -69,17 +69,17 @@ interface MountedComponent {
   app: App;
   child: { value: ExposedInstance | null };
   host: HTMLDivElement;
-  state: Record<string, unknown>;
+  state: JieshuVueProps;
   unmount(): void;
 }
 
 function mountComponent(
-  initialProps: Record<string, unknown>,
+  initialProps: JieshuVueProps,
   listeners: Record<string, (...payload: unknown[]) => void> = {},
 ): MountedComponent {
   const host = document.createElement('div');
   document.body.appendChild(host);
-  const state = reactive({ ...initialProps }) as Record<string, unknown>;
+  const state = reactive({ ...initialProps });
   const child = ref<ExposedInstance | null>(null);
   const Root = defineComponent({
     setup() {
@@ -200,10 +200,10 @@ describe('JieshuVue for Vue 3', () => {
     forwardBusEvent('adapterEvent', 'payload', 3);
     expect(eventHandler).toHaveBeenCalledWith('payload', 3);
 
-    mounted.state['name'] = 'second';
+    mounted.state.name = 'second';
     await nextTick();
     expect(controller.start).toHaveBeenCalledTimes(2);
-    mounted.state['url'] = 'https://second.test/';
+    mounted.state.url = 'https://second.test/';
     await nextTick();
     expect(controller.start).toHaveBeenCalledTimes(3);
 
@@ -274,7 +274,7 @@ describe('JieshuVue for Vue 3', () => {
     const isolatedContainer = document.createElement('div');
 
     try {
-      delete (globalThis as unknown as Record<string, unknown>)['HTMLElement'];
+      Reflect.deleteProperty(globalThis, 'HTMLElement');
       vi.resetModules();
       vi.doMock('vue', () => ({
         defineComponent: (options: unknown) => options,

@@ -63,7 +63,8 @@ export function beginOperation(id: string): OperationIntent {
 /** Observe the current intent without superseding it (used by idle preload). */
 export function observeOperation(id: string): OperationIntent {
   const slots = sharedSlots();
-  const slot = (slots[id] ||= createSlot(0));
+  slots[id] ||= createSlot(0);
+  const slot = slots[id];
   return asIntent(id, slot);
 }
 

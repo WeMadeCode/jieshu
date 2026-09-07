@@ -132,31 +132,37 @@ describe('iframe inline event compiler', () => {
   });
 
   it('serializes hostile app ids instead of interpolating executable source', () => {
+    const { iframeWindow } = createIframeWindow();
     const appId = 'quoted"\\\n-id];hostEscape()//';
     const compiled = wrapInlineEventHandler('work()', appId);
     const getScope = vi.fn(() => null);
     const hostEscape = vi.fn();
-    const execute = new Function('window', 'hostEscape', compiled) as (
-      runtimeWindow: { __getJieshuWindow__: (id: string) => null },
-      escape: () => void,
-    ) => void;
+    iframeWindow.__getJieshuWindow__ = getScope;
+    Object.defineProperty(iframeWindow, 'hostEscape', { value: hostEscape });
+    const button = iframeWindow.document.createElement('button');
+    iframeWindow.document.body.appendChild(button);
+    button.setAttribute('onclick', compiled);
 
-    execute({ __getJieshuWindow__: getScope }, hostEscape);
+    button.click();
 
     expect(getScope).toHaveBeenCalledWith(appId);
     expect(hostEscape).not.toHaveBeenCalled();
   });
 
   it('does not execute a stale handler when its child scope no longer exists', () => {
+    const { iframeWindow } = createIframeWindow();
     const hostOnly = vi.fn();
     const compiled = wrapInlineEventHandler('hostOnly()', 'removed-app');
-    const execute = new Function('window', 'hostOnly', compiled) as (
-      runtimeWindow: { __getJieshuWindow__: () => null },
-      hostCallback: () => void,
-    ) => void;
+    const getScope = vi.fn(() => null);
+    iframeWindow.__getJieshuWindow__ = getScope;
+    Object.defineProperty(iframeWindow, 'hostOnly', { value: hostOnly });
+    const button = iframeWindow.document.createElement('button');
+    iframeWindow.document.body.appendChild(button);
+    button.setAttribute('onclick', compiled);
 
-    execute({ __getJieshuWindow__: () => null }, hostOnly);
+    button.click();
 
+    expect(getScope).toHaveBeenCalledWith('removed-app');
     expect(hostOnly).not.toHaveBeenCalled();
   });
 

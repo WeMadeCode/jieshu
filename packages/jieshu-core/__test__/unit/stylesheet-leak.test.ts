@@ -61,7 +61,7 @@ describe('styleSheetElements destroy 时的清理', () => {
     const style = document.createElement('style') as HTMLStyleElement & {
       _patcher?: number;
     };
-    style._patcher = window.setTimeout(patch, 50);
+    style._patcher = window.setTimeout(() => patch(), 50);
     sandbox.styleSheetElements.push(style);
 
     sandbox.clearStyleSheets();

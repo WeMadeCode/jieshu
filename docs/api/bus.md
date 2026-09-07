@@ -9,22 +9,22 @@ export declare class EventBus {
   private id;
   private eventObj;
   constructor(id: string);
-  $on(event: string, fn: callback): EventBus;
+  $on(event: string, fn: callback): this;
   /** 任何$emit都会导致监听函数触发，第一个参数为事件名，后续的参数为$emit的参数 */
-  $onAll(fn: (event: string, ...args: Array<any>) => any): EventBus;
+  $onAll(fn: (event: string, ...args: Array<any>) => any): this;
   $once(event: string, fn: callback): void;
-  $off(event: string, fn: callback): EventBus;
-  $offAll(fn: callback): EventBus;
-  $emit(event: string, ...args: Array<any>): EventBus;
-  $clear(): EventBus;
+  $off(event: string, fn: callback): this;
+  $offAll(fn: callback): this;
+  $emit(event: string, ...args: Array<any>): this;
+  $clear(): this;
 }
 ```
 
-- **详情：** 去中心化的事件平台，类`Vue`的事件`api`，支持链式调用。[示例](/guide/communication.html#eventbus-通信)
+- **详情：** 去中心化的事件平台，类`Vue`的事件`api`，支持链式调用。`$on`、`$onAll`、`$off`、`$offAll`、`$emit`、`$clear` 返回当前实例，返回类型为 `this`，因此子类也能继续链式调用自身的方法。[示例](/guide/communication.html#eventbus-通信)
 
 ## $on
 
-- **类型：** `(event: string, fn: callback) => EventBus`
+- **类型：** `(event: string, fn: callback) => this`
 
 - **参数：**
 
@@ -35,7 +35,7 @@ export declare class EventBus {
 
 ## $onAll
 
-- **类型：** `(fn: (event: string, ...args: Array<any>) => any) => EventBus`
+- **类型：** `(fn: (event: string, ...args: Array<any>) => any) => this`
 
 - **参数：**
 
@@ -56,7 +56,7 @@ export declare class EventBus {
 
 ## $off
 
-- **类型：** `(event: string, fn: callback) => EventBus`
+- **类型：** `(event: string, fn: callback) => this`
 
 - **参数：**
 
@@ -67,7 +67,7 @@ export declare class EventBus {
 
 ## $offAll
 
-- **类型：** `(fn: callback) => EventBus`
+- **类型：** `(fn: callback) => this`
 
 - **参数：**
 
@@ -77,7 +77,7 @@ export declare class EventBus {
 
 ## $emit
 
-- **类型：** `(event: string, ...args: Array<any>) => EventBus`
+- **类型：** `(event: string, ...args: Array<any>) => this`
 
 - **参数：**
 

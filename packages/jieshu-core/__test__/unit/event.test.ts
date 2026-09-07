@@ -10,6 +10,30 @@ vi.mock('../../src/utils', () => {
 import { EventBus } from '../../src/event';
 
 describe('event bus test', () => {
+  test('chainable methods preserve the subclass instance and its type', () => {
+    class ApplicationBus extends EventBus {
+      readonly applicationName = 'chainable-child';
+    }
+    const bus = new ApplicationBus('test-subclass-chaining');
+    const listener = vi.fn();
+    const allListener = vi.fn();
+    const chained = bus
+      .$on('child', listener)
+      .$onAll(allListener)
+      .$emit('child')
+      .$off('child', listener)
+      .$offAll(allListener)
+      .$clear();
+
+    expect(chained).toBe(bus);
+    expect(chained.applicationName).toBe('chainable-child');
+    expect(listener).toHaveBeenCalledOnce();
+    expect(allListener).toHaveBeenCalledWith('child');
+    expect(bus.$off('missing', listener)).toBe(bus);
+    expect(bus.$emit('')).toBe(bus);
+    bus.$destroy();
+  });
+
   test('bus event on and off', () => {
     const bus = new EventBus('test-on-and-emit');
     const mockFn = vi.fn();

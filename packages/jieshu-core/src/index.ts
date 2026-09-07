@@ -100,7 +100,9 @@ function isSandboxUnavailable(sandbox: Jieshu, canContinue: ContinuationGuard): 
 
 function pendingTeardownCompletion(id: string, canContinue: ContinuationGuard): Promise<boolean> | undefined {
   const firstTeardown = waitForSandboxTeardown(id);
-  if (!firstTeardown) return undefined;
+  if (!firstTeardown) {
+    return undefined;
+  }
   return (async () => {
     let pendingTeardown: Promise<void> | undefined = firstTeardown;
     while (canContinue() && pendingTeardown) {
@@ -170,7 +172,9 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
   // 初始化内联事件处理器辅助函数
   initInlineEventHelper();
   const teardown = pendingTeardownCompletion(startOptions.name, canContinue);
-  if (teardown && !(await teardown)) return;
+  if (teardown && !(await teardown)) {
+    return undefined;
+  }
   const sandbox = getJieshuById(startOptions.name);
   const cacheOptions = getOptionsById(startOptions.name);
   // 合并缓存配置
@@ -195,37 +199,49 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
     iframeAddEventListeners,
     iframeOnEvents,
   } = options;
-  if (!canContinue()) return;
+  if (!canContinue()) {
+    return undefined;
+  }
   // 已经初始化过的应用，快速渲染。普通 start 若撞到另一个未完成的
   // bootstrap，会取消旧实例后重建；preload 则是可复用的显式准备阶段。
   if (sandbox) {
     const pendingUnmount = sandbox.waitForUnmount();
     if (pendingUnmount) await pendingUnmount;
     if (sandbox.preload) await sandbox.preload;
-    if (isSandboxUnavailable(sandbox, canContinue)) return;
+    if (isSandboxUnavailable(sandbox, canContinue)) {
+      return undefined;
+    }
 
     if (!sandbox.initialized) {
       await sandbox.destroy();
-      if (!canContinue()) return;
+      if (!canContinue()) {
+        return undefined;
+      }
     } else {
       sandbox.initialized = false;
       try {
         sandbox.plugins = getPlugins(plugins);
         sandbox.lifecycles = lifecycles;
         const iframeWindow = sandbox.iframe.contentWindow;
-        if (!iframeWindow) return;
+        if (!iframeWindow) {
+          return undefined;
+        }
         if (alive) {
           // 保活
           await sandbox.active({ url, sync, prefix, el, props, alive, fetch, replace });
-          if (isSandboxUnavailable(sandbox, canContinue)) return;
+          if (isSandboxUnavailable(sandbox, canContinue)) {
+            return undefined;
+          }
           if (!sandbox.activeFlag) {
             await discardSandboxIfOwned(sandbox);
-            return;
+            return undefined;
           }
           // 预加载但是没有执行的情况
           if (!sandbox.execFlag) {
             sandbox.lifecycles?.beforeLoad?.(iframeWindow);
-            if (isSandboxUnavailable(sandbox, canContinue)) return;
+            if (isSandboxUnavailable(sandbox, canContinue)) {
+              return undefined;
+            }
             const { getExternalScripts } = await importHTML({
               url,
               html,
@@ -237,12 +253,18 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
                 cacheScope: sandbox.assetCacheScope,
               },
             });
-            if (isSandboxUnavailable(sandbox, canContinue)) return;
+            if (isSandboxUnavailable(sandbox, canContinue)) {
+              return undefined;
+            }
             await sandbox.start(getExternalScripts);
           }
-          if (!(await retainOnlyActiveInitialization(sandbox, canContinue))) return;
+          if (!(await retainOnlyActiveInitialization(sandbox, canContinue))) {
+            return undefined;
+          }
           sandbox.lifecycles?.activated?.(iframeWindow);
-          if (isSandboxUnavailable(sandbox, canContinue)) return;
+          if (isSandboxUnavailable(sandbox, canContinue)) {
+            return undefined;
+          }
           sandbox.initialized = true;
           return () => sandbox.destroy();
         } else if (isFunction(iframeWindow.__JIESHU_MOUNT)) {
@@ -251,23 +273,31 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
            * 此处是防止没有销毁webcomponent时调用startApp的情况，需要手动调用unmount
            */
           await sandbox.unmount();
-          if (isSandboxUnavailable(sandbox, canContinue)) return;
+          if (isSandboxUnavailable(sandbox, canContinue)) {
+            return undefined;
+          }
           await sandbox.active({ url, sync, prefix, el, props, alive, fetch, replace });
-          if (isSandboxUnavailable(sandbox, canContinue)) return;
+          if (isSandboxUnavailable(sandbox, canContinue)) {
+            return undefined;
+          }
           if (!sandbox.activeFlag) {
             await discardSandboxIfOwned(sandbox);
-            return;
+            return undefined;
           }
           // 正常加载的情况，先注入css，最后才mount。重新激活也保持同样的时序
           sandbox.rebuildStyleSheets();
           sandbox.mount(false);
-          if (!(await retainOnlyActiveInitialization(sandbox, canContinue))) return;
+          if (!(await retainOnlyActiveInitialization(sandbox, canContinue))) {
+            return undefined;
+          }
           sandbox.initialized = true;
           return () => sandbox.destroy();
         } else {
           // 没有渲染函数
           await sandbox.destroy();
-          if (!canContinue()) return;
+          if (!canContinue()) {
+            return undefined;
+          }
         }
       } catch (cause: unknown) {
         if (canContinue()) await discardSandboxIfOwned(sandbox);
@@ -278,7 +308,9 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
 
   // 设置loading
   addLoading(el, loading);
-  if (!canContinue()) return;
+  if (!canContinue()) {
+    return undefined;
+  }
   const newSandbox = new Jieshu({
     name,
     url,
@@ -291,16 +323,18 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
   });
   if (isSandboxUnavailable(newSandbox, canContinue)) {
     await discardSandboxIfOwned(newSandbox);
-    return;
+    return undefined;
   }
   const iframeWindow = newSandbox.iframe.contentWindow;
   if (!iframeWindow) {
     await discardSandboxIfOwned(newSandbox);
-    return;
+    return undefined;
   }
   try {
     newSandbox.lifecycles?.beforeLoad?.(iframeWindow);
-    if (isSandboxUnavailable(newSandbox, canContinue)) return;
+    if (isSandboxUnavailable(newSandbox, canContinue)) {
+      return undefined;
+    }
     const { template, getExternalScripts, getExternalStyleSheets } = await importHTML({
       url,
       html,
@@ -313,17 +347,25 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
       },
     });
 
-    if (isSandboxUnavailable(newSandbox, canContinue)) return;
+    if (isSandboxUnavailable(newSandbox, canContinue)) {
+      return undefined;
+    }
     const processedHtml = await processCssLoader(newSandbox, template, getExternalStyleSheets);
-    if (isSandboxUnavailable(newSandbox, canContinue)) return;
+    if (isSandboxUnavailable(newSandbox, canContinue)) {
+      return undefined;
+    }
     await newSandbox.active({ url, sync, prefix, template: processedHtml, el, props, alive, fetch, replace });
-    if (isSandboxUnavailable(newSandbox, canContinue)) return;
+    if (isSandboxUnavailable(newSandbox, canContinue)) {
+      return undefined;
+    }
     if (!newSandbox.activeFlag) {
       await discardSandboxIfOwned(newSandbox);
-      return;
+      return undefined;
     }
     await newSandbox.start(getExternalScripts);
-    if (!(await retainOnlyActiveInitialization(newSandbox, canContinue))) return;
+    if (!(await retainOnlyActiveInitialization(newSandbox, canContinue))) {
+      return undefined;
+    }
     newSandbox.initialized = true;
     return () => newSandbox.destroy();
   } catch (cause: unknown) {
@@ -406,7 +448,10 @@ export function preloadApp(preOptions: PreOptions): void {
         iframeAddEventListeners,
         iframeOnEvents,
       });
-      if (sandbox.preload) return sandbox.preload;
+      if (sandbox.preload) {
+        await sandbox.preload;
+        return;
+      }
       const iframeWindow = sandbox.iframe.contentWindow;
       if (!iframeWindow) {
         await discardSandboxIfOwned(sandbox);

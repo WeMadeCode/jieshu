@@ -306,7 +306,7 @@ describe('JieshuReact', () => {
     if (!descriptor) throw new Error('jsdom window descriptor is unavailable');
 
     try {
-      delete (globalThis as unknown as Record<string, unknown>)['window'];
+      Reflect.deleteProperty(globalThis, 'window');
       vi.resetModules();
       const serverComponent = (await import('../../src')).default;
       expect(serverComponent.displayName).toBe('JieshuReact');

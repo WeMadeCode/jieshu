@@ -166,7 +166,10 @@ const htmlDocuments = new AssetCache(embedHTMLCache);
 export function clearAssetsCache(host?: string | string[]): void {
   // Keep accepting a legacy runtime `null` even though the public type only
   // exposes the clearer undefined form.
-  const prefixes = host == null ? undefined : Array.isArray(host) ? host : [host];
+  let prefixes: string[] | undefined;
+  if (host !== undefined && host !== null) {
+    prefixes = Array.isArray(host) ? host : [host];
+  }
   styleAssets.clear(prefixes);
   scriptAssets.clear(prefixes);
   htmlDocuments.clear(prefixes);
@@ -394,23 +397,25 @@ export function getExternalStyleSheets(
   return styles.map((style) => {
     const { src, content, ignore, attrs, fallback } = style;
     const keepNativeDisabledLink = Boolean(src && hasStyleAttribute(attrs, 'disabled'));
-    const result: StyleResult =
-      content !== undefined
-        ? { src: '', attrs, contentPromise: Promise.resolve(content) }
-        : src?.startsWith('<')
-          ? { src: '', attrs, contentPromise: Promise.resolve(extractInlineCode(src)) }
-          : !src
-            ? { src: '', ignore, attrs, contentPromise: Promise.resolve('') }
-            : {
-                src,
-                ignore,
-                attrs,
-                fallback,
-                contentPromise:
-                  ignore || keepNativeDisabledLink
-                    ? Promise.resolve('')
-                    : fetchAssetText(src, styleAssets, fetch, 'style', loadError, cacheScope),
-              };
+    let result: StyleResult;
+    if (content !== undefined) {
+      result = { src: '', attrs, contentPromise: Promise.resolve(content) };
+    } else if (src?.startsWith('<')) {
+      result = { src: '', attrs, contentPromise: Promise.resolve(extractInlineCode(src)) };
+    } else if (!src) {
+      result = { src: '', ignore, attrs, contentPromise: Promise.resolve('') };
+    } else {
+      result = {
+        src,
+        ignore,
+        attrs,
+        fallback,
+        contentPromise:
+          ignore || keepNativeDisabledLink
+            ? Promise.resolve('')
+            : fetchAssetText(src, styleAssets, fetch, 'style', loadError, cacheScope),
+      };
+    }
     result[STYLE_SOURCE_INDEX] = (style as IndexedStyleObject)[STYLE_SOURCE_INDEX];
     return result;
   });
