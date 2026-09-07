@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { HashRouter, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 import All from './pages/All';
+import Custom from './pages/Custom';
 import Home from './pages/Home';
 import React16 from './pages/React16';
 import React17 from './pages/React17';
@@ -99,6 +100,9 @@ function Navigation({ onOpen }: NavigationProps) {
       {renderExpandableLink('vue2', 'vue2')}
       {renderExpandableLink('vue3', 'vue3', true)}
       {renderExpandableLink('vite', 'vite')}
+      <NavLink to="/custom" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
+        custom
+      </NavLink>
       <NavLink to="/all" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
         all
       </NavLink>
@@ -137,6 +141,7 @@ export default function App() {
             <Route path="/vue3-sub/:path" element={<Vue3 />} />
             <Route path="/vite" element={<Vite />} />
             <Route path="/vite-sub/:path" element={<Vite />} />
+            <Route path="/custom" element={<Custom />} />
             <Route path="/all" element={<All />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
