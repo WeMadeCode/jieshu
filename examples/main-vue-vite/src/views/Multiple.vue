@@ -6,6 +6,7 @@
     <JieshuVue class="item" name="vue3" :url="vue3Url" :sync="true"></JieshuVue>
     <JieshuVue class="item" name="vite" :url="vite" :sync="true"></JieshuVue>
     <JieshuVue class="item" name="angular12" :url="angular12Url" :sync="true"></JieshuVue>
+    <JieshuVue class="item" name="react18" :url="react18Url" :sync="true" />
   </div>
 </template>
 
@@ -18,6 +19,7 @@ export default {
     return {
       react16Url: hostMap('//localhost:7600/'),
       react17Url: hostMap('//localhost:7100/'),
+      react18Url: hostMap('//localhost:7900/'),
       vue2Url: hostMap('//localhost:7200/'),
       vue3Url: hostMap('//localhost:7300/'),
       vite: hostMap('//localhost:7500/'),

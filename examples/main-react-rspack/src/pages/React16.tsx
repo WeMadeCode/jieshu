@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import hostMap from '../hostMap';
-import JieshuReact from '../jieshuReact';
+import JieshuReact from '@cloud/jieshu-react';
+import { useCallback } from 'react';
 
 export default function React16() {
   const location = useLocation();
@@ -14,5 +15,23 @@ export default function React16() {
     },
   };
 
-  return <JieshuReact width="100%" height="100%" name="react16" url={react16Url} sync={!path} props={props} />;
+  const beforeMount = useCallback((window: Window) => {
+    console.log('React 16 Before mount = ', window);
+  }, []);
+  const afterMount = useCallback((window: Window) => {
+    console.log('React 16 After mount = ', window);
+  }, []);
+
+  return (
+    <JieshuReact
+      beforeMount={beforeMount}
+      afterMount={afterMount}
+      width="100%"
+      height="100%"
+      name="react16"
+      url={react16Url}
+      sync={!path}
+      props={props}
+    />
+  );
 }

@@ -8,10 +8,11 @@ import Angular12 from './pages/Angular12';
 import Home from './pages/Home';
 import React16 from './pages/React16';
 import React17 from './pages/React17';
+import React18 from './pages/React18';
 import Vite from './pages/Vite';
 import Vue2 from './pages/Vue2';
 import Vue3 from './pages/Vue3';
-import JieshuReact from './jieshuReact';
+import JieshuReact from '@cloud/jieshu-react';
 
 const { bus } = JieshuReact;
 
@@ -93,6 +94,9 @@ function Navigation({ onOpen }: NavigationProps) {
       </NavLink>
       {renderExpandableLink('react16', 'react16')}
       {renderExpandableLink('react17', 'react17', true)}
+      <NavLink to="/react18" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
+        React18
+      </NavLink>
       {renderExpandableLink('vue2', 'vue2')}
       {renderExpandableLink('vue3', 'vue3', true)}
       {renderExpandableLink('vite', 'vite')}
@@ -129,6 +133,7 @@ export default function App() {
             <Route path="/react16-sub/:path" element={<React16 />} />
             <Route path="/react17" element={<React17 />} />
             <Route path="/react17-sub/:path" element={<React17 />} />
+            <Route path="/react18" element={<React18 />} />
             <Route path="/vue2" element={<Vue2 />} />
             <Route path="/vue2-sub/:path" element={<Vue2 />} />
             <Route path="/vue3" element={<Vue3 />} />

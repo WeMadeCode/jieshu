@@ -21,6 +21,16 @@ import JieshuReact from '@cloud/jieshu-react';
 const { bus, setupApp, preloadApp, destroyApp, refreshApp, clearAssetsCache } = JieshuReact;
 ```
 
+TypeScript 项目可直接将 `JieshuReact` 用作 JSX 组件，包括适配包使用 React 17 类型、主应用使用 React 19 类型的 workspace 场景。主应用的 `@types/react`、`@types/react-dom` 应与主应用的 React 主版本保持一致。
+
+```tsx
+import { createRef } from 'react';
+import JieshuReact, { type JieshuReactRef } from '@cloud/jieshu-react';
+
+const appRef = createRef<JieshuReactRef>();
+const child = <JieshuReact name="child" url="https://example.com/" ref={appRef} />;
+```
+
 ## 使用
 
 ```jsx

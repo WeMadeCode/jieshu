@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import hostMap from '../hostMap';
-import JieshuReact from '../jieshuReact';
+import JieshuReact from '@cloud/jieshu-react';
 
 export default function All() {
   const navigate = useNavigate();
@@ -53,6 +53,9 @@ export default function All() {
           sync
           props={props}
         />
+      </div>
+      <div className="all-item">
+        <JieshuReact height="100%" width="100%" name="react18" url={hostMap('//localhost:7900/')} sync props={props} />
       </div>
     </div>
   );

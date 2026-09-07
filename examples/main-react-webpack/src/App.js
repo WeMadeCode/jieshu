@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Home from './pages/Home';
 import React16 from './pages/React16';
 import React17 from './pages/React17';
+import React18 from './pages/React18';
 import Vue2 from './pages/Vue2';
 import Vue3 from './pages/Vue3';
 import Vite from './pages/Vite';
@@ -103,6 +104,9 @@ function Nav() {
           </NavLink>
         ))}
       </div>
+      <NavLink to="/react18" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
+        React18
+      </NavLink>
       <NavLink to="/vue2" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
         vue2
         <CaretUpOutlined className={vue2Flag ? 'main-icon active' : 'main-icon'} onClick={() => handleFlag('vue2')} />
@@ -168,6 +172,7 @@ class App extends React.PureComponent {
               <Route exact path="/react16-sub/:path" element={<React16 />} />
               <Route exact path="/react17" element={<React17 />} />
               <Route exact path="/react17-sub/:path" element={<React17 />} />
+              <Route path="/react18" element={<React18 />} />
               <Route exact path="/vue2" element={<Vue2 />} />
               <Route exact path="/vue2-sub/:path" element={<Vue2 />} />
               <Route exact path="/vue3" element={<Vue3 />} />

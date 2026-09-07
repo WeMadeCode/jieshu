@@ -28,6 +28,7 @@
         <router-link to="/react17-sub/communication">communication</router-link>
         <router-link to="/react17-sub/state">state</router-link>
       </div>
+      <router-link to="/react18">React18</router-link>
       <!-- vue2相关路由 -->
       <router-link to="/vue2">
         vue2

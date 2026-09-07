@@ -1,6 +1,6 @@
 {
   "name": "@cloud/jieshu-vue3",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "界枢微前端Vue3组件封装",
   "repository": {
     "type": "git",
@@ -52,7 +52,7 @@
     "@cloud/jieshu-core": "workspace:*"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "6.0.8",
+    "@vitejs/plugin-vue": "^6.0.7",
     "@vue/compiler-sfc": "^3.5.22",
     "vue": "^3.5.22",
     "vue-tsc": "3.2.4"

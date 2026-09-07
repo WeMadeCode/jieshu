@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import hostMap from '../hostMap';
-import JieshuReact from '../jieshuReact';
+import JieshuReact from '@cloud/jieshu-react';
 
 export default function Vite() {
   const location = useLocation();

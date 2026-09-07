@@ -1,17 +1,18 @@
 import { useNavigate } from 'react-router-dom';
-
 import hostMap from '../hostMap';
 import JieshuReact from '@cloud/jieshu-react';
 
-export default function Angular12() {
+const React18 = () => {
   const navigate = useNavigate();
   const props = {
-    jump: (name: string): void => {
+    jump: (name) => {
       void navigate(`/${name}`);
     },
   };
 
   return (
-    <JieshuReact width="100%" height="100%" name="angular12" url={hostMap('//localhost:7400/')} sync props={props} />
+    <JieshuReact width="100%" height="100%" name="react18" url={hostMap('//localhost:7900/')} sync props={props} />
   );
-}
+};
+
+export default React18;

@@ -11,7 +11,7 @@ pnpm start
 需要分组启动时，使用两个终端依次执行：
 
 ```bash
-pnpm start:children # 框架包监听 + 子应用（7100–7600）
+pnpm start:children # 框架包监听 + 子应用（7100–7600、7900）
 pnpm start:mains    # 主应用（7700、7800、8000）
 ```
 
@@ -31,6 +31,18 @@ pnpm dev:examples:docs
 | React 19 + TypeScript 主应用 | `http://localhost:7800/`     |
 | Vue 主应用                   | `http://localhost:8000/`     |
 | 文档                         | `http://localhost:5173/doc/` |
+
+## React18 子应用
+
+`examples/react18` 使用 Vite + TypeScript + React 18，独立开发地址为 `http://localhost:7900/`。
+
+```bash
+pnpm --filter react18 start
+pnpm --filter react18 build
+pnpm --filter react18 test
+```
+
+三个主应用的 **React18** 菜单及 **all** 页面均已接入；`pnpm start:children` 和 `pnpm start` 会自动启动它。
 
 ## 同源生产预览
 
@@ -57,6 +69,7 @@ pnpm preview:examples
 | `examples/main-vue/dist/`      | `site/demo-main-vue/`      |
 | `examples/react16/build/`      | `site/demo-react16/`       |
 | `examples/react17/build/`      | `site/demo-react17/`       |
+| `examples/react18/dist/`       | `site/demo-react18/`       |
 | `examples/vue2/dist/`          | `site/demo-vue2/`          |
 | `examples/vue3/dist/`          | `site/demo-vue3/`          |
 | `examples/vite/dist/`          | `site/demo-vite/`          |

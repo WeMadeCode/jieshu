@@ -51,6 +51,15 @@ setupApp({
 });
 
 setupApp({
+  name: 'react18',
+  url: hostMap('//localhost:7900/'),
+  attrs,
+  exec: true,
+  fetch: credentialsFetch,
+  ...lifecycles,
+});
+
+setupApp({
   name: 'vue2',
   url: hostMap('//localhost:7200/'),
   attrs,
@@ -91,6 +100,7 @@ setupApp({
 });
 
 if (window.localStorage.getItem('preload') !== 'false') {
+  preloadApp({ name: 'react18' });
   preloadApp({
     name: 'react16',
   });

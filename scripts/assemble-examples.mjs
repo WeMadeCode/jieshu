@@ -11,6 +11,7 @@ const outputs = [
   ['main-vue-vite', 'examples/main-vue-vite/dist', 'demo-main-vue-vite'],
   ['react16', 'examples/react16/build', 'demo-react16'],
   ['react17', 'examples/react17/build', 'demo-react17'],
+  ['react18', 'examples/react18/dist', 'demo-react18'],
   ['vue2', 'examples/vue2/dist', 'demo-vue2'],
   ['vue3', 'examples/vue3/dist', 'demo-vue3'],
   ['vite', 'examples/vite/dist', 'demo-vite'],

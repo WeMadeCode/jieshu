@@ -7,7 +7,7 @@ import credentialsFetch from './fetch';
 import hostMap from './hostMap';
 import lifecycles from './lifecycle';
 import plugins from './plugin';
-import JieshuReact from './jieshuReact';
+import JieshuReact from '@cloud/jieshu-react';
 
 const { setupApp, preloadApp, bus } = JieshuReact;
 const attrs = __PRODUCTION__ ? { src: new URL(__BASE_URL__, window.location.href).href } : {};
@@ -31,6 +31,15 @@ setupApp({
   attrs,
   exec: true,
   alive: true,
+  fetch: credentialsFetch,
+  ...lifecycles,
+});
+
+setupApp({
+  name: 'react18',
+  url: hostMap('//localhost:7900/'),
+  attrs,
+  exec: true,
   fetch: credentialsFetch,
   ...lifecycles,
 });
@@ -79,6 +88,7 @@ setupApp({
 });
 
 if (window.localStorage.getItem('preload') !== 'false') {
+  preloadApp({ name: 'react18' });
   preloadApp({ name: 'react16' });
   preloadApp({ name: 'react17' });
   preloadApp({ name: 'vue2' });
