@@ -114,7 +114,7 @@ export default [
     name: 'jieshu/core-compatibility',
     files: ['packages/jieshu-core/**/*.ts'],
     rules: {
-      'no-prototype-builtins': 'off',
+      'no-prototype-builtins': 'error',
       'no-self-assign': 'off',
     },
   },

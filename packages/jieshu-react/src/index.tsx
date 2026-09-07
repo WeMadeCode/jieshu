@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef } from 'react';
 import {
   bus,
   clearAssetsCache,
@@ -76,102 +77,92 @@ function reportAutomaticFailure(error: unknown): void {
   console.error('[@cloud/jieshu-react] failed to start application', error);
 }
 
-const useOwnershipEffect = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect;
+const useOwnershipEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
-const JieshuReactView = React.forwardRef<JieshuReactRef, JieshuReactProps>(
-  function JieshuReact(componentProps, forwardedRef) {
-    const containerRef = React.useRef<HTMLDivElement | null>(null);
-    const controllerRef = React.useRef<AppController | null>(null);
-    const propsRef = React.useRef(componentProps);
-    const previousIdentityRef = React.useRef<ApplicationIdentity>({
+const JieshuReactView = forwardRef<JieshuReactRef, JieshuReactProps>((componentProps, forwardedRef) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const controllerRef = useRef<AppController | null>(null);
+  const propsRef = useRef(componentProps);
+  const previousIdentityRef = useRef<ApplicationIdentity>({
+    name: componentProps.name,
+    url: componentProps.url,
+  });
+  propsRef.current = componentProps;
+
+  const getController = useCallback((): AppController => {
+    if (controllerRef.current === null) controllerRef.current = createAppController();
+    return controllerRef.current;
+  }, []);
+
+  const getStartOptions = useCallback((): StartOptions => {
+    const container = containerRef.current;
+    if (container === null) {
+      throw new Error('JieshuReact cannot start before its container is mounted');
+    }
+    return createStartOptions(propsRef.current, container);
+  }, []);
+
+  const startAutomatically = useCallback((): void => {
+    let operation: Promise<DestroyHandler | void>;
+    try {
+      operation = getController().start(getStartOptions());
+    } catch (error: unknown) {
+      operation = Promise.reject(error);
+    }
+    void operation.catch(reportAutomaticFailure);
+  }, [getController, getStartOptions]);
+
+  useImperativeHandle(
+    forwardedRef,
+    (): JieshuReactRef => ({
+      refresh: (): Promise<DestroyHandler | void> => {
+        try {
+          return getController().refresh(getStartOptions());
+        } catch (error: unknown) {
+          return Promise.reject(error);
+        }
+      },
+      destroy: (): Promise<void> => getController().destroy(propsRef.current.name),
+    }),
+    [getController, getStartOptions],
+  );
+
+  useOwnershipEffect(() => {
+    startAutomatically();
+    return (): void => {
+      const controller = controllerRef.current;
+      controller?.dispose();
+      controllerRef.current = null;
+    };
+  }, [startAutomatically]);
+
+  useEffect(() => {
+    const previousIdentity = previousIdentityRef.current;
+    const nextIdentity: ApplicationIdentity = {
       name: componentProps.name,
       url: componentProps.url,
-    });
-    propsRef.current = componentProps;
+    };
+    previousIdentityRef.current = nextIdentity;
 
-    const getController = React.useCallback((): AppController => {
-      if (controllerRef.current === null) controllerRef.current = createAppController();
-      return controllerRef.current;
-    }, []);
-
-    const getStartOptions = React.useCallback((): StartOptions => {
-      const container = containerRef.current;
-      if (container === null) {
-        throw new Error('JieshuReact cannot start before its container is mounted');
-      }
-      return createStartOptions(propsRef.current, container);
-    }, []);
-
-    const startAutomatically = React.useCallback((): void => {
-      let operation: Promise<DestroyHandler | void>;
-      try {
-        operation = getController().start(getStartOptions());
-      } catch (error: unknown) {
-        operation = Promise.reject(error);
-      }
-      void operation.catch(reportAutomaticFailure);
-    }, [getController, getStartOptions]);
-
-    const refresh = React.useCallback((): Promise<DestroyHandler | void> => {
-      try {
-        return getController().refresh(getStartOptions());
-      } catch (error: unknown) {
-        return Promise.reject(error);
-      }
-    }, [getController, getStartOptions]);
-
-    const destroy = React.useCallback((): Promise<void> => {
-      return getController().destroy(propsRef.current.name);
-    }, [getController]);
-
-    React.useImperativeHandle(
-      forwardedRef,
-      (): JieshuReactRef => ({
-        refresh,
-        destroy,
-      }),
-      [destroy, refresh],
-    );
-
-    useOwnershipEffect(() => {
+    if (nextIdentity.name !== previousIdentity.name || nextIdentity.url !== previousIdentity.url) {
       startAutomatically();
-      return (): void => {
-        const controller = controllerRef.current;
-        controller?.dispose();
-        controllerRef.current = null;
-      };
-    }, [startAutomatically]);
+    }
+  });
 
-    React.useEffect(() => {
-      const previousIdentity = previousIdentityRef.current;
-      const nextIdentity: ApplicationIdentity = {
-        name: componentProps.name,
-        url: componentProps.url,
-      };
-      previousIdentityRef.current = nextIdentity;
-
-      if (nextIdentity.name !== previousIdentity.name || nextIdentity.url !== previousIdentity.url) {
-        startAutomatically();
-      }
-    });
-
-    const { width, height, style } = componentProps;
-    return <div ref={containerRef} style={{ width, height, ...style }} />;
-  },
-);
+  const { width, height, style } = componentProps;
+  return <div ref={containerRef} style={{ width, height, ...style }} />;
+});
 
 JieshuReactView.displayName = 'JieshuReact';
 
-const memoizedComponent = React.memo(JieshuReactView);
-const componentStatics = memoizedComponent as unknown as JieshuReactStatics;
-componentStatics.bus = bus;
-componentStatics.setupApp = setupApp;
-componentStatics.preloadApp = preloadApp;
-componentStatics.destroyApp = destroyApp;
-componentStatics.refreshApp = refreshApp;
-componentStatics.clearAssetsCache = clearAssetsCache;
-
-const JieshuReact = memoizedComponent as unknown as JieshuReactComponent;
+const JieshuReact: JieshuReactComponent = Object.assign(memo(JieshuReactView), {
+  bus,
+  setupApp,
+  preloadApp,
+  destroyApp,
+  refreshApp,
+  clearAssetsCache,
+});
 JieshuReact.displayName = 'JieshuReact';
 
 export default JieshuReact;

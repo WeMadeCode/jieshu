@@ -138,6 +138,8 @@ import JieshuReact from '@cloud/jieshu-react';
 
 ## 本地开发
 
+开发前请阅读 [代码规范](./CODE_STYLE.md)，统一对象属性检查、控制流、函数写法和类型使用方式。
+
 运行以下脚本，可以本地开发界枢微前端框架，支持实时编译调试开发。
 
 ```bash

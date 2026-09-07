@@ -1,5 +1,4 @@
 export type ProxyTarget = Window | Document | ShadowRoot | Location;
-type CallableRecord = CallableFunction & Record<string, unknown>;
 
 const safariDocumentAllIsCallable = typeof document.all === 'function' && typeof document.all === 'undefined';
 const callableCache = new WeakMap<CallableFunction, boolean>();
@@ -7,84 +6,109 @@ const boundedCache = new WeakMap<CallableFunction, boolean>();
 const constructableCache = new WeakMap<CallableFunction, boolean>();
 const targetBindingCaches = new WeakMap<ProxyTarget, WeakMap<CallableFunction, CallableFunction>>();
 
-export function isFunction(value: unknown): value is (...args: Array<unknown>) => unknown {
+export const isFunction = (value: unknown): value is (...args: Array<unknown>) => unknown => {
   return typeof value === 'function';
-}
+};
 
-export function isCallable(value: unknown): value is CallableFunction {
-  if (typeof value !== 'function') return false;
-  if (callableCache.has(value)) return true;
+export const isCallable = (value: unknown): value is CallableFunction => {
+  if (typeof value !== 'function') {
+    return false;
+  }
+  if (callableCache.has(value)) {
+    return true;
+  }
 
   const callable = safariDocumentAllIsCallable
     ? typeof value === 'function' && typeof value !== 'undefined'
     : typeof value === 'function';
-  if (callable) callableCache.set(value, true);
+  if (callable) {
+    callableCache.set(value, true);
+  }
   return callable;
-}
+};
 
-export function isBoundedFunction(fn: CallableFunction): boolean {
+export const isBoundedFunction = (fn: CallableFunction) => {
   const cached = boundedCache.get(fn);
-  if (cached !== undefined) return cached;
+  if (cached !== undefined) {
+    return cached;
+  }
 
-  const bounded = fn.name.indexOf('bound ') === 0 && !fn.hasOwnProperty('prototype');
+  const bounded = fn.name.startsWith('bound ') && Reflect.getOwnPropertyDescriptor(fn, 'prototype') === undefined;
   boundedCache.set(fn, bounded);
   return bounded;
-}
+};
 
-export function isConstructable(fn: CallableFunction): boolean {
+export const isConstructable = (fn: CallableFunction) => {
   const hasPrototypeMethods =
     fn.prototype && fn.prototype.constructor === fn && Object.getOwnPropertyNames(fn.prototype).length > 1;
-  if (hasPrototypeMethods) return true;
+  if (hasPrototypeMethods) {
+    return true;
+  }
 
   const cached = constructableCache.get(fn);
-  if (cached !== undefined) return cached;
+  if (cached !== undefined) {
+    return cached;
+  }
 
   const source = fn.toString();
   const constructable = /^function\b\s[A-Z].*/.test(source) || /^class\b/.test(source);
   constructableCache.set(fn, constructable);
   return constructable;
-}
+};
 
-function getBindingCache(target: ProxyTarget): WeakMap<CallableFunction, CallableFunction> {
+const getBindingCache = (target: ProxyTarget) => {
   const cached = targetBindingCaches.get(target);
-  if (cached) return cached;
+  if (cached) {
+    return cached;
+  }
 
   const created = new WeakMap<CallableFunction, CallableFunction>();
   targetBindingCaches.set(target, created);
   return created;
-}
+};
 
-export function checkProxyFunction(target: ProxyTarget, value: unknown): void {
-  if (!isCallable(value) || isBoundedFunction(value) || isConstructable(value)) return;
+export const checkProxyFunction = (target: ProxyTarget, value: unknown) => {
+  if (!isCallable(value) || isBoundedFunction(value) || isConstructable(value)) {
+    return;
+  }
 
   const bindings = getBindingCache(target);
-  if (!bindings.has(value)) bindings.set(value, value);
-}
+  if (!bindings.has(value)) {
+    bindings.set(value, value);
+  }
+};
 
-function copyCallableProperties(source: CallableFunction, destination: CallableRecord): void {
-  const sourceRecord = source as CallableRecord;
-  for (const key in source) destination[key] = sourceRecord[key];
+const copyCallableProperties = (source: CallableFunction, destination: CallableFunction) => {
+  for (const key in source) {
+    if (!Reflect.set(destination, key, Reflect.get(source, key))) {
+      throw new TypeError(`Cannot copy callable property: ${key}`);
+    }
+  }
 
   if (
     Object.prototype.hasOwnProperty.call(source, 'prototype') &&
     !Object.prototype.hasOwnProperty.call(destination, 'prototype')
   ) {
     Object.defineProperty(destination, 'prototype', {
-      value: sourceRecord.prototype,
+      value: source.prototype,
       enumerable: false,
       writable: true,
     });
   }
-}
+};
 
-export function getTargetValue(target: ProxyTarget, property: PropertyKey): unknown {
+export const getTargetValue = (target: ProxyTarget, property: PropertyKey) => {
   const value: unknown = Reflect.get(target, property);
   const bindings = targetBindingCaches.get(target);
-  if (isCallable(value) && bindings?.has(value)) return bindings.get(value);
-  if (!isCallable(value) || isBoundedFunction(value) || isConstructable(value)) return value;
+  if (isCallable(value) && bindings?.has(value)) {
+    return bindings.get(value);
+  }
+  if (!isCallable(value) || isBoundedFunction(value) || isConstructable(value)) {
+    return value;
+  }
 
-  const bound = Function.prototype.bind.call(value, target) as CallableRecord;
+  const bound: CallableFunction = Function.prototype.bind.call(value, target);
   getBindingCache(target).set(value, bound);
   copyCallableProperties(value, bound);
   return bound;
-}
+};

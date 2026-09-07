@@ -204,7 +204,38 @@ describe('JieshuReact', () => {
     expect(mockCreateAppController).toHaveBeenCalledTimes(2);
   });
 
+  test('keeps imperative controls stable across updates while reading the latest props', async () => {
+    const forwardedRef = React.createRef<JieshuReactRef>();
+    renderComponent(host, { name: 'first', props: { revision: 1 } }, forwardedRef);
+    const controls = forwardedRef.current as JieshuReactRef;
+    const { refresh, destroy } = controls;
+    const controller = mockControllers[0];
+
+    renderComponent(host, { name: 'first', props: { revision: 2 } }, forwardedRef);
+    expect(forwardedRef.current).toBe(controls);
+    expect(controller.start).toHaveBeenCalledTimes(1);
+    await refresh();
+    expect(controller.refresh).toHaveBeenLastCalledWith(
+      expect.objectContaining({ name: 'first', props: { revision: 2 } }),
+    );
+
+    renderComponent(host, { name: 'second', props: { revision: 3 } }, forwardedRef);
+    expect(forwardedRef.current).toBe(controls);
+    expect(forwardedRef.current?.refresh).toBe(refresh);
+    expect(forwardedRef.current?.destroy).toBe(destroy);
+    expect(mockCreateAppController).toHaveBeenCalledTimes(1);
+    expect(controller.start).toHaveBeenCalledTimes(2);
+    expect(controller.dispose).not.toHaveBeenCalled();
+    await refresh();
+    expect(controller.refresh).toHaveBeenLastCalledWith(
+      expect.objectContaining({ name: 'second', props: { revision: 3 } }),
+    );
+    await destroy();
+    expect(controller.destroy).toHaveBeenCalledWith('second');
+  });
+
   test('preserves the public static API', () => {
+    expect(JieshuReact.$$typeof).toBe(Symbol.for('react.memo'));
     expect(JieshuReact.bus).toBe(mockBus);
     expect(JieshuReact.setupApp).toBe(mockSetupApp);
     expect(JieshuReact.preloadApp).toBe(mockPreloadApp);

@@ -208,7 +208,7 @@ function patchPolicyControlledUnloadProperty(iframeWindow: Window): void {
 /**
  * 修改window对象的事件监听，只有路由事件采用iframe的事件
  */
-export function patchIframeEvents(iframeWindow: Window): void {
+export function patchIframeEvents(iframeWindow: Window) {
   iframeWindow.__JIESHU_EVENTLISTENER__ = iframeWindow.__JIESHU_EVENTLISTENER__ || new Set();
   patchPolicyControlledUnloadProperty(iframeWindow);
   iframeWindow.addEventListener = function addEventListener<K extends keyof WindowEventMap>(
@@ -226,8 +226,11 @@ export function patchIframeEvents(iframeWindow: Window): void {
       (typeof options === 'object' && options.targetWindow)
     ) {
       const targetWindow = typeof options === 'object' && options.targetWindow ? options?.targetWindow : iframeWindow;
-      if (!isWindowEventAllowedByPolicy(targetWindow, type)) return;
-      return rawWindowAddEventListener.call(targetWindow, type, eventListener, options);
+      if (!isWindowEventAllowedByPolicy(targetWindow, type)) {
+        return;
+      }
+      rawWindowAddEventListener.call(targetWindow, type, eventListener, options);
+      return;
     }
     // 在子应用嵌套场景使用window.window获取真实window
     rawWindowAddEventListener.call(window.__JIESHU_RAW_WINDOW__ || window, type, eventListener, options);
@@ -259,7 +262,8 @@ export function patchIframeEvents(iframeWindow: Window): void {
       (typeof options === 'object' && options.targetWindow)
     ) {
       const targetWindow = typeof options === 'object' && options.targetWindow ? options?.targetWindow : iframeWindow;
-      return rawWindowRemoveEventListener.call(targetWindow, type, eventListener, options);
+      rawWindowRemoveEventListener.call(targetWindow, type, eventListener, options);
+      return;
     }
     rawWindowRemoveEventListener.call(window.__JIESHU_RAW_WINDOW__ || window, type, eventListener, options);
   };
@@ -576,8 +580,10 @@ export function patchDocumentEffect(iframeWindow: Window): void {
     type: string,
     handler: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions,
-  ): void {
-    if (!handler) return;
+  ) {
+    if (!handler) {
+      return;
+    }
     let callback = handlerCallbackMap.get(handler);
     let registrations = handlerRegistrationMap.get(handler);
     // 设置 handlerCallbackMap
@@ -594,12 +600,14 @@ export function patchDocumentEffect(iframeWindow: Window): void {
     // 运行插件钩子函数
     execHooks(iframeWindow.__JIESHU.plugins, 'documentAddEventListenerHook', iframeWindow, type, callback, options);
     if (appDocumentAddEventListenerEvents.includes(type)) {
-      return rawAddEventListener.call(this, type, callback, options);
+      rawAddEventListener.call(this, type, callback, options);
+      return;
     }
     if (mainDocumentAddEventListenerEvents.includes(type)) {
       // 登记到清理跟踪器，destroy 时反向解绑，避免 handler 闭包永久钉住 iframeWindow
       sandbox.eventCleanupTracker?.trackMainDocumentListener({ type, callback, options });
-      return window.document.addEventListener(type, callback, options);
+      window.document.addEventListener(type, callback, options);
+      return;
     }
     if (mainAndAppAddEventListenerEvents.includes(type)) {
       sandbox.eventCleanupTracker?.trackMainDocumentListener({ type, callback, options });
@@ -613,7 +621,7 @@ export function patchDocumentEffect(iframeWindow: Window): void {
     type: string,
     handler: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions,
-  ): void {
+  ) {
     const callback = handlerCallbackMap.get(handler);
     const registrations = handlerRegistrationMap.get(handler);
     if (callback) {
@@ -633,11 +641,13 @@ export function patchDocumentEffect(iframeWindow: Window): void {
         options,
       );
       if (appDocumentAddEventListenerEvents.includes(type)) {
-        return rawRemoveEventListener.call(this, type, callback, options);
+        rawRemoveEventListener.call(this, type, callback, options);
+        return;
       }
       if (mainDocumentAddEventListenerEvents.includes(type)) {
         sandbox.eventCleanupTracker?.untrackMainDocumentListener({ type, callback, options });
-        return window.document.removeEventListener(type, callback, options);
+        window.document.removeEventListener(type, callback, options);
+        return;
       }
       if (mainAndAppAddEventListenerEvents.includes(type)) {
         sandbox.eventCleanupTracker?.untrackMainDocumentListener({ type, callback, options });
@@ -929,17 +939,23 @@ function stopIframeLoading(iframe: HTMLIFrameElement, options: { fallbackSrc: st
         if (safetyTimer !== undefined) clearTimeout(safetyTimer);
       };
       const runTrick = () => {
-        if (done) return;
+        if (done) {
+          return;
+        }
         done = true;
         cleanup();
         let newDoc: Document;
         let previousHref: string;
         try {
-          if (!iframe.isConnected || !iframeWindow.location) return finish();
+          if (!iframe.isConnected || !iframeWindow.location) {
+            finish();
+            return;
+          }
           newDoc = iframeWindow.document;
           previousHref = iframeWindow.location.href;
         } catch {
-          return finish();
+          finish();
+          return;
         }
         newDoc.open();
         newDoc.close();

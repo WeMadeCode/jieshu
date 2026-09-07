@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "极致的微前端框架",
   "private": true,
-  "packageManager": "pnpm@11.13.0",
+  "packageManager": "pnpm@10.28.2",
   "scripts": {
     "build:packages": "pnpm --recursive --filter \"./packages/*\" run build",
     "build:examples": "pnpm run build:packages && pnpm --recursive --workspace-concurrency=1 --filter \"./examples/*\" run build && pnpm --filter jieshu-docs run docs:build && pnpm run assemble:examples",

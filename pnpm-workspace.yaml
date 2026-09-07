@@ -1,17 +1,3 @@
 packages:
   - 'packages/*'
   - 'examples/*'
-
-allowBuilds:
-  '@angular/cli': false
-  ant-design-vue: false
-  core-js: false
-  core-js-pure: false
-  ejs: false
-  es5-ext: false
-  esbuild: true
-  fsevents: false
-  nice-napi: false
-  vue-demi: false
-
-minimumReleaseAge: 0
