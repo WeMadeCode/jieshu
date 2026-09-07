@@ -11,6 +11,7 @@ interface ScriptTestSandbox {
   execQueue: Array<() => unknown>;
   dynamicScriptElements: HTMLScriptElement[];
   activeFlag: boolean;
+  alive?: boolean;
   destroyed: boolean;
 }
 
@@ -68,19 +69,21 @@ describe('iframe script execution pipeline', () => {
     expect(onload).toHaveBeenCalledTimes(1);
   });
 
-  it('waits for an external script event before advancing and tracks dynamic scripts', () => {
+  it('tracks native dynamic scripts and leaves queue advancement to the dynamic scheduler', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const rawElement = iframeWindow.document.createElement('script');
     rawElement.setAttribute(JIESHU_SCRIPT_ID, 'dynamic-7');
     const onload = vi.fn();
+    const next = vi.fn();
+    sandbox.execQueue.push(next);
 
-    insertScriptToIframe(
+    const handle = insertScriptToIframe(
       { src: 'https://cdn.example/chunk.js', crossorigin: true, crossoriginType: 'anonymous', onload },
       iframeWindow,
       rawElement,
     );
 
-    const inserted = iframeWindow.document.head.querySelector('script') as HTMLScriptElement;
+    const inserted = handle.element;
     expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(1);
     expect(inserted.getAttribute(JIESHU_SCRIPT_ID)).toBe('dynamic-7');
     expect(inserted.getAttribute('crossorigin')).toBe('anonymous');
@@ -88,11 +91,79 @@ describe('iframe script execution pipeline', () => {
 
     inserted.dispatchEvent(new Event('load'));
     expect(onload).toHaveBeenCalledTimes(1);
-    expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(2);
+    expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(1);
+    expect(next).not.toHaveBeenCalled();
     expect(inserted.onload).toBeNull();
     expect(inserted.onerror).toBeNull();
     inserted.dispatchEvent(new Event('error'));
     expect(onload).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['load', 'error'])(
+    'finishes a native %s while its owner is kept alive in the background',
+    async (outcome) => {
+      const { iframeWindow, sandbox } = createScriptEnvironment();
+      const loaded = vi.fn();
+      const failed = vi.fn();
+      const handle = insertScriptToIframe(
+        { src: 'https://cdn.example/alive.js', onload: loaded, onerror: failed },
+        iframeWindow,
+      );
+      sandbox.alive = true;
+      sandbox.activeFlag = false;
+      handle.element.dispatchEvent(new Event(outcome));
+      handle.element.dispatchEvent(new Event(outcome));
+      handle.cancel();
+
+      await expect(handle.completion).resolves.toBe(outcome);
+      expect(loaded).toHaveBeenCalledTimes(outcome === 'load' ? 1 : 0);
+      expect(failed).toHaveBeenCalledTimes(outcome === 'error' ? 1 : 0);
+      expect(handle.element.onload).toBeNull();
+      expect(handle.element.onerror).toBeNull();
+    },
+  );
+
+  it('does not accept a non-alive inactive owner', async () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    sandbox.activeFlag = false;
+    const loaded = vi.fn();
+    const handle = insertScriptToIframe({ content: 'window.__inactiveCode = true;', onload: loaded }, iframeWindow);
+
+    await expect(handle.completion).resolves.toBe('cancelled');
+    expect(handle.element.isConnected).toBe(false);
+    expect(loaded).not.toHaveBeenCalled();
+    expect(Reflect.get(iframeWindow, '__inactiveCode')).toBeUndefined();
+  });
+
+  it('cleans up a native script when a callback throws before its handle is returned', () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const rawElement = iframeWindow.document.createElement('script');
+    const loaded = vi.fn();
+    let inserted: HTMLScriptElement | undefined;
+    expect(() =>
+      insertScriptToIframe(
+        {
+          module: true,
+          content: 'export default 1',
+          onload: loaded,
+          callback: () => {
+            inserted = sandbox.dynamicScriptElements[0];
+            throw new Error('callback failure');
+          },
+        },
+        iframeWindow,
+        rawElement,
+      ),
+    ).toThrow('callback failure');
+
+    expect(inserted).toBeDefined();
+    expect(inserted?.isConnected).toBe(false);
+    expect(inserted?.onload).toBeNull();
+    expect(inserted?.onerror).toBeNull();
+    expect(sandbox.dynamicScriptElements).toEqual([]);
+    inserted?.dispatchEvent(new Event('load'));
+    cancelSandboxDynamicResources(sandbox);
+    expect(loaded).not.toHaveBeenCalled();
   });
 
   it('reports a native error separately and still advances the serial queue', async () => {

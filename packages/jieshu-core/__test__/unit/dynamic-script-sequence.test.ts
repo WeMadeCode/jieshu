@@ -86,6 +86,206 @@ describe('dynamic script sequencing', () => {
     document.body.innerHTML = '';
   });
 
+  describe.each([false, true])('kept-alive scripts (fiber=%s)', (fiber) => {
+    const setup = (id: string, fetch: (input: RequestInfo) => Promise<Response>) => {
+      const root = createRenderRoot();
+      const sandbox = createSandbox(id, fetch);
+      sandbox.alive = true;
+      const iframeWindow = sandbox.iframe.contentWindow;
+      if (!iframeWindow) {
+        throw new Error('Expected a script execution window');
+      }
+      sandbox.fiber = fiber;
+      const idleCallbacks: Array<() => unknown> = [];
+      sandbox.requestIdleCallback = (callback) => {
+        idleCallbacks.push(() => callback.call(sandbox));
+        return idleCallbacks.length;
+      };
+      const flush = async () => {
+        await flushPromises();
+        while (idleCallbacks.length) {
+          idleCallbacks.shift()?.();
+          await flushPromises();
+        }
+      };
+      patchRenderEffect(root, id);
+      return { root, sandbox, iframeWindow, flush };
+    };
+
+    test.each([
+      { module: false, native: false, startsInactive: false },
+      { module: false, native: false, startsInactive: true },
+      { module: true, native: false, startsInactive: false },
+      { module: true, native: false, startsInactive: true },
+      { module: false, native: true, startsInactive: false },
+      { module: false, native: true, startsInactive: true },
+    ])('finishes background requests and resumes: %j', async ({ module, native, startsInactive }) => {
+      const pending = deferred<Response>();
+      const { root, sandbox, iframeWindow, flush } = setup('alive-request', () => pending.promise);
+      const events: string[] = [];
+      const script = document.createElement('script');
+      script.src = 'https://assets.example/background.js';
+      script.type = module ? 'module' : 'text/javascript';
+      script.onload = () => events.push('load');
+      script.onerror = () => events.push('error');
+      sandbox.activeFlag = !startsInactive;
+      root.head.appendChild(script);
+      sandbox.activeFlag = false;
+      pending.resolve(scriptResponse(native ? '' : '/* background code */'));
+      await flush();
+
+      expect(sandbox.dynamicScriptElements).toHaveLength(1);
+      const injected = sandbox.dynamicScriptElements[0];
+      if (module || native) {
+        expect(events).toEqual([]);
+        injected.dispatchEvent(new Event('load'));
+        injected.dispatchEvent(new Event('error'));
+      }
+      await flush();
+      expect(events).toEqual(['load']);
+      expect(sandbox.execQueue).toEqual([]);
+
+      sandbox.activeFlag = true;
+      const next = document.createElement('script');
+      next.textContent = 'window.__afterAliveRequest = true;';
+      root.head.appendChild(next);
+      await flush();
+      expect(sandbox.dynamicScriptElements).toHaveLength(2);
+      expect(Reflect.get(iframeWindow, '__afterAliveRequest')).toBe(true);
+      expect(sandbox.execQueue).toEqual([]);
+    });
+
+    test('runs inline classic background scripts without synthesizing load', async () => {
+      const { root, sandbox, iframeWindow, flush } = setup('alive-inline', () => Promise.resolve(scriptResponse('')));
+      sandbox.activeFlag = false;
+      const loaded = vi.fn();
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.textContent = 'window.__aliveInline = true;';
+      script.onload = loaded;
+      root.head.appendChild(script);
+      await flush();
+
+      expect(sandbox.dynamicScriptElements).toHaveLength(1);
+      expect(Reflect.get(iframeWindow, '__aliveInline')).toBe(true);
+      await flush();
+      expect(loaded).not.toHaveBeenCalled();
+      expect(sandbox.execQueue).toEqual([]);
+    });
+  });
+
+  test('a cancelled execution releases its lane before the next activation', async () => {
+    const root = createRenderRoot();
+    const sandbox = createSandbox('cancelled-execution', () => Promise.resolve(scriptResponse('')));
+    const iframeWindow = sandbox.iframe.contentWindow;
+    if (!iframeWindow) {
+      throw new Error('Expected a script execution window');
+    }
+    sandbox.plugins = [
+      {
+        jsLoader: vi
+          .fn((code: string) => code)
+          .mockImplementationOnce((code) => {
+            sandbox.activeFlag = false;
+            return code;
+          }),
+      },
+    ];
+    patchRenderEffect(root, sandbox.id);
+    const first = document.createElement('script');
+    first.type = 'module';
+    first.textContent = 'window.__cancelledExecution = true;';
+    const events = vi.fn();
+    first.onload = events;
+    first.onerror = events;
+    root.head.appendChild(first);
+    sandbox.activeFlag = true;
+    const next = document.createElement('script');
+    next.textContent = 'window.__afterCancelledExecution = true;';
+    root.head.appendChild(next);
+    await flushPromises();
+
+    expect(events).not.toHaveBeenCalled();
+    expect(Reflect.get(iframeWindow, '__cancelledExecution')).toBeUndefined();
+    expect(Reflect.get(iframeWindow, '__afterCancelledExecution')).toBe(true);
+    expect(sandbox.execQueue).toEqual([]);
+  });
+
+  test.each(['load', 'error'])(
+    'a background native %s keeps reentrant scripts behind the next module',
+    async (outcome) => {
+      const root = createRenderRoot();
+      const sandbox = createSandbox('reentrant-alive', () => Promise.resolve(scriptResponse('')));
+      sandbox.alive = true;
+      sandbox.activeFlag = false;
+      patchRenderEffect(root, sandbox.id);
+      const events: string[] = [];
+      const first = document.createElement('script');
+      first.type = 'module';
+      first.textContent = 'export default 1';
+      const onComplete = () => {
+        events.push(outcome);
+        const reentrant = document.createElement('script');
+        reentrant.textContent = 'window.__reentrantAlive = true;';
+        root.head.appendChild(reentrant);
+      };
+      first.onload = onComplete;
+      first.onerror = onComplete;
+      root.head.appendChild(first);
+      const second = document.createElement('script');
+      second.type = 'module';
+      second.textContent = 'export default 2';
+      second.onload = () => events.push('second');
+      root.head.appendChild(second);
+
+      const injectedFirst = sandbox.dynamicScriptElements[0];
+      injectedFirst.dispatchEvent(new Event(outcome));
+      injectedFirst.dispatchEvent(new Event(outcome));
+      await flushPromises();
+      expect(events).toEqual([outcome]);
+      expect(sandbox.dynamicScriptElements).toHaveLength(2);
+      sandbox.dynamicScriptElements[1].dispatchEvent(new Event('load'));
+      await flushPromises();
+      expect(events).toEqual([outcome, 'second']);
+      expect(sandbox.dynamicScriptElements).toHaveLength(3);
+      expect(sandbox.execQueue).toEqual([]);
+    },
+  );
+
+  test.each(['loader', 'append'])(
+    'an inline %s failure releases its lane and native registrations',
+    async (failure) => {
+      const root = createRenderRoot();
+      const sandbox = createSandbox('inline-failure', () => Promise.resolve(scriptResponse('')));
+      const iframeWindow = sandbox.iframe.contentWindow;
+      if (!iframeWindow) {
+        throw new Error('Expected a script execution window');
+      }
+      const fail = () => {
+        throw new Error('injected setup failure');
+      };
+      if (failure === 'loader') {
+        sandbox.plugins = [{ jsLoader: vi.fn((code: string) => code).mockImplementationOnce(fail) }];
+      } else {
+        vi.spyOn(iframeWindow.document.head, 'appendChild').mockImplementationOnce(fail);
+      }
+      patchRenderEffect(root, sandbox.id);
+      const first = document.createElement('script');
+      first.type = failure === 'append' ? 'module' : 'text/javascript';
+      first.textContent = 'window.__failedSetup = true;';
+      root.head.appendChild(first);
+      const next = document.createElement('script');
+      next.textContent = 'window.__afterFailedSetup = true;';
+      root.head.appendChild(next);
+      await flushPromises();
+
+      expect(Reflect.get(iframeWindow, '__failedSetup')).toBeUndefined();
+      expect(Reflect.get(iframeWindow, '__afterFailedSetup')).toBe(true);
+      expect(sandbox.dynamicScriptElements).toHaveLength(1);
+      expect(sandbox.execQueue).toEqual([]);
+    },
+  );
+
   test('a pending fetch in one app does not block another app', async () => {
     const pending = deferred<Response>();
     const firstRoot = createRenderRoot();

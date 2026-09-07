@@ -2,7 +2,7 @@ import type { ScriptObject } from './template';
 import type { ScriptObjectLoader } from './contracts';
 import { getJieshuById, rawDocumentQuerySelector } from './common';
 import { getJsLoader } from './plugin';
-import { registerSandboxDynamicResource } from './sandbox-runtime';
+import { isSandboxExecutionAllowed, registerSandboxDynamicResource } from './sandbox-runtime';
 import { JIESHU_TIPS_SCRIPT_ERROR_REQUESTED } from './constant';
 import { error, execHooks, getCurUrl, getTagFromScript, setTagToScript } from './utils';
 
@@ -90,15 +90,14 @@ function createExecutionContext(
   };
 }
 
-function isExecutionOwnerCurrent(context: ScriptExecutionContext): boolean {
+const isExecutionOwnerCurrent = (context: ScriptExecutionContext) => {
   const { owner } = context;
   return Boolean(
     context.iframeWindow.__JIESHU === owner &&
-    !owner.destroyed &&
-    owner.activeFlag !== false &&
+    isSandboxExecutionAllowed(owner) &&
     (!owner.id || getJieshuById(owner.id) === owner),
   );
-}
+};
 
 function applyForwardedAttributes(context: ScriptExecutionContext): void {
   const { attrs, source } = context.input;
@@ -170,19 +169,21 @@ function unregisterDynamicScript(context: ScriptExecutionContext): void {
 }
 
 class IframeScriptExecutionPipeline {
-  execute(source: ScriptInput, iframeWindow: Window, rawElement?: HTMLScriptElement): ScriptExecutionHandle {
+  execute = (source: ScriptInput, iframeWindow: Window, rawElement?: HTMLScriptElement) => {
     const context = createExecutionContext(source, iframeWindow, rawElement);
     let completed = false;
     let unregisterCancellation: (() => void) | undefined;
-    let resolveCompletion!: (outcome: ScriptExecutionOutcome) => void;
+    let resolveCompletion: (outcome: ScriptExecutionOutcome) => void;
     const completion = new Promise<ScriptExecutionOutcome>((resolve) => {
       resolveCompletion = resolve;
     });
     const handle: ScriptExecutionHandle = {
       element: context.scriptElement,
       completion,
-      cancel: (): void => {
-        if (completed) return;
+      cancel: () => {
+        if (completed) {
+          return;
+        }
         completed = true;
         unregisterCancellation?.();
         unregisterCancellation = undefined;
@@ -195,20 +196,27 @@ class IframeScriptExecutionPipeline {
       },
     };
 
-    const advanceQueue = (): void => {
-      if (!context.input.async && isExecutionOwnerCurrent(context)) {
+    const advanceQueue = () => {
+      // Dynamic scripts own a reservation in effect.ts and settle it there,
+      // including cancellation. Only startup scripts use the native advancer.
+      if (!rawElement && !context.input.async && isExecutionOwnerCurrent(context)) {
         context.container.appendChild(context.queueAdvancerElement);
       }
     };
-    const afterExecution = (outcome: Exclude<ScriptExecutionOutcome, 'cancelled'>): void => {
-      if (completed) return;
+    const afterExecution = (outcome: Exclude<ScriptExecutionOutcome, 'cancelled'>) => {
+      if (completed) {
+        return;
+      }
       completed = true;
       unregisterCancellation?.();
       unregisterCancellation = undefined;
       try {
         if (isExecutionOwnerCurrent(context)) {
-          if (outcome === 'load') context.input.onload?.();
-          else context.input.onerror?.();
+          if (outcome === 'load') {
+            context.input.onload?.();
+          } else {
+            context.input.onerror?.();
+          }
         }
       } finally {
         context.scriptElement.onload = null;
@@ -222,8 +230,7 @@ class IframeScriptExecutionPipeline {
     // the owner while the execution context is being created. Never append a
     // script after that lifecycle generation has relinquished ownership.
     if (!isExecutionOwnerCurrent(context)) {
-      completed = true;
-      resolveCompletion('cancelled');
+      handle.cancel();
       return handle;
     }
     configureQueueAdvancer(context);
@@ -233,27 +240,35 @@ class IframeScriptExecutionPipeline {
       return handle;
     }
 
-    configureScriptElement(context);
-    if (!isExecutionOwnerCurrent(context)) {
-      completed = true;
-      resolveCompletion('cancelled');
-      return handle;
-    }
+    try {
+      configureScriptElement(context);
+      if (!isExecutionOwnerCurrent(context)) {
+        handle.cancel();
+        return handle;
+      }
 
-    registerDynamicScript(context);
-    const waitsForNativeCompletion = context.input.module || (!context.input.content && Boolean(context.input.src));
-    if (waitsForNativeCompletion) {
-      context.scriptElement.onload = () => afterExecution('load');
-      context.scriptElement.onerror = () => afterExecution('error');
-      unregisterCancellation = registerSandboxDynamicResource(context.owner, () => handle.cancel());
-    }
+      registerDynamicScript(context);
+      const waitsForNativeCompletion = context.input.module || (!context.input.content && Boolean(context.input.src));
+      if (waitsForNativeCompletion) {
+        context.scriptElement.onload = () => afterExecution('load');
+        context.scriptElement.onerror = () => afterExecution('error');
+        unregisterCancellation = registerSandboxDynamicResource(context.owner, () => handle.cancel());
+      }
 
-    context.container.appendChild(context.scriptElement);
-    context.input.callback?.(iframeWindow);
-    execHooks(context.plugins, 'appendOrInsertElementHook', context.scriptElement, iframeWindow, rawElement);
-    if (!waitsForNativeCompletion) afterExecution('load');
+      context.container.appendChild(context.scriptElement);
+      context.input.callback?.(iframeWindow);
+      execHooks(context.plugins, 'appendOrInsertElementHook', context.scriptElement, iframeWindow, rawElement);
+      if (!waitsForNativeCompletion) {
+        afterExecution('load');
+      }
+    } catch (cause: unknown) {
+      // A failed DOM insertion/callback must not leave a registered native
+      // script behind when the caller never receives its cancellation handle.
+      handle.cancel();
+      throw cause;
+    }
     return handle;
-  }
+  };
 }
 
 const scriptExecutionPipeline = new IframeScriptExecutionPipeline();

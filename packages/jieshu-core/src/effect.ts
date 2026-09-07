@@ -37,8 +37,13 @@ import {
 import { ScriptObject, parseTagAttributes } from './template';
 import { HandlerPipeline } from './effect-pipeline';
 import type { PipelineHandler } from './effect-pipeline';
-import { registerSandboxDynamicResource, scheduleSandboxDynamicScript } from './sandbox-runtime';
+import {
+  isSandboxExecutionAllowed,
+  registerSandboxDynamicResource,
+  scheduleSandboxDynamicScript,
+} from './sandbox-runtime';
 import type { SandboxDynamicResourceCancellationReason } from './sandbox-runtime';
+import type { ScriptExecutionOutcome } from './iframe-script';
 
 function patchCustomEvent(
   e: CustomEvent,
@@ -378,14 +383,9 @@ function releaseVirtualScriptParent(scriptElement: HTMLScriptElement): VirtualSc
 }
 
 /** Dynamic effects may continue while kept alive, but never after a normal inactive unmount. */
-export function isDynamicEffectContextLive(sandbox: Jieshu, jieshuId: string): boolean {
-  return (
-    !sandbox.destroyed &&
-    Boolean(sandbox.iframe) &&
-    (sandbox.alive || sandbox.activeFlag) &&
-    getJieshuById(jieshuId) === sandbox
-  );
-}
+export const isDynamicEffectContextLive = (sandbox: Jieshu, jieshuId: string) => {
+  return isSandboxExecutionAllowed(sandbox) && Boolean(sandbox.iframe) && getJieshuById(jieshuId) === sandbox;
+};
 
 type TypedInsertionHandler<TElement extends HTMLElement> = (context: InsertionContext, element: TElement) => Node;
 
@@ -563,10 +563,12 @@ class DynamicScriptScheduler {
     this.scriptElement = scriptElement;
   }
 
-  schedule(): void {
+  schedule = () => {
     const { sandbox } = this.context;
     const scriptElement = this.scriptElement;
-    if (!scriptElement) return;
+    if (!scriptElement) {
+      return;
+    }
     if (!this.isLive()) {
       this.release();
       nextTick(() => elementEventForwarder.dispatch(scriptElement, 'error'));
@@ -598,15 +600,12 @@ class DynamicScriptScheduler {
 
     this.enqueue(() => {
       const pendingElement = this.scriptElement;
-      if (!pendingElement) return;
-      if (!this.isLive()) {
-        warn(JIESHU_TIPS_REPEAT_RENDER);
-        this.cancelQueuedTask();
+      if (!pendingElement) {
         return;
       }
-      const iframeWindow = sandbox.iframe.contentWindow;
-      if (!iframeWindow) {
-        this.cancelQueuedTask();
+      if (!this.isLive()) {
+        warn(JIESHU_TIPS_REPEAT_RENDER);
+        this.finishQueuedTask();
         return;
       }
       const inlineScript: ScriptObject = {
@@ -614,16 +613,9 @@ class DynamicScriptScheduler {
         module: isModule,
         attrs: parseTagAttributes(pendingElement.outerHTML),
       };
-      if (isModule) this.executeWithForwardedOutcome(inlineScript);
-      else {
-        try {
-          insertScriptToIframe(inlineScript, iframeWindow, pendingElement);
-        } finally {
-          this.release();
-        }
-      }
+      this.executeWithForwardedOutcome(inlineScript, isModule);
     });
-  }
+  };
 
   private scheduleExternal(scriptResult: ScriptObject & { contentPromise: Promise<string> }): void {
     scheduleSandboxDynamicScript(this.context.sandbox, scriptResult.contentPromise, {
@@ -645,32 +637,37 @@ class DynamicScriptScheduler {
     });
   }
 
-  private executeWithForwardedOutcome(scriptResult: ScriptObject): void {
+  private executeWithForwardedOutcome = (scriptResult: ScriptObject, forwardEvents = true) => {
     const { sandbox } = this.context;
     const pendingElement = this.scriptElement;
-    if (!pendingElement) return;
-    if (!this.isLive()) {
-      warn(JIESHU_TIPS_REPEAT_RENDER);
-      this.cancelQueuedTask();
+    if (!pendingElement) {
       return;
     }
-    const complete = (outcome: ResourceEventName) => {
-      if (this.completionStarted) return;
+    if (!this.isLive()) {
+      warn(JIESHU_TIPS_REPEAT_RENDER);
+      this.finishQueuedTask();
+      return;
+    }
+    const complete = (outcome: ScriptExecutionOutcome) => {
+      if (this.completionStarted || !this.scriptElement) {
+        return;
+      }
       this.completionStarted = true;
       const completedElement = this.scriptElement;
       const shouldNotify = Boolean(completedElement && this.isLive());
       try {
-        if (completedElement && shouldNotify) elementEventForwarder.dispatch(completedElement, outcome);
+        if (forwardEvents && outcome !== 'cancelled' && completedElement && shouldNotify) {
+          elementEventForwarder.dispatch(completedElement, outcome);
+        }
       } finally {
-        // insertScriptToIframe advances execQueue immediately after this
-        // callback. Leave our reservation in place across user event handlers
-        // so reentrant script insertion cannot observe an empty lane.
-        this.release(true);
+        // Keep the lane occupied across reentrant event handlers, then settle
+        // this reservation exactly once, independently of the iframe executor.
+        this.finishQueuedTask();
       }
     };
     const iframeWindow = sandbox.iframe.contentWindow;
     if (!iframeWindow) {
-      this.cancelQueuedTask();
+      this.finishQueuedTask();
       return;
     }
     try {
@@ -686,20 +683,19 @@ class DynamicScriptScheduler {
       if (this.scriptElement) {
         this.executionHandle = executionHandle;
       }
+      // Cancellation or suppressed callbacks still owe the lane a completion.
+      // A normal callback already settled it synchronously; complete is idempotent.
+      void executionHandle.completion.then(complete);
     } catch (cause: unknown) {
-      const failedElement = this.scriptElement;
       // Loader/DOM setup failed before insertScriptToIframe could publish a
       // completion handle. This task has already left execQueue, so explicitly
       // advance the lane and surface the failure through the original element.
-      if (!failedElement) return;
-      const shouldNotify = this.isLive();
-      this.cancelQueuedTask();
-      if (shouldNotify) elementEventForwarder.dispatch(failedElement, 'error');
+      complete('error');
       warn(cause);
     }
-  }
+  };
 
-  private enqueue(task: () => unknown): void {
+  private enqueue = (task: () => unknown) => {
     const { sandbox } = this.context;
     const queue = sandbox.execQueue;
     if (!Array.isArray(queue) || !this.isLive()) {
@@ -711,7 +707,7 @@ class DynamicScriptScheduler {
     this.executionQueue = queue;
     const runIfLive = () => {
       if (!this.isLive()) {
-        this.cancelQueuedTask();
+        this.finishQueuedTask();
         return;
       }
       task();
@@ -719,12 +715,14 @@ class DynamicScriptScheduler {
     const queuedTask = () => {
       this.queuedTask = undefined;
       this.reserveExecutionLane(queue);
-      return sandbox.fiber ? sandbox.requestIdleCallback(runIfLive, () => this.cancelQueuedTask()) : runIfLive();
+      return sandbox.fiber ? sandbox.requestIdleCallback(runIfLive, () => this.finishQueuedTask()) : runIfLive();
     };
     this.queuedTask = queuedTask;
     queue.push(queuedTask);
-    if (queueWasEmpty) queue.shift()?.();
-  }
+    if (queueWasEmpty) {
+      queue.shift()?.();
+    }
+  };
 
   /** Keep the lane occupied while the dequeued task waits for fiber/native completion. */
   private reserveExecutionLane(queue: Array<() => unknown>): void {
@@ -753,35 +751,41 @@ class DynamicScriptScheduler {
     }
   }
 
-  /** The current task has already been shifted, so cancellation must advance the remaining queue. */
-  private cancelQueuedTask(): void {
+  /** Remove this reservation before starting the next task; repeated completion is harmless. */
+  private finishQueuedTask = () => {
     const queue = this.executionQueue ?? this.context.sandbox.execQueue;
     const ownsLane = Boolean(this.laneReservation);
     this.release();
-    if (ownsLane && Array.isArray(queue)) queue.shift()?.();
-  }
+    if (ownsLane && Array.isArray(queue)) {
+      queue.shift()?.();
+    }
+  };
 
-  private release(preserveExecutionLane = false): void {
+  private release = () => {
     const queue = this.executionQueue ?? this.context.sandbox.execQueue;
     if (Array.isArray(queue)) {
       if (this.queuedTask) {
         const queuedIndex = queue.indexOf(this.queuedTask);
-        if (queuedIndex !== -1) queue.splice(queuedIndex, 1);
+        if (queuedIndex !== -1) {
+          queue.splice(queuedIndex, 1);
+        }
       }
-      if (this.laneReservation && !preserveExecutionLane) {
+      if (this.laneReservation) {
         const reservationIndex = queue.indexOf(this.laneReservation);
-        if (reservationIndex !== -1) queue.splice(reservationIndex, 1);
+        if (reservationIndex !== -1) {
+          queue.splice(reservationIndex, 1);
+        }
       }
     }
     this.queuedTask = undefined;
-    if (!preserveExecutionLane) this.laneReservation = undefined;
+    this.laneReservation = undefined;
     this.unregisterCancellation?.();
     this.unregisterCancellation = undefined;
     this.executionHandle = undefined;
     this.scriptElement = null;
     this.context.element = null;
     this.executionQueue = null;
-  }
+  };
 }
 
 const linkInsertionHandler = createInsertionHandler<HTMLLinkElement>('LINK', (context, linkElement) => {

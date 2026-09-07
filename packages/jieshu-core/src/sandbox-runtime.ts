@@ -4,6 +4,11 @@ type Cleanup = () => void;
 type ScheduledTask = () => unknown;
 export type SandboxDynamicResourceCancellationReason = 'unmount' | 'destroy';
 
+/** Kept-alive runtimes may execute in the background; destroyed runtimes never may. */
+export const isSandboxExecutionAllowed = (sandbox: { destroyed: boolean; alive?: boolean; activeFlag: boolean }) => {
+  return !sandbox.destroyed && Boolean(sandbox.alive || sandbox.activeFlag);
+};
+
 type PromiseOutcome<Value> = { status: 'fulfilled'; value: Value } | { status: 'rejected'; reason: unknown };
 
 function observe<Value>(promise: Promise<Value>): Promise<PromiseOutcome<Value>> {
