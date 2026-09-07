@@ -19,6 +19,7 @@ const { bus } = JieshuReact;
 const subRoutes = {
   react16: ['home', 'dialog', 'location', 'communication', 'nest', 'font'],
   react17: ['home', 'dialog', 'location', 'communication', 'state'],
+  react18: ['home', 'dialog', 'location', 'communication', 'state'],
   vue2: ['home', 'dialog', 'location', 'communication'],
   vue3: ['home', 'dialog', 'location', 'contact', 'state', 'inline-event'],
   vite: ['home', 'dialog', 'location', 'contact'],
@@ -37,6 +38,7 @@ function Navigation({ onOpen }: NavigationProps) {
   const [openMenus, setOpenMenus] = useState<OpenMenus>({
     react16: location.pathname.includes('react16-sub'),
     react17: location.pathname.includes('react17-sub'),
+    react18: location.pathname.includes('react18-sub'),
     vue2: location.pathname.includes('vue2-sub'),
     vue3: location.pathname.includes('vue3-sub'),
     vite: location.pathname.includes('vite-sub'),
@@ -94,9 +96,7 @@ function Navigation({ onOpen }: NavigationProps) {
       </NavLink>
       {renderExpandableLink('react16', 'react16')}
       {renderExpandableLink('react17', 'react17', true)}
-      <NavLink to="/react18" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
-        React18
-      </NavLink>
+      {renderExpandableLink('react18', 'React18', true)}
       {renderExpandableLink('vue2', 'vue2')}
       {renderExpandableLink('vue3', 'vue3', true)}
       {renderExpandableLink('vite', 'vite')}
@@ -134,6 +134,7 @@ export default function App() {
             <Route path="/react17" element={<React17 />} />
             <Route path="/react17-sub/:path" element={<React17 />} />
             <Route path="/react18" element={<React18 />} />
+            <Route path="/react18-sub/:path" element={<React18 />} />
             <Route path="/vue2" element={<Vue2 />} />
             <Route path="/vue2-sub/:path" element={<Vue2 />} />
             <Route path="/vue3" element={<Vue3 />} />

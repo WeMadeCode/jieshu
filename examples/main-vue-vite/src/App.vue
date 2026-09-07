@@ -28,7 +28,17 @@
         <router-link to="/react17-sub/communication">communication</router-link>
         <router-link to="/react17-sub/state">state</router-link>
       </div>
-      <router-link to="/react18">React18</router-link>
+      <router-link to="/react18">
+        React18<span class="alive">保活</span>
+        <span :class="['main-icon', { active: react18Flag }]" @click="handleFlag('react18')">▲</span>
+      </router-link>
+      <div class="sub-menu" v-show="react18Flag">
+        <router-link to="/react18-sub/home">home</router-link>
+        <router-link to="/react18-sub/dialog">dialog</router-link>
+        <router-link to="/react18-sub/location">location</router-link>
+        <router-link to="/react18-sub/communication">communication</router-link>
+        <router-link to="/react18-sub/state">state</router-link>
+      </div>
       <!-- vue2相关路由 -->
       <router-link to="/vue2">
         vue2
@@ -84,10 +94,21 @@ export default {
       active: false,
       react16Flag: this.$route.name === 'react16-sub',
       react17Flag: this.$route.name === 'react17-sub',
+      react18Flag: this.$route.name === 'react18-sub',
       vue2Flag: this.$route.name === 'vue2-sub',
       vue3Flag: this.$route.name === 'vue3-sub',
       viteFlag: this.$route.name === 'vite-sub',
     };
+  },
+  watch: {
+    '$route.name': {
+      immediate: true,
+      handler(name) {
+        if (name === 'react18-sub') {
+          this.react18Flag = true;
+        }
+      },
+    },
   },
   mounted() {
     window.addEventListener('message', this.handleMessage);

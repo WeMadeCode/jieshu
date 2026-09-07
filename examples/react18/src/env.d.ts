@@ -6,7 +6,12 @@ interface Window {
   __JIESHU_UNMOUNT?: () => void;
   __JIESHU?: { mount: () => void };
   $jieshu?: {
-    props?: { jump?: (name: string) => void };
-    bus: { $emit: (event: string, message: string) => void };
+    location: Location;
+    props?: { jump?: (name: string) => void; route?: string };
+    bus: {
+      $emit: <Arguments extends unknown[]>(event: string, ...args: Arguments) => void;
+      $on: <Arguments extends unknown[]>(event: string, callback: (...args: Arguments) => void) => void;
+      $off: <Arguments extends unknown[]>(event: string, callback: (...args: Arguments) => void) => void;
+    };
   };
 }

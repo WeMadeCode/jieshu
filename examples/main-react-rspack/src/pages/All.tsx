@@ -55,7 +55,15 @@ export default function All() {
         />
       </div>
       <div className="all-item">
-        <JieshuReact height="100%" width="100%" name="react18" url={hostMap('//localhost:7900/')} sync props={props} />
+        <JieshuReact
+          height="100%"
+          width="100%"
+          name="react18"
+          url={hostMap('//localhost:7900/')}
+          alive
+          sync
+          props={props}
+        />
       </div>
     </div>
   );

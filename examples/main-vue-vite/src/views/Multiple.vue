@@ -6,7 +6,7 @@
     <JieshuVue class="item" name="vue3" :url="vue3Url" :sync="true"></JieshuVue>
     <JieshuVue class="item" name="vite" :url="vite" :sync="true"></JieshuVue>
     <JieshuVue class="item" name="angular12" :url="angular12Url" :sync="true"></JieshuVue>
-    <JieshuVue class="item" name="react18" :url="react18Url" :sync="true" />
+    <JieshuVue class="item" name="react18" :url="react18Url" :sync="true" :alive="true" />
   </div>
 </template>
 

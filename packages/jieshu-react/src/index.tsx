@@ -39,7 +39,8 @@ export interface JieshuReactStatics {
 }
 
 export interface JieshuReactComponent extends JieshuReactStatics {
-  (props: JieshuReactProps & React.RefAttributes<JieshuReactRef>): React.ReactElement | null;
+  // Avoid exposing React 17's JSXElementConstructor constraints to newer React consumers.
+  (props: JieshuReactProps & React.RefAttributes<JieshuReactRef>): React.JSX.Element | null;
   readonly $$typeof: symbol;
   displayName?: string;
 }

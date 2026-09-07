@@ -18,6 +18,7 @@ const { bus } = JieshuReact;
 const subMap = {
   react16: ['home', 'dialog', 'location', 'communication', 'nest', 'font'],
   react17: ['home', 'dialog', 'location', 'communication', 'state'],
+  react18: ['home', 'dialog', 'location', 'communication', 'state'],
   vue2: ['home', 'dialog', 'location', 'communication'],
   vue3: ['home', 'dialog', 'location', 'contact', 'state', 'inline-event'],
   vite: ['home', 'dialog', 'location', 'contact'],
@@ -28,6 +29,7 @@ function Nav() {
   const navigation = useNavigate();
   const [react16Flag, setReact16Flag] = useState(location.pathname.includes('react16-sub'));
   const [react17Flag, setReact17Flag] = useState(location.pathname.includes('react7-sub'));
+  const [react18Flag, setReact18Flag] = useState(location.pathname.includes('react18-sub'));
   const [vue2Flag, setVue2Flag] = useState(location.pathname.includes('vue2-sub'));
   const [vue3Flag, setVue3Flag] = useState(location.pathname.includes('vue3-sub'));
   const [viteFlag, setViteFlag] = useState(location.pathname.includes('vite-sub'));
@@ -49,6 +51,9 @@ function Nav() {
         break;
       case 'react17':
         setReact17Flag(!react17Flag);
+        break;
+      case 'react18':
+        setReact18Flag(!react18Flag);
         break;
       case 'vue2':
         setVue2Flag(!vue2Flag);
@@ -105,8 +110,23 @@ function Nav() {
         ))}
       </div>
       <NavLink to="/react18" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
-        React18
+        React18<span className="alive">保活</span>
+        <CaretUpOutlined
+          className={react18Flag ? 'main-icon active' : 'main-icon'}
+          onClick={() => handleFlag('react18')}
+        />
       </NavLink>
+      <div className="sub-menu" style={{ display: react18Flag ? 'block' : 'none' }}>
+        {subMap.react18.map((item) => (
+          <NavLink
+            to={`/react18-sub/${item}`}
+            key={item}
+            className={({ isActive }) => (isActive ? 'active' : 'inactive')}
+          >
+            {item}
+          </NavLink>
+        ))}
+      </div>
       <NavLink to="/vue2" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
         vue2
         <CaretUpOutlined className={vue2Flag ? 'main-icon active' : 'main-icon'} onClick={() => handleFlag('vue2')} />
@@ -173,6 +193,7 @@ class App extends React.PureComponent {
               <Route exact path="/react17" element={<React17 />} />
               <Route exact path="/react17-sub/:path" element={<React17 />} />
               <Route path="/react18" element={<React18 />} />
+              <Route path="/react18-sub/:path" element={<React18 />} />
               <Route exact path="/vue2" element={<Vue2 />} />
               <Route exact path="/vue2-sub/:path" element={<Vue2 />} />
               <Route exact path="/vue3" element={<Vue3 />} />

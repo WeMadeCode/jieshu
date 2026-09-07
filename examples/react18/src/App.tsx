@@ -1,42 +1,76 @@
-import { useState, version } from 'react';
+import { useEffect, useRef } from 'react';
+import { BrowserRouter, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import Home from './pages/Home';
+import Dialog from './pages/Dialog';
+import Location from './pages/Location';
+import Communication from './pages/Communication';
+import State from './pages/State';
 
-const App = () => {
-  const [count, setCount] = useState(0);
-  const embedded = Boolean(window.__POWERED_BY_JIESHU__);
+const Navigation = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const ready = useRef(false);
+
+  useEffect(() => {
+    const bus = window.$jieshu?.bus;
+    const changeRoute = (path: string) => {
+      const currentPath = `/${window.location.pathname.slice(import.meta.env.BASE_URL.length)}`;
+      if (currentPath !== path) {
+        // 主应用已经创建历史记录，同步指令只替换子应用路由，避免前进后退产生重复记录。
+        void navigate(path, { replace: true });
+      }
+    };
+    bus?.$on('react18-router-change', changeRoute);
+    if (!ready.current) {
+      ready.current = true;
+      bus?.$emit('react18-router-ready');
+    }
+    return () => {
+      bus?.$off('react18-router-change', changeRoute);
+    };
+  }, [navigate]);
+
+  useEffect(() => {
+    window.$jieshu?.bus.$emit('sub-route-change', 'react18', location.pathname);
+    console.log(`react18 ${location.pathname.slice(1)} mounted`);
+  }, [location.pathname]);
 
   return (
-    <main className="react18-app">
-      <header>
-        <span className="stack">Vite + TypeScript + React {version}</span>
-        <h1>React18 子应用</h1>
-        <p>{embedded ? '当前运行在界枢微前端环境中' : '当前为独立运行模式'}</p>
-      </header>
-
-      <section aria-labelledby="state-title">
-        <h2 id="state-title">组件状态</h2>
-        <p>使用 React 18 createRoot 渲染，体验组件状态更新。</p>
-        <div className="actions">
-          <button onClick={() => setCount((value) => value + 1)}>计数：{count}</button>
-          <button className="secondary" onClick={() => setCount(0)}>
-            重置
-          </button>
-        </div>
-      </section>
-
-      <section aria-labelledby="communication-title">
-        <h2 id="communication-title">主子应用通信</h2>
-        <p>通过界枢事件总线发送消息，或调用主应用传入的跳转方法。</p>
-        <div className="actions">
-          <button disabled={!embedded} onClick={() => window.$jieshu?.bus.$emit('click', '来自 React18 的消息')}>
-            发送消息给主应用
-          </button>
-          <button className="secondary" disabled={!embedded} onClick={() => window.$jieshu?.props?.jump?.('home')}>
-            返回主应用首页
-          </button>
-        </div>
-        {!embedded && <p className="hint">从主应用的 React18 菜单进入，即可体验通信。</p>}
-      </section>
-    </main>
+    <nav aria-label="React18 子应用导航" className="react18-nav">
+      <NavLink to="/home" replace={Boolean(window.$jieshu?.props?.route)}>
+        首页
+      </NavLink>
+      <NavLink to="/dialog" replace={Boolean(window.$jieshu?.props?.route)}>
+        弹窗
+      </NavLink>
+      <NavLink to="/location" replace={Boolean(window.$jieshu?.props?.route)}>
+        路由
+      </NavLink>
+      <NavLink to="/communication" replace={Boolean(window.$jieshu?.props?.route)}>
+        通信
+      </NavLink>
+      <NavLink to="/state" replace={Boolean(window.$jieshu?.props?.route)}>
+        状态
+      </NavLink>
+    </nav>
   );
 };
+
+const App = () => (
+  <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <main className="react18-app">
+      <h1>React18 子应用</h1>
+      <Navigation />
+      <Routes>
+        <Route path="/home" element={<Home />} />
+        <Route path="/dialog" element={<Dialog />} />
+        <Route path="/location" element={<Location />} />
+        <Route path="/communication" element={<Communication />} />
+        <Route path="/state" element={<State />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
+      </Routes>
+    </main>
+  </BrowserRouter>
+);
+
 export default App;

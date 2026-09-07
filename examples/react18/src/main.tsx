@@ -2,6 +2,7 @@ import '@vitejs/plugin-react/preamble';
 import { StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import App from './App';
+import 'antd/dist/antd.css';
 import './index.css';
 
 let root: Root | undefined;

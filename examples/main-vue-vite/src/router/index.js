@@ -50,6 +50,11 @@ const routes = [
     component: React18,
   },
   {
+    path: '/react18-sub/:path',
+    name: 'react18-sub',
+    component: React18,
+  },
+  {
     path: '/vue2',
     name: 'vue2',
     component: Vue2,

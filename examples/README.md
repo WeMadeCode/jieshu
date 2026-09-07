@@ -42,7 +42,7 @@ pnpm --filter react18 build
 pnpm --filter react18 test
 ```
 
-三个主应用的 **React18** 菜单及 **all** 页面均已接入；`pnpm start:children` 和 `pnpm start` 会自动启动它。
+三个主应用的 **React18（保活）** 菜单、首页/弹窗/路由/通信/状态五个子菜单及 **all** 页面均已接入；`pnpm start:children` 和 `pnpm start` 会自动启动它。
 
 ## 同源生产预览
 

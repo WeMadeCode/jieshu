@@ -40,6 +40,7 @@ setupApp({
   url: hostMap('//localhost:7900/'),
   attrs,
   exec: true,
+  alive: true,
   fetch: credentialsFetch,
   ...lifecycles,
 });
