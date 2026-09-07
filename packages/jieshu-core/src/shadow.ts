@@ -121,22 +121,45 @@ export function createJieshuWebComponent(id: string): HTMLElement {
   return element;
 }
 
-function hasLoadingIndicator(container: HTMLElement): boolean {
-  return Boolean(container.querySelector(`div[${LOADING_DATA_FLAG}]`));
-}
+const getLoadingIndicator = (container: HTMLElement) => {
+  return container.querySelector<HTMLDivElement>(`div[${LOADING_DATA_FLAG}]`);
+};
+
+// Bind an overlay to its concrete host without retaining that host through a detached overlay.
+const renderOwnerTokens = new WeakMap<Node, symbol>();
+const loadingOwners = new WeakMap<HTMLDivElement, symbol>();
 
 /** Replace a host container's contents while allowing its loading overlay to survive. */
-export function renderElementToContainer(
-  element: Element | ChildNode,
-  selectorOrElement: string | HTMLElement,
-): HTMLElement {
+export const renderElementToContainer = (element: Element | ChildNode, selectorOrElement: string | HTMLElement) => {
   const container = getContainer(selectorOrElement);
-  if (container.contains(element)) return container;
+  if (container.contains(element)) {
+    return container;
+  }
 
-  if (!hasLoadingIndicator(container)) clearChild(container);
+  const indicator = getLoadingIndicator(container);
+  if (indicator) {
+    const owner = renderOwnerTokens.get(element) ?? Symbol();
+    renderOwnerTokens.set(element, owner);
+    loadingOwners.set(indicator, owner);
+  } else {
+    clearChild(container);
+  }
   rawElementAppendChild.call(container, element);
   return container;
-}
+};
+
+/** Release only this render's nodes, even if another application has reused the container. */
+export const removeRenderedElementFromContainer = (element: Node, container: HTMLElement) => {
+  const owner = renderOwnerTokens.get(element);
+  renderOwnerTokens.delete(element);
+  const indicator = getLoadingIndicator(container);
+  if (owner && indicator?.parentNode === container && loadingOwners.get(indicator) === owner) {
+    removeLoading(container);
+  }
+  if (element.parentNode === container) {
+    rawElementRemoveChild.call(container, element);
+  }
+};
 
 async function loadPresetStyles(styles: readonly StyleObject[], sandbox: Jieshu): Promise<LoadedPresetStyle[]> {
   const results = getExternalStyleSheets(
@@ -416,21 +439,29 @@ export function addLoading(el: string | HTMLElement, loading?: HTMLElement): voi
 }
 
 /** Remove a loading overlay and restore layout properties changed by addLoading. */
-export function removeLoading(container: HTMLElement): void {
+export const removeLoading = (container: HTMLElement) => {
   const position = container.getAttribute(CONTAINER_POSITION_DATA_FLAG);
   const overflow = container.getAttribute(CONTAINER_OVERFLOW_DATA_FLAG);
 
-  if (position !== null) container.style.removeProperty('position');
+  if (position !== null) {
+    container.style.removeProperty('position');
+  }
   if (overflow !== null) {
-    if (overflow) container.style.setProperty('overflow', overflow);
-    else container.style.removeProperty('overflow');
+    if (overflow) {
+      container.style.setProperty('overflow', overflow);
+    } else {
+      container.style.removeProperty('overflow');
+    }
   }
 
   container.removeAttribute(CONTAINER_POSITION_DATA_FLAG);
   container.removeAttribute(CONTAINER_OVERFLOW_DATA_FLAG);
-  const indicator = container.querySelector(`div[${LOADING_DATA_FLAG}]`);
-  if (indicator) rawElementRemoveChild.call(container, indicator);
-}
+  const indicator = getLoadingIndicator(container);
+  if (indicator) {
+    loadingOwners.delete(indicator);
+    rawElementRemoveChild.call(container, indicator);
+  }
+};
 
 function readableRules(styleSheet: CSSStyleSheet | null | undefined): readonly CSSRule[] {
   if (!styleSheet) return [];

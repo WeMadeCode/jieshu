@@ -1,6 +1,6 @@
 # jieshu 与 wujie 源码缺陷修复 TODO
 
-本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。共 **11 项，已修复 1 项（FIX-002），剩余 10 项：2 项 P1、8 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
+本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。共 **11 项，已修复 2 项（FIX-002、FIX-003），剩余 9 项：1 项 P1、8 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
 
 ## 使用与关闭规则
 
@@ -42,7 +42,7 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 
 - [ ] **P1 · [FIX-001](#fix-001)**：保活应用后台加载脚本导致队列阻塞。相对当前 wujie 的新增回归。
 - [x] **P1 · [FIX-002](#fix-002)**：旧 head/body 引用可向同名新实例注入代码。jieshu 已修复并补充回归测试；wujie 未修改。
-- [ ] **P1 · [FIX-003](#fix-003)**：旧应用异步销毁误清理新应用容器。两边共有，jieshu 还会触发新实例销毁。
+- [x] **P1 · [FIX-003](#fix-003)**：旧应用异步销毁误清理新应用容器。jieshu 已限定清理范围并补充回归测试；wujie 未修改。
 - [ ] **P2 · [FIX-004](#fix-004)**：公开 API 的 Promise 提前完成。普通调用与卸载重入处理混在一起。
 - [ ] **P2 · [FIX-005](#fix-005)**：多份 core 的事件清理恢复已销毁实例的处理器。两边共有，jieshu 的单副本修复覆盖不足。
 - [ ] **P2 · [FIX-006](#fix-006)**：子应用路由同步清空主应用 `history.state`。两边共有。
@@ -52,7 +52,7 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 - [ ] **P2 · [FIX-010](#fix-010)**：资源的属性回调与事件监听器不能同时收到通知。jieshu 已复现，wujie 有相同实现。
 - [ ] **P2 · [FIX-011](#fix-011)**：EventBus 无法处理与对象原型属性同名的事件。jieshu 已复现，wujie 有相同实现。
 
-FIX-002 因影响实例隔离已优先修复。剩余建议依次处理 FIX-003 → FIX-001 → FIX-004 → FIX-005，再处理路由、资源语义和 EventBus。FIX-003 与 FIX-004 应联合验证，但分开关闭：修正 Promise 完成语义不能替代容器归属保护。
+FIX-002、FIX-003 已修复。剩余建议依次处理 FIX-001 → FIX-004 → FIX-005，再处理路由、资源语义和 EventBus。FIX-003 的回归保留了重复调用 `destroyApp` 的场景；FIX-004 仍需独立修正公开 Promise 的完成语义。
 
 ## FIX-001
 
@@ -137,7 +137,7 @@ FIX-002 因影响实例隔离已优先修复。剩余建议依次处理 FIX-003 
 3. 在同一容器 C 中启动另一个名字的 B，等待 B 显示。
 4. 完成 A 的卸载 Promise，等待 A 销毁结束。
 
-| 观测项               | jieshu | wujie | 预期          |
+| 修复前观测项         | jieshu | wujie | 预期          |
 | -------------------- | ------ | ----- | ------------- |
 | A 清理前 B 可见      | true   | true  | true          |
 | A 清理后容器子节点数 | 0      | 0     | 保留 B 的节点 |
@@ -149,12 +149,18 @@ FIX-002 因影响实例隔离已优先修复。剩余建议依次处理 FIX-003 
 
 **修复与验收：**
 
-- [ ] 将清理范围限定为旧实例拥有的宿主、loading 等节点，或在清理时重新核验容器归属。
-- [ ] 不得只以 `getJieshuById(oldName)` 的结果判断整个容器是否仍属于旧实例。
-- [ ] 覆盖 A → B → C 共用容器、不同应用使用独立容器、卸载成功/失败等情况。
-- [ ] 验证新应用宿主保持连接，新实例仍存在，且其生命周期不会被旧清理触发。
-- [ ] 验证旧应用 iframe、事件和资源仍被释放，不能以跳过整个 destroy 回避问题。
-- [ ] 在 `destroy-order.test.ts`、`public-operation-race.test.ts` 或对应集成测试中加入不同名字共用容器的回归。
+- [x] 将清理范围限定为旧实例拥有的宿主、loading 等节点，或在清理时重新核验容器归属。
+- [x] 不得只以 `getJieshuById(oldName)` 的结果判断整个容器是否仍属于旧实例。
+- [x] 覆盖 A → B → C 共用容器、不同应用使用独立容器、卸载成功/失败等情况。
+- [x] 验证新应用宿主保持连接，新实例仍存在，且其生命周期不会被旧清理触发。
+- [x] 验证旧应用 iframe、事件和资源仍被释放，不能以跳过整个 destroy 回避问题。
+- [x] 在对应的 `container-destroy.test.ts` 单测及 `container-destroy.test.mts` 浏览器测试中加入不同名字共用容器的回归。
+
+**已实施修复（2026-09-07）：** `sandbox.clearContainer` 不再清空整个 `el`，而是调用 `removeRenderedElementFromContainer`，只移除仍直接挂在该容器中的旧宿主。`renderElementToContainer` 将当时的 loading 与具体宿主身份关联；清理时只有身份匹配才移除 loading、恢复布局。后继应用的宿主、loading 及主应用额外插入的节点均予以保留。
+
+**归属与释放：** 宿主和 loading 分别通过弱映射保存 `symbol` 身份，loading 元数据不会强引用旧宿主或沙箱；正常移除 loading 时也会删除它的归属记录。销毁仍完整执行旧实例的 iframe、脚本、样式、事件、代理和引用清理。原有同名注册表/teardown 保护继续保留，但它不再授权清空整个容器。
+
+**回归结果：** 新增 5 项单测，修复前全部失败，修复后全部通过；覆盖 A → B → C 的异步销毁、卸载抛错、独立容器、主应用额外节点、旧资源释放，以及后继应用尚未挂载时的 loading。新增 4 项 Chromium 回归，在真实 `startApp/destroyApp` 路径组合“卸载成功/失败 × 后继应用已显示/仍在加载”，验证后继应用保持连接、正常执行代码并可独立销毁。FIX-002 的 2 项浏览器回归继续通过。当前核心总计 344 项单测、6 项 Chromium 测试通过。
 
 ## FIX-004
 
@@ -381,9 +387,10 @@ git status --short
 
 每次关闭任务时，在下表增加记录。若只完成局部保护、未完成本项约定的验收场景或仍存在失败场景，应明确记为部分完成，不勾选总览任务。浏览器范围必须单独记录：仓库当前浏览器回归配置使用 Chromium，通过这些测试不能扩大为 Firefox、Safari 或全部浏览器的兼容性结论。
 
-| 编号    | 完成日期   | 提交 / PR      | 实际修改范围                                           | 实际验证命令、结果与覆盖率                                                                                                        | 剩余限制                                                                |
-| ------- | ---------- | -------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| FIX-002 | 2026-09-07 | 随本次修复提交 | core DOM 归属校验、12 项单测、2 项浏览器回归及测试脚本 | 以下实际命令均通过；单测 44 文件/339 项，Chromium 2 项；覆盖率 statements 75.63%、branches 67.91%、functions 79.85%、lines 78.34% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，未修改 wujie |
+| 编号    | 完成日期   | 提交 / PR      | 实际修改范围                                           | 实际验证命令、结果与覆盖率                                                                                                        | 剩余限制                                                                    |
+| ------- | ---------- | -------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| FIX-002 | 2026-09-07 | `a2b8409`      | core DOM 归属校验、12 项单测、2 项浏览器回归及测试脚本 | 以下实际命令均通过；单测 44 文件/339 项，Chromium 2 项；覆盖率 statements 75.63%、branches 67.91%、functions 79.85%、lines 78.34% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，未修改 wujie     |
+| FIX-003 | 2026-09-07 | 随本次修复提交 | core 容器清理、loading 归属、5 项单测、4 项浏览器回归  | 下述实际命令均通过；单测 45 文件/344 项，Chromium 6 项；覆盖率 statements 75.85%、branches 68.13%、functions 80%、lines 78.53%    | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，FIX-004 仍待修复 |
 
 FIX-002 的实际验证命令如下，均在仓库根目录执行。沿用初始审计的直接调用方式，使用已安装的工具和 Chromium，没有重新安装项目依赖。Chromium 在受限沙箱内启动时受到 macOS MachPort 权限限制，随后经自动审批在沙箱外执行上述本机测试并通过。
 
@@ -398,6 +405,13 @@ node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/effect.ts packag
 node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/effect.ts packages/jieshu-core/__test__/unit/dynamic-script-sequence.test.ts packages/jieshu-core/__test__/browser packages/jieshu-core/package.json docs/notes/jieshu-wujie-fix-todo.md
 git diff --check
 git status --short
+```
+
+FIX-003 继续使用上面的 Vitest、Playwright、四项 TypeScript 和 Git 检查命令；本次 ESLint、Prettier 检查的实际文件范围如下。新增和修改的函数使用箭头函数，新增实现与测试未使用类型断言。Chromium 同样经自动审批在沙箱外访问本机源码服务。
+
+```bash
+node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/shadow.ts packages/jieshu-core/__test__/unit/container-destroy.test.ts packages/jieshu-core/__test__/browser/container-destroy.test.mts --max-warnings=0
+node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/shadow.ts packages/jieshu-core/__test__/unit/container-destroy.test.ts packages/jieshu-core/__test__/browser/container-destroy.test.mts docs/notes/jieshu-wujie-fix-todo.md
 ```
 
 ## 后续实现应保持的一致性

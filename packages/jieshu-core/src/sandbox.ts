@@ -5,6 +5,7 @@ import {
   clearChild,
   getPatchStyleElements,
   renderElementToContainer,
+  removeRenderedElementFromContainer,
   renderTemplateToShadowRoot,
   removeLoading,
 } from './shadow';
@@ -618,15 +619,12 @@ export default class Jieshu {
     return cleanup;
   }
 
-  private clearContainer(): void {
-    if (!this.el) return;
-    if (!this.clearContainerOnDestroy) {
-      this.releaseReference('el');
-      return;
+  private clearContainer = () => {
+    if (this.el && this.clearContainerOnDestroy && this.shadowRoot) {
+      removeRenderedElementFromContainer(this.shadowRoot.host, this.el);
     }
-    clearChild(this.el);
     this.releaseReference('el');
-  }
+  };
 
   private releaseIframe(): void {
     if (!this.iframe) return;
