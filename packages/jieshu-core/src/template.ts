@@ -735,9 +735,11 @@ class TemplateCompiler {
     return getInlineStyleReplaceSymbol(index);
   }
 
-  private compileScript(token: BlockToken): string {
+  private compileScript = (token: BlockToken) => {
     const scriptType = stringAttribute(token.attributes, 'type');
-    if (!isValidJavaScriptType(scriptType)) return token.raw;
+    if (!isValidJavaScriptType(scriptType)) {
+      return token.raw;
+    }
 
     const normalizedScriptType = scriptType?.trim().toLowerCase();
     const isModule = normalizedScriptType === 'module';
@@ -748,12 +750,18 @@ class TemplateCompiler {
     const source = sourceAttribute ? resolveAssetUrl(sourceAttribute, this.baseURI) : undefined;
 
     if (source && hasAttribute(token.attributes, 'entry')) {
-      if (this.explicitEntry) throw new SyntaxError('You should not set multiply entry script!');
+      if (this.explicitEntry) {
+        throw new SyntaxError('You should not set multiply entry script!');
+      }
       this.explicitEntry = source;
     }
 
-    if (isIgnored) return genIgnoreAssetReplaceSymbol(source ?? 'js file');
-    if (shouldSkipForModuleSupport) return genModuleScriptReplaceSymbol(source ?? 'js file', this.moduleSupport);
+    if (isIgnored) {
+      return genIgnoreAssetReplaceSymbol(source ?? 'js file');
+    }
+    if (shouldSkipForModuleSupport) {
+      return genModuleScriptReplaceSymbol(source ?? 'js file', this.moduleSupport);
+    }
 
     const crossorigin = hasAttribute(token.attributes, 'crossorigin');
     // Execution distinguishes import maps by the canonical lower-case key and
@@ -784,9 +792,15 @@ class TemplateCompiler {
     const isPureCommentBlock = token.content
       .split(/[\r\n]+/)
       .every((line) => !line.trim() || line.trim().startsWith('//'));
-    if (token.content && !isPureCommentBlock) this.scripts.push({ ...baseScript, src: '', content: token.content });
+    if (token.content && !isPureCommentBlock) {
+      const inlineScript = { ...baseScript, src: '', content: token.content };
+      // Unlike inline classic scripts, inline modules honor the async attribute.
+      this.scripts.push(
+        isModule && hasAttribute(token.attributes, 'async') ? { ...inlineScript, async: true } : inlineScript,
+      );
+    }
     return inlineScriptReplaceSymbol;
-  }
+  };
 }
 
 export default function processTpl(

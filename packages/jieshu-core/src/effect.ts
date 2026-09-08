@@ -613,7 +613,7 @@ class DynamicScriptScheduler {
         module: isModule,
         attrs: parseTagAttributes(pendingElement.outerHTML),
       };
-      this.executeWithForwardedOutcome(inlineScript, isModule);
+      this.executeWithForwardedOutcome(inlineScript, false, isModule);
     });
   };
 
@@ -637,7 +637,11 @@ class DynamicScriptScheduler {
     });
   }
 
-  private executeWithForwardedOutcome = (scriptResult: ScriptObject, forwardEvents = true) => {
+  private executeWithForwardedOutcome = (
+    scriptResult: ScriptObject,
+    forwardLoad = true,
+    forwardError = forwardLoad,
+  ) => {
     const { sandbox } = this.context;
     const pendingElement = this.scriptElement;
     if (!pendingElement) {
@@ -656,7 +660,11 @@ class DynamicScriptScheduler {
       const completedElement = this.scriptElement;
       const shouldNotify = Boolean(completedElement && this.isLive());
       try {
-        if (forwardEvents && outcome !== 'cancelled' && completedElement && shouldNotify) {
+        if (
+          ((outcome === 'load' && forwardLoad) || (outcome === 'error' && forwardError)) &&
+          completedElement &&
+          shouldNotify
+        ) {
           elementEventForwarder.dispatch(completedElement, outcome);
         }
       } finally {

@@ -17,6 +17,20 @@ function compileWithModuleSupport(template: string, supported: boolean) {
 }
 
 describe('template tokenizer and compiler', () => {
+  test('honors async only for inline modules, including mixed-case boolean attributes', () => {
+    const { scripts } = compileWithModuleSupport(
+      '<script ASYNC="false" type="module">export const value = 1;</script>' +
+        '<script async defer>window.classic = true;</script>' +
+        '<script type="module">export const value = 2;</script>',
+      true,
+    );
+    expect(scripts).toHaveLength(3);
+    expect(scripts[0]).toMatchObject({ module: true, async: true });
+    expect(scripts[1].async).toBeUndefined();
+    expect(scripts[1].defer).toBeUndefined();
+    expect(scripts[2].async).toBeUndefined();
+  });
+
   test('parses quoted, unquoted and boolean attributes without consuming a self-closing slash', () => {
     expect(
       parseTagAttributes(

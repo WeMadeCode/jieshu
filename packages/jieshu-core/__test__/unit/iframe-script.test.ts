@@ -217,7 +217,7 @@ describe('iframe script execution pipeline', () => {
     expect(onload).not.toHaveBeenCalled();
   });
 
-  it('keeps transformed module code cancellable until its native load event', () => {
+  it('keeps inline module code cancellable until its ordered completion marker', () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const rawElement = iframeWindow.document.createElement('script');
     const onload = vi.fn();
@@ -236,6 +236,131 @@ describe('iframe script execution pipeline', () => {
     expect(onload).not.toHaveBeenCalled();
     expect(handle.element.isConnected).toBe(false);
     expect(sandbox.dynamicScriptElements).toEqual([]);
+  });
+
+  it.each(['module flag', 'type attribute'])('preserves inline module source and nonce with %s', (mode) => {
+    const { iframeWindow } = createScriptEnvironment();
+    const code = "import value from './dep.js'; export { value }; const url = import.meta.url;";
+    const handle = insertScriptToIframe(
+      { content: code, module: mode === 'module flag', attrs: { type: 'module', nonce: 'allowed' } },
+      iframeWindow,
+    );
+    const marker = iframeWindow.document.querySelector<HTMLScriptElement>('[data-jieshu-module-completion]');
+    expect(handle.element.textContent).toBe(code);
+    expect(handle.element.type).toBe('module');
+    expect(handle.element.async).toBe(false);
+    expect(handle.element.hasAttribute('src')).toBe(false);
+    expect(marker?.async).toBe(false);
+    expect(marker?.nonce).toBe('allowed');
+    handle.cancel();
+    expect(marker?.isConnected).toBe(false);
+  });
+
+  it('settles an inline marker once and never treats a synthetic script load as native completion', async () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const loaded = vi.fn();
+    const next = vi.fn();
+    sandbox.execQueue.push(next);
+    const handle = insertScriptToIframe({ module: true, content: 'export default 1', onload: loaded }, iframeWindow);
+    const marker = iframeWindow.document.querySelector('[data-jieshu-module-completion]');
+    const eventName = marker?.getAttribute('data-jieshu-module-completion');
+    if (!eventName) {
+      throw new Error('Expected a module completion event');
+    }
+    handle.element.dispatchEvent(new Event('load'));
+    expect(loaded).not.toHaveBeenCalled();
+    // jsdom cannot evaluate modules. Browser ordering is verified in Playwright.
+    iframeWindow.dispatchEvent(new Event(eventName));
+    iframeWindow.dispatchEvent(new Event(eventName));
+    await expect(handle.completion).resolves.toBe('load');
+    expect(loaded).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(marker?.isConnected).toBe(false);
+  });
+
+  it('disposes the pending marker and listener on cancellation', async () => {
+    const { iframeWindow } = createScriptEnvironment();
+    const loaded = vi.fn();
+    const handle = insertScriptToIframe({ module: true, content: 'export default 1', onload: loaded }, iframeWindow);
+    const marker = iframeWindow.document.querySelector('[data-jieshu-module-completion]');
+    const eventName = marker?.getAttribute('data-jieshu-module-completion');
+    if (!eventName) {
+      throw new Error('Expected a module completion event');
+    }
+    handle.cancel();
+    iframeWindow.dispatchEvent(new Event(eventName));
+    await expect(handle.completion).resolves.toBe('cancelled');
+    expect(loaded).not.toHaveBeenCalled();
+    expect(marker?.isConnected).toBe(false);
+    expect(handle.element.isConnected).toBe(false);
+  });
+
+  it('cleans up when appending the completion marker throws', () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const head = iframeWindow.document.head;
+    const append = head.appendChild.bind(head);
+    vi.spyOn(head, 'appendChild')
+      .mockImplementationOnce(append)
+      .mockImplementationOnce(() => {
+        throw new Error('marker insertion failed');
+      });
+    const original = iframeWindow.document.createElement('script');
+    expect(() => insertScriptToIframe({ module: true, content: 'export default 1' }, iframeWindow, original)).toThrow(
+      'marker insertion failed',
+    );
+    expect(head.querySelectorAll('script')).toHaveLength(0);
+    expect(sandbox.dynamicScriptElements).toEqual([]);
+    cancelSandboxDynamicResources(sandbox);
+  });
+
+  it('settles a failed completion marker and releases its listener', async () => {
+    const { iframeWindow } = createScriptEnvironment();
+    const failed = vi.fn();
+    const handle = insertScriptToIframe({ module: true, content: 'export default 1', onerror: failed }, iframeWindow);
+    const marker = iframeWindow.document.querySelector('[data-jieshu-module-completion]');
+    const eventName = marker?.getAttribute('data-jieshu-module-completion');
+    if (!marker || !eventName) {
+      throw new Error('Expected a completion marker');
+    }
+    marker.dispatchEvent(new Event('error'));
+    iframeWindow.dispatchEvent(new Event(eventName));
+    await expect(handle.completion).resolves.toBe('error');
+    expect(failed).toHaveBeenCalledTimes(1);
+    expect(marker.isConnected).toBe(false);
+  });
+
+  it('does not call append callbacks after cancellation during marker insertion', async () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const head = iframeWindow.document.head;
+    const append = head.appendChild.bind(head);
+    vi.spyOn(head, 'appendChild')
+      .mockImplementationOnce(append)
+      .mockImplementationOnce((node) => {
+        const result = append(node);
+        cancelSandboxDynamicResources(sandbox);
+        return result;
+      });
+    const callback = vi.fn();
+    const handle = insertScriptToIframe({ module: true, content: 'export default 1', callback }, iframeWindow);
+    await expect(handle.completion).resolves.toBe('cancelled');
+    expect(callback).not.toHaveBeenCalled();
+    expect(head.querySelectorAll('script')).toHaveLength(0);
+  });
+
+  it('acknowledges scheduling of an explicitly async inline module without a serial marker', async () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const loaded = vi.fn();
+    const next = vi.fn();
+    sandbox.execQueue.push(next);
+    const handle = insertScriptToIframe(
+      { module: true, async: true, content: "import './slow.js';", onload: loaded },
+      iframeWindow,
+    );
+    await expect(handle.completion).resolves.toBe('scheduled');
+    expect(handle.element.async).toBe(true);
+    expect(iframeWindow.document.querySelector('[data-jieshu-module-completion]')).toBeNull();
+    expect(next).not.toHaveBeenCalled();
+    expect(loaded).not.toHaveBeenCalled();
   });
 
   it('ignores a native script event delivered after its sandbox was destroyed', () => {

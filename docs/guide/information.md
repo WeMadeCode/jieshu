@@ -216,6 +216,18 @@ const script = `(function(window, self, global, location) {
   );`;
 ```
 
+### iframe 内联 module 的执行顺序
+
+内联 `<script type="module">` 执行成功时，浏览器不会触发该节点的 `load` 事件。界枢为串行内联 module 插入独立的 module 完成标记，并将两者的 `async` 设为 `false`，利用浏览器的有序脚本列表推进后续任务。静态、预设和动态内联 module 均走这一执行路径；保活应用失活后仍可继续执行。依据见 [HTML 脚本处理模型](https://html.spec.whatwg.org/multipage/scripting.html#prepare-the-script-element)。
+
+模块内容经已有 `jsLoader` 处理后直接交给浏览器，不添加普通函数闭包，也不搬到 Blob URL。静态 `import`、动态 `import()`、import map、相对路径及 `import.meta.url` 继续使用 iframe 的模块解析环境。完成标记沿用原脚本的 nonce，并在完成、出错或取消时移除节点和监听器。
+
+串行完成表示浏览器已处理依赖图并尝试启动模块求值，**不表示 top-level await 已经结束**。后续经典脚本可以在 `await` 恢复前执行，这与原生外部 module 的 `load` 边界一致。子应用需要等待异步初始化时，应显式管理自己的 ready Promise 和渲染时机，不能将队列推进或 `startApp` 返回当作异步初始化全部完成的信号。参见 [HTML 模块执行模型](https://html.spec.whatwg.org/multipage/webappapis.html#run-a-module-script)。
+
+框架不会给动态内联 module 合成成功 `load`；依赖加载失败保留 `error` 通知，语法和运行时异常仍通过浏览器全局错误机制报告，并释放后续队列。HTML 中显式标记 `async` 的内联 module 独立调度，不占用串行完成标记；动态插入仍沿用现有应用内队列策略。
+
+非保活卸载会取消框架资源并调用 iframe 的 `stop()` 中止待处理的原生加载，防止复用 iframe 时新模块被旧依赖请求挡住。保活失活不会中止这些请求；已开始执行的 JavaScript、已经进入 top-level await 的异步任务无法由此回滚。
+
 ### iframe 和 shadowRoot 副作用的处理
 
 `iframe` 内部的副作用处理在初始化`iframe`时进行，主要分为如下几部

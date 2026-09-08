@@ -1,6 +1,6 @@
 # jieshu 与 wujie 源码缺陷修复 TODO
 
-本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 3 项（FIX-001、FIX-002、FIX-003），剩余 9 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
+本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 4 项（FIX-001、FIX-002、FIX-003、FIX-012），剩余 8 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
 
 ## 使用与关闭规则
 
@@ -52,9 +52,9 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 - [ ] **P2 · [FIX-010](#fix-010)**：资源的属性回调与事件监听器不能同时收到通知。jieshu 已复现，wujie 有相同实现。
 - [ ] **P2 · [FIX-011](#fix-011)**：EventBus 无法处理与对象原型属性同名的事件。jieshu 已复现，wujie 有相同实现。
 
-- [ ] **P2 · [FIX-012](#fix-012)**：内联 module 不触发原生 load，执行器等待该事件导致队列阻塞。修复 FIX-001 时通过 Chromium 新发现。
+- [x] **P2 · [FIX-012](#fix-012)**：内联 module 等待成功 load 导致队列阻塞。已改用独立的原生 module 完成标记，并验证模块语法、顺序、错误及取消路径。
 
-FIX-001、FIX-002、FIX-003 已修复。剩余建议依次处理 FIX-004 → FIX-012 → FIX-005，再处理路由、资源语义和 EventBus。FIX-003 的回归保留了重复调用 `destroyApp` 的场景；FIX-004 仍需独立修正公开 Promise 的完成语义。
+FIX-001、FIX-002、FIX-003、FIX-012 已修复。剩余建议依次处理 FIX-004 → FIX-005，再处理路由、资源语义和 EventBus。FIX-003 的回归保留了重复调用 `destroyApp` 的场景；FIX-004 仍需独立修正公开 Promise 的完成语义。
 
 ## FIX-001
 
@@ -388,7 +388,7 @@ bus.$on('constructor', () => {});
 
 **来源：** 修复 FIX-001 时新增的真实 Chromium 场景暴露；不在初始 11 项审计范围内。
 
-**定位：** `packages/jieshu-core/src/iframe-script.ts` 中 `waitsForNativeCompletion` 将所有 `module` 都视为需要等待原生 load/error；`DynamicScriptScheduler` 因此保留队列位置。
+**修复前定位：** `packages/jieshu-core/src/iframe-script.ts` 中 `waitsForNativeCompletion` 将所有 `module` 都视为需要等待原生 load/error；`DynamicScriptScheduler` 因此保留队列位置。
 
 **触发与证据：**
 
@@ -396,7 +396,7 @@ bus.$on('constructor', () => {});
 2. 在 jieshu 中插入内联 module，再插入外部经典脚本、外部 module 和原生回退脚本。真实源码回归在 `fiber=false/true` 均超时，内联 module 的代码标记已经出现，但完成事件仍为空，队列保留 4 个位置。
 3. 旧 jsdom 测试手动派发 `new Event('load')`，因此只能检验事件到达后的收尾，无法发现这个浏览器语义差异。
 
-**影响：** 动态内联 module 后续的脚本可能长期等待；静态/预设的内联 module 也使用同一执行器，需要进一步验证是否阻止 start 完成。该条件不依赖保活失活。下面的本地 wujie 对照未出现同类等待 load 的队列阻塞。
+**修复前影响：** 动态内联 module 后续的脚本可能长期等待；静态/预设的内联 module 也使用同一执行器，存在相同等待条件，本次修复已覆盖其 start 完成场景。该条件不依赖保活失活。下面的本地 wujie 对照未出现同类等待 load 的队列阻塞。
 
 **wujie 对照实测：** 使用 Chromium `151.0.7922.34`，将两个本地仓库的源码分别临时打包，经 `127.0.0.1` 服务运行真实 `startApp`、动态插入、unmount 和 destroy。wujie 基线为干净工作区 `c45932998c0602f34454df8d3e29f4d33a38446a`；jieshu 为 `b25ec78cb039cdd5f4abc54e649cbc96207a4764` 加对照时尚未提交的 FIX-001 修复。两边都使用包含普通启动脚本的 HTML，启动后依次插入内联 module、外部经典脚本、外部 module。
 
@@ -413,15 +413,23 @@ bus.$on('constructor', () => {});
 
 **为何 wujie 不堵：** `wujie/packages/wujie-core/src/iframe.ts` 的 `insertScriptToIframe` 仅为 `!content && src` 的外部脚本等待 load/error；内联脚本插入后立即调用 `afterExecScript()` 推进队列。`effect.ts` 中也明确注释内联脚本不触发 load/error。因此本项队列阻塞属于 jieshu 相对此份 wujie 的回归。
 
-**不能直接照搬的部分：** wujie 的动态内联分支未向执行器传递 `module` 标记，导致 `type="module"` 的代码仍被包进普通函数；含 `export` 时产生语法错误。此外，普通代码的 `fiber=false` 两组观测顺序均为“后续经典脚本 → 内联 module → 外部 module”，说明队列为空也不代表内联模块已经先执行完毕。这些是 wujie 当前实现的另外两项语义限制，本次没有修复它们。jieshu 的 FIX-012 修复仍需明确模块语法与完成顺序契约。
+**不能直接照搬的部分：** wujie 的动态内联分支未向执行器传递 `module` 标记，导致 `type="module"` 的代码仍被包进普通函数；含 `export` 时产生语法错误。此外，普通代码的 `fiber=false` 两组观测顺序均为“后续经典脚本 → 内联 module → 外部 module”，说明队列为空也不代表内联模块已经先执行完毕。这些是 wujie 当前实现的另外两项语义限制，本次没有修复它们。jieshu 的修复契约见下文。
 
 **修复与验收：**
 
-- [ ] 明确内联 module 与后续脚本之间的执行/完成契约，不再假定浏览器提供成功 load。
-- [ ] 验证普通执行、静态 import、动态 import、top-level await、语法及运行时错误；保留相对导入、import map 和 `import.meta.url` 的语义。
-- [ ] 评估原生内联语义与串行等待的取舍；不能仅追加代码尾回调而遗漏异常，也不能未经验证将代码搬到 Blob URL 改变模块解析基址。
-- [ ] 覆盖动态插入、静态/预设脚本、fiber、活跃/保活失活、取消/销毁和之后的脚本推进。
-- [ ] 先加入真实浏览器失败断言，再调整目前人工派发 module load 的单测，避免模拟测试替代原生行为。
+- [x] 明确内联 module 与后续脚本之间的执行/完成契约，不再假定浏览器提供成功 load。
+- [x] 验证普通执行、静态 import、动态 import、top-level await、语法及运行时错误；保留相对导入、import map 和 `import.meta.url` 的语义。
+- [x] 评估原生内联语义与串行等待的取舍；不能仅追加代码尾回调而遗漏异常，也不能未经验证将代码搬到 Blob URL 改变模块解析基址。
+- [x] 覆盖动态插入、静态/预设脚本、fiber、活跃/保活失活、取消/销毁和之后的脚本推进。
+- [x] 先加入真实浏览器失败断言，再调整目前人工派发 module load 的单测，避免模拟测试替代原生行为。
+
+**已实施修复（2026-09-08）：** 串行内联 module 和独立的 module 完成标记均设置 `async=false`，进入浏览器的有序脚本列表。标记在原模块的依赖图就绪并尝试开始求值后通知执行器收尾；语法或运行时错误不会跳过独立标记。原模块代码只经过已有 loader，不追加尾回调、不添加普通函数闭包、不改为 Blob URL。标记复制 nonce，完成、错误、取消及插入异常均清理临时节点和监听器。属性中声明 `type=module` 的预设也按模块处理。
+
+**完成与事件契约：** 不给动态内联 module 合成成功 load；依赖加载失败继续转发原生 error，语法/运行时错误交由浏览器报告。与原生外部 module 的 load 一样，串行推进不等待 top-level await 的 Promise 完成，也不等待独立 `import()`。HTML 解析保留显式 async 内联 module 的标记，使其独立调度；执行句柄以内部 `scheduled` 结果确认插入，不伪报模块求值完成。动态插入保留现有应用内排队策略；FIX-007 的外部 async 事件问题仍独立待修。公开说明见 [iframe 内联 module 的执行顺序](../guide/information.md#iframe-内联-module-的执行顺序)，规范依据见 [HTML 脚本处理模型](https://html.spec.whatwg.org/multipage/scripting.html#prepare-the-script-element)及[模块执行模型](https://html.spec.whatwg.org/multipage/webappapis.html#run-a-module-script)。
+
+**取消与复用：** 原生实验确认，移除等待 import 的节点不能把它从浏览器有序列表中删除。非保活卸载在取消框架资源后中止 iframe 的原生加载；保活失活继续保留运行。浏览器回归在旧请求仍悬挂时验证同一 iframe 重新激活及同名销毁重建，新模块能够执行，旧请求迟到不会执行旧模块或阻塞新队列。已启动的 JavaScript/TLA 异步工作不承诺回滚。
+
+**回归方式：** 先加入 4 项 fiber × 活跃状态 Chromium 断言，修复前全部失败，再修改执行器。最终新增 23 项浏览器回归，覆盖延迟 import、相对/映射/动态导入、`import.meta.url`、TLA、静态/预设/async、空模块、依赖失败、语法/运行时/TLA 拒绝以及卸载和重建。单测改掉人工派发内联 module load 的错误前提；新增的完成标记通知只验证内部收尾，原生顺序由 Playwright 验证。
 
 ## 修复验证与交付记录
 
@@ -438,11 +446,12 @@ git status --short
 
 每次关闭任务时，在下表增加记录。若只完成局部保护、未完成本项约定的验收场景或仍存在失败场景，应明确记为部分完成，不勾选总览任务。浏览器范围必须单独记录：仓库当前浏览器回归配置使用 Chromium，通过这些测试不能扩大为 Firefox、Safari 或全部浏览器的兼容性结论。
 
-| 编号    | 完成日期   | 提交 / PR | 实际修改范围                                           | 实际验证命令、结果与覆盖率                                                                                                        | 剩余限制                                                                                      |
-| ------- | ---------- | --------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| FIX-002 | 2026-09-07 | `a2b8409` | core DOM 归属校验、12 项单测、2 项浏览器回归及测试脚本 | 以下实际命令均通过；单测 44 文件/339 项，Chromium 2 项；覆盖率 statements 75.63%、branches 67.91%、functions 79.85%、lines 78.34% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，未修改 wujie                       |
-| FIX-003 | 2026-09-07 | `b25ec78` | core 容器清理、loading 归属、5 项单测、4 项浏览器回归  | 下述实际命令均通过；单测 45 文件/344 项，Chromium 6 项；覆盖率 statements 75.85%、branches 68.13%、functions 80%、lines 78.53%    | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，FIX-004 仍待修复                   |
-| FIX-001 | 2026-09-07 | 本次提交  | core 状态校验、动态队列收尾、23 项单测、2 项浏览器回归 | 下述实际命令均通过；单测 45 文件/367 项，Chromium 8 项；覆盖率 statements 75.88%、branches 68.26%、functions 79.92%、lines 78.50% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；内联 module 独立问题登记为 FIX-012 |
+| 编号    | 完成日期   | 提交 / PR | 实际修改范围                                                                               | 实际验证命令、结果与覆盖率                                                                                                         | 剩余限制                                                                                                   |
+| ------- | ---------- | --------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| FIX-002 | 2026-09-07 | `a2b8409` | core DOM 归属校验、12 项单测、2 项浏览器回归及测试脚本                                     | 以下实际命令均通过；单测 44 文件/339 项，Chromium 2 项；覆盖率 statements 75.63%、branches 67.91%、functions 79.85%、lines 78.34%  | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，未修改 wujie                                    |
+| FIX-003 | 2026-09-07 | `b25ec78` | core 容器清理、loading 归属、5 项单测、4 项浏览器回归                                      | 下述实际命令均通过；单测 45 文件/344 项，Chromium 6 项；覆盖率 statements 75.85%、branches 68.13%、functions 80%、lines 78.53%     | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，FIX-004 仍待修复                                |
+| FIX-001 | 2026-09-07 | `0d626aa` | core 状态校验、动态队列收尾、23 项单测、2 项浏览器回归                                     | 下述实际命令均通过；单测 45 文件/367 项，Chromium 8 项；覆盖率 statements 75.88%、branches 68.26%、functions 79.92%、lines 78.50%  | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；内联 module 独立问题登记为 FIX-012              |
+| FIX-012 | 2026-09-08 | 本次提交  | core 内联 module 完成标记、HTML async 解析、卸载取消、12 项单测、23 项浏览器回归及公开说明 | 下述实际命令均通过；单测 45 文件/379 项，Chromium 31 项；覆盖率 statements 76.07%、branches 68.63%、functions 80.02%、lines 78.73% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；不等待 TLA 完成，不回滚已执行代码；未修改 wujie |
 
 FIX-002 的实际验证命令如下，均在仓库根目录执行。沿用初始审计的直接调用方式，使用已安装的工具和 Chromium，没有重新安装项目依赖。Chromium 在受限沙箱内启动时受到 macOS MachPort 权限限制，随后经自动审批在沙箱外执行上述本机测试并通过。
 
@@ -471,6 +480,13 @@ FIX-001 继续使用上述 Vitest、Playwright、四项 TypeScript 和 Git 检�
 ```bash
 node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/effect.ts packages/jieshu-core/src/iframe-script.ts packages/jieshu-core/src/sandbox-runtime.ts packages/jieshu-core/__test__/unit/dynamic-script-sequence.test.ts packages/jieshu-core/__test__/unit/iframe-script.test.ts packages/jieshu-core/__test__/browser/alive-dynamic-script.test.mts --max-warnings=0
 node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/effect.ts packages/jieshu-core/src/iframe-script.ts packages/jieshu-core/src/sandbox-runtime.ts packages/jieshu-core/__test__/unit/dynamic-script-sequence.test.ts packages/jieshu-core/__test__/unit/iframe-script.test.ts packages/jieshu-core/__test__/browser/alive-dynamic-script.test.mts docs/notes/jieshu-wujie-fix-todo.md
+```
+
+FIX-012 继续使用上述 Vitest（含覆盖率）、Playwright、四项 TypeScript 和 Git 检查命令。新增 12 项单测覆盖完成标记的幂等、错误、nonce、取消、插入异常、异步调度、卸载及 HTML 属性解析；此前 FIX-001/002/003 的 8 项浏览器回归全部保持通过。ESLint、Prettier 的实际范围如下：
+
+```bash
+node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/effect.ts packages/jieshu-core/src/iframe-script.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/template.ts packages/jieshu-core/__test__/unit/dynamic-script-sequence.test.ts packages/jieshu-core/__test__/unit/iframe-script.test.ts packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts packages/jieshu-core/__test__/unit/template.test.ts packages/jieshu-core/__test__/browser/inline-module.test.mts --max-warnings=0
+node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/effect.ts packages/jieshu-core/src/iframe-script.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/template.ts packages/jieshu-core/__test__/unit/dynamic-script-sequence.test.ts packages/jieshu-core/__test__/unit/iframe-script.test.ts packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts packages/jieshu-core/__test__/unit/template.test.ts packages/jieshu-core/__test__/browser/inline-module.test.mts docs/guide/information.md docs/notes/jieshu-wujie-fix-todo.md
 ```
 
 ## 后续实现应保持的一致性

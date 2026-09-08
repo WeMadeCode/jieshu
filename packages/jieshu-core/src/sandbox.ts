@@ -35,6 +35,7 @@ import {
   requestIdleCallback,
   getAbsolutePath,
   eventTrigger,
+  warn,
 } from './utils';
 import { JIESHU_DATA_ATTACH_CSS_FLAG, JIESHU_APP_ID, JIESHU_FONT_STYLE_CONTAINER_ATTR } from './constant';
 import type {
@@ -504,6 +505,14 @@ export default class Jieshu {
       releaseAssetCacheScope(this.assetCacheScope);
       this.assetCacheScope = {};
       cancelSandboxDynamicResources(this, 'unmount');
+      // Removing a pending module does not remove it from the browser's ordered
+      // script list. Abort this inactive runtime's native requests so a reusable
+      // iframe's next activation cannot wait forever behind the old import graph.
+      try {
+        this.iframe?.contentWindow?.stop?.();
+      } catch (cause: unknown) {
+        warn(cause);
+      }
     }
 
     void this.performUnmount().then(

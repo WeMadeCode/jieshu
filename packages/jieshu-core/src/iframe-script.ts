@@ -1,6 +1,6 @@
 import type { ScriptObject } from './template';
 import type { ScriptObjectLoader } from './contracts';
-import { getJieshuById, rawDocumentQuerySelector } from './common';
+import { getJieshuById, rawDocumentQuerySelector, rawAddEventListener, rawRemoveEventListener } from './common';
 import { getJsLoader } from './plugin';
 import { isSandboxExecutionAllowed, registerSandboxDynamicResource } from './sandbox-runtime';
 import { JIESHU_TIPS_SCRIPT_ERROR_REQUESTED } from './constant';
@@ -40,7 +40,36 @@ export interface ScriptExecutionHandle {
   cancel(): void;
 }
 
-export type ScriptExecutionOutcome = 'load' | 'error' | 'cancelled';
+// Explicitly async inline modules have no browser completion event and do not
+// occupy the serial queue. Their handle acknowledges scheduling, not evaluation.
+export type ScriptExecutionOutcome = 'load' | 'error' | 'cancelled' | 'scheduled';
+
+const moduleEventPrefix = `__jieshu_module_${Math.random().toString(36).slice(2)}_`;
+let moduleEventSequence = 0;
+
+const observeInlineModule = (context: ScriptExecutionContext, onReady: () => void, onError: () => void) => {
+  const marker = context.iframeWindow.document.createElement('script');
+  const eventName = `${moduleEventPrefix}${moduleEventSequence++}`;
+  marker.type = 'module';
+  marker.async = false;
+  marker.nonce = context.scriptElement.nonce;
+  marker.setAttribute('data-jieshu-module-completion', eventName);
+  marker.textContent = `window.dispatchEvent(new Event(${JSON.stringify(eventName)}));`;
+  marker.onerror = onError;
+  // Both scripts join the browser's ordered list. The marker follows module
+  // graph readiness and the start of evaluation, including parse/runtime errors.
+  // Like an external module's load event, it does not await top-level await.
+  context.scriptElement.async = false;
+  rawAddEventListener.call(context.iframeWindow, eventName, onReady, { once: true });
+  return {
+    marker,
+    dispose: () => {
+      rawRemoveEventListener.call(context.iframeWindow, eventName, onReady);
+      marker.onerror = null;
+      marker.parentNode?.removeChild(marker);
+    },
+  };
+};
 
 function normalizeScriptInput(source: ScriptInput): NormalizedScriptInput {
   return {
@@ -129,25 +158,31 @@ function exposeInlineScriptSource(scriptElement: HTMLScriptElement, src?: string
   }
 }
 
-function configureScriptElement(context: ScriptExecutionContext): void {
+const configureScriptElement = (context: ScriptExecutionContext) => {
   const { input, scriptElement } = context;
   const { type } = input.attrs ?? {};
   const isImportMap = String(type ?? '').toLowerCase() === 'importmap';
   applyForwardedAttributes(context);
+  if (input.module) {
+    scriptElement.type = 'module';
+  }
 
   if (input.content) {
-    if (!input.module && !isImportMap) {
+    if (scriptElement.type.toLowerCase() !== 'module' && !isImportMap) {
       context.code = wrapInlineCode(context.code);
     }
     exposeInlineScriptSource(scriptElement, input.src);
   } else {
-    if (input.src) scriptElement.setAttribute('src', input.src);
-    if (input.crossorigin) scriptElement.setAttribute('crossorigin', String(input.crossoriginType));
+    if (input.src) {
+      scriptElement.setAttribute('src', input.src);
+    }
+    if (input.crossorigin) {
+      scriptElement.setAttribute('crossorigin', String(input.crossoriginType));
+    }
   }
 
-  if (input.module) scriptElement.setAttribute('type', 'module');
   scriptElement.textContent = context.code || '';
-}
+};
 
 function configureQueueAdvancer(context: ScriptExecutionContext): void {
   context.queueAdvancerElement.textContent =
@@ -173,6 +208,7 @@ class IframeScriptExecutionPipeline {
     const context = createExecutionContext(source, iframeWindow, rawElement);
     let completed = false;
     let unregisterCancellation: (() => void) | undefined;
+    let inlineModuleObserver: ReturnType<typeof observeInlineModule> | undefined;
     let resolveCompletion: (outcome: ScriptExecutionOutcome) => void;
     const completion = new Promise<ScriptExecutionOutcome>((resolve) => {
       resolveCompletion = resolve;
@@ -187,6 +223,8 @@ class IframeScriptExecutionPipeline {
         completed = true;
         unregisterCancellation?.();
         unregisterCancellation = undefined;
+        inlineModuleObserver?.dispose();
+        inlineModuleObserver = undefined;
         context.scriptElement.onload = null;
         context.scriptElement.onerror = null;
         context.scriptElement.parentNode?.removeChild(context.scriptElement);
@@ -210,11 +248,13 @@ class IframeScriptExecutionPipeline {
       completed = true;
       unregisterCancellation?.();
       unregisterCancellation = undefined;
+      inlineModuleObserver?.dispose();
+      inlineModuleObserver = undefined;
       try {
         if (isExecutionOwnerCurrent(context)) {
           if (outcome === 'load') {
             context.input.onload?.();
-          } else {
+          } else if (outcome === 'error') {
             context.input.onerror?.();
           }
         }
@@ -247,19 +287,49 @@ class IframeScriptExecutionPipeline {
         return handle;
       }
 
+      const isInlineModule =
+        context.scriptElement.type.toLowerCase() === 'module' && !context.scriptElement.hasAttribute('src');
+      const isAsyncInlineModule = isInlineModule && context.input.async === true;
+      if (isAsyncInlineModule) {
+        context.scriptElement.async = true;
+      }
+      if (isInlineModule && !isAsyncInlineModule) {
+        inlineModuleObserver = observeInlineModule(
+          context,
+          () => afterExecution('load'),
+          () => afterExecution('error'),
+        );
+      }
+      if (!isExecutionOwnerCurrent(context)) {
+        handle.cancel();
+        return handle;
+      }
       registerDynamicScript(context);
-      const waitsForNativeCompletion = context.input.module || (!context.input.content && Boolean(context.input.src));
+      const waitsForNativeCompletion = Boolean(inlineModuleObserver) || context.scriptElement.hasAttribute('src');
       if (waitsForNativeCompletion) {
-        context.scriptElement.onload = () => afterExecution('load');
+        if (!isInlineModule) {
+          context.scriptElement.onload = () => afterExecution('load');
+        }
         context.scriptElement.onerror = () => afterExecution('error');
         unregisterCancellation = registerSandboxDynamicResource(context.owner, () => handle.cancel());
       }
 
       context.container.appendChild(context.scriptElement);
+      if (completed || !isExecutionOwnerCurrent(context)) {
+        handle.cancel();
+        return handle;
+      }
+      if (inlineModuleObserver) {
+        context.container.appendChild(inlineModuleObserver.marker);
+      }
+      if (completed || !isExecutionOwnerCurrent(context)) {
+        handle.cancel();
+        return handle;
+      }
       context.input.callback?.(iframeWindow);
       execHooks(context.plugins, 'appendOrInsertElementHook', context.scriptElement, iframeWindow, rawElement);
       if (!waitsForNativeCompletion) {
-        afterExecution('load');
+        afterExecution(isAsyncInlineModule ? 'scheduled' : 'load');
       }
     } catch (cause: unknown) {
       // A failed DOM insertion/callback must not leave a registered native

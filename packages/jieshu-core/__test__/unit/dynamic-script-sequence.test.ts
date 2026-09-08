@@ -222,7 +222,7 @@ describe('dynamic script sequencing', () => {
       const events: string[] = [];
       const first = document.createElement('script');
       first.type = 'module';
-      first.textContent = 'export default 1';
+      first.src = 'https://assets.example/reentrant-first.js';
       const onComplete = () => {
         events.push(outcome);
         const reentrant = document.createElement('script');
@@ -234,10 +234,11 @@ describe('dynamic script sequencing', () => {
       root.head.appendChild(first);
       const second = document.createElement('script');
       second.type = 'module';
-      second.textContent = 'export default 2';
+      second.src = 'https://assets.example/reentrant-second.js';
       second.onload = () => events.push('second');
       root.head.appendChild(second);
 
+      await flushPromises();
       const injectedFirst = sandbox.dynamicScriptElements[0];
       injectedFirst.dispatchEvent(new Event(outcome));
       injectedFirst.dispatchEvent(new Event(outcome));
@@ -684,7 +685,7 @@ describe('dynamic script sequencing', () => {
     expect(loaded).not.toHaveBeenCalled();
   });
 
-  test('an inline module uses native module completion and forwards its error', async () => {
+  test('an inline module forwards a native dependency error and releases its lane', async () => {
     const root = createRenderRoot();
     const sandbox = createSandbox('inline-module-app', () => Promise.resolve(scriptResponse('/* next */')));
     patchRenderEffect(root, 'inline-module-app');
@@ -718,42 +719,51 @@ describe('dynamic script sequencing', () => {
     expect(nextLoaded).toHaveBeenCalledTimes(1);
   });
 
-  test.each(['load', 'error'] as const)(
-    'fiber keeps a following classic script behind inline module native %s',
-    (outcome) => {
-      const root = createRenderRoot();
-      const sandbox = createSandbox('fiber-inline-module-app', () => Promise.resolve(scriptResponse('/* unused */')));
-      const idleCallbacks: Array<() => unknown> = [];
-      sandbox.fiber = true;
-      sandbox.requestIdleCallback = (callback): number => {
-        idleCallbacks.push(() => callback.call(sandbox));
-        return idleCallbacks.length;
-      };
-      patchRenderEffect(root, 'fiber-inline-module-app');
-      const moduleScript = document.createElement('script');
-      moduleScript.type = 'module';
-      moduleScript.textContent = 'export const fiberModuleA = true';
-      const classicScript = document.createElement('script');
-      classicScript.textContent = 'window.__fiberClassicB = true';
+  test.each(['ready', 'error'])('fiber keeps a following classic script behind inline module %s', (outcome) => {
+    const root = createRenderRoot();
+    const sandbox = createSandbox('fiber-inline-module-app', () => Promise.resolve(scriptResponse('/* unused */')));
+    const idleCallbacks: Array<() => unknown> = [];
+    sandbox.fiber = true;
+    sandbox.requestIdleCallback = (callback): number => {
+      idleCallbacks.push(() => callback.call(sandbox));
+      return idleCallbacks.length;
+    };
+    patchRenderEffect(root, 'fiber-inline-module-app');
+    const moduleScript = document.createElement('script');
+    moduleScript.type = 'module';
+    moduleScript.textContent = 'export const fiberModuleA = true';
+    const classicScript = document.createElement('script');
+    classicScript.textContent = 'window.__fiberClassicB = true';
 
-      root.head.appendChild(moduleScript);
-      root.head.appendChild(classicScript);
+    root.head.appendChild(moduleScript);
+    root.head.appendChild(classicScript);
 
-      expect(idleCallbacks).toHaveLength(1);
-      idleCallbacks.shift()?.();
-      expect(sandbox.dynamicScriptElements).toHaveLength(1);
-      expect(sandbox.dynamicScriptElements[0].getAttribute('type')).toBe('module');
-      expect(idleCallbacks).toEqual([]);
+    expect(idleCallbacks).toHaveLength(1);
+    idleCallbacks.shift()?.();
+    expect(sandbox.dynamicScriptElements).toHaveLength(1);
+    expect(sandbox.dynamicScriptElements[0].getAttribute('type')).toBe('module');
+    expect(idleCallbacks).toEqual([]);
 
-      sandbox.dynamicScriptElements[0].dispatchEvent(new Event(outcome));
+    if (outcome === 'error') {
+      sandbox.dynamicScriptElements[0].dispatchEvent(new Event('error'));
+    } else {
+      const iframeWindow = sandbox.iframe.contentWindow;
+      const marker = iframeWindow?.document.querySelector('[data-jieshu-module-completion]');
+      const eventName = marker?.getAttribute('data-jieshu-module-completion');
+      if (!iframeWindow || !eventName) {
+        throw new Error('Expected the inline module completion marker');
+      }
+      // jsdom does not evaluate modules; exercise our notification separately
+      // from the native execution-order assertions in inline-module.test.mts.
+      iframeWindow.dispatchEvent(new Event(eventName));
+    }
 
-      expect(sandbox.dynamicScriptElements).toHaveLength(1);
-      expect(idleCallbacks).toHaveLength(1);
-      idleCallbacks.shift()?.();
-      expect(sandbox.dynamicScriptElements).toHaveLength(2);
-      expect(sandbox.dynamicScriptElements[1].textContent).toContain('window.__fiberClassicB = true');
-    },
-  );
+    expect(sandbox.dynamicScriptElements).toHaveLength(1);
+    expect(idleCallbacks).toHaveLength(1);
+    idleCallbacks.shift()?.();
+    expect(sandbox.dynamicScriptElements).toHaveLength(2);
+    expect(sandbox.dynamicScriptElements[1].textContent).toContain('window.__fiberClassicB = true');
+  });
 
   test('a native retry after an external script HTTP failure forwards error, never load', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);

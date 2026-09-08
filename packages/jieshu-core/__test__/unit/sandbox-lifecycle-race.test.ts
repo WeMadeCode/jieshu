@@ -87,6 +87,30 @@ describe('sandbox lifecycle races', () => {
     await sandbox.destroy();
   });
 
+  test.each([false, true])('stops native requests only for non-alive unmount (alive=%s)', async (alive) => {
+    const sandbox = createSandbox('native-unmount');
+    sandbox.alive = alive;
+    const stop = vi.spyOn(sandbox.iframe.contentWindow, 'stop');
+    await sandbox.unmount();
+    expect(stop).toHaveBeenCalledTimes(alive ? 0 : 1);
+    stop.mockRestore();
+    await sandbox.destroy();
+  });
+
+  test('a replaced native stop cannot prevent unmount from settling', async () => {
+    const sandbox = createSandbox('throwing-native-stop');
+    const stop = vi.spyOn(sandbox.iframe.contentWindow, 'stop').mockImplementation(() => {
+      throw new Error('stop failed');
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    await expect(sandbox.unmount()).resolves.toBeUndefined();
+    expect(sandbox.activeFlag).toBe(false);
+    expect(warn).toHaveBeenCalled();
+    stop.mockRestore();
+    warn.mockRestore();
+    await sandbox.destroy();
+  });
+
   test('does not deactivate an already inactive alive generation twice', async () => {
     const sandbox = createSandbox('idempotent-alive-unmount');
     const deactivated = vi.fn();
