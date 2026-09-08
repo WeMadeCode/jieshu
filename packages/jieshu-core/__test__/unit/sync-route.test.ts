@@ -142,3 +142,137 @@ describe('sync route orchestration', () => {
     expect(() => window.dispatchEvent(new PopStateEvent('popstate'))).not.toThrow();
   });
 });
+
+describe('route synchronization preserves host history state', () => {
+  const frames: HTMLIFrameElement[] = [];
+  const hostStates = [
+    { label: 'null', state: null },
+    { label: 'zero', state: 0 },
+    { label: 'string', state: 'host-state' },
+    { label: 'object', state: { idx: 7, key: 'host-route', usr: { selected: ['a', 'b'] }, scroll: { top: 120 } } },
+  ];
+
+  const createRouteWindow = (id: string, sync = true, path = '/products/special/item?q=a%20b#intro') => {
+    const iframe = document.createElement('iframe');
+    iframe.src = new URL(path, window.location.href).href;
+    document.body.appendChild(iframe);
+    frames.push(iframe);
+    const iframeWindow = iframe.contentWindow;
+    if (!iframeWindow) {
+      throw new Error('Expected a window for the route fixture');
+    }
+    iframeWindow.history.replaceState({ child: 'private-state' }, '');
+    // Only route metadata is consumed here; complete sandbox behavior is covered in Chromium.
+    Object.defineProperty(iframeWindow, '__JIESHU', {
+      value: { id, sync, prefix: { detail: '/products/special' } },
+      configurable: true,
+    });
+    return iframeWindow;
+  };
+
+  beforeEach(() => {
+    mockGetJieshuById.mockReset();
+    window.history.replaceState(null, '', '/shell?keep=hello%20world#/all');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    for (const frame of frames) {
+      frame.remove();
+    }
+    frames.length = 0;
+  });
+
+  test.each(hostStates)('synchronization preserves $label host state without importing child state', ({ state }) => {
+    const child = createRouteWindow('app');
+    window.history.replaceState(state, '', window.location.href);
+    const historyLength = window.history.length;
+
+    syncUrlToWindow(child);
+
+    expect(window.history.state).toEqual(state);
+    expect(child.history.state).toEqual({ child: 'private-state' });
+    expect(window.history.length).toBe(historyLength);
+    expect(window.location.href).toBe(
+      'http://localhost/shell?keep=hello%20world&app=%7Bdetail%7D%2Fitem%3Fq%3Da%2520b%23intro#/all',
+    );
+  });
+
+  test.each(hostStates)('inactive app cleanup preserves $label host state and active app routes', ({ state }) => {
+    window.history.replaceState(state, '', '/shell?inactive=%2Fold&active=%2Fhome&keep=1#/all');
+    mockGetJieshuById.mockImplementation((id: string) => ({
+      id,
+      execFlag: true,
+      sync: true,
+      hrefFlag: false,
+      activeFlag: id !== 'inactive',
+    }));
+    const historyLength = window.history.length;
+
+    clearInactiveAppUrl();
+
+    expect(window.history.state).toEqual(state);
+    expect(window.history.length).toBe(historyLength);
+    expect(window.location.href).toBe('http://localhost/shell?active=%2Fhome&keep=1#/all');
+  });
+
+  test('sync toggles retain each latest host state and only remove the current app route', () => {
+    const child = createRouteWindow('app');
+    window.history.replaceState({ key: 'initial' }, '', '/shell?app=%2Fold&other=%2Fhome#/all');
+    syncUrlToWindow(child);
+    expect(window.history.state).toEqual({ key: 'initial' });
+
+    window.history.replaceState({ key: 'host-update' }, '', window.location.href);
+    child.__JIESHU.sync = false;
+    syncUrlToWindow(child);
+    expect(window.history.state).toEqual({ key: 'host-update' });
+    expect(window.location.href).toBe('http://localhost/shell?other=%2Fhome#/all');
+
+    window.history.replaceState({ key: 'latest' }, '', window.location.href);
+    child.__JIESHU.sync = true;
+    syncUrlToWindow(child);
+    expect(window.history.state).toEqual({ key: 'latest' });
+    expect(new URL(window.location.href).searchParams.get('app')).toBe('{detail}/item?q=a%20b#intro');
+  });
+
+  test('teardown cleanup preserves current host state after removal from the sandbox registry', () => {
+    window.history.replaceState({ key: 'teardown' }, '', '/shell?destroying=%2Fold&keep=1#/all');
+    mockGetJieshuById.mockReturnValue(null);
+    clearInactiveAppUrl({ id: 'destroying', execFlag: true, sync: true, hrefFlag: false, activeFlag: false });
+
+    expect(window.history.state).toEqual({ key: 'teardown' });
+    expect(window.location.href).toBe('http://localhost/shell?keep=1#/all');
+  });
+
+  test('unchanged routes do not rewrite history or state', () => {
+    const child = createRouteWindow('app', true, '/home');
+    window.history.replaceState({ key: 'untouched' }, '', '/shell?app=%2Fhome#/all');
+    const replace = vi.spyOn(window.history, 'replaceState');
+
+    syncUrlToWindow(child);
+    clearInactiveAppUrl();
+    expect(replace).not.toHaveBeenCalled();
+    expect(window.history.state).toEqual({ key: 'untouched' });
+    child.__JIESHU.sync = false;
+    window.history.replaceState({ key: 'disabled' }, '', '/shell?keep=1#/all');
+    replace.mockClear();
+    syncUrlToWindow(child);
+
+    expect(replace).not.toHaveBeenCalled();
+    expect(window.history.state).toEqual({ key: 'disabled' });
+  });
+
+  test('href pushes a separate empty-state entry without mutating the old host state', () => {
+    const hostState = { idx: 7, key: 'host-route', position: 7, usr: { selected: 'a' } };
+    window.history.replaceState(hostState, '', '/shell?keep=1#/all');
+    const historyLength = window.history.length;
+
+    pushUrlToWindow('app', 'https://child.test/detail?q=a b#intro');
+
+    expect(window.history.length).toBe(historyLength + 1);
+    expect(window.history.state).toBeNull();
+    expect(hostState).toEqual({ idx: 7, key: 'host-route', position: 7, usr: { selected: 'a' } });
+    expect(window.location.hash).toBe('#/all');
+    expect(new URL(window.location.href).searchParams.get('app')).toBe('https://child.test/detail?q=a b#intro');
+  });
+});

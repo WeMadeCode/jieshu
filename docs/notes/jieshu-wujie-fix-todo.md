@@ -1,6 +1,6 @@
 # jieshu 与 wujie 源码缺陷修复 TODO
 
-本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 6 项（FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-012），剩余 6 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
+本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 7 项（FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012），剩余 5 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
 
 ## 使用与关闭规则
 
@@ -45,7 +45,7 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 - [x] **P1 · [FIX-003](#fix-003)**：旧应用异步销毁误清理新应用容器。jieshu 已限定清理范围并补充回归测试；wujie 未修改。
 - [x] **P2 · [FIX-004](#fix-004)**：公开 API 的 Promise 提前完成。已恢复普通调用的完成和错误语义，并明确同步/子应用重入与异步主应用回调的处理。
 - [x] **P2 · [FIX-005](#fix-005)**：多份 core 的事件清理恢复已销毁实例的处理器。已按目标 window 共享覆盖栈，保留主应用中途更新，并验证独立 bundle 与跨 realm 清理。
-- [ ] **P2 · [FIX-006](#fix-006)**：子应用路由同步清空主应用 `history.state`。两边共有。
+- [x] **P2 · [FIX-006](#fix-006)**：子应用路由同步清空主应用 `history.state`。已保留当前主应用历史项状态，并验证真实路由器、参数清理及前进后退。
 - [ ] **P2 · [FIX-007](#fix-007)**：合成 `load` 早于 async 脚本执行。两边共有。
 - [ ] **P2 · [FIX-008](#fix-008)**：已完成资源缓存跨请求上下文串用。风险已复现，缓存共享契约需要明确。
 - [ ] **P2 · [FIX-009](#fix-009)**：首次 HTML/CSS 处理未应用 `replace`。两边共有。
@@ -54,7 +54,7 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 
 - [x] **P2 · [FIX-012](#fix-012)**：内联 module 等待成功 load 导致队列阻塞。已改用独立的原生 module 完成标记，并验证模块语法、顺序、错误及取消路径。
 
-FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-012 已修复。下一项建议处理 FIX-006，随后处理资源语义和 EventBus。FIX-003 的回归继续保留重复调用 `destroyApp` 的场景，并验证两个调用都在清理结束后接收结果。
+FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012 已修复。下一项建议处理 FIX-007，随后处理资源缓存、资源通知和 EventBus。FIX-003 的回归继续保留重复调用 `destroyApp` 的场景，并验证两个调用都在清理结束后接收结果。
 
 ## FIX-001
 
@@ -250,7 +250,7 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-012 已修复。下一项�
 
 **P2：子应用路由同步清空主应用 history.state**
 
-**定位：** `packages/jieshu-core/src/sync.ts` 中 `syncUrlToWindow`（约 26 行）、`clearInactiveAppUrl`、`pushUrlToWindow`。wujie 的对应路由同步同样使用 `replaceState(null, ...)`。
+**修复前定位：** `packages/jieshu-core/src/sync.ts` 中 `syncUrlToWindow`（约 26 行）、`clearInactiveAppUrl`、`pushUrlToWindow`。wujie 的对应路由同步同样使用 `replaceState(null, ...)`。
 
 **触发与复现：**
 
@@ -259,17 +259,23 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-012 已修复。下一项�
 3. 子应用执行 `history.pushState({}, '', '/child/next')`。
 4. 读取主应用 `history.state`。
 
-**实际结果：** 两个仓库都得到 `null`，预期在仅重写同步查询参数时保留主应用原有状态。
+**修复前实际结果：** 两个仓库都得到 `null`，预期在仅重写同步查询参数时保留主应用原有状态。
 
 **原因与影响：** URL 同步写入了空 state，覆盖主应用路由器或业务存储的导航索引、key、滚动位置等。实际路由器受影响程度取决于其实现；本次直接确认的是 state 被清空。
 
 **修复与验收：**
 
-- [ ] 对只修改当前地址的 replace 操作保留当前 state，不注入子应用自身的 state。
-- [ ] 分别明确清理同步参数和 href 跳转新增历史项时的 state 策略，避免统一替换造成其他语义变化。
-- [ ] 覆盖 sync 开关切换、unmount/destroy 清理、主应用 hash、多子应用同步及浏览器前进后退。
-- [ ] 验证 state 内容保留、主应用 hash 不丢失、同步参数正确且不会重复编码。
-- [ ] 在 `sync-route.test.ts` / `sync.test.ts` 增加 state 断言，并用至少一个真实主应用路由场景验收。
+- [x] 对只修改当前地址的 replace 操作保留当前 state，不注入子应用自身的 state。
+- [x] 分别明确清理同步参数和 href 跳转新增历史项时的 state 策略，避免统一替换造成其他语义变化。
+- [x] 覆盖 sync 开关切换、unmount/destroy 清理、主应用 hash、多子应用同步及浏览器前进后退。
+- [x] 验证 state 内容保留、主应用 hash 不丢失、同步参数正确且不会重复编码。
+- [x] 在 `sync-route.test.ts` / `sync.test.ts` 增加 state 断言，并用至少一个真实主应用路由场景验收。
+
+**已实施修复（2026-09-08）：** `syncUrlToWindow` 和 `clearInactiveAppUrl` 修改主应用当前 URL 时，使用调用时的 `window.history.state`。同步路径、关闭同步、卸载和销毁清理均保留原状态，不把子应用状态写入主应用。URL 未变化时仍不执行 replace，不额外增加主应用历史项；原有 query、hash、最长 prefix 和编码规则保持不变。
+
+**历史项策略：** iframe 首次路由初始化仍使用自身的空 state；`pushUrlToWindow` 对 href 跳转仍新增 `state=null` 的主应用历史项，旧项的状态保留。不能直接复制主路由器的 idx、key 或 position，否则新旧历史项会使用重复的导航标识。本项没有实现不同主路由器新增历史项元数据的协调，不将状态保留的修复扩大为所有 href 导航拦截、滚动恢复和前进后退行为的兼容保证。公开契约见 [路由同步：主应用的历史状态](../guide/sync.md#主应用的历史状态)。
+
+**回归结果：** 新增 12 项单测，修复前 8 项因 state 被清空而失败，4 项为通过的对照；覆盖 null、0、字符串及嵌套对象、主子状态隔离、不增加历史项、同步开关与主应用更新、注册表已移除的销毁清理、URL 无变化和 href 新项策略。新增 5 项 Chromium 回归，覆盖两种 fiber、真实子应用 push/replace/hash、同步关闭重开、alive 卸载与激活、双应用清理、中文/加号/百分号及主 hash、真实 Vue Router 的状态与主应用前进后退，以及 href 新项为空且返回旧项恢复状态。首轮浏览器观察到 4 项 state=null 失败，但执行期间源码发生修改，不将该轮作为严格完整的修前版本基线；修后在全新进程中验收全部通过。
 
 ## FIX-007
 
@@ -466,14 +472,15 @@ git status --short
 
 每次关闭任务时，在下表增加记录。若只完成局部保护、未完成本项约定的验收场景或仍存在失败场景，应明确记为部分完成，不勾选总览任务。浏览器范围必须单独记录：仓库当前浏览器回归配置使用 Chromium，通过这些测试不能扩大为 Firefox、Safari 或全部浏览器的兼容性结论。
 
-| 编号    | 完成日期   | 提交 / PR | 实际修改范围                                                                               | 实际验证命令、结果与覆盖率                                                                                                         | 剩余限制                                                                                                   |
-| ------- | ---------- | --------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| FIX-002 | 2026-09-07 | `a2b8409` | core DOM 归属校验、12 项单测、2 项浏览器回归及测试脚本                                     | 以下实际命令均通过；单测 44 文件/339 项，Chromium 2 项；覆盖率 statements 75.63%、branches 67.91%、functions 79.85%、lines 78.34%  | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，未修改 wujie                                    |
-| FIX-003 | 2026-09-07 | `b25ec78` | core 容器清理、loading 归属、5 项单测、4 项浏览器回归                                      | 下述实际命令均通过；单测 45 文件/344 项，Chromium 6 项；覆盖率 statements 75.85%、branches 68.13%、functions 80%、lines 78.53%     | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，FIX-004 仍待修复                                |
-| FIX-001 | 2026-09-07 | `0d626aa` | core 状态校验、动态队列收尾、23 项单测、2 项浏览器回归                                     | 下述实际命令均通过；单测 45 文件/367 项，Chromium 8 项；覆盖率 statements 75.88%、branches 68.26%、functions 79.92%、lines 78.50%  | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；内联 module 独立问题登记为 FIX-012              |
-| FIX-012 | 2026-09-08 | `6ddf850` | core 内联 module 完成标记、HTML async 解析、卸载取消、12 项单测、23 项浏览器回归及公开说明 | 下述实际命令均通过；单测 45 文件/379 项，Chromium 31 项；覆盖率 statements 76.07%、branches 68.63%、functions 80.02%、lines 78.73% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；不等待 TLA 完成，不回滚已执行代码；未修改 wujie |
-| FIX-004 | 2026-09-08 | `8156092` | core 公开完成语义、共享卸载注册表、显式重入 API、14 项单测、30 项浏览器回归及 API 文档     | 下述实际命令均通过；单测 46 文件/393 项，Chromium 61 项；覆盖率 statements 76.63%、branches 69.09%、functions 80.77%、lines 79.15% | 仅验证 Chromium；异步主应用重入回调需显式迁移；未运行整套 examples 集成测试或适配包测试                    |
-| FIX-005 | 2026-09-08 | 本次提交  | core 共享事件覆盖栈、主应用更新基线、原生属性恢复、17 项单测及 14 项浏览器回归             | 下述实际命令均通过；单测 46 文件/410 项，Chromium 75 项；覆盖率 statements 76.81%、branches 69.33%、functions 80.80%、lines 79.28% | 各 core 副本须采用共享协议；仅验证 Chromium，未运行整套 examples 集成测试或适配包测试，未修改 wujie        |
+| 编号    | 完成日期   | 提交 / PR | 实际修改范围                                                                               | 实际验证命令、结果与覆盖率                                                                                                                       | 剩余限制                                                                                                   |
+| ------- | ---------- | --------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| FIX-002 | 2026-09-07 | `a2b8409` | core DOM 归属校验、12 项单测、2 项浏览器回归及测试脚本                                     | 以下实际命令均通过；单测 44 文件/339 项，Chromium 2 项；覆盖率 statements 75.63%、branches 67.91%、functions 79.85%、lines 78.34%                | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，未修改 wujie                                    |
+| FIX-003 | 2026-09-07 | `b25ec78` | core 容器清理、loading 归属、5 项单测、4 项浏览器回归                                      | 下述实际命令均通过；单测 45 文件/344 项，Chromium 6 项；覆盖率 statements 75.85%、branches 68.13%、functions 80%、lines 78.53%                   | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，FIX-004 仍待修复                                |
+| FIX-001 | 2026-09-07 | `0d626aa` | core 状态校验、动态队列收尾、23 项单测、2 项浏览器回归                                     | 下述实际命令均通过；单测 45 文件/367 项，Chromium 8 项；覆盖率 statements 75.88%、branches 68.26%、functions 79.92%、lines 78.50%                | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；内联 module 独立问题登记为 FIX-012              |
+| FIX-012 | 2026-09-08 | `6ddf850` | core 内联 module 完成标记、HTML async 解析、卸载取消、12 项单测、23 项浏览器回归及公开说明 | 下述实际命令均通过；单测 45 文件/379 项，Chromium 31 项；覆盖率 statements 76.07%、branches 68.63%、functions 80.02%、lines 78.73%               | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；不等待 TLA 完成，不回滚已执行代码；未修改 wujie |
+| FIX-004 | 2026-09-08 | `8156092` | core 公开完成语义、共享卸载注册表、显式重入 API、14 项单测、30 项浏览器回归及 API 文档     | 下述实际命令均通过；单测 46 文件/393 项，Chromium 61 项；覆盖率 statements 76.63%、branches 69.09%、functions 80.77%、lines 79.15%               | 仅验证 Chromium；异步主应用重入回调需显式迁移；未运行整套 examples 集成测试或适配包测试                    |
+| FIX-005 | 2026-09-08 | `9c4fcc2` | core 共享事件覆盖栈、主应用更新基线、原生属性恢复、17 项单测及 14 项浏览器回归             | 下述实际命令均通过；单测 46 文件/410 项，Chromium 75 项；覆盖率 statements 76.81%、branches 69.33%、functions 80.80%、lines 79.28%               | 各 core 副本须采用共享协议；仅验证 Chromium，未运行整套 examples 集成测试或适配包测试，未修改 wujie        |
+| FIX-006 | 2026-09-08 | 本次提交  | core 两处主应用历史状态保留、12 项单测、5 项浏览器回归、href 集成等待修正及路由文档        | 单测 46 文件/422 项、Chromium 80 项通过；覆盖率 statements 76.85%、branches 69.41%、functions 80.80%、lines 79.30%；定向 examples 集成 14 项通过 | 仅验证 Chromium；href 新历史项沿用空 state，未实现主路由器元数据协调；未修改适配包或 wujie                 |
 
 FIX-002 的实际验证命令如下，均在仓库根目录执行。沿用初始审计的直接调用方式，使用已安装的工具和 Chromium，没有重新安装项目依赖。Chromium 在受限沙箱内启动时受到 macOS MachPort 权限限制，随后经自动审批在沙箱外执行上述本机测试并通过。
 
@@ -524,6 +531,22 @@ FIX-005 继续使用上述 Vitest（含覆盖率）、完整 Playwright、四项
 node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/tracker.ts packages/jieshu-core/__test__/unit/destroy-cleanup.test.ts packages/jieshu-core/__test__/browser/window-event-overrides.test.mts --max-warnings=0
 node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/tracker.ts packages/jieshu-core/__test__/unit/destroy-cleanup.test.ts packages/jieshu-core/__test__/browser/window-event-overrides.test.mts docs/notes/jieshu-wujie-fix-todo.md
 ```
+
+FIX-006 继续使用上述 Vitest（含覆盖率）、完整核心 Playwright、四项 TypeScript 和 Git 检查命令。核心单测 46 文件/422 项、Chromium 80 项全部通过。新增浏览器用例采用真实 Vue Router 验证主历史项状态及前进后退，href 新项的空状态策略另用原生浏览器历史验证。
+
+复用当前 React Rspack 7800、Vue 8000 及六个子应用开发服务，执行 `sync.test.ts` 与 `href.test.ts`。首轮 13/14 通过：唯一超时发生在 React16 进入跳转操作前，专页自定义 afterMount 日志与旧测试的固定文本不一致。将 href 测试的初始等待改为实际子应用标题可见，保留跳转和回退验证，重跑后 **14/14 全部通过（sync 4 项、href 10 项）**。本次没有为测试改动示例业务或框架适配包。运行前将 PATH 指向本机已安装的 pnpm 10.28.2。
+
+```bash
+JIESHU_REUSE_EXISTING_SERVERS=1 \
+JIESHU_REACT_MAIN_WORKSPACE=main-react-ts \
+JIESHU_REACT_MAIN_PORT=7800 \
+JIESHU_REACT_MAIN_URL=http://localhost:7800/ \
+node node_modules/@playwright/test/cli.js test --config packages/jieshu-core/__test__/integration/playwright.config.mts sync.test.ts href.test.ts
+node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/sync.ts packages/jieshu-core/__test__/unit/sync-route.test.ts packages/jieshu-core/__test__/browser/sync-history-state.test.mts packages/jieshu-core/__test__/integration/href.test.ts --max-warnings=0
+node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/sync.ts packages/jieshu-core/__test__/unit/sync-route.test.ts packages/jieshu-core/__test__/browser/sync-history-state.test.mts packages/jieshu-core/__test__/integration/href.test.ts docs/guide/sync.md docs/notes/jieshu-wujie-fix-todo.md
+```
+
+未执行整套 examples 集成测试或适配包测试，没有重新安装依赖、构建或重启已有示例服务；浏览器范围仍仅限 Chromium。
 
 ## 后续实现应保持的一致性
 

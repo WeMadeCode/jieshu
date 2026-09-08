@@ -7,11 +7,13 @@ import { compactRoutePath, getAppRoute, readRouteState, writeRouteState } from '
 /**
  * 同步子应用路由到主应用路由
  */
-export function syncUrlToWindow(iframeWindow: Window): void {
+export const syncUrlToWindow = (iframeWindow: Window) => {
   const { sync, id, prefix } = iframeWindow.__JIESHU;
   const routeState = readRouteState(window.location.href);
   // 非同步且url上没有当前id的查询参数，否则就要同步参数或者清理参数
-  if (!sync && !routeState.query[id]) return;
+  if (!sync && !routeState.query[id]) {
+    return;
+  }
   const curUrl = iframeWindow.location.pathname + iframeWindow.location.search + iframeWindow.location.hash;
   // 同步
   if (sync) {
@@ -23,9 +25,10 @@ export function syncUrlToWindow(iframeWindow: Window): void {
   }
   const nextHref = writeRouteState(routeState);
   if (nextHref !== window.location.href) {
-    window.history.replaceState(null, '', nextHref);
+    // Updating a route query does not replace the host router's current entry state.
+    window.history.replaceState(window.history.state, '', nextHref);
   }
-}
+};
 
 /**
  * 同步主应用路由到子应用
@@ -59,14 +62,16 @@ interface RouteSandboxState {
   activeFlag: boolean;
 }
 
-export function clearInactiveAppUrl(tearingDownSandbox?: RouteSandboxState): void {
+export const clearInactiveAppUrl = (tearingDownSandbox?: RouteSandboxState) => {
   const routeState = readRouteState(window.location.href);
   Object.keys(routeState.query).forEach((id) => {
     // destroy() deliberately removes the sandbox from the live registry before
     // awaiting user hooks. Keep using its explicit snapshot so its own route
     // entry is not mistaken for an unknown application and left behind.
     const sandbox = tearingDownSandbox?.id === id ? tearingDownSandbox : getJieshuById(id);
-    if (!sandbox) return;
+    if (!sandbox) {
+      return;
+    }
     // 子应用执行过并且已经失活才需要清除
     if (sandbox.execFlag && sandbox.sync && !sandbox.hrefFlag && !sandbox.activeFlag) {
       delete routeState.query[id];
@@ -74,9 +79,9 @@ export function clearInactiveAppUrl(tearingDownSandbox?: RouteSandboxState): voi
   });
   const nextHref = writeRouteState(routeState);
   if (nextHref !== window.location.href) {
-    window.history.replaceState(null, '', nextHref);
+    window.history.replaceState(window.history.state, '', nextHref);
   }
-}
+};
 
 /**
  * 推送指定url到主应用路由

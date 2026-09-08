@@ -1,4 +1,4 @@
-import { test, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 import { awaitConsoleLogMessage, triggerClickByJsSelector } from './utils';
 import { reactMainAppInfoList, reactMainUrl, vueMainAppInfoList, vueMainUrl } from './common';
@@ -28,9 +28,8 @@ describe('main react location href test', () => {
 
   reactMainAppInfoList.forEach((appInfo) =>
     it(`${appInfo.name} location href test`, async () => {
-      const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
       await page.click(appInfo.linkSelector);
-      await appInfoMountedPromise;
+      await expect(page.getByText(appInfo.titleText, { exact: true })).toBeVisible();
       const appInfoRouteMountedPromise = awaitConsoleLogMessage(page, appInfo.routeMountedMessage);
       await triggerClickByJsSelector(page, appInfo.routeNavSelector);
       await appInfoRouteMountedPromise;
@@ -54,9 +53,8 @@ describe('main vue location href test', () => {
 
   vueMainAppInfoList.forEach((appInfo) =>
     it(`${appInfo.name} location href test`, async () => {
-      const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
       await page.click(appInfo.linkSelector);
-      await appInfoMountedPromise;
+      await expect(page.getByText(appInfo.titleText, { exact: true })).toBeVisible();
       const appInfoRouteMountedPromise = awaitConsoleLogMessage(page, appInfo.routeMountedMessage);
       await triggerClickByJsSelector(page, appInfo.routeNavSelector);
       await appInfoRouteMountedPromise;
