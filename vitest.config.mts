@@ -8,7 +8,7 @@ export default defineConfig({
       'packages/jieshu-vue3/__test__/unit/vitest.config.mts',
     ],
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       reportsDirectory: 'coverage/unit',
       reporter: ['text', 'text-summary'],
       thresholds: {

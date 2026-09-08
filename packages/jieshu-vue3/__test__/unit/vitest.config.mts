@@ -19,7 +19,7 @@ export default defineConfig({
     globals: true,
     include: [unitTests],
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       include: ['src/index.ts', 'src/JieshuVue.vue'],
       reportsDirectory: 'coverage/unit',
       reporter: ['text', 'text-summary'],

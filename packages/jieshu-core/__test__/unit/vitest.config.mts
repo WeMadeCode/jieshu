@@ -19,7 +19,7 @@ export default defineConfig({
     include: [unitTests],
     setupFiles: [setupFile],
     coverage: {
-      provider: 'istanbul',
+      provider: 'v8',
       reportsDirectory: 'coverage/unit',
       reporter: ['text', 'text-summary'],
     },
