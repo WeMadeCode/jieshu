@@ -54,6 +54,7 @@ import {
   SandboxScriptScheduler,
 } from './sandbox-runtime';
 import type { OperationSlots } from './operation-intent';
+import { unmountHookDepthById } from './sandbox-registry';
 
 /**
  * A sandbox iframe is attached before its runtime is initialized. Keeping the
@@ -192,6 +193,7 @@ export default class Jieshu {
     mainHostPath: string;
     fontStyleSheetContainer?: HTMLElement;
     coreOperationSlots?: OperationSlots;
+    unmountHookDepthById?: Map<string, number>;
   };
 
   /** 激活子应用
@@ -836,14 +838,16 @@ export default class Jieshu {
     iframeOnEvents?: Array<string>;
   }) {
     assertJieshuSupport();
-    // 传递inject给嵌套子应用（显式 as：__JIESHU_INJECT 全局类型是 Partial，需断言回完整结构）
-    if (window.__POWERED_BY_JIESHU__) this.inject = window.__JIESHU.inject as Jieshu['inject'];
-    else {
+    // Nested applications retain the same host-owned registries.
+    if (window.__POWERED_BY_JIESHU__) {
+      this.inject = window.__JIESHU.inject;
+    } else {
       this.inject = {
         idToSandboxMap: idToSandboxCacheMap,
         teardownById: window.__JIESHU_INJECT.teardownById,
         appEventObjMap,
         coreOperationSlots: window.__JIESHU_CORE_INTENTS,
+        unmountHookDepthById,
         mainHostPath: window.location.protocol + '//' + window.location.host,
         fontStyleSheetContainer: this.createFontStyleSheetContainer(),
       };

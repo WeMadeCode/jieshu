@@ -54,7 +54,7 @@ export default function Home() {
         />
         <span className="brand">界枢</span>
       </h1>
-      <h2 className="subtitle">—极致的微前端框架</h2>
+      <h2 className="subtitle">启动更快、内存更少、所有场景更稳定</h2>
 
       <div className="detail-content">
         <section className="item">

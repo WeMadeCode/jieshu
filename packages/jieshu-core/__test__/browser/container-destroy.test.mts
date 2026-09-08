@@ -84,8 +84,10 @@ for (const rejects of [false, true]) {
             () => 'completed',
             (cause: unknown) => (cause instanceof Error ? cause.message : String(cause)),
           );
-          // FIX-004 currently acknowledges this second call before the first teardown ends.
-          await destroyApp(first.sandbox.id);
+          const destroyingFirstAgain = destroyApp(first.sandbox.id).then(
+            () => 'completed',
+            (cause: unknown) => (cause instanceof Error ? cause.message : String(cause)),
+          );
 
           const second = await startOld('container-second');
           const secondGate = deferred();
@@ -129,6 +131,7 @@ for (const rejects of [false, true]) {
           await destroyingSecond;
           firstGate.resolve();
           const firstOutcome = await destroyingFirst;
+          const repeatedOutcome = await destroyingFirstAgain;
           const preservedDuringCleanup =
             contentBeforeCleanup !== null &&
             container.firstElementChild === contentBeforeCleanup &&
@@ -145,6 +148,7 @@ for (const rejects of [false, true]) {
           const currentWindow = current?.iframe?.contentWindow;
           const result = {
             firstOutcome,
+            repeatedOutcome,
             firstUnmountCalls,
             preservedDuringCleanup,
             layoutPreserved,
@@ -168,6 +172,7 @@ for (const rejects of [false, true]) {
 
       expect(result).toEqual({
         firstOutcome: rejects ? 'expected old unmount failure' : 'completed',
+        repeatedOutcome: rejects ? 'expected old unmount failure' : 'completed',
         firstUnmountCalls: 1,
         preservedDuringCleanup: true,
         layoutPreserved: true,

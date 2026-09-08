@@ -8,27 +8,40 @@ export interface SandboxCache {
 
 export type SandboxTeardownRegistry = Map<string, Promise<void>>;
 
-const activeUnmountHooks = new Map<string, number>();
+const resolveUnmountHooks = () => {
+  const inherited =
+    window.__JIESHU_INJECT?.unmountHookDepthById ??
+    (window.__POWERED_BY_JIESHU__ ? window.__JIESHU?.inject.unmountHookDepthById : undefined);
+  const hooks = inherited ?? new Map<string, number>();
+  window.__JIESHU_INJECT = { ...window.__JIESHU_INJECT, unmountHookDepthById: hooks };
+  return hooks;
+};
 
-function enterUnmountHook(id: string): void {
-  activeUnmountHooks.set(id, (activeUnmountHooks.get(id) ?? 0) + 1);
-}
+/** Shared synchronous call depth across independently bundled core runtimes. */
+export const unmountHookDepthById = resolveUnmountHooks();
 
-function leaveUnmountHook(id: string): void {
-  const remaining = (activeUnmountHooks.get(id) ?? 1) - 1;
-  if (remaining > 0) activeUnmountHooks.set(id, remaining);
-  else activeUnmountHooks.delete(id);
-}
+const enterUnmountHook = (id: string) => {
+  unmountHookDepthById.set(id, (unmountHookDepthById.get(id) ?? 0) + 1);
+};
+
+const leaveUnmountHook = (id: string) => {
+  const remaining = (unmountHookDepthById.get(id) ?? 1) - 1;
+  if (remaining > 0) {
+    unmountHookDepthById.set(id, remaining);
+  } else {
+    unmountHookDepthById.delete(id);
+  }
+};
 
 /** Run the synchronous entry of a child unmount hook with reentrancy metadata. */
-export function runInSandboxUnmountHook<Value>(id: string, invoke: () => Value): Value {
+export const runInSandboxUnmountHook = <Value>(id: string, invoke: () => Value) => {
   enterUnmountHook(id);
   try {
     return invoke();
   } finally {
     leaveUnmountHook(id);
   }
-}
+};
 
 export function invokeSandboxUnmountHook(id: string, invoke: () => void | Promise<void>): Promise<void> {
   try {
@@ -39,9 +52,7 @@ export function invokeSandboxUnmountHook(id: string, invoke: () => void | Promis
 }
 
 /** Public destroy uses this to avoid waiting on the teardown that invoked it. */
-export function isSandboxUnmountHookActive(id: string): boolean {
-  return activeUnmountHooks.has(id);
-}
+export const isSandboxUnmountHookActive = (id: string) => unmountHookDepthById.has(id);
 
 function resolveSandboxRegistry(): Map<string, SandboxCache> {
   const injectedRegistry = window.__JIESHU_INJECT?.idToSandboxMap;
@@ -56,14 +67,16 @@ function resolveSandboxRegistry(): Map<string, SandboxCache> {
 
 export const idToSandboxCacheMap = resolveSandboxRegistry();
 
-function resolveTeardownRegistry(): SandboxTeardownRegistry {
-  const injectedRegistry = window.__JIESHU_INJECT?.teardownById;
-  if (injectedRegistry) return injectedRegistry;
-
-  const registry = new Map<string, Promise<void>>();
-  window.__JIESHU_INJECT = { ...window.__JIESHU_INJECT, teardownById: registry } as Window['__JIESHU_INJECT'];
+const resolveTeardownRegistry = () => {
+  // A child core also needs host tombstones when it operates on another app;
+  // sharing only live instances would let it overtake the host's old cleanup.
+  const inherited =
+    window.__JIESHU_INJECT?.teardownById ??
+    (window.__POWERED_BY_JIESHU__ ? window.__JIESHU?.inject.teardownById : undefined);
+  const registry = inherited ?? new Map<string, Promise<void>>();
+  window.__JIESHU_INJECT = { ...window.__JIESHU_INJECT, teardownById: registry };
   return registry;
-}
+};
 
 /**
  * A teardown remains discoverable after its live sandbox is synchronously

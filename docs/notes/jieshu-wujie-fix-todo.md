@@ -1,6 +1,6 @@
 # jieshu 与 wujie 源码缺陷修复 TODO
 
-本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 4 项（FIX-001、FIX-002、FIX-003、FIX-012），剩余 8 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
+本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 5 项（FIX-001、FIX-002、FIX-003、FIX-004、FIX-012），剩余 7 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
 
 ## 使用与关闭规则
 
@@ -43,7 +43,7 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 - [x] **P1 · [FIX-001](#fix-001)**：保活应用后台加载脚本导致队列阻塞。已统一状态校验与队列收尾；内联 module 的独立完成语义问题见 FIX-012。
 - [x] **P1 · [FIX-002](#fix-002)**：旧 head/body 引用可向同名新实例注入代码。jieshu 已修复并补充回归测试；wujie 未修改。
 - [x] **P1 · [FIX-003](#fix-003)**：旧应用异步销毁误清理新应用容器。jieshu 已限定清理范围并补充回归测试；wujie 未修改。
-- [ ] **P2 · [FIX-004](#fix-004)**：公开 API 的 Promise 提前完成。普通调用与卸载重入处理混在一起。
+- [x] **P2 · [FIX-004](#fix-004)**：公开 API 的 Promise 提前完成。已恢复普通调用的完成和错误语义，并明确同步/子应用重入与异步主应用回调的处理。
 - [ ] **P2 · [FIX-005](#fix-005)**：多份 core 的事件清理恢复已销毁实例的处理器。两边共有，jieshu 的单副本修复覆盖不足。
 - [ ] **P2 · [FIX-006](#fix-006)**：子应用路由同步清空主应用 `history.state`。两边共有。
 - [ ] **P2 · [FIX-007](#fix-007)**：合成 `load` 早于 async 脚本执行。两边共有。
@@ -54,7 +54,7 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 
 - [x] **P2 · [FIX-012](#fix-012)**：内联 module 等待成功 load 导致队列阻塞。已改用独立的原生 module 完成标记，并验证模块语法、顺序、错误及取消路径。
 
-FIX-001、FIX-002、FIX-003、FIX-012 已修复。剩余建议依次处理 FIX-004 → FIX-005，再处理路由、资源语义和 EventBus。FIX-003 的回归保留了重复调用 `destroyApp` 的场景；FIX-004 仍需独立修正公开 Promise 的完成语义。
+FIX-001、FIX-002、FIX-003、FIX-004、FIX-012 已修复。下一项建议处理 FIX-005，再处理路由、资源语义和 EventBus。FIX-003 的回归继续保留重复调用 `destroyApp` 的场景，并验证两个调用都在清理结束后接收结果。
 
 ## FIX-001
 
@@ -176,7 +176,7 @@ FIX-001、FIX-002、FIX-003、FIX-012 已修复。剩余建议依次处理 FIX-0
 
 **P2：公开 API 的 Promise 提前完成**
 
-**定位：** `packages/jieshu-core/src/index.ts` 中 `startApp`（约 391 行）、`destroyApp`（约 549 行）、`refreshApp`（约 574 行），以及 `hasPendingLifecycle`、`detachReentrantOperation`。
+**修复前定位：** `packages/jieshu-core/src/index.ts` 中 `startApp`、`destroyApp`、`refreshApp`，以及 `hasPendingLifecycle`、`detachReentrantOperation`。
 
 **触发与复现：**
 
@@ -185,19 +185,31 @@ FIX-001、FIX-002、FIX-003、FIX-012 已修复。剩余建议依次处理 FIX-0
 3. 保持 unmount 未完成，清空微任务队列。
 4. 第二个 Promise 已完成；第一轮清理此时仍在等待。
 
-**实际结果：** 定向断言得到 `premature=true`，预期为 `false`。浏览器中的第二次 await 也没有阻止 FIX-003 的复现。`startApp`、`refreshApp` 存在相同的公开包装分支，仍需为它们分别补充完成时序与返回值测试。
+**修复前实际结果：** 定向断言得到 `premature=true`，预期为 `false`。浏览器中的第二次 await 也没有阻止 FIX-003 的复现。本次先新增 12 项 Chromium 回归，确认普通并发 destroy、卸载期间 start/refresh 在 fiber=false/true、卸载成功/失败组合中全部因提前完成或异常未传播而失败。
 
 **原因与影响：** 避免卸载钩子等待自身形成死锁的逻辑，被扩大为“只要有 pending lifecycle 就立即确认”。内部已经有重入识别，但公开包装又按所有 pending lifecycle 处理。调用者可能在清理未完成时复用容器，或在应用未启动完成时继续操作；部分错误只会被记录为 warning，不能通过原调用者的 await 捕获。
 
 **修复与验收：**
 
-- [ ] 明确普通调用的 Promise 表示实际完成，正常启动返回有效的销毁函数。
-- [ ] 仅对真正会形成等待循环的卸载重入执行特殊策略，并记录该策略。
-- [ ] 覆盖并发 destroy、多方外部 await、卸载期间 start/refresh 以及 teardown 拒绝。
-- [ ] 保留同名最新操作取消旧操作的既有契约，不能将合法的取消完成误判为本缺陷。
-- [ ] 覆盖子应用内同步重入、await 后重入、独立打包 core 的调用路径，确保不新增死锁。
-- [ ] 核对 `createAppController` 使用的完成态与直接公开 API 保持一致。
-- [ ] 更新 `docs/api/destroyApp.md` 的返回值，以及 start/refresh 的完成、取消和异常说明。
+- [x] 明确普通调用的 Promise 表示实际完成，正常启动返回有效的销毁函数。
+- [x] 对自动识别或显式标记的卸载重入执行避免循环等待的策略，并记录其识别范围。
+- [x] 覆盖并发 destroy、多方外部 await、卸载期间 start/refresh 以及 teardown 拒绝。
+- [x] 保留同名最新操作取消旧操作的既有契约，不能将合法的取消完成误判为本缺陷。
+- [x] 覆盖子应用内同步重入、await 后重入、独立打包 core 的调用路径，以及异步主应用回调的显式迁移方式。
+- [x] 核对 `createAppController` 使用的完成态与直接公开 API 保持一致。
+- [x] 更新 `docs/api/destroyApp.md` 的返回值，以及 start/refresh 的完成、取消和异常说明。
+
+**已实施修复（2026-09-08）：** 移除公开 API 中按“存在 pending lifecycle”一律提前完成的包装，直接返回与 `createAppController` 共用的执行结果。普通 destroy 等待卸载和资源清理，多个外部等待者都接收原始失败；start/refresh 完成时返回具体实例的销毁函数。后续同名操作仍可取消正在进行的 start/refresh，使其返回 `undefined`。先前独立 destroy 失败后，新的 start 可以在清理结束后恢复；refresh 自己等待的销毁失败则拒绝，不开始重建。
+
+**重入识别与兼容边界：** 同步卸载调用栈及正在卸载的子应用自身 realm 继续自动识别。同步标记改为共享注入的深度表，支持另一份独立 core 和同名嵌套调用。主应用 props 回调经过 `await` 后，与普通外部并发调用没有可靠的自动区分依据；不能继续用全局 pending 状态兜底，否则会重现本缺陷。此类回调需要迁移为 `runAsUnmountReentry(name, () => destroyApp(name))`，在进入该同步作用域之前完成异步准备。辅助函数返回原始结果，异常和退出都会清理标记，不将标记延续到 Promise 完成。
+
+**重入完成契约：** 同名重入 start/refresh 作为取消返回 `undefined`，不启动替换；重入 destroy 发起实际销毁并确认请求，不等待调用自己的卸载钩子，外部原始调用继续观察完成或失败。重入 destroy 仍属于新的同名操作，可以取消外层 refresh。单独进行 unmount 时发起的重入 destroy 仍会完整释放实例，不能简单当作无操作。辅助函数只用于直接调用 core API，不承诺穿过 controller 内部的异步等待。
+
+**跨 realm 等待：** 独立子应用 core 操作另一个正在销毁的应用时属于普通调用，必须继承主应用的 teardown 等待表，不能因为共享实例表已删除该应用就视为清理完成。这条路径与自身卸载重入分别测试。
+
+**公开说明：** [destroyApp](../api/destroyApp.md)、[startApp](../api/startApp.md)、[refreshApp](../api/refreshApp.md) 和新增的 [runAsUnmountReentry](../api/runAsUnmountReentry.md) 已说明真实完成、取消、错误传播及异步主应用回调的迁移方式。适配包不新增静态导出，辅助函数直接从 `@cloud/jieshu-core` 导入。
+
+**验收结果：** 新增 14 项单测，覆盖 public/controller 完成结果、销毁函数、失败恢复、重入取消、独立 unmount 请求销毁、显式作用域嵌套/异常/异步退出及应用隔离；旧测试中依赖提前返回的断言同步修正。新增 30 项 Chromium 回归：普通完成/异常 12 项、独立 core 和真实 props 回调重入 12 项、跨应用等待 6 项。普通调用首批 12 项及跨应用 6 项均先确认修前断言失败，再修复并通过。最终核心 46 文件/393 项单测与全部 61 项 Chromium 回归通过。
 
 ## FIX-005
 
@@ -451,7 +463,8 @@ git status --short
 | FIX-002 | 2026-09-07 | `a2b8409` | core DOM 归属校验、12 项单测、2 项浏览器回归及测试脚本                                     | 以下实际命令均通过；单测 44 文件/339 项，Chromium 2 项；覆盖率 statements 75.63%、branches 67.91%、functions 79.85%、lines 78.34%  | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，未修改 wujie                                    |
 | FIX-003 | 2026-09-07 | `b25ec78` | core 容器清理、loading 归属、5 项单测、4 项浏览器回归                                      | 下述实际命令均通过；单测 45 文件/344 项，Chromium 6 项；覆盖率 statements 75.85%、branches 68.13%、functions 80%、lines 78.53%     | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，FIX-004 仍待修复                                |
 | FIX-001 | 2026-09-07 | `0d626aa` | core 状态校验、动态队列收尾、23 项单测、2 项浏览器回归                                     | 下述实际命令均通过；单测 45 文件/367 项，Chromium 8 项；覆盖率 statements 75.88%、branches 68.26%、functions 79.92%、lines 78.50%  | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；内联 module 独立问题登记为 FIX-012              |
-| FIX-012 | 2026-09-08 | 本次提交  | core 内联 module 完成标记、HTML async 解析、卸载取消、12 项单测、23 项浏览器回归及公开说明 | 下述实际命令均通过；单测 45 文件/379 项，Chromium 31 项；覆盖率 statements 76.07%、branches 68.63%、functions 80.02%、lines 78.73% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；不等待 TLA 完成，不回滚已执行代码；未修改 wujie |
+| FIX-012 | 2026-09-08 | `6ddf850` | core 内联 module 完成标记、HTML async 解析、卸载取消、12 项单测、23 项浏览器回归及公开说明 | 下述实际命令均通过；单测 45 文件/379 项，Chromium 31 项；覆盖率 statements 76.07%、branches 68.63%、functions 80.02%、lines 78.73% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；不等待 TLA 完成，不回滚已执行代码；未修改 wujie |
+| FIX-004 | 2026-09-08 | 本次提交  | core 公开完成语义、共享卸载注册表、显式重入 API、14 项单测、30 项浏览器回归及 API 文档     | 下述实际命令均通过；单测 46 文件/393 项，Chromium 61 项；覆盖率 statements 76.63%、branches 69.09%、functions 80.77%、lines 79.15% | 仅验证 Chromium；异步主应用重入回调需显式迁移；未运行整套 examples 集成测试或适配包测试                    |
 
 FIX-002 的实际验证命令如下，均在仓库根目录执行。沿用初始审计的直接调用方式，使用已安装的工具和 Chromium，没有重新安装项目依赖。Chromium 在受限沙箱内启动时受到 macOS MachPort 权限限制，随后经自动审批在沙箱外执行上述本机测试并通过。
 
@@ -487,6 +500,13 @@ FIX-012 继续使用上述 Vitest（含覆盖率）、Playwright、四项 TypeSc
 ```bash
 node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/effect.ts packages/jieshu-core/src/iframe-script.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/template.ts packages/jieshu-core/__test__/unit/dynamic-script-sequence.test.ts packages/jieshu-core/__test__/unit/iframe-script.test.ts packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts packages/jieshu-core/__test__/unit/template.test.ts packages/jieshu-core/__test__/browser/inline-module.test.mts --max-warnings=0
 node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/effect.ts packages/jieshu-core/src/iframe-script.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/template.ts packages/jieshu-core/__test__/unit/dynamic-script-sequence.test.ts packages/jieshu-core/__test__/unit/iframe-script.test.ts packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts packages/jieshu-core/__test__/unit/template.test.ts packages/jieshu-core/__test__/browser/inline-module.test.mts docs/guide/information.md docs/notes/jieshu-wujie-fix-todo.md
+```
+
+FIX-004 继续使用上述 Vitest（含覆盖率）、完整 Playwright、四项 TypeScript 和 Git 检查命令。核心单测覆盖率为 statements 76.63%、branches 69.09%、functions 80.77%、lines 79.15%。ESLint 和 Prettier 的实际检查范围如下；未运行整套 examples 集成测试，未修改或运行框架适配包测试，浏览器结论仅覆盖 Chromium。
+
+```bash
+node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/index.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/sandbox-registry.ts packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts packages/jieshu-core/__test__/unit/destroy-order.test.ts packages/jieshu-core/__test__/unit/unmount-reentry.test.ts packages/jieshu-core/__test__/browser/container-destroy.test.mts packages/jieshu-core/__test__/browser/public-api-completion.test.mts --max-warnings=0
+node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/index.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/sandbox-registry.ts packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts packages/jieshu-core/__test__/unit/destroy-order.test.ts packages/jieshu-core/__test__/unit/unmount-reentry.test.ts packages/jieshu-core/__test__/browser/container-destroy.test.mts packages/jieshu-core/__test__/browser/public-api-completion.test.mts docs/api/destroyApp.md docs/api/startApp.md docs/api/refreshApp.md docs/api/runAsUnmountReentry.md docs/notes/jieshu-wujie-fix-todo.md
 ```
 
 ## 后续实现应保持的一致性

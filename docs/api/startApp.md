@@ -4,7 +4,7 @@
 
 - **参数：** `startOption`
 
-- **返回值：**`Promise<Function>`
+- **返回值：** `Promise<DestroyHandler | void>`，其中 `DestroyHandler` 为 `() => Promise<void>`
 
 ```typescript
 type lifecycle = (appWindow: Window) => any;
@@ -66,6 +66,32 @@ type startOption  {
   - `name`、`replace`、`fetch`、`alive`这四个参数在`preloadApp`和`startApp`中须保持严格一致，否则子应用的渲染可能出现异常
 
   :::
+
+## 完成、取消与异常
+
+主应用普通调用会等待框架的启动流程完成，再返回当前实例的销毁函数。若同名应用仍在异步卸载或销毁，启动会等待旧清理结束；返回的 Promise 也会继续等待，不会提前确认成功。调用销毁函数并等待其 Promise，可以等待该实例清理完成。
+
+同名的后续 start、refresh 或 destroy 会取消尚未完成的旧启动请求。被取消的请求返回 `undefined`，因此使用返回值前需要判断。仍然有效的启动请求发生初始化错误时，Promise 会拒绝。
+
+```typescript
+import { startApp } from '@cloud/jieshu-core';
+
+const destroy = await startApp({
+  name: 'vue3',
+  url: 'https://xxx.com/',
+  el: '#container',
+});
+
+if (destroy) {
+  await destroy();
+}
+```
+
+先前独立发起的销毁即使失败，也不会永久阻止后续启动：`startApp` 等待旧实例清理结束后仍可创建新实例，原始销毁调用仍接收原来的错误。若需要一次操作中“销毁失败就停止重建”，使用 [refreshApp](/api/refreshApp.html)。
+
+启动完成不表示应用的所有后台异步任务都已完成，例如内联 module 的 top-level await，详见 [iframe 内联 module 的执行顺序](/guide/information.html#iframe-内联-module-的执行顺序)。
+
+框架识别到卸载钩子内启动自身的重入时，会将这次启动视为取消，返回 `undefined`，不创建替换实例；新启动应由主应用在卸载完成后发起。通过 props 传入的主应用异步回调需要显式使用 [runAsUnmountReentry](/api/runAsUnmountReentry.html)。
 
 ## name
 

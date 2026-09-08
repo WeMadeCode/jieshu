@@ -4,11 +4,21 @@
 
 - **参数：** `startOptions`（与 [startApp](/api/startApp.html) 相同）
 
-- **返回值：** `Promise<Function | void>`
+- **返回值：** `Promise<DestroyHandler | void>`，其中 `DestroyHandler` 为 `() => Promise<void>`
 
 主动刷新子应用：先调用 [destroyApp](/api/destroyApp.html) 销毁当前实例，再以传入配置调用 [startApp](/api/startApp.html) 全量重建。内部会等待 `destroyApp` 完成后再 `startApp`，避免销毁未结束就重启导致的竞态问题。
 
-等价于手动串联 `destroyApp(name)` + `startApp(startOptions)`，由框架保证调用顺序。
+销毁和重建属于同一次操作，由框架保证调用顺序。
+
+## 完成、取消与异常
+
+主应用普通调用会等待旧实例的异步卸载和清理结束，再等待新实例的启动流程完成，成功后返回新实例的销毁函数。同名应用已有进行中的卸载时，返回的 Promise 也会等待，不会提前确认刷新完成。
+
+同名的后续 start、refresh 或 destroy 会取消尚未完成的旧刷新请求；被取消的请求返回 `undefined`。仍然有效的刷新请求如果在销毁阶段失败，会拒绝并停止重建；新实例初始化失败也会拒绝。可以使用 `try/catch` 处理这些错误。
+
+框架识别到卸载钩子内刷新自身的重入时，会将该刷新视为取消，返回 `undefined`，不创建替换实例。卸载钩子内的同名 destroy 仍会发起新的操作，因此也会取消触发这次卸载的 refresh。新刷新应由主应用在卸载完成后发起。
+
+通过 props 传入的主应用回调若经过 `await` 后重入，需要在实际 API 调用处使用 [runAsUnmountReentry](/api/runAsUnmountReentry.html)。
 
 ::: tip 使用场景
 

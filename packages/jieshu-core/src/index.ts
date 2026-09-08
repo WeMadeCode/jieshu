@@ -20,6 +20,7 @@ import {
   addSandboxCacheWithOptions,
   waitForSandboxTeardown,
   isSandboxUnmountHookActive,
+  runInSandboxUnmountHook,
 } from './common';
 import { EventBus } from './event';
 import { RuntimeAppController } from './controller';
@@ -79,14 +80,22 @@ function isReentrantUnmountOperation(id: string): boolean {
   return isSandboxUnmountHookActive(id) || isChildSelfUnmountOperation(id);
 }
 
-function detachReentrantOperation<Value>(work: Promise<Value>, operation: string): Promise<Value | void> {
+const detachReentrantOperation = <Value>(work: Promise<Value>, operation: string) => {
   void work.catch((cause: unknown) => warn(`reentrant ${operation} failed: ${String(cause)}`));
   return Promise.resolve();
-}
+};
 
-function hasPendingLifecycle(id: string): boolean {
-  return Boolean(waitForSandboxTeardown(id) || getJieshuById(id)?.waitForUnmount());
-}
+/**
+ * Mark the immediate public API call in an async host callback as unmount
+ * reentry. This is synchronous scope, not async-context propagation: perform
+ * awaited preparation before entering it. Ordinary host calls remain waiters.
+ */
+export const runAsUnmountReentry = <Value>(id: string, invoke: () => Value) => {
+  if (waitForSandboxTeardown(id) || getJieshuById(id)?.waitForUnmount()) {
+    return runInSandboxUnmountHook(id, invoke);
+  }
+  return invoke();
+};
 
 function isSandboxUnavailable(sandbox: Jieshu, canContinue: ContinuationGuard): boolean {
   return (
@@ -388,17 +397,7 @@ function startAppWithCompletion(request: StartOptions): Promise<DestroyHandler |
   return starting;
 }
 
-export function startApp(startOptions: StartOptions): Promise<DestroyHandler | void> {
-  const request = { ...startOptions };
-  const pendingLifecycle = hasPendingLifecycle(request.name);
-  const starting = startAppWithCompletion(request);
-  // During an in-flight unmount, the real start remains queued behind cleanup
-  // but its outward acknowledgement cannot be awaited by that same hook. This
-  // matches the historical concurrent-call contract while preventing overlap.
-  return pendingLifecycle
-    ? (detachReentrantOperation(starting, 'start app after teardown') as Promise<DestroyHandler | void>)
-    : starting;
-}
+export const startApp = (startOptions: StartOptions) => startAppWithCompletion({ ...startOptions });
 
 /**
  * 预加载界枢APP
@@ -533,26 +532,22 @@ async function destroyAppNow(id: string, canContinue: ContinuationGuard): Promis
   if (replacement) await replacement.destroy();
 }
 
-function destroyAppWithCompletion(id: string): Promise<void> {
+const destroyAppWithCompletion = (id: string) => {
   const reentrantUnmount = isReentrantUnmountOperation(id);
   const intent = beginOperation(id);
   const destroying = destroyAppNow(id, () => isOperationCurrent(intent));
-  if (!reentrantUnmount) return destroying;
+  if (!reentrantUnmount) {
+    return destroying;
+  }
 
   // Awaiting the same public destroy from inside __JIESHU_UNMOUNT would form a
   // promise cycle: the outer destroy waits for the hook while the hook waits
   // for the outer teardown tombstone. The teardown keeps running, but the
   // reentrant call must settle at the point where ownership was transferred.
-  return detachReentrantOperation(destroying, 'destroy app') as Promise<void>;
-}
+  return detachReentrantOperation(destroying, 'destroy app');
+};
 
-export function destroyApp(id: string): Promise<void> {
-  const pendingLifecycle = hasPendingLifecycle(id);
-  const destroying = destroyAppWithCompletion(id);
-  return pendingLifecycle
-    ? (detachReentrantOperation(destroying, 'destroy app after teardown') as Promise<void>)
-    : destroying;
-}
+export const destroyApp = (id: string) => destroyAppWithCompletion(id);
 
 /**
  * 刷新界枢APP
@@ -571,14 +566,7 @@ function refreshAppWithCompletion(request: StartOptions): Promise<DestroyHandler
   return refreshing;
 }
 
-export function refreshApp(startOptions: StartOptions): Promise<DestroyHandler | void> {
-  const request = { ...startOptions };
-  const pendingLifecycle = hasPendingLifecycle(request.name);
-  const refreshing = refreshAppWithCompletion(request);
-  return pendingLifecycle
-    ? (detachReentrantOperation(refreshing, 'refresh app after teardown') as Promise<DestroyHandler | void>)
-    : refreshing;
-}
+export const refreshApp = (startOptions: StartOptions) => refreshAppWithCompletion({ ...startOptions });
 
 /**
  * Create an adapter-scoped lifecycle coordinator. Framework integrations use

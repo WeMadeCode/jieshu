@@ -186,7 +186,7 @@ describe('destroyApp', () => {
     await expect(destroyApp('nonexistent')).resolves.toBeUndefined();
   });
 
-  test('live map 已移除时并发 destroy 立即确认，但原 teardown 继续完成', async () => {
+  test('live map 已移除时并发 destroy 仍等待原 teardown 完成', async () => {
     const { inst } = createMinimalDestroyableSandbox('pending-teardown');
     let finishUnmount!: () => void;
     inst.unmount = vi.fn(
@@ -207,7 +207,7 @@ describe('destroyApp', () => {
       secondDestroyFinished = true;
     });
     await Promise.resolve();
-    expect(secondDestroyFinished).toBe(true);
+    expect(secondDestroyFinished).toBe(false);
     expect(waitForSandboxTeardown('pending-teardown')).toBeDefined();
 
     finishUnmount();
@@ -215,7 +215,7 @@ describe('destroyApp', () => {
     expect(secondDestroyFinished).toBe(true);
   });
 
-  test('并发 public destroy 先确认已有 teardown，原调用仍观察失败', async () => {
+  test('并发 public destroy 的所有调用者都收到原 teardown 的失败', async () => {
     const { inst } = createMinimalDestroyableSandbox('failed-concurrent-destroy');
     const failure = new Error('unmount failed');
     let failUnmount!: () => void;
@@ -231,7 +231,7 @@ describe('destroyApp', () => {
     const secondDestroy = destroyApp('failed-concurrent-destroy');
     failUnmount();
 
-    await expect(secondDestroy).resolves.toBeUndefined();
+    await expect(secondDestroy).rejects.toBe(failure);
     await expect(firstDestroy).rejects.toBe(failure);
   });
 });

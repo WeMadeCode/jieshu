@@ -1,8 +1,9 @@
 import Jieshu from '../../src/sandbox';
-import { createAppController, destroyApp, startApp } from '../../src/index';
+import { createAppController, destroyApp, startApp, refreshApp, runAsUnmountReentry } from '../../src/index';
 import { idToSandboxCacheMap, sandboxTeardownById } from '../../src/common';
 import { registerSandboxDynamicResource } from '../../src/sandbox-runtime';
 import { patchRenderEffect } from '../../src/effect';
+import type { StartOptions } from '../../src/contracts';
 
 type SandboxWithIframeRealm = Jieshu & {
   iframe: HTMLIFrameElement & {
@@ -164,12 +165,12 @@ describe('sandbox lifecycle races', () => {
     expect(sandboxTeardownById.has(name)).toBe(false);
   });
 
-  test('async child unmount can reenter through a host callback passed in props', async () => {
+  test('async child unmount explicitly marks reentry through a host callback passed in props', async () => {
     const name = 'async-props-reentrant-destroy';
     const sandbox = createSandbox(name);
     const hostDestroy = vi.fn(async () => {
       await Promise.resolve();
-      await destroyApp(name);
+      await runAsUnmountReentry(name, () => destroyApp(name));
     });
     const props = Object.freeze({
       getLifecycle: () => Object.freeze({ destroy: hostDestroy }),
@@ -201,7 +202,7 @@ describe('sandbox lifecycle races', () => {
     expect(sandboxTeardownById.has(name)).toBe(false);
   });
 
-  test('a concurrent public destroy acknowledges ownership while the first teardown continues', async () => {
+  test('a concurrent public destroy waits until the first teardown completes', async () => {
     const name = 'external-concurrent-destroy';
     const sandbox = createSandbox(name);
     const gate = deferred<void>();
@@ -214,7 +215,7 @@ describe('sandbox lifecycle races', () => {
       concurrentSettled = true;
     });
     await Promise.resolve();
-    expect(concurrentSettled).toBe(true);
+    expect(concurrentSettled).toBe(false);
     expect(sandboxTeardownById.has(name)).toBe(true);
 
     gate.resolve();
@@ -222,12 +223,17 @@ describe('sandbox lifecycle races', () => {
     expect(concurrentSettled).toBe(true);
   });
 
-  test('a concurrent start stays queued until an async host cleanup really settles', async () => {
+  test.each([
+    { label: 'public start', run: startApp },
+    { label: 'public refresh', run: refreshApp },
+    { label: 'controller start', run: (options: StartOptions) => createAppController().start(options) },
+    { label: 'controller refresh', run: (options: StartOptions) => createAppController().refresh(options) },
+  ])('$label waits for async host cleanup and returns the new destroy handler', async ({ run }) => {
     const name = 'queued-start-after-host-cleanup';
     const sandbox = createSandbox(name);
     const cleanupGate = deferred<void>();
     let cleanupFinished = false;
-    const cleanup = async (): Promise<void> => {
+    const cleanup = async () => {
       await cleanupGate.promise;
       cleanupFinished = true;
     };
@@ -249,30 +255,148 @@ describe('sandbox lifecycle races', () => {
     const beforeLoad = vi.fn(() => {
       expect(cleanupFinished).toBe(true);
       const replacement = idToSandboxCacheMap.get(name)?.jieshu;
-      if (!replacement) return;
+      if (!replacement) {
+        return;
+      }
       replacement.active = vi.fn(async () => {
         replacement.activeFlag = true;
       });
       replacement.start = vi.fn(async () => undefined);
     });
-    await expect(
-      startApp({
-        name,
-        url: `https://example.test/${name}/`,
-        html: '<html><head></head><body>replacement</body></html>',
-        el: replacementContainer,
-        beforeLoad,
-        fiber: false,
-      }),
-    ).resolves.toBeUndefined();
+    let startSettled = false;
+    const starting = run({
+      name,
+      url: `https://example.test/${name}/`,
+      html: '<html><head></head><body>replacement</body></html>',
+      el: replacementContainer,
+      beforeLoad,
+      fiber: false,
+    });
+    void starting.then(() => {
+      startSettled = true;
+    });
+    await flushPromises();
+    expect(startSettled).toBe(false);
     expect(beforeLoad).not.toHaveBeenCalled();
 
     cleanupGate.resolve();
     await destroying;
-    for (let attempt = 0; attempt < 20 && !beforeLoad.mock.calls.length; attempt += 1) await Promise.resolve();
+    const destroy = await starting;
+    if (!destroy) {
+      throw new Error('Expected a completed application destroy handler');
+    }
 
     expect(beforeLoad).toHaveBeenCalledTimes(1);
-    await destroyApp(name);
+    await destroy();
+    expect(idToSandboxCacheMap.has(name)).toBe(false);
+  });
+
+  test.each([false, true])(
+    'controller destroy shares external completion and failure (rejects=%s)',
+    async (rejects) => {
+      const name = 'controller-external-waiter';
+      const sandbox = createSandbox(name);
+      const gate = deferred<void>();
+      const failure = new Error('unmount failed');
+      sandbox.mountFlag = true;
+      sandbox.iframe.contentWindow.__JIESHU_UNMOUNT = async () => {
+        await gate.promise;
+        if (rejects) {
+          throw failure;
+        }
+      };
+      const controller = createAppController();
+      let settled = 0;
+      const observe = (operation: Promise<void>) =>
+        operation.then(
+          () => {
+            settled += 1;
+            return undefined;
+          },
+          (cause: unknown) => {
+            settled += 1;
+            return cause;
+          },
+        );
+      const first = observe(destroyApp(name));
+      const second = observe(controller.destroy(name));
+      await flushPromises();
+      expect(settled).toBe(0);
+      gate.resolve();
+      expect(await Promise.all([first, second])).toEqual(rejects ? [failure, failure] : [undefined, undefined]);
+      expect(settled).toBe(2);
+      expect(sandboxTeardownById.has(name)).toBe(false);
+    },
+  );
+
+  test('a new start recovers after a failed prior teardown while the destroy caller sees its failure', async () => {
+    const name = 'start-after-failed-teardown';
+    const sandbox = createSandbox(name);
+    const gate = deferred<void>();
+    const failure = new Error('old unmount failed');
+    sandbox.mountFlag = true;
+    sandbox.iframe.contentWindow.__JIESHU_UNMOUNT = async () => {
+      await gate.promise;
+      throw failure;
+    };
+    const destroying = destroyApp(name).catch((cause: unknown) => cause);
+    const starting = startApp({
+      name,
+      url: 'https://example.test/recovery/',
+      html: '<html><head></head><body>replacement</body></html>',
+      el: sandbox.el,
+      beforeLoad: () => {
+        const replacement = idToSandboxCacheMap.get(name)?.jieshu;
+        if (!replacement) {
+          throw new Error('Expected a replacement sandbox');
+        }
+        replacement.active = vi.fn(async () => {
+          replacement.activeFlag = true;
+        });
+        replacement.start = vi.fn(async () => undefined);
+      },
+    });
+    gate.resolve();
+    expect(await destroying).toBe(failure);
+    const destroy = await starting;
+    if (!destroy) {
+      throw new Error('Expected recovery to produce a destroy handler');
+    }
+    await destroy();
+  });
+
+  test('a same-app destroy from a refresh unmount hook remains the newest cancellation intent', async () => {
+    const name = 'reentry-cancels-refresh';
+    const sandbox = createSandbox(name);
+    sandbox.mountFlag = true;
+    sandbox.iframe.contentWindow.__JIESHU_UNMOUNT = () => destroyApp(name);
+    const beforeLoad = vi.fn();
+    await expect(
+      refreshApp({
+        name,
+        url: 'https://example.test/refresh/',
+        el: sandbox.el,
+        beforeLoad,
+      }),
+    ).resolves.toBeUndefined();
+    await sandbox.destroy();
+    expect(beforeLoad).not.toHaveBeenCalled();
+    expect(idToSandboxCacheMap.has(name)).toBe(false);
+  });
+
+  test('explicit async reentry during standalone unmount still requests full destruction', async () => {
+    const name = 'unmount-requests-destroy';
+    const sandbox = createSandbox(name);
+    const iframe = sandbox.iframe;
+    sandbox.mountFlag = true;
+    sandbox.iframe.contentWindow.__JIESHU_UNMOUNT = async () => {
+      await Promise.resolve();
+      await runAsUnmountReentry(name, () => destroyApp(name));
+    };
+    await sandbox.unmount();
+    await sandbox.destroy();
+    expect(iframe.isConnected).toBe(false);
+    expect(idToSandboxCacheMap.has(name)).toBe(false);
   });
 
   test('disposing a controller cancels its completion-tracked start behind an unmount', async () => {
