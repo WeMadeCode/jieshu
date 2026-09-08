@@ -1,6 +1,6 @@
 # jieshu 与 wujie 源码缺陷修复 TODO
 
-本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 5 项（FIX-001、FIX-002、FIX-003、FIX-004、FIX-012），剩余 7 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
+本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 6 项（FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-012），剩余 6 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
 
 ## 使用与关闭规则
 
@@ -44,7 +44,7 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 - [x] **P1 · [FIX-002](#fix-002)**：旧 head/body 引用可向同名新实例注入代码。jieshu 已修复并补充回归测试；wujie 未修改。
 - [x] **P1 · [FIX-003](#fix-003)**：旧应用异步销毁误清理新应用容器。jieshu 已限定清理范围并补充回归测试；wujie 未修改。
 - [x] **P2 · [FIX-004](#fix-004)**：公开 API 的 Promise 提前完成。已恢复普通调用的完成和错误语义，并明确同步/子应用重入与异步主应用回调的处理。
-- [ ] **P2 · [FIX-005](#fix-005)**：多份 core 的事件清理恢复已销毁实例的处理器。两边共有，jieshu 的单副本修复覆盖不足。
+- [x] **P2 · [FIX-005](#fix-005)**：多份 core 的事件清理恢复已销毁实例的处理器。已按目标 window 共享覆盖栈，保留主应用中途更新，并验证独立 bundle 与跨 realm 清理。
 - [ ] **P2 · [FIX-006](#fix-006)**：子应用路由同步清空主应用 `history.state`。两边共有。
 - [ ] **P2 · [FIX-007](#fix-007)**：合成 `load` 早于 async 脚本执行。两边共有。
 - [ ] **P2 · [FIX-008](#fix-008)**：已完成资源缓存跨请求上下文串用。风险已复现，缓存共享契约需要明确。
@@ -54,7 +54,7 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 
 - [x] **P2 · [FIX-012](#fix-012)**：内联 module 等待成功 load 导致队列阻塞。已改用独立的原生 module 完成标记，并验证模块语法、顺序、错误及取消路径。
 
-FIX-001、FIX-002、FIX-003、FIX-004、FIX-012 已修复。下一项建议处理 FIX-005，再处理路由、资源语义和 EventBus。FIX-003 的回归继续保留重复调用 `destroyApp` 的场景，并验证两个调用都在清理结束后接收结果。
+FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-012 已修复。下一项建议处理 FIX-006，随后处理资源语义和 EventBus。FIX-003 的回归继续保留重复调用 `destroyApp` 的场景，并验证两个调用都在清理结束后接收结果。
 
 ## FIX-001
 
@@ -215,7 +215,7 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-012 已修复。下一项建议处�
 
 **P2：多份 core 的事件清理恢复已销毁实例的处理器**
 
-**定位：** `packages/jieshu-core/src/tracker.ts` 中模块局部的 `sharedWindowOverrides`，约 22 行；`setWindowOnEvent`、`cleanupWindowOnEventOverrides`。另见 `packages/jieshu-react/vite.config.mts`、`packages/jieshu-vue3/vite.config.mts` 的 UMD core 内嵌配置。
+**修复前定位：** `packages/jieshu-core/src/tracker.ts` 中模块局部的 `sharedWindowOverrides`，约 22 行；`setWindowOnEvent`、`cleanupWindowOnEventOverrides`。另见 `packages/jieshu-react/vite.config.mts`、`packages/jieshu-vue3/vite.config.mts` 的 UMD core 内嵌配置。
 
 **触发与复现：**
 
@@ -224,19 +224,27 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-012 已修复。下一项建议处�
 3. 同页再次加载独立打包的 core，启动 B，让其覆盖为 HB。
 4. 依次销毁 A、B，检查最终处理器。
 
-**实际结果：** Chromium 中确认两份 core 的 `startApp` 函数身份不同；最终 `restoredHostHandler=false`，`restoredDestroyedChildHandler=true`。两个仓库均复现，最终恢复 HA。
+**修复前实际结果：** Chromium 中确认两份 core 的 `startApp` 函数身份不同；最终 `restoredHostHandler=false`，`restoredDestroyedChildHandler=true`。两个仓库均复现，最终恢复 HA。
 
 **原因与影响：** jieshu 的事件覆盖栈可以协调同一模块内的多个实例，但不同 bundle 的 WeakMap 不共享。B 保存 HA 为前值，A 销毁不能更新 B 的栈，B 销毁后又恢复 HA。旧处理器仍被主 window 引用，可能保留旧应用闭包并在事件发生时访问已释放对象。本次验证的是处理器恢复错误，没有进行堆快照或量化内存泄漏。
 
 **修复与验收：**
 
-- [ ] 将覆盖栈共享范围与目标 window 及多份 core 的运行范围对齐，而非仅在模块内共享。
-- [ ] 保留主应用主动更新处理器后不被旧 cleanup 覆盖的保护。
-- [ ] 用两份真实独立 bundle 验证，不能只在同一模块实例中创建两个 tracker。
-- [ ] 覆盖 A/B 两种销毁顺序、同一应用多次覆盖、主应用中途改写及多个 onXXX 属性。
-- [ ] 最终恢复正确主应用处理器，已销毁应用的处理器不再被事件调用。
-- [ ] 在 `destroy-cleanup.test.ts` 及多副本浏览器场景中补测试。
-- [ ] 若修改任何适配包文件，逐包执行其 UI、单元和完整 test，并满足四项 100% 覆盖率要求。
+- [x] 将覆盖栈共享范围与目标 window 及多份 core 的运行范围对齐，而非仅在模块内共享。
+- [x] 保留主应用主动更新处理器后不被旧 cleanup 覆盖的保护。
+- [x] 用两份真实独立 bundle 验证，不能只在同一模块实例中创建两个 tracker。
+- [x] 覆盖 A/B 两种销毁顺序、同一应用多次覆盖、主应用中途改写及多个 onXXX 属性。
+- [x] 最终恢复正确主应用处理器，已销毁应用的处理器不再被事件调用。
+- [x] 在 `destroy-cleanup.test.ts` 及多副本浏览器场景中补测试。
+- [x] 核对适配包影响：本次未修改任何适配包文件，不触发其 UI、单元和完整 test 的强制规则。
+
+**已实施修复（2026-09-08）：** `tracker.ts` 使用版本化 `Symbol.for` 键，将共享覆盖栈保存在实际被写入的目标 window 上。字段不可枚举，不同 core 副本及同源 realm 使用同一份记录；全部覆盖清理后移除共享字段。不同目标 window 的记录独立，不通过全局强引用表持有窗口。新的安装失败时保留原覆盖链，并撤回尚无条目的注册表。
+
+**主应用更新与原生属性语义：** 写入前核对当前属性值及其是否为自有属性；若与栈顶安装状态不同，成功写入后丢弃旧链，以主应用的新状态作为恢复基线，避免 `H0 → A → H1 → B` 在销毁时丢失 H1。同一 owner 连续覆盖仍保留接管前的值，重新接管和两种销毁顺序都能移除旧 owner。安装后保存实际读回值，兼容原生 on* setter 将非对象值归一化为 null；恢复写入失败时不会继续删除属性。
+
+**回归结果：** 新增 17 项单测，覆盖独立模块、副本交错清理、重复写入、主应用更新与删除自有属性、不同目标窗口、setter 归一化、写入失败、只读恢复及共享字段释放。首批 12 项中 7 项在修复前失败。新增 14 项 Chromium 回归：12 项通过真实 `startApp/destroyApp` 验证源码 ESM 与独立 IIFE，另 2 项在普通同源 iframe 内加载独立 tracker bundle，验证跨 realm 共享。首批 10 项浏览器用例修前 5 项失败、5 项通过；失败时最终主应用处理器不再收到原生事件，修后正确恢复主处理器且不再调用已销毁应用处理器。
+
+**兼容与验证边界：** 参与同一目标 window 事件覆盖的 core 副本都需要使用本次共享协议；无法协调仍采用模块私有栈的旧版本。没有拦截主应用赋值，因此无法识别“重复写回相同 handler 引用且自有属性状态不变”的操作。自定义 getter/setter 的任意同步重入或写后 getter 抛错不承诺事务回滚。本次没有修改公开 API、框架适配包或 wujie，没有进行堆快照或量化内存泄漏，也未验证 Firefox、Safari 或整套 examples 集成测试。
 
 ## FIX-006
 
@@ -464,7 +472,8 @@ git status --short
 | FIX-003 | 2026-09-07 | `b25ec78` | core 容器清理、loading 归属、5 项单测、4 项浏览器回归                                      | 下述实际命令均通过；单测 45 文件/344 项，Chromium 6 项；覆盖率 statements 75.85%、branches 68.13%、functions 80%、lines 78.53%     | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试，FIX-004 仍待修复                                |
 | FIX-001 | 2026-09-07 | `0d626aa` | core 状态校验、动态队列收尾、23 项单测、2 项浏览器回归                                     | 下述实际命令均通过；单测 45 文件/367 项，Chromium 8 项；覆盖率 statements 75.88%、branches 68.26%、functions 79.92%、lines 78.50%  | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；内联 module 独立问题登记为 FIX-012              |
 | FIX-012 | 2026-09-08 | `6ddf850` | core 内联 module 完成标记、HTML async 解析、卸载取消、12 项单测、23 项浏览器回归及公开说明 | 下述实际命令均通过；单测 45 文件/379 项，Chromium 31 项；覆盖率 statements 76.07%、branches 68.63%、functions 80.02%、lines 78.73% | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；不等待 TLA 完成，不回滚已执行代码；未修改 wujie |
-| FIX-004 | 2026-09-08 | 本次提交  | core 公开完成语义、共享卸载注册表、显式重入 API、14 项单测、30 项浏览器回归及 API 文档     | 下述实际命令均通过；单测 46 文件/393 项，Chromium 61 项；覆盖率 statements 76.63%、branches 69.09%、functions 80.77%、lines 79.15% | 仅验证 Chromium；异步主应用重入回调需显式迁移；未运行整套 examples 集成测试或适配包测试                    |
+| FIX-004 | 2026-09-08 | `8156092` | core 公开完成语义、共享卸载注册表、显式重入 API、14 项单测、30 项浏览器回归及 API 文档     | 下述实际命令均通过；单测 46 文件/393 项，Chromium 61 项；覆盖率 statements 76.63%、branches 69.09%、functions 80.77%、lines 79.15% | 仅验证 Chromium；异步主应用重入回调需显式迁移；未运行整套 examples 集成测试或适配包测试                    |
+| FIX-005 | 2026-09-08 | 本次提交  | core 共享事件覆盖栈、主应用更新基线、原生属性恢复、17 项单测及 14 项浏览器回归             | 下述实际命令均通过；单测 46 文件/410 项，Chromium 75 项；覆盖率 statements 76.81%、branches 69.33%、functions 80.80%、lines 79.28% | 各 core 副本须采用共享协议；仅验证 Chromium，未运行整套 examples 集成测试或适配包测试，未修改 wujie        |
 
 FIX-002 的实际验证命令如下，均在仓库根目录执行。沿用初始审计的直接调用方式，使用已安装的工具和 Chromium，没有重新安装项目依赖。Chromium 在受限沙箱内启动时受到 macOS MachPort 权限限制，随后经自动审批在沙箱外执行上述本机测试并通过。
 
@@ -507,6 +516,13 @@ FIX-004 继续使用上述 Vitest（含覆盖率）、完整 Playwright、四项
 ```bash
 node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/index.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/sandbox-registry.ts packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts packages/jieshu-core/__test__/unit/destroy-order.test.ts packages/jieshu-core/__test__/unit/unmount-reentry.test.ts packages/jieshu-core/__test__/browser/container-destroy.test.mts packages/jieshu-core/__test__/browser/public-api-completion.test.mts --max-warnings=0
 node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/index.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/sandbox-registry.ts packages/jieshu-core/__test__/unit/sandbox-lifecycle-race.test.ts packages/jieshu-core/__test__/unit/destroy-order.test.ts packages/jieshu-core/__test__/unit/unmount-reentry.test.ts packages/jieshu-core/__test__/browser/container-destroy.test.mts packages/jieshu-core/__test__/browser/public-api-completion.test.mts docs/api/destroyApp.md docs/api/startApp.md docs/api/refreshApp.md docs/api/runAsUnmountReentry.md docs/notes/jieshu-wujie-fix-todo.md
+```
+
+FIX-005 继续使用上述 Vitest（含覆盖率）、完整 Playwright、四项 TypeScript 和 Git 检查命令。最终核心 46 文件/410 项单测、75 项 Chromium 回归全部通过。覆盖率为 statements 76.81%、branches 69.33%、functions 80.80%、lines 79.28%。本次 ESLint 和 Prettier 的实际范围如下；没有重装依赖，没有运行整套 examples 集成测试或框架适配包测试。
+
+```bash
+node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/tracker.ts packages/jieshu-core/__test__/unit/destroy-cleanup.test.ts packages/jieshu-core/__test__/browser/window-event-overrides.test.mts --max-warnings=0
+node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/tracker.ts packages/jieshu-core/__test__/unit/destroy-cleanup.test.ts packages/jieshu-core/__test__/browser/window-event-overrides.test.mts docs/notes/jieshu-wujie-fix-todo.md
 ```
 
 ## 后续实现应保持的一致性

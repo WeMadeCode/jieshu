@@ -12,14 +12,21 @@ interface WindowPropertySnapshot {
 
 interface WindowPropertyOverride {
   readonly owner: EventCleanupTracker;
-  readonly installedValue: unknown;
+  readonly installed: WindowPropertySnapshot;
   previous: WindowPropertySnapshot;
 }
 
-type DynamicWindow = Window & Record<string, unknown>;
 type WindowOverrideStacks = Map<string, WindowPropertyOverride[]>;
 
-const sharedWindowOverrides = new WeakMap<Window, WindowOverrideStacks>();
+// All core copies touching the same window must use the same protocol and stack,
+// including copies loaded in another same-origin realm.
+const windowOverridesKey = Symbol.for('jieshu.window-event-overrides.v1');
+
+declare global {
+  interface Window {
+    [windowOverridesKey]?: WindowOverrideStacks;
+  }
+}
 
 function sameListener(left: DocumentListenerEntry, right: DocumentListenerEntry): boolean {
   const leftCapture = typeof left.options === 'boolean' ? left.options : left.options?.capture === true;
@@ -27,33 +34,43 @@ function sameListener(left: DocumentListenerEntry, right: DocumentListenerEntry)
   return left.type === right.type && left.callback === right.callback && leftCapture === rightCapture;
 }
 
-function dynamicWindow(target: Window): DynamicWindow {
-  return target as DynamicWindow;
-}
-
-function snapshotWindowProperty(targetWindow: Window, key: string): WindowPropertySnapshot {
+const snapshotWindowProperty = (targetWindow: Window, key: string) => {
+  const value: unknown = Reflect.get(targetWindow, key);
   return {
-    value: Reflect.get(targetWindow, key),
-    wasOwnProperty: Object.prototype.hasOwnProperty.call(targetWindow, key),
+    value,
+    wasOwnProperty: Reflect.getOwnPropertyDescriptor(targetWindow, key) !== undefined,
   };
-}
+};
 
-function restoreWindowProperty(targetWindow: Window, key: string, snapshot: WindowPropertySnapshot): void {
-  const target = dynamicWindow(targetWindow);
+const sameWindowProperty = (left: WindowPropertySnapshot, right: WindowPropertySnapshot) => {
+  return Object.is(left.value, right.value) && left.wasOwnProperty === right.wasOwnProperty;
+};
+
+const restoreWindowProperty = (targetWindow: Window, key: string, snapshot: WindowPropertySnapshot) => {
   // Assignment is required for native on* accessors: it invokes their setter
   // and restores the browser's internal handler slot.
-  target[key] = snapshot.value;
-  if (!snapshot.wasOwnProperty) delete target[key];
-}
+  if (!Reflect.set(targetWindow, key, snapshot.value)) {
+    return;
+  }
+  if (!snapshot.wasOwnProperty) {
+    Reflect.deleteProperty(targetWindow, key);
+  }
+};
 
-function windowOverrideStacks(targetWindow: Window): WindowOverrideStacks {
-  let stacks = sharedWindowOverrides.get(targetWindow);
+const windowOverrideStacks = (targetWindow: Window) => {
+  let stacks = targetWindow[windowOverridesKey];
   if (!stacks) {
     stacks = new Map();
-    sharedWindowOverrides.set(targetWindow, stacks);
+    Object.defineProperty(targetWindow, windowOverridesKey, { configurable: true, value: stacks });
   }
   return stacks;
-}
+};
+
+const releaseEmptyWindowOverrideStacks = (targetWindow: Window, stacks: WindowOverrideStacks) => {
+  if (!stacks.size && targetWindow[windowOverridesKey] === stacks) {
+    Reflect.deleteProperty(targetWindow, windowOverridesKey);
+  }
+};
 
 /**
  * Records effects that a sandbox forwards to host-owned objects. The tracker is
@@ -76,19 +93,33 @@ export class EventCleanupTracker {
   }
 
   /** Install a host window on* value while preserving cross-sandbox ownership. */
-  public setWindowOnEvent(targetWindow: Window, key: string, installedValue: unknown): void {
+  public setWindowOnEvent = (targetWindow: Window, key: string, installedValue: unknown) => {
+    const current = snapshotWindowProperty(targetWindow, key);
     const stacks = windowOverrideStacks(targetWindow);
-    const stack = stacks.get(key) ?? [];
+    let stack = stacks.get(key) ?? [];
+    const top = stack[stack.length - 1];
+    if (top && !sameWindowProperty(current, top.installed)) {
+      // The host took ownership since the last tracked write. Older layers can
+      // no longer be restored; the host's current value becomes the new base.
+      stack = [];
+    }
     const existingIndex = stack.findIndex((entry) => entry.owner === this);
     const existing = existingIndex === -1 ? undefined : stack[existingIndex];
     const isExistingTop = existingIndex === stack.length - 1;
-    const currentValue = Reflect.get(targetWindow, key);
-    const previous =
-      existing && isExistingTop && Object.is(currentValue, existing.installedValue)
-        ? existing.previous
-        : snapshotWindowProperty(targetWindow, key);
+    const previous = existing && isExistingTop ? existing.previous : current;
 
-    if (!Reflect.set(targetWindow, key, installedValue)) return;
+    let installed: WindowPropertySnapshot;
+    try {
+      if (!Reflect.set(targetWindow, key, installedValue)) {
+        releaseEmptyWindowOverrideStacks(targetWindow, stacks);
+        return;
+      }
+      // Native on* setters can normalize values (for example, a number to null).
+      installed = snapshotWindowProperty(targetWindow, key);
+    } catch (error) {
+      releaseEmptyWindowOverrideStacks(targetWindow, stacks);
+      throw error;
+    }
 
     if (existing) {
       stack.splice(existingIndex, 1);
@@ -96,9 +127,11 @@ export class EventCleanupTracker {
       // value that existed before the removed owner, never that owner's bound
       // iframe handler.
       const successor = stack[existingIndex];
-      if (successor) successor.previous = existing.previous;
+      if (successor) {
+        successor.previous = existing.previous;
+      }
     }
-    stack.push({ owner: this, installedValue, previous });
+    stack.push({ owner: this, installed, previous });
     stacks.set(key, stack);
 
     let keys = this.windowProperties.get(targetWindow);
@@ -107,7 +140,7 @@ export class EventCleanupTracker {
       this.windowProperties.set(targetWindow, keys);
     }
     keys.add(key);
-  }
+  };
 
   public cleanupMainDocumentListeners(targetDocument: Document = window.document): void {
     for (const { type, callback, options } of this.mainDocumentListeners) {
@@ -120,28 +153,37 @@ export class EventCleanupTracker {
     this.mainDocumentListeners.clear();
   }
 
-  public cleanupWindowOnEventOverrides(targetWindow: Window = window): void {
+  public cleanupWindowOnEventOverrides = (targetWindow: Window = window) => {
     const keys = this.windowProperties.get(targetWindow);
-    const stacks = sharedWindowOverrides.get(targetWindow);
-    if (!keys || !stacks) return;
+    const stacks = targetWindow[windowOverridesKey];
+    if (!keys || !stacks) {
+      this.windowProperties.delete(targetWindow);
+      return;
+    }
 
     keys.forEach((key) => {
       const stack = stacks.get(key);
-      if (!stack) return;
+      if (!stack) {
+        return;
+      }
       const ownerIndex = stack.findIndex((entry) => entry.owner === this);
-      if (ownerIndex === -1) return;
+      if (ownerIndex === -1) {
+        return;
+      }
       const override = stack[ownerIndex];
       const wasTop = ownerIndex === stack.length - 1;
       let ownsCurrentValue = false;
       try {
-        ownsCurrentValue = Object.is(Reflect.get(targetWindow, key), override.installedValue);
+        ownsCurrentValue = sameWindowProperty(snapshotWindowProperty(targetWindow, key), override.installed);
       } catch {
         // A hostile getter means ownership cannot be proven; never overwrite it.
       }
 
       stack.splice(ownerIndex, 1);
       const successor = stack[ownerIndex];
-      if (successor) successor.previous = override.previous;
+      if (successor) {
+        successor.previous = override.previous;
+      }
 
       if (wasTop && ownsCurrentValue) {
         try {
@@ -151,13 +193,16 @@ export class EventCleanupTracker {
         }
       }
 
-      if (stack.length) stacks.set(key, stack);
-      else stacks.delete(key);
+      if (stack.length) {
+        stacks.set(key, stack);
+      } else {
+        stacks.delete(key);
+      }
     });
 
     this.windowProperties.delete(targetWindow);
-    if (!stacks.size) sharedWindowOverrides.delete(targetWindow);
-  }
+    releaseEmptyWindowOverrideStacks(targetWindow, stacks);
+  };
 
   public cleanupAll(targetWindow: Window = window): void {
     this.cleanupMainDocumentListeners(targetWindow.document);

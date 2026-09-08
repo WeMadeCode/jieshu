@@ -157,3 +157,278 @@ describe('EventCleanupTracker 主应用 window.onXXX 污染还原', () => {
     expect((window as any).__leakProbeOnEvent).toBe('host-latest');
   });
 });
+
+describe('独立 core 副本共享 window.onXXX 覆盖历史', () => {
+  const trackers: EventCleanupTracker[] = [];
+  const targets: Window[] = [];
+  let first: EventCleanupTracker;
+  let second: EventCleanupTracker;
+  let sameCopy: EventCleanupTracker;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    const firstCore = await import('../../src/tracker');
+    vi.resetModules();
+    const secondCore = await import('../../src/tracker');
+    expect(firstCore.EventCleanupTracker).not.toBe(secondCore.EventCleanupTracker);
+    first = new firstCore.EventCleanupTracker();
+    second = new secondCore.EventCleanupTracker();
+    sameCopy = new firstCore.EventCleanupTracker();
+    trackers.push(first, second, sameCopy);
+    targets.push(window);
+  });
+
+  afterEach(() => {
+    for (const tracker of trackers) {
+      for (const target of targets) {
+        tracker.cleanupWindowOnEventOverrides(target);
+      }
+    }
+    trackers.length = 0;
+    targets.length = 0;
+    window.onresize = null;
+    window.ononline = null;
+    document.body.innerHTML = '';
+  });
+
+  test.each(['first', 'second'])('先清理 %s 副本时最终恢复主应用处理器', (order) => {
+    const host = vi.fn();
+    const firstHandler = vi.fn();
+    const secondHandler = vi.fn();
+    window.onresize = host;
+    first.setWindowOnEvent(window, 'onresize', firstHandler);
+    second.setWindowOnEvent(window, 'onresize', secondHandler);
+
+    const [earlier, later] = order === 'first' ? [first, second] : [second, first];
+    earlier.cleanupAll();
+    expect(window.onresize).toBe(order === 'first' ? secondHandler : firstHandler);
+
+    later.cleanupAll();
+    expect(window.onresize).toBe(host);
+  });
+
+  test.each(['first', 'second'])('重复写入与重新接管后先清理 %s 副本，不恢复旧处理器', (order) => {
+    const host = vi.fn();
+    const firstHandler = vi.fn();
+    const latestFirstHandler = vi.fn();
+    const secondHandler = vi.fn();
+    window.onresize = host;
+    first.setWindowOnEvent(window, 'onresize', firstHandler);
+    first.setWindowOnEvent(window, 'onresize', vi.fn());
+    second.setWindowOnEvent(window, 'onresize', secondHandler);
+    first.setWindowOnEvent(window, 'onresize', latestFirstHandler);
+
+    const [earlier, later] = order === 'first' ? [first, second] : [second, first];
+    earlier.cleanupAll();
+    expect(window.onresize).toBe(order === 'first' ? secondHandler : latestFirstHandler);
+    later.cleanupAll();
+    expect(window.onresize).toBe(host);
+  });
+
+  test.each(['first', 'second'])('主应用在两个副本写入之间更新，先清理 %s 时保留更新', (order) => {
+    const latestHost = vi.fn();
+    window.onresize = vi.fn();
+    first.setWindowOnEvent(window, 'onresize', vi.fn());
+    window.onresize = latestHost;
+    second.setWindowOnEvent(window, 'onresize', vi.fn());
+
+    const [earlier, later] = order === 'first' ? [first, second] : [second, first];
+    earlier.cleanupAll();
+    later.cleanupAll();
+    expect(window.onresize).toBe(latestHost);
+  });
+
+  test('主应用更新后原副本再次接管，保留最新主应用基线', () => {
+    const latestHost = vi.fn();
+    window.onresize = vi.fn();
+    first.setWindowOnEvent(window, 'onresize', vi.fn());
+    second.setWindowOnEvent(window, 'onresize', vi.fn());
+    window.onresize = latestHost;
+    first.setWindowOnEvent(window, 'onresize', vi.fn());
+
+    second.cleanupAll();
+    first.cleanupAll();
+    expect(window.onresize).toBe(latestHost);
+  });
+
+  test('主应用最后改写多个属性，清理两个副本不回滚主应用更新', () => {
+    const resizeHost = vi.fn();
+    const onlineHost = vi.fn();
+    for (const key of ['onresize', 'ononline']) {
+      first.setWindowOnEvent(window, key, vi.fn());
+      second.setWindowOnEvent(window, key, vi.fn());
+    }
+    window.onresize = resizeHost;
+    window.ononline = onlineHost;
+    first.cleanupAll();
+    second.cleanupAll();
+    expect(window.onresize).toBe(resizeHost);
+    expect(window.ononline).toBe(onlineHost);
+  });
+
+  test('不同目标 window 的恢复历史保持独立', () => {
+    const iframe = document.createElement('iframe');
+    document.body.appendChild(iframe);
+    const childWindow = iframe.contentWindow;
+    if (!childWindow) {
+      throw new Error('Expected an iframe window');
+    }
+    targets.push(childWindow);
+    const host = vi.fn();
+    const childHost = vi.fn();
+    window.onresize = host;
+    childWindow.onresize = childHost;
+    first.setWindowOnEvent(window, 'onresize', vi.fn());
+    first.setWindowOnEvent(childWindow, 'onresize', vi.fn());
+    second.setWindowOnEvent(window, 'onresize', vi.fn());
+    second.setWindowOnEvent(childWindow, 'onresize', vi.fn());
+
+    first.cleanupWindowOnEventOverrides(window);
+    second.cleanupWindowOnEventOverrides(childWindow);
+    second.cleanupWindowOnEventOverrides(window);
+    expect(window.onresize).toBe(host);
+    expect(childWindow.onresize).not.toBe(childHost);
+    first.cleanupWindowOnEventOverrides(childWindow);
+    expect(childWindow.onresize).toBe(childHost);
+  });
+
+  test('setter 归一化写入值后仍能恢复主应用处理器', () => {
+    const key = '__normalizedOnEvent';
+    const host = vi.fn();
+    let current: unknown = host;
+    Object.defineProperty(window, key, {
+      configurable: true,
+      get: () => current,
+      set: (value: unknown) => {
+        current = typeof value === 'function' ? value : null;
+      },
+    });
+    try {
+      first.setWindowOnEvent(window, key, 7);
+      expect(Reflect.get(window, key)).toBeNull();
+      second.setWindowOnEvent(window, key, vi.fn());
+      first.cleanupAll();
+      second.cleanupAll();
+      expect(Reflect.get(window, key)).toBe(host);
+    } finally {
+      Reflect.deleteProperty(window, key);
+    }
+  });
+
+  test('同一 core 内主应用中途改写也必须保留新的基线', () => {
+    const latestHost = vi.fn();
+    window.onresize = vi.fn();
+    first.setWindowOnEvent(window, 'onresize', vi.fn());
+    window.onresize = latestHost;
+    sameCopy.setWindowOnEvent(window, 'onresize', vi.fn());
+    first.cleanupAll();
+    sameCopy.cleanupAll();
+    expect(window.onresize).toBe(latestHost);
+  });
+
+  test.each([false, true])('主应用删除自有属性后，即使读取值未变也不能复活旧属性（再次写入：%s）', (writeAgain) => {
+    const key = '__deletedOnEvent';
+    Reflect.set(window, key, 'host');
+    try {
+      first.setWindowOnEvent(window, key, undefined);
+      Reflect.deleteProperty(window, key);
+      if (writeAgain) {
+        second.setWindowOnEvent(window, key, vi.fn());
+      }
+      first.cleanupAll();
+      second.cleanupAll();
+      expect(Reflect.getOwnPropertyDescriptor(window, key)).toBeUndefined();
+    } finally {
+      Reflect.deleteProperty(window, key);
+    }
+  });
+
+  test('只读属性写入失败不撤销旧 owner，也不遗留空注册表', () => {
+    const key = '__readonlyOnEvent';
+    const host = vi.fn();
+    const symbols = Object.getOwnPropertySymbols(window);
+    Object.defineProperty(window, key, { configurable: true, writable: false, value: host });
+    try {
+      first.setWindowOnEvent(window, key, vi.fn());
+      expect(Reflect.get(window, key)).toBe(host);
+      expect(Object.getOwnPropertySymbols(window)).toEqual(symbols);
+
+      Object.defineProperty(window, key, { writable: true });
+      first.setWindowOnEvent(window, key, vi.fn());
+      Object.defineProperty(window, key, { writable: false });
+      second.setWindowOnEvent(window, key, vi.fn());
+      Object.defineProperty(window, key, { writable: true });
+      first.cleanupAll();
+      second.cleanupAll();
+      expect(Reflect.get(window, key)).toBe(host);
+      expect(Object.getOwnPropertySymbols(window)).toEqual(symbols);
+    } finally {
+      Reflect.deleteProperty(window, key);
+    }
+  });
+
+  test('setter 抛错时保持旧恢复链并撤回新建的空注册表', () => {
+    const key = '__throwingOnEvent';
+    const host = vi.fn();
+    const symbols = Object.getOwnPropertySymbols(window);
+    let current: unknown = host;
+    let fail = true;
+    Object.defineProperty(window, key, {
+      configurable: true,
+      get: () => current,
+      set: (value: unknown) => {
+        if (fail) {
+          throw new Error('Write failed');
+        }
+        current = value;
+      },
+    });
+    try {
+      expect(() => first.setWindowOnEvent(window, key, vi.fn())).toThrow('Write failed');
+      expect(Object.getOwnPropertySymbols(window)).toEqual(symbols);
+      fail = false;
+      first.setWindowOnEvent(window, key, vi.fn());
+      fail = true;
+      expect(() => second.setWindowOnEvent(window, key, vi.fn())).toThrow('Write failed');
+      fail = false;
+      first.cleanupAll();
+      second.cleanupAll();
+      expect(Reflect.get(window, key)).toBe(host);
+      expect(Object.getOwnPropertySymbols(window)).toEqual(symbols);
+    } finally {
+      fail = false;
+      Reflect.deleteProperty(window, key);
+    }
+  });
+
+  test('主应用将处理器设为只读后，恢复失败不能继续删除该属性', () => {
+    const key = '__protectedOnEvent';
+    const handler = vi.fn();
+    try {
+      first.setWindowOnEvent(window, key, handler);
+      Object.defineProperty(window, key, { writable: false });
+      first.cleanupAll();
+      expect(Reflect.getOwnPropertyDescriptor(window, key)).toMatchObject({ value: handler, writable: false });
+    } finally {
+      Reflect.deleteProperty(window, key);
+    }
+  });
+
+  test('全部清理后重新安装可恢复新的主应用处理器', () => {
+    const oldHost = vi.fn();
+    const newHost = vi.fn();
+    window.onresize = oldHost;
+    first.setWindowOnEvent(window, 'onresize', vi.fn());
+    second.setWindowOnEvent(window, 'onresize', vi.fn());
+    first.cleanupAll();
+    second.cleanupAll();
+    expect(window.onresize).toBe(oldHost);
+
+    window.onresize = newHost;
+    second.setWindowOnEvent(window, 'onresize', vi.fn());
+    first.setWindowOnEvent(window, 'onresize', vi.fn());
+    second.cleanupAll();
+    first.cleanupAll();
+    expect(window.onresize).toBe(newHost);
+  });
+});
