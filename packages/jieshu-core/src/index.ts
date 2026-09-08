@@ -340,6 +340,10 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
     return undefined;
   }
   try {
+    // Initial HTML/CSS processing runs before active() installs runtime options.
+    if (replace) {
+      newSandbox.replace = replace;
+    }
     newSandbox.lifecycles?.beforeLoad?.(iframeWindow);
     if (isSandboxUnavailable(newSandbox, canContinue)) {
       return undefined;
@@ -458,6 +462,9 @@ export function preloadApp(preOptions: PreOptions): void {
       }
       const runPreload = async () => {
         try {
+          if (replace) {
+            sandbox.replace = replace;
+          }
           sandbox.lifecycles?.beforeLoad?.(iframeWindow);
           if (isSandboxUnavailable(sandbox, () => true)) return;
           const { template, getExternalScripts, getExternalStyleSheets } = await importHTML({

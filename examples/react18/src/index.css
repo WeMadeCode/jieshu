@@ -11,10 +11,25 @@ body {
 }
 
 .react18-app {
-  max-width: 880px;
+  box-sizing: border-box;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 32px 24px;
+  font-size: 14px;
   line-height: 1.6;
+}
+
+.react18-app--embedded {
+  max-width: none;
+  padding: 24px;
+}
+.react18-app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
 }
 
 .stack {
@@ -23,21 +38,24 @@ body {
 }
 
 h1 {
-  margin: 12px 0;
-  font-size: 36px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 650;
+  color: #2d4559;
 }
 
 h2 {
   margin-top: 0;
-  font-size: 20px;
+  font-size: 18px;
+  color: #2d4559;
 }
 
 section {
-  margin-top: 28px;
+  margin-top: 0;
   padding: 24px;
   background: white;
-  border: 1px solid #dce5ef;
-  border-radius: 12px;
+  border: 1px solid #e3eaf0;
+  border-radius: 10px;
 }
 
 .actions {
@@ -48,19 +66,33 @@ section {
 
 .hint {
   color: #66768a;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .react18-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
-  margin: 24px 0;
+  gap: 4px;
+  padding: 4px;
+  margin: 0;
+  border-radius: 8px;
+  background: #f1f5f7;
 }
 
+.react18-nav a {
+  padding: 5px 14px;
+  border-radius: 6px;
+  color: #728396;
+  text-decoration: none;
+  font-size: 13px;
+}
+.react18-nav a:hover {
+  color: #087e9a;
+}
 .react18-nav a.active {
   color: #087e9a;
-  border-bottom: 2px solid currentColor;
+  background: white;
+  box-shadow: 0 1px 4px #2030470d;
   font-weight: 600;
 }
 
@@ -87,4 +119,199 @@ section {
 
 dd {
   overflow-wrap: anywhere;
+}
+
+.communication-page h2,
+.state-page h2 {
+  margin-bottom: 6px;
+}
+.communication-intro,
+.state-intro {
+  color: #7a899b;
+  margin: 0 0 20px;
+  font-size: 13px;
+}
+.communication-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+}
+.communication-block {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #e6edf0;
+  border-radius: 9px;
+  background: #fbfcfd;
+}
+.communication-direction {
+  color: #438690;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.communication-block h3,
+.communication-navigation h3,
+.state-navigation h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #344d62;
+  margin: 5px 0 16px;
+}
+.communication-value {
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid #e9eef2;
+  border-radius: 6px;
+  background: #fff;
+}
+.communication-value > span,
+.communication-value-label {
+  color: #8a97a7;
+  font-size: 11px;
+}
+.communication-value > output {
+  display: block;
+  margin-top: 4px;
+  color: #42586c;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.communication-value-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.communication-count {
+  color: #57939c;
+}
+.communication-count output {
+  font-weight: 600;
+}
+.communication-compose {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.communication-compose > input {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.communication-page .ant-btn {
+  border-radius: 6px;
+  box-shadow: none;
+  font-size: 13px;
+}
+.communication-page .ant-input {
+  border-radius: 6px;
+  font-size: 13px;
+}
+.communication-compose .ant-btn-primary:not(:disabled) {
+  background: #35858f;
+  border-color: #35858f;
+}
+.communication-compose .ant-btn-primary:not(:disabled):hover {
+  background: #276f78;
+  border-color: #276f78;
+}
+.communication-block > .hint {
+  margin: 10px 0 0;
+}
+.communication-alternatives {
+  border-top: 1px solid #e8edf2;
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.communication-alternatives > span {
+  display: block;
+  margin-bottom: 10px;
+  color: #8a97a7;
+  font-size: 12px;
+}
+.communication-page .actions {
+  gap: 8px;
+}
+.communication-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #e8edf2;
+  margin-top: 22px;
+  padding-top: 20px;
+}
+.communication-navigation h3 {
+  margin: 0 0 3px;
+}
+.communication-navigation .hint {
+  margin: 0;
+}
+.state-counter-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 600px;
+  padding: 22px 24px;
+  border: 1px solid #e0ebed;
+  background: #f6fafb;
+  border-radius: 10px;
+}
+.state-counter-label {
+  display: block;
+  color: #526d7e;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.state-stepper .number {
+  min-width: 64px;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.state-stepper .ant-btn {
+  border-radius: 7px;
+  box-shadow: none;
+}
+.state-stepper .ant-btn:not(:last-child) {
+  min-width: 34px;
+  height: 34px;
+}
+.state-stepper .ant-btn:last-child {
+  margin-left: 12px;
+}
+.state-navigation {
+  margin-top: 24px;
+}
+.state-navigation h3 {
+  margin: 0 0 12px;
+}
+.state-navigation .hint {
+  margin: 12px 0 0;
+}
+@media (max-width: 640px) {
+  .react18-app,
+  .react18-app--embedded {
+    padding: 16px;
+  }
+  .react18-app-header {
+    gap: 12px;
+  }
+  .react18-app h1 {
+    font-size: 20px;
+  }
+  .react18-nav a {
+    padding: 5px 10px;
+  }
+  .react18-app > section {
+    padding: 18px;
+  }
+  .communication-block {
+    padding: 16px;
+  }
+  .state-counter-panel {
+    padding: 18px;
+  }
 }

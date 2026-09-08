@@ -89,7 +89,9 @@ if (destroy) {
 
 先前独立发起的销毁即使失败，也不会永久阻止后续启动：`startApp` 等待旧实例清理结束后仍可创建新实例，原始销毁调用仍接收原来的错误。若需要一次操作中“销毁失败就停止重建”，使用 [refreshApp](/api/refreshApp.html)。
 
-启动完成不表示应用的所有后台异步任务都已完成，例如内联 module 的 top-level await，详见 [iframe 内联 module 的执行顺序](/guide/information.html#iframe-内联-module-的执行顺序)。
+初始外部 async 脚本不会阻塞框架派发的 `DOMContentLoaded`，但其加载与执行句柄完成后，框架才派发 `load` 并完成 `startApp`。失败会结束对应等待，取消启动也会释放等待；不会因取消而等待一个始终不返回的请求。
+
+启动完成不表示应用的所有后台异步任务都已完成，例如模块的 top-level await 或独立 `import()`。显式 async 内联 module 保持独立调度，启动只确认它已插入，不等待其依赖加载或求值，详见 [iframe 内联 module 的执行顺序](/guide/information.html#iframe-内联-module-的执行顺序)。
 
 框架识别到卸载钩子内启动自身的重入时，会将这次启动视为取消，返回 `undefined`，不创建替换实例；新启动应由主应用在卸载完成后发起。通过 props 传入的主应用异步回调需要显式使用 [runAsUnmountReentry](/api/runAsUnmountReentry.html)。
 
@@ -206,12 +208,16 @@ if (destroy) {
   `replace`函数可以在运行时处理子应用的代码，如果子应用不方便修改代码，可以在这里进行代码替换，子应用的`html`、`js`、`css`代码均会做替换
   :::
 
+首次 `startApp` 和 `preloadApp` 就会应用 `replace`，也支持通过 `setupApp` 提供配置。初始模板按 `htmlLoader → 静态 cssLoader → replace` 处理：静态 CSS 先嵌入模板，再对完整模板替换一次。JavaScript 按 `replace → jsLoader` 处理。缓存保存的是替换前的资源，新实例仍使用本次配置处理；预加载已处理好的模板在随后激活时直接复用。
+
 ## fetch
 
 - **类型：** `(input: RequestInfo, init?: RequestInit) => Promise<Response>`
 
 - **详情：**
-  自定义 fetch，添加自定义`fetch`后，子应用的静态资源请求和采用了 `fetch` 的接口请求全部会走自定义`fetch`
+  自定义 fetch，框架获取的 HTML、JavaScript、CSS，以及子应用采用 `fetch` 的接口请求会经过该函数。通过浏览器原生加载的外部 module、忽略资源及模块依赖不经过该函数。
+
+  框架资源缓存按 URL 和 `fetch` 函数身份隔离。同一函数可跨实例复用资源；其内部登录态、租户或 Cookie 改变时，需在重新加载前调用 [clearAssetsCache](/api/clearAssetsCache.html)。接口响应不存入框架资源缓存。
 
   ::: tip 技巧
   对于需要携带 cookie 的请求，可以采用自定义 `fetch` 方式实现：`(url, options) => window.fetch(url, { ...options, credentials: "include" })`

@@ -24,6 +24,8 @@ pnpm --filter react18 test
 
 ## 路由与保活
 
+手动验证核心能力时，从 Rspack 主应用的 React18 页面进入：顶部可发送消息、刷新、销毁和重新挂载。子应用“通信”页展示主应用注入值、消息接收次数，并提供回传输入框与按钮；“状态”页用于对比保活与重建后的计数。
+
 - 普通 React18 入口开启 `sync`，将子路由写入主应用 URL 的 `react18` 参数。
 - `/react18-sub/:path` 入口通过 `react18-router-change` 控制保活实例；子应用通过 `sub-route-change` 同步主应用菜单。首次启动通过 `react18-router-ready` 通知主应用，兼容预加载和异步 module 入口。
 - `alive` 开启后，切换主应用只会停用实例，再次进入保留路由和计数；浏览器刷新会重新创建实例。

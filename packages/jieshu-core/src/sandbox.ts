@@ -11,7 +11,7 @@ import {
 } from './shadow';
 import { proxyGenerator } from './proxy';
 import type { ScriptResultList } from './entry';
-import { releaseAssetCacheScope } from './entry';
+import { bindFetchCacheContext, releaseAssetCacheScope } from './entry';
 import { getPlugins, getPresetLoaders } from './plugin';
 import { removeEventListener } from './effect';
 import {
@@ -240,6 +240,9 @@ export default class Jieshu {
       ? (input: RequestInfo, init?: RequestInit) =>
           fetch(typeof input === 'string' ? getAbsolutePath(input, (this.proxyLocation as Location).href) : input, init)
       : this.fetch;
+    if (fetch && iframeFetch) {
+      bindFetchCacheContext(iframeFetch, fetch);
+    }
     if (iframeFetch) {
       iframeWindow.fetch = iframeFetch;
       this.fetch = iframeFetch;
@@ -366,6 +369,7 @@ export default class Jieshu {
 
     const syncCompletions = new Map<ScriptResultList[number], Promise<void>>();
     scripts.sync.forEach((script) => syncCompletions.set(script, scheduleSerialScript(script)));
+    const asyncCompletions: Promise<void>[] = [];
 
     // Async fetches may finish independently, but a script cannot execute
     // before a preceding parser-blocking classic script has executed. Keep a
@@ -374,7 +378,12 @@ export default class Jieshu {
     scriptResultList.forEach((script) => {
       if (script.async) {
         const ready = Promise.all([parserBarrier, script.contentPromise]).then(([, content]) => content);
-        scheduler.executeAfter(ready, (content) => insertScriptToIframe({ ...script, content }, iframeWindow));
+        asyncCompletions.push(
+          scheduler.executeAfter(
+            ready,
+            (content) => insertScriptToIframe({ ...script, content }, iframeWindow).completion,
+          ),
+        );
       } else if (!script.defer) {
         parserBarrier = syncCompletions.get(script) ?? parserBarrier;
       }
@@ -390,6 +399,10 @@ export default class Jieshu {
     scheduler.schedule(() => this.mount());
     this.scheduleLifecycleEvent(scheduler, iframeWindow, 'DOMContentLoaded');
     afterScripts.forEach((script) => schedulePreset(script));
+    // Initial async scripts do not delay DOMContentLoaded, but load and start()
+    // must observe their actual load/error completion. Explicitly async inline
+    // modules only acknowledge scheduling; their native semantics stay intact.
+    scheduler.scheduleAfter(Promise.all(asyncCompletions), () => scheduler.advance());
     this.scheduleLifecycleEvent(scheduler, iframeWindow, 'load');
     // 由于没有办法准确定位是哪个代码做了mount，保活、重建模式提前关闭loading
     if (this.alive || !isFunction(iframeWindow.__JIESHU_UNMOUNT)) removeLoading(this.el);

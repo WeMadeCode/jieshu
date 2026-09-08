@@ -7,7 +7,12 @@ interface Window {
   __JIESHU?: { mount: () => void };
   $jieshu?: {
     location: Location;
-    props?: { jump?: (name: string) => void; route?: string };
+    props?: {
+      jump?: (name: string) => void;
+      route?: string;
+      message?: string;
+      report?: (message: string) => void;
+    };
     bus: {
       $emit: <Arguments extends unknown[]>(event: string, ...args: Arguments) => void;
       $on: <Arguments extends unknown[]>(event: string, callback: (...args: Arguments) => void) => void;

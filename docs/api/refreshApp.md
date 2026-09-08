@@ -10,6 +10,8 @@
 
 销毁和重建属于同一次操作，由框架保证调用顺序。
 
+刷新会重建运行时，但保留可复用的已完成资源缓存。若代码、登录态或租户发生变化，需要重新获取同 URL 的资源，请先调用 [clearAssetsCache](/api/clearAssetsCache.html)，再刷新。
+
 ## 完成、取消与异常
 
 主应用普通调用会等待旧实例的异步卸载和清理结束，再等待新实例的启动流程完成，成功后返回新实例的销毁函数。同名应用已有进行中的卸载时，返回的 Promise 也会等待，不会提前确认刷新完成。
@@ -23,7 +25,7 @@
 ::: tip 使用场景
 
 - 子应用处于 [重建模式](/guide/mode.html#重建模式)，需要强制全量重建以清空状态、重新加载资源
-- 子应用代码或静态资源已更新，需要销毁旧实例后重新拉取
+- 子应用代码或静态资源已更新，清理资源缓存后销毁旧实例并重新拉取
 - 使用 Vue / React 组件封装时，也可通过组件 ref 调用 [refresh()](/pack/#refresh)，**无需传参**，自动复用组件当前 props 全量重建
 
 :::
@@ -39,8 +41,10 @@
 ## 示例
 
 ```javascript
-import { refreshApp } from '@cloud/jieshu-core';
+import { clearAssetsCache, refreshApp } from '@cloud/jieshu-core';
 
+// 资源或请求上下文已变化时，先失效相关缓存；仅重建运行时时可省略。
+clearAssetsCache('https://xxx.com/');
 await refreshApp({
   name: 'vue3',
   url: 'https://xxx.com/',

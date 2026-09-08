@@ -1,6 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { awaitConsoleLogMessage } from './utils';
 import {
   reactMainAppInfoMap,
   reactMainAppNameList,
@@ -29,10 +28,12 @@ const generateTest = (
 ) => {
   AppNameList.slice(0, 5).forEach((appName) => {
     it(`${appName} proxy test`, async () => {
-      const appInfo = (AppInfoMap as Record<string, { linkSelector: string; mountedMessage: string }>)[appName];
-      const childApplicationMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
+      const appInfo = Object.entries(AppInfoMap).find(([name]) => name === appName)?.[1];
+      if (!appInfo) {
+        throw new Error(`Missing application fixture: ${appName}`);
+      }
       await page.click(appInfo.linkSelector);
-      await childApplicationMountedPromise;
+      await expect(page.getByText(appInfo.titleText, { exact: true })).toBeVisible();
 
       // 测试boundValue缓存，及作用域
       const { targetCurrentAttribute, isSameBoundFn } = await page.evaluate((childName) => {

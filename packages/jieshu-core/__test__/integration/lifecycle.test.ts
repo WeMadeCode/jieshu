@@ -16,11 +16,12 @@ test.afterAll(async () => {
   await page.close();
 });
 
-const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainAppInfoMap) => {
+const generateTest = (
+  AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainAppInfoMap,
+  react16EntryLifecycles = AppInfoMap.react16.entryLifecycles,
+) => {
   it(`react16 entry lifecycles`, async () => {
-    const lifecyclePromiseList = reactMainAppInfoMap.react16.entryLifecycles.map((lifecycle) =>
-      awaitConsoleLogMessage(page, lifecycle),
-    );
+    const lifecyclePromiseList = react16EntryLifecycles.map((lifecycle) => awaitConsoleLogMessage(page, lifecycle));
     await page.click(AppInfoMap.react16.linkSelector);
     await Promise.all(lifecyclePromiseList);
   });
@@ -56,7 +57,7 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
 
   it(`react16 entry again lifecycles`, async () => {
     const lifecyclePromiseList = AppInfoMap.vite.leaveLifecycles
-      .concat(AppInfoMap.react16.entryLifecycles.slice(1))
+      .concat(react16EntryLifecycles.slice(1))
       .map((lifecycle) => awaitConsoleLogMessage(page, lifecycle));
     await page.click(AppInfoMap.react16.linkSelector);
     await Promise.all(lifecyclePromiseList);
@@ -101,7 +102,13 @@ describe('main react startApp', () => {
     });
     await page.goto(reactMainUrl);
   });
-  generateTest(reactMainAppInfoMap);
+  // The Rspack example deliberately overrides these two hooks on its React16
+  // page. Keep checking the hooks themselves using that example's messages.
+  const react16EntryLifecycles =
+    process.env['JIESHU_REACT_MAIN_WORKSPACE'] === 'main-react-ts'
+      ? ['react16 beforeLoad 生命周期', 'React 16 Before mount =  Window', 'React 16 After mount =  Window']
+      : reactMainAppInfoMap.react16.entryLifecycles;
+  generateTest(reactMainAppInfoMap, react16EntryLifecycles);
 });
 
 describe('main vue startApp', () => {

@@ -23,7 +23,6 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
     const jsBeforeLoaderPromise = awaitConsoleLogMessage(page, 'js-before-loader-callback react16');
     const jsLoaderPromise = awaitConsoleLogMessage(page, 'js-loader http://localhost:7600/static/js/bundle.js');
     const jsAfterLoaderPromise = awaitConsoleLogMessage(page, 'js-after-loader-callback react16');
-    const mountPromise = awaitConsoleLogMessage(page, AppInfoMap.react16.mountedMessage);
     await page.click(AppInfoMap.react16.linkSelector);
     await Promise.all([
       htmlLoaderPromise,
@@ -31,8 +30,8 @@ const generateTest = (AppInfoMap: typeof reactMainAppInfoMap | typeof vueMainApp
       jsBeforeLoaderPromise,
       jsLoaderPromise,
       jsAfterLoaderPromise,
-      mountPromise,
     ]);
+    await expect(page.getByText(AppInfoMap.react16.titleText, { exact: true })).toBeVisible();
     const title = await page.evaluateHandle<Element>(AppInfoMap.react16.titleJsSelector);
     expect(await title.asElement()!.evaluate((el) => window.getComputedStyle(el).color)).toBe('rgb(241, 107, 95)');
     const dialogMountedPromise = awaitConsoleLogMessage(page, AppInfoMap.react16.dialogMountedMessage);

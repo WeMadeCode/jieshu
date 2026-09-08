@@ -226,6 +226,8 @@ const script = `(function(window, self, global, location) {
 
 框架不会给动态内联 module 合成成功 `load`；依赖加载失败保留 `error` 通知，语法和运行时异常仍通过浏览器全局错误机制报告，并释放后续队列。HTML 中显式标记 `async` 的内联 module 独立调度，不占用串行完成标记；动态插入仍沿用现有应用内队列策略。
 
+初始外部 async 脚本独立加载，不阻塞合成的 `DOMContentLoaded`。框架会等这些脚本的执行句柄完成（包括原生 `load/error`）再派发 window `load`、完成 `startApp`。显式 async 内联 module 仍只确认插入，不等待其依赖和求值；外部 module 的原生完成事件也不表示 top-level await 已结束。
+
 非保活卸载会取消框架资源并调用 iframe 的 `stop()` 中止待处理的原生加载，防止复用 iframe 时新模块被旧依赖请求挡住。保活失活不会中止这些请求；已开始执行的 JavaScript、已经进入 top-level await 的异步任务无法由此回滚。
 
 ### iframe 和 shadowRoot 副作用的处理

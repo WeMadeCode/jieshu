@@ -30,10 +30,9 @@ describe('main react startApp', () => {
   });
   it('check react16 font-face', async () => {
     const appInfo = reactMainAppInfoMap.react16;
-    const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
     expect(await page.evaluate(hasInjectedFontRule)).toBe(false);
     await page.click(appInfo.linkSelector);
-    await appInfoMountedPromise;
+    await expect(page.getByText(appInfo.titleText, { exact: true })).toBeVisible();
     const appInfoFontMountedPromise = awaitConsoleLogMessage(page, appInfo.fontMountedMessage);
     await triggerClickByJsSelector(page, appInfo.fontNavSelector);
     await appInfoFontMountedPromise;
@@ -56,10 +55,9 @@ describe('main vue startApp', () => {
   });
   it('check react16 font-face', async () => {
     const appInfo = vueMainAppInfoMap.react16;
-    const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
     expect(await page.evaluate(hasInjectedFontRule)).toBe(false);
     await page.click(appInfo.linkSelector);
-    await appInfoMountedPromise;
+    await expect(page.getByText(appInfo.titleText, { exact: true })).toBeVisible();
     const appInfoFontMountedPromise = awaitConsoleLogMessage(page, appInfo.fontMountedMessage);
     await triggerClickByJsSelector(page, appInfo.fontNavSelector);
     await appInfoFontMountedPromise;

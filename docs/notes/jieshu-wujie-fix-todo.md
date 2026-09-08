@@ -1,6 +1,6 @@
 # jieshu 与 wujie 源码缺陷修复 TODO
 
-本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，已修复 7 项（FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012），剩余 5 项 P2**。修复范围、验证结果和限制见对应条目及文末交付记录。
+本文记录 2026-09-07 源码对比中发现的问题，供后续修复、补充回归测试和更新公开契约使用。初始审计记录 11 项，修复中新增 FIX-012；当前共 **12 项，均已完成约定范围内的修复**。修复范围、验证结果和限制见对应条目及文末交付记录。
 
 ## 使用与关闭规则
 
@@ -46,15 +46,15 @@ node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/u
 - [x] **P2 · [FIX-004](#fix-004)**：公开 API 的 Promise 提前完成。已恢复普通调用的完成和错误语义，并明确同步/子应用重入与异步主应用回调的处理。
 - [x] **P2 · [FIX-005](#fix-005)**：多份 core 的事件清理恢复已销毁实例的处理器。已按目标 window 共享覆盖栈，保留主应用中途更新，并验证独立 bundle 与跨 realm 清理。
 - [x] **P2 · [FIX-006](#fix-006)**：子应用路由同步清空主应用 `history.state`。已保留当前主应用历史项状态，并验证真实路由器、参数清理及前进后退。
-- [ ] **P2 · [FIX-007](#fix-007)**：合成 `load` 早于 async 脚本执行。两边共有。
-- [ ] **P2 · [FIX-008](#fix-008)**：已完成资源缓存跨请求上下文串用。风险已复现，缓存共享契约需要明确。
-- [ ] **P2 · [FIX-009](#fix-009)**：首次 HTML/CSS 处理未应用 `replace`。两边共有。
-- [ ] **P2 · [FIX-010](#fix-010)**：资源的属性回调与事件监听器不能同时收到通知。jieshu 已复现，wujie 有相同实现。
-- [ ] **P2 · [FIX-011](#fix-011)**：EventBus 无法处理与对象原型属性同名的事件。jieshu 已复现，wujie 有相同实现。
+- [x] **P2 · [FIX-007](#fix-007)**：合成 `load` 早于 async 脚本执行。已为初始 async 资源增加可取消完成屏障，保留 DOMContentLoaded 和显式 async 内联 module 的独立语义。
+- [x] **P2 · [FIX-008](#fix-008)**：已完成资源缓存跨请求上下文串用。已按 fetch 函数身份隔离 HTML/JS/CSS，保留同上下文复用及显式失效。
+- [x] **P2 · [FIX-009](#fix-009)**：首次 HTML/CSS 处理未应用 `replace`。已在首次 start/preload 处理模板前初始化替换配置。
+- [x] **P2 · [FIX-010](#fix-010)**：资源的属性回调与事件监听器不能同时收到通知。已统一在原始节点派发所属 realm 的原生 Event。
+- [x] **P2 · [FIX-011](#fix-011)**：EventBus 无法处理与对象原型属性同名的事件。已使用无原型字典、自有属性查询及安全写入。
 
 - [x] **P2 · [FIX-012](#fix-012)**：内联 module 等待成功 load 导致队列阻塞。已改用独立的原生 module 完成标记，并验证模块语法、顺序、错误及取消路径。
 
-FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012 已修复。下一项建议处理 FIX-007，随后处理资源缓存、资源通知和 EventBus。FIX-003 的回归继续保留重复调用 `destroyApp` 的场景，并验证两个调用都在清理结束后接收结果。
+本轮统一完成 FIX-007～FIX-011，验证范围见下方交付记录。FIX-003 的回归继续保留重复调用 `destroyApp` 的场景，并验证两个调用都在清理结束后接收结果。
 
 ## FIX-001
 
@@ -289,18 +289,24 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012 已修复。
 2. 后面包含 `<script async src="/slow.js"></script>`，用自定义 fetch 的受控 Promise 暂停响应。
 3. 观察 `startApp` 返回及 `load` 是否发生，再释放脚本响应，令其记录 `async-script`。
 
-**实际结果：** 两个仓库均在 async 脚本未完成时触发 `load`；`startApp` 返回时日志已经为 `["load"]`，最终为 `["load", "async-script"]`。
+**修复前实际结果：** 两个仓库均在 async 脚本未完成时触发 `load`；`startApp` 返回时日志已经为 `["load"]`，最终为 `["load", "async-script"]`。
 
 **原因与影响：** async 的独立执行路径不进入 load 的完成屏障。依赖 window load 确认初始资源就绪的代码可能过早运行。不要将修复理解为“所有 async 都必须阻塞 DOMContentLoaded”；两类浏览器事件的等待语义需要区分。
 
 **修复与验收：**
 
-- [ ] 为初始 async 资源维护独立完成屏障，覆盖 fetch 完成之后的实际原生 script load/error。
-- [ ] 保持 DOMContentLoaded 不被普通 async 请求阻塞，并保留 defer/module 的相应执行顺序。
-- [ ] 明确 `startApp` 对启动完成的承诺；至少确保派发的 load 与初始资源完成时序一致。
-- [ ] 覆盖 async 成功、失败、原生回退、多个并发请求及 destroy 取消。
-- [ ] 对同步、defer、async、module 的组合加入浏览器事件顺序断言。
-- [ ] 在 `sandbox-start.test.ts`、`iframe-script.test.ts` 及集成生命周期测试中补充验证。
+- [x] 为初始 async 资源维护独立完成屏障，覆盖 fetch 完成之后的实际原生 script load/error。
+- [x] 保持 DOMContentLoaded 不被普通 async 请求阻塞，并保留 defer/module 的相应执行顺序。
+- [x] 明确 `startApp` 对启动完成的承诺；至少确保派发的 load 与初始资源完成时序一致。
+- [x] 覆盖 async 成功、失败、原生回退、多个并发请求及 destroy 取消。
+- [x] 对同步、defer、async、module 的组合加入浏览器事件顺序断言。
+- [x] 在 `sandbox-runtime.test.ts` 和真实 `async-load.test.mts` 补充验证，保留启动与内联 module 回归。
+
+**已实施修复（2026-09-08）：** `executeAfter` 返回涵盖请求就绪、fiber 调度和执行句柄完成的 Promise；启动器汇总初始 async 的完成态，在 DOMContentLoaded、挂载及后置预设之后、合成 load 之前等待。请求失败或原生 error 都能结束对应等待；取消、卸载、销毁会释放屏障，不再派发本代次的合成 load，未开始的调度任务不再执行。非保活卸载/销毁中止待处理原生资源；保活失活仍保留已插入资源的原生加载，已开始的 JavaScript 不承诺回滚。异步任务抛错仍通过启动调度器报告。
+
+**完成边界：** 初始外部 async 经典脚本和外部 module 纳入 load/startApp 等待，普通 async 请求不延迟 DOMContentLoaded。沿用 FIX-012：显式 async 内联 module 只确认已插入，不等待依赖或求值；外部 module 的原生 load 也不等待 TLA 或独立 import()。已在 startApp API 和运行原理文档写明。
+
+**回归结果：** `sandbox-runtime.test.ts` 新增 7 项单测；首批 5 项在修复前失败。新增 `async-load.test.mts` 19 项真实 Chromium 测试，首批 5 项修前失败，修后全部通过。覆盖两种 fiber、同步/defer/async/module 混合顺序、多请求、网络/原生失败、预设、取消、卸载及同名重启，旧内联 module 回归继续通过。
 
 ## FIX-008
 
@@ -315,7 +321,7 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012 已修复。
 3. 再次调用 `importHTML`，使用 fetch B 和另一个新的 cache scope。
 4. 检查第二次 fetch 调用次数和入口模板。
 
-**实际结果：** 第二个 fetch 调用次数为 0，模板仍为 `<html><body>tenant-A</body></html>`。本次直接复现了 HTML；JS/CSS 使用同类缓存策略，仍需分别增加行为用例。
+**修复前实际结果：** 第二个 fetch 调用次数为 0，模板仍为 `<html><body>tenant-A</body></html>`。初始审计直接复现了 HTML；本轮已补齐 JS/CSS 的独立用例，结果见下方回归记录。
 
 **原因与影响：** scope 只隔离 pending 工作；已 fulfilled 的结果允许跨 scope 共享，而且共享键没有包含响应变化所依赖的请求上下文。对 URL 内容不可变的静态资源，这是有效优化；对依据登录态、租户或灰度条件变化的同 URL 入口，则可能返回另一个上下文的数据。本次没有验证真实账号数据泄漏，确认的是不同 fetch 上下文返回值被串用。
 
@@ -323,13 +329,21 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012 已修复。
 
 **修复与验收：**
 
-- [ ] 明确可跨实例共享资源的前提，为上下文相关资源提供缓存命名空间、失效或禁用策略。
-- [ ] 评估自定义 fetch 身份、显式 cache key/namespace 等方案；不要在未明确契约时一律取消静态资源共享。
-- [ ] 若调整公开选项或刷新语义，同步类型、适配包透传和 API 文档。
-- [ ] 覆盖不同上下文相同 URL、同上下文复用、同 scope 请求合并和失败重试。
-- [ ] 保留旧 pending 请求不阻塞新实例、旧拒绝不删除新缓存、清理后迟到请求不重新污染缓存的保护。
-- [ ] 在 `asset-cache.test.ts`、`entry-pipeline.test.ts` 分别覆盖 HTML、JS、CSS。
-- [ ] 更新 `docs/api/clearAssetsCache.md`、`docs/api/refreshApp.md` 和自定义 fetch 的使用边界。
+- [x] 明确可跨实例共享资源的前提，为上下文相关资源提供缓存命名空间、失效或禁用策略。
+- [x] 评估自定义 fetch 身份、显式 cache key/namespace 等方案；不要在未明确契约时一律取消静态资源共享。
+- [x] 若调整公开选项或刷新语义，同步类型、适配包透传和 API 文档。
+- [x] 覆盖不同上下文相同 URL、同上下文复用、同 scope 请求合并和失败重试。
+- [x] 保留旧 pending 请求不阻塞新实例、旧拒绝不删除新缓存、清理后迟到请求不重新污染缓存的保护。
+- [x] 在 `cache-fetch-context.test.ts` 和 `entry-pipeline.test.ts` 分别覆盖 HTML、JS、CSS，保留 asset-cache 回归。
+- [x] 更新 `docs/api/clearAssetsCache.md`、`docs/api/refreshApp.md` 和自定义 fetch 的使用边界。
+
+**已实施修复（2026-09-08）：** URL 下按 fetch 函数身份保存独立缓存，函数身份通过弱引用 token 管理；默认 fetch 与子应用的 URL 包装函数继承原函数身份，避免静态和动态资源拆成不同上下文。同一 fetch 的已完成资源可跨实例复用，pending 请求仍受启动代次约束。按前缀清理会使全部匹配上下文失效，迟到请求不能回填；旧拒绝不能移除新请求。同步 fetch 重入销毁时，通过已释放 scope 标记阻止稍后登记旧缓存；明确为空的失败 bucket 会删除。
+
+**共享契约：** 没有新增公开配置，不需要适配包透传。不同 fetch 自动隔离；同一个函数闭包内的登录态、租户、Cookie 或灰度变化不可由函数身份推断，调用者须在重新加载前 clearAssetsCache，或为不同上下文提供独立且稳定的 fetch。destroy/refresh 保留已完成缓存。原生模块及忽略资源遵从浏览器加载策略，不纳入这层缓存；接口响应也不缓存。已同步 clearAssetsCache、refreshApp 和 fetch 文档。
+
+**回归结果：** 新增 `cache-fetch-context.test.ts` 21 项，覆盖 HTML/JS/CSS 的 A→B→A 复用、交错 pending 合并、前缀/全量清理、同函数可变租户、旧拒绝和同步重入清理。用 `09309c6` 的独立源码快照执行同一组用例，修前 18 失败、3 对照通过；修后 21 全通过。审查补出的同步 scope 释放问题单独复现为 3 项失败，修后通过。更新 entry-pipeline 中依赖跨 fetch 共享的旧预期；销毁 fixture 补全真实实例原本具备的 assetCacheScope，不改变销毁断言。
+
+新增 `cache-context.test.mts` 3 项真实 Chromium 聚合场景，验证并行不同 fetch 的模板/CSS computed style/JS 结果独立；同 fetch 跨动态插入、新实例和 refresh，三类资源各请求一次；显式清理后 refresh 全部切换为新租户。这里只验证受控上下文隔离，没有声称复现真实账号数据泄漏。
 
 ## FIX-009
 
@@ -343,18 +357,22 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012 已修复。
 2. 配置 `replace: (code) => code.split('PLACEHOLDER').join('REPLACED')`。
 3. 等待 `startApp` 完成，检查子应用 body 文本。
 
-**实际结果：** 两个仓库都仍显示 `PLACEHOLDER`，预期为 `REPLACED`。实际浏览器用例直接确认了 HTML；静态 CSS 与其共享模板处理路径，需要补充单独断言。
+**修复前实际结果：** 两个仓库都仍显示 `PLACEHOLDER`，预期为 `REPLACED`。初始浏览器用例直接确认了 HTML；本轮已对共享模板处理路径中的内联和外联 CSS 补充单独断言。
 
 **原因与影响：** `processCssLoader` 在 `active({ replace })` 之前执行，读取到的新 sandbox 的 `replace` 尚未设置。后续 JavaScript 和动态资源可能正常应用 replace，导致“脚本替换生效、首屏模板替换失效”的不一致。公开文档声明 HTML、JS、CSS 均会替换。
 
 **修复与验收：**
 
-- [ ] 在首次入口处理前准备好替换配置，或显式传入转换函数，不依赖尚未发生的 active 副作用。
-- [ ] 明确 replace 与 htmlLoader、cssLoader、jsLoader 的执行顺序及次数，避免一次修复引入重复替换。
-- [ ] 覆盖首次 start、preload 后 start、refresh、缓存命中和 `setupApp` 提供 replace 的情况。
-- [ ] 分别断言 HTML、内联/外联 CSS、JavaScript 的替换结果。
-- [ ] 验证 replace 抛错或重入销毁时不会留下半初始化实例。
-- [ ] 在 `entry-pipeline.test.ts`、公开启动测试及浏览器测试中加入首屏占位符用例。
+- [x] 在首次入口处理前准备好替换配置，或显式传入转换函数，不依赖尚未发生的 active 副作用。
+- [x] 明确 replace 与 htmlLoader、cssLoader、jsLoader 的执行顺序及次数，避免一次修复引入重复替换。
+- [x] 覆盖首次 start、preload 后 start、refresh、缓存命中和 `setupApp` 提供 replace 的情况。
+- [x] 分别断言 HTML、内联/外联 CSS、JavaScript 的替换结果。
+- [x] 验证 replace 抛错或重入销毁时不会留下半初始化实例。
+- [x] 在 `initial-replace.test.ts`、对应浏览器测试中加入公开启动与首屏占位符用例。
+
+**已实施修复（2026-09-08）：** 在新实例 start/preload 的 beforeLoad 与入口处理之前安装已解析的 replace 配置，覆盖 setupApp 的默认值。初始模板顺序为 htmlLoader → 静态 cssLoader → replace（完整嵌入模板一次）；每份 JavaScript 为 replace → jsLoader。缓存保持替换前的资源，新实例按自己的配置处理；preload 已处理好的模板在随后激活时直接复用，避免重复替换。没有更改预设 CSS 的独立处理路径。
+
+**回归结果：** 新增 `initial-replace.test.ts` 6 项，修前全失败，修后全通过；覆盖首次/setup、replace 抛错及重入销毁、start/preload 的清理。新增 `initial-replace.test.mts` 12 项 Chromium 回归，覆盖 fiber 两种设置 × 首次/setup/preload(exec=false/true)/refresh/缓存；分别检查 HTML、内联/外联 CSS、JavaScript 的实际结果，以及 loader 顺序和次数。
 
 ## FIX-010
 
@@ -368,18 +386,22 @@ FIX-001、FIX-002、FIX-003、FIX-004、FIX-005、FIX-006、FIX-012 已修复。
 2. 通过已 patch 的子应用 head 插入，令自定义 fetch 返回有效脚本。
 3. 等待处理完成，检查两个处理器的调用次数。
 
-**实际结果：** handlerA 调用 1 次，handlerB 调用 0 次；预期两者各调用 1 次。此项已通过 jieshu 定向用例复现，wujie 的结论来自对应源码，没有为它另跑该用例。
+**修复前实际结果：** handlerA 调用 1 次，handlerB 调用 0 次；预期两者各调用 1 次。此项已通过 jieshu 定向用例复现，wujie 的结论来自对应源码，没有为它另跑该用例。
 
 **原因与影响：** 实现检测到 onload/onerror 属性处理器后直接调用，只有不存在属性处理器时才 dispatch。资源加载器、监控插件或业务同时使用两种订阅方式时，一方可能无法收到完成通知。
 
 **修复与验收：**
 
-- [ ] 建立统一的事件派发路径，使属性回调和 addEventListener 监听器都能收到通知。
-- [ ] 保证属性回调不被手动调用与原生 dispatch 重复触发。
-- [ ] 验证 `target`、`currentTarget`、回调 `this` 指向原始资源节点，而非内部替代节点。
-- [ ] 覆盖 script/link、load/error、只设置属性、只注册监听器及两者同时存在。
-- [ ] 覆盖监听器抛错、once、removeEventListener 和回调中重入插入资源，保证不会卡住队列。
-- [ ] 将行为用例纳入动态脚本和动态 stylesheet 测试，并补充真实浏览器事件验证。
+- [x] 建立统一的事件派发路径，使属性回调和 addEventListener 监听器都能收到通知。
+- [x] 保证属性回调不被手动调用与原生 dispatch 重复触发。
+- [x] 验证 `target`、`currentTarget`、回调 `this` 指向原始资源节点，而非内部替代节点。
+- [x] 覆盖 script/link、load/error、只设置属性、只注册监听器及两者同时存在。
+- [x] 覆盖监听器抛错、once、removeEventListener 和回调中重入插入资源，保证不会卡住队列。
+- [x] 将行为用例纳入动态脚本和动态 stylesheet 测试，并补充真实浏览器事件验证。
+
+**已实施修复（2026-09-08）：** 删除属性回调与 dispatch 二选一及手动覆写 target 的路径，使用原始资源 ownerDocument 对应 realm 的 Event 构造器，在原节点统一 dispatch。属性回调、addEventListener 使用浏览器原生顺序及同一个事件；target/srcElement/currentTarget、动态 this、once、removeEventListener 均保持原生语义。回调抛错由浏览器报告，其他监听器及资源队列仍继续；不为内联 module 新增成功 load。
+
+**回归结果：** 新增 `resource-event-forwarding.test.ts` 10 项，修前全失败、修后全通过；新增同名 `.test.mts` 16 项 Chromium 回归，首批 4 项修前失败，最终全通过。覆盖两种 fiber、script/link、load/error、仅属性/仅监听器/同时订阅、事件与节点身份、异常及回调中插入新资源。原动态脚本和样式的相关 59 项单测继续通过。
 
 ## FIX-011
 
@@ -395,18 +417,22 @@ import { bus } from '@cloud/jieshu-core';
 bus.$on('constructor', () => {});
 ```
 
-**实际结果：** 定向用例抛出 `TypeError: currentListeners.includes is not a function`。预期 `constructor` 作为普通事件名完成订阅。wujie 的同类问题来自源码检查，没有为它另跑此用例。
+**修复前实际结果：** 定向用例抛出 `TypeError: currentListeners.includes is not a function`。预期 `constructor` 作为普通事件名完成订阅。wujie 的同类问题来自源码检查，没有为它另跑此用例。
 
 **原因与影响：** `this.eventObj[event]` 会读取原型链上的属性；`constructor` 得到函数，`__proto__` 等也可能得到非数组。除订阅外，其他直接读取事件字典的路径也需要检查。问题范围是合法字符串事件名处理错误，不能仅修复一次 includes 调用。
 
 **修复与验收：**
 
-- [ ] 使用 Map、无原型字典或可靠的自有属性查询，统一事件名到监听器数组的访问。
-- [ ] 检查构造、清空、销毁后重新创建字典的所有路径，避免重新引入 `{}`。
-- [ ] 覆盖 `constructor`、`__proto__`、`toString`、`hasOwnProperty` 等名字及普通事件名。
-- [ ] 验证 `$on/$once/$off/$emit/$clear/$destroy` 与全事件监听的行为。
-- [ ] 保留当前事件分发快照、重复订阅去重和递归 emit 的既有契约。
-- [ ] 在 `event.test.ts`、`event-registry.test.ts` 添加边界测试。
+- [x] 使用 Map、无原型字典或可靠的自有属性查询，统一事件名到监听器数组的访问。
+- [x] 检查构造、清空、销毁后重新创建字典的所有路径，避免重新引入 `{}`。
+- [x] 覆盖 `constructor`、`__proto__`、`toString`、`hasOwnProperty` 等名字及普通事件名。
+- [x] 验证 `$on/$once/$off/$emit/$clear/$destroy` 与全事件监听的行为。
+- [x] 保留当前事件分发快照、重复订阅去重和递归 emit 的既有契约。
+- [x] 在 `event-prototype-names.test.ts` 添加边界测试，保留 event/event-registry 回归。
+
+**已实施修复（2026-09-08）：** 新建和销毁后使用无原型事件字典，所有按名字读取只接受自有属性；通过 defineProperty 写入监听器，使 **proto** 也是普通键。兼容独立 core 已登记的普通对象，不替换仍被引用的字典、不修改其原型；同名实例的字典身份及现有分发快照保持不变。
+
+**回归结果：** 新增 `event-prototype-names.test.ts` 12 项，修前 10 失败、2 对照通过，修后全部通过。覆盖 constructor、**proto**、toString、hasOwnProperty 与普通事件，完整 on/once/off/emit/clear/destroy、全事件监听、去重、递归、订阅变更快照、同名重建及旧字典兼容；原 EventBus 和注册表测试继续通过。
 
 ## FIX-012
 
@@ -451,7 +477,7 @@ bus.$on('constructor', () => {});
 
 **已实施修复（2026-09-08）：** 串行内联 module 和独立的 module 完成标记均设置 `async=false`，进入浏览器的有序脚本列表。标记在原模块的依赖图就绪并尝试开始求值后通知执行器收尾；语法或运行时错误不会跳过独立标记。原模块代码只经过已有 loader，不追加尾回调、不添加普通函数闭包、不改为 Blob URL。标记复制 nonce，完成、错误、取消及插入异常均清理临时节点和监听器。属性中声明 `type=module` 的预设也按模块处理。
 
-**完成与事件契约：** 不给动态内联 module 合成成功 load；依赖加载失败继续转发原生 error，语法/运行时错误交由浏览器报告。与原生外部 module 的 load 一样，串行推进不等待 top-level await 的 Promise 完成，也不等待独立 `import()`。HTML 解析保留显式 async 内联 module 的标记，使其独立调度；执行句柄以内部 `scheduled` 结果确认插入，不伪报模块求值完成。动态插入保留现有应用内排队策略；FIX-007 的外部 async 事件问题仍独立待修。公开说明见 [iframe 内联 module 的执行顺序](../guide/information.md#iframe-内联-module-的执行顺序)，规范依据见 [HTML 脚本处理模型](https://html.spec.whatwg.org/multipage/scripting.html#prepare-the-script-element)及[模块执行模型](https://html.spec.whatwg.org/multipage/webappapis.html#run-a-module-script)。
+**完成与事件契约：** 不给动态内联 module 合成成功 load；依赖加载失败继续转发原生 error，语法/运行时错误交由浏览器报告。与原生外部 module 的 load 一样，串行推进不等待 top-level await 的 Promise 完成，也不等待独立 `import()`。HTML 解析保留显式 async 内联 module 的标记，使其独立调度；执行句柄以内部 `scheduled` 结果确认插入，不伪报模块求值完成。动态插入保留现有应用内排队策略；FIX-007 已修复初始外部 async 的完成等待，保留上述显式 async 内联 module 边界。公开说明见 [iframe 内联 module 的执行顺序](../guide/information.md#iframe-内联-module-的执行顺序)，规范依据见 [HTML 脚本处理模型](https://html.spec.whatwg.org/multipage/scripting.html#prepare-the-script-element)及[模块执行模型](https://html.spec.whatwg.org/multipage/webappapis.html#run-a-module-script)。
 
 **取消与复用：** 原生实验确认，移除等待 import 的节点不能把它从浏览器有序列表中删除。非保活卸载在取消框架资源后中止 iframe 的原生加载；保活失活继续保留运行。浏览器回归在旧请求仍悬挂时验证同一 iframe 重新激活及同名销毁重建，新模块能够执行，旧请求迟到不会执行旧模块或阻塞新队列。已启动的 JavaScript/TLA 异步工作不承诺回滚。
 
@@ -480,7 +506,12 @@ git status --short
 | FIX-012 | 2026-09-08 | `6ddf850` | core 内联 module 完成标记、HTML async 解析、卸载取消、12 项单测、23 项浏览器回归及公开说明 | 下述实际命令均通过；单测 45 文件/379 项，Chromium 31 项；覆盖率 statements 76.07%、branches 68.63%、functions 80.02%、lines 78.73%               | 仅验证 Chromium；未运行整套 examples 集成测试或适配包测试；不等待 TLA 完成，不回滚已执行代码；未修改 wujie |
 | FIX-004 | 2026-09-08 | `8156092` | core 公开完成语义、共享卸载注册表、显式重入 API、14 项单测、30 项浏览器回归及 API 文档     | 下述实际命令均通过；单测 46 文件/393 项，Chromium 61 项；覆盖率 statements 76.63%、branches 69.09%、functions 80.77%、lines 79.15%               | 仅验证 Chromium；异步主应用重入回调需显式迁移；未运行整套 examples 集成测试或适配包测试                    |
 | FIX-005 | 2026-09-08 | `9c4fcc2` | core 共享事件覆盖栈、主应用更新基线、原生属性恢复、17 项单测及 14 项浏览器回归             | 下述实际命令均通过；单测 46 文件/410 项，Chromium 75 项；覆盖率 statements 76.81%、branches 69.33%、functions 80.80%、lines 79.28%               | 各 core 副本须采用共享协议；仅验证 Chromium，未运行整套 examples 集成测试或适配包测试，未修改 wujie        |
-| FIX-006 | 2026-09-08 | 本次提交  | core 两处主应用历史状态保留、12 项单测、5 项浏览器回归、href 集成等待修正及路由文档        | 单测 46 文件/422 项、Chromium 80 项通过；覆盖率 statements 76.85%、branches 69.41%、functions 80.80%、lines 79.30%；定向 examples 集成 14 项通过 | 仅验证 Chromium；href 新历史项沿用空 state，未实现主路由器元数据协调；未修改适配包或 wujie                 |
+| FIX-006 | 2026-09-08 | `09309c6` | core 两处主应用历史状态保留、12 项单测、5 项浏览器回归、href 集成等待修正及路由文档        | 单测 46 文件/422 项、Chromium 80 项通过；覆盖率 statements 76.85%、branches 69.41%、functions 80.80%、lines 79.30%；定向 examples 集成 14 项通过 | 仅验证 Chromium；href 新历史项沿用空 state，未实现主路由器元数据协调；未修改适配包或 wujie                 |
+| FIX-007 | 2026-09-08 | 本次提交  | async 启动完成屏障、7 项单测、19 项浏览器回归及完成契约文档                                | 本轮核心 50 文件/478 项、Chromium 130 项、examples 集成 77 项全通过；覆盖率及命令见下文                                                          | 不等待显式 async 内联 module 求值、TLA 或独立 import()                                                     |
+| FIX-008 | 2026-09-08 | 本次提交  | fetch 缓存隔离、21 项单测、3 项浏览器回归及缓存/刷新文档                                   | 同上；旧代次与同步清理竞态回归通过                                                                                                               | 同 fetch 内部状态变化须主动失效；原生资源不属于框架 fetch 缓存                                             |
+| FIX-009 | 2026-09-08 | 本次提交  | 首次 start/preload 替换配置、6 项单测、12 项浏览器回归及 replace 文档                      | 同上；模板、CSS、JS 实际替换和异常清理通过                                                                                                       | 保留已有 loader 顺序及预加载模板复用约定                                                                   |
+| FIX-010 | 2026-09-08 | 本次提交  | 原始资源节点统一事件派发、10 项单测、16 项浏览器回归                                       | 同上；同时订阅、原生事件语义、异常与重入通过                                                                                                     | 浏览器范围仅 Chromium；内联 module 不合成成功 load                                                         |
+| FIX-011 | 2026-09-08 | 本次提交  | EventBus 字典与自有属性处理、12 项单测                                                     | 同上；特殊名字、旧字典和分发快照通过                                                                                                             | 未修改适配包及 wujie；不扩大为任意外部篡改字典的保证                                                       |
 
 FIX-002 的实际验证命令如下，均在仓库根目录执行。沿用初始审计的直接调用方式，使用已安装的工具和 Chromium，没有重新安装项目依赖。Chromium 在受限沙箱内启动时受到 macOS MachPort 权限限制，随后经自动审批在沙箱外执行上述本机测试并通过。
 
@@ -547,6 +578,42 @@ node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/syn
 ```
 
 未执行整套 examples 集成测试或适配包测试，没有重新安装依赖、构建或重启已有示例服务；浏览器范围仍仅限 Chromium。
+
+## FIX-007～FIX-011 统一验证
+
+本轮新增 **56 项单测、50 项浏览器测试**。最终核心 **50 文件/478 项单测、130 项 Chromium 回归、77 项 examples 集成测试全部通过**；四项 TypeScript 检查、变更文件 ESLint、Prettier 和 git diff --check 通过。核心覆盖率：statements **77.54%**、branches **70.21%**、functions **81.77%**、lines **79.70%**。这些结果不代表 Firefox/Safari 验证，也不代表适配包测试；本轮未修改适配包或 wujie。
+
+沿用上述 Vitest（含覆盖率）、完整核心 Playwright 和四项 TypeScript 命令。ESLint 的实际文件范围为本轮修改/新增的 core 文件（含下列五份集成测试）；Prettier 另包含五份文档：startApp、clearAssetsCache、refreshApp、information 和本 TODO。修改前后定向失败证据已登记在各条目；缓存旧实现对照使用 HEAD 的独立临时源码副本，测试后已移除，不回退共享工作区源码。
+
+```bash
+node node_modules/eslint/bin/eslint.js \
+  packages/jieshu-core/src/{effect,entry,event,index,sandbox-runtime,sandbox}.ts \
+  packages/jieshu-core/__test__/unit/{cache-fetch-context,destroy-order,destroy-provide-leak,entry-pipeline,event-prototype-names,initial-replace,rebuild-style-sheets-contract,resource-event-forwarding,sandbox-runtime}.test.ts \
+  packages/jieshu-core/__test__/browser/{async-load,cache-context,initial-replace,resource-event-forwarding}.test.mts \
+  packages/jieshu-core/__test__/integration/{font,lifecycle,plugin,proxy,startApp}.test.ts \
+  --max-warnings=0
+```
+
+示例集成复用 React Rspack 7800、Vue 8000 与六个子应用服务。首轮遇到开发服务 bundle 保留旧的模块解析失败：7800 无法解析 core、7600 无法解析 React 适配包。包入口、workspace 链接及新的 resolver 均正常；通过更新生成文件的 mtime 和 webpack-dev-server 的 invalidate 路由触发既有编译后恢复，没有重装依赖、修改示例源码或重启服务。该轮环境失败没有计作核心回归结论。
+
+恢复后发现 font/lifecycle 的旧测试依赖通用 React16 日志，而 Rspack 专页已显式覆盖 beforeMount/afterMount 的文案。字体、插件、proxy 和 startApp 用例改为等待真实子应用标题，继续保留各自的 font-face、loader、代理及渲染断言；生命周期用例按所选主应用读取实际 hook 文案，保留首次/再次进入及离开验证，并修正首项误用 React 主应用 map 的问题。
+
+最终在新进程中执行完整集成集，无文件过滤，**77/77 全部通过，耗时 1 分钟，退出码 0**；此前失败和中止没有计入通过数。结果写入忽略目录 `test-results/integration-fix007-011-verified`，之前两批 trace 单独保留。集成测试修改后的 TypeScript、ESLint、Prettier 与 git diff --check 均通过。运行前将 PATH 指向本机已安装的 pnpm 10.28.2，没有重新安装依赖。
+
+```bash
+JIESHU_REUSE_EXISTING_SERVERS=1 \
+JIESHU_REACT_MAIN_WORKSPACE=main-react-ts \
+JIESHU_REACT_MAIN_PORT=7800 \
+JIESHU_REACT_MAIN_URL=http://localhost:7800/ \
+node node_modules/@playwright/test/cli.js test \
+  --config packages/jieshu-core/__test__/integration/playwright.config.mts \
+  --output=test-results/integration-fix007-011-verified \
+  --max-failures=3
+```
+
+本次提交同时包含共享工作区中的 React18 主子应用示例更新：通信与 props 展示、状态保活验证、刷新/销毁/重建操作及页面样式。它们与上述核心修复一并提交，核心验证结果与示例功能范围分别记录。
+
+示例提交核验：已核对改动后的 `pnpm --filter react18 test` 记录，31/31 通过；已有浏览器验证覆盖双向消息、props 刷新、计数重置、销毁与重新挂载、路由往返监听清理，最新 CSS 在 375/768/1100px 下无横向溢出。本次另执行两个示例的 `tsc --noEmit --project examples/main-react-rspack/tsconfig.json` 和 `tsc --noEmit --project examples/react18/tsconfig.json`，均通过。
 
 ## 后续实现应保持的一致性
 

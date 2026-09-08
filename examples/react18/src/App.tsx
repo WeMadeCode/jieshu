@@ -58,9 +58,11 @@ const Navigation = () => {
 
 const App = () => (
   <BrowserRouter basename={import.meta.env.BASE_URL}>
-    <main className="react18-app">
-      <h1>React18 子应用</h1>
-      <Navigation />
+    <main className={`react18-app${window.__POWERED_BY_JIESHU__ ? ' react18-app--embedded' : ''}`}>
+      <header className="react18-app-header">
+        <h1>React18 子应用</h1>
+        <Navigation />
+      </header>
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/dialog" element={<Dialog />} />

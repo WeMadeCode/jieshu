@@ -276,12 +276,20 @@ export class SandboxScriptScheduler {
     );
   }
 
-  public executeAfter<Value>(promise: Promise<Value>, task: (value: Value) => unknown): void {
-    if (this.cancelled) return;
-    observe(promise).then((result) => {
-      if (result.status === 'fulfilled' && this.canExecute()) this.execute(() => task(result.value));
+  public executeAfter = <Value>(promise: Promise<Value>, task: (value: Value) => unknown) => {
+    if (this.cancelled) {
+      return Promise.resolve();
+    }
+    const completion = observe(promise).then((result) => {
+      if (result.status === 'fulfilled' && !this.cancelled && this.canExecute()) {
+        return this.execute(() => task(result.value));
+      }
+      return undefined;
     });
-  }
+    // A network request or native execution can remain pending indefinitely.
+    // Stopping this startup generation releases its lifecycle barrier immediately.
+    return Promise.race([completion, this.stopped]);
+  };
 
   public advance(): void {
     if (this.cancelled) return;
@@ -327,26 +335,44 @@ export class SandboxScriptScheduler {
     reject?.(cause);
   }
 
-  private executeTask(task: ScheduledTask): unknown {
+  private executeTask = (task: ScheduledTask) => {
     try {
       const result = task();
-      if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
-        void Promise.resolve(result).catch((cause: unknown) => this.fail(cause));
-      }
+      void Promise.resolve(result).catch((cause: unknown) => this.fail(cause));
       return result;
     } catch (cause: unknown) {
       this.fail(cause);
       return undefined;
     }
-  }
+  };
 
-  private execute(task: ScheduledTask): unknown {
-    if (this.cancelled) return undefined;
-    if (!this.fiber) return this.canExecute() ? this.executeTask(task) : undefined;
-    return this.scheduleIdle(() => {
-      if (!this.cancelled && this.canExecute()) this.executeTask(task);
+  private execute = (task: ScheduledTask) => {
+    const completion = new Promise<void>((resolve) => {
+      const execute = () => {
+        if (this.cancelled || !this.canExecute()) {
+          resolve();
+          return;
+        }
+        // executeTask reports failures to run(). This separate completion must
+        // also settle on failure, so waiting for window load cannot deadlock.
+        void Promise.resolve(this.executeTask(task)).then(
+          () => resolve(),
+          () => resolve(),
+        );
+      };
+      try {
+        if (this.cancelled || !this.fiber) {
+          execute();
+        } else {
+          this.scheduleIdle(execute);
+        }
+      } catch (cause: unknown) {
+        this.fail(cause);
+        resolve();
+      }
     });
-  }
+    return Promise.race([completion, this.stopped]);
+  };
 
   private executeQueued(task: ScheduledTask): unknown {
     if (this.cancelled) return undefined;

@@ -60,9 +60,18 @@ function reportListenerError(caughtError: unknown): void {
   Reflect.apply(error, undefined, [caughtError]);
 }
 
-function listenersFor(eventObj: EventObj, event: string): StoredEventCallback[] {
-  return eventObj[event] ?? [];
-}
+const createEventDictionary = () => {
+  const dictionary: EventObj = {};
+  Reflect.setPrototypeOf(dictionary, null);
+  return dictionary;
+};
+
+// Other core copies may have registered ordinary objects. Read only own
+// entries without replacing dictionaries still referenced by their buses.
+const ownListenersFor = (eventObj: EventObj, event: string) =>
+  Object.prototype.hasOwnProperty.call(eventObj, event) ? eventObj[event] : undefined;
+
+const listenersFor = (eventObj: EventObj, event: string) => ownListenersFor(eventObj, event) ?? [];
 
 /** Cross-application event hub. */
 export class EventBus {
@@ -79,17 +88,24 @@ export class EventBus {
       Object.keys(existingEvents).forEach((event) => delete existingEvents[event]);
       this.eventObj = existingEvents;
     } else {
-      this.eventObj = {};
+      this.eventObj = createEventDictionary();
       appEventObjMap.set(id, this.eventObj);
     }
   }
 
   public $on<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): this {
     const storedCallback = eraseCallbackArguments(callback);
-    const currentListeners = this.eventObj[event];
+    const currentListeners = ownListenersFor(this.eventObj, event);
 
     if (!currentListeners) {
-      this.eventObj[event] = [storedCallback];
+      // Define an own property so __proto__ remains an event name even when
+      // this dictionary was created by an older independently bundled core.
+      Object.defineProperty(this.eventObj, event, {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: [storedCallback],
+      });
     } else if (!currentListeners.includes(storedCallback)) {
       currentListeners.push(storedCallback);
     }
@@ -110,7 +126,7 @@ export class EventBus {
   }
 
   public $off<Arguments extends unknown[]>(event: string, callback: EventCallback<Arguments>): this {
-    const currentListeners = this.eventObj[event];
+    const currentListeners = ownListenersFor(this.eventObj, event);
     if (!event || !currentListeners?.length) {
       warn(`${event} ${JIESHU_TIPS_NO_SUBJECT}`);
       return this;
@@ -168,6 +184,6 @@ export class EventBus {
   public $destroy(): void {
     this.$clear();
     appEventObjMap.delete(this.id);
-    this.eventObj = {};
+    this.eventObj = createEventDictionary();
   }
 }

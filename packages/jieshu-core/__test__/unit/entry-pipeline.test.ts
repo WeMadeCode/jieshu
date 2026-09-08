@@ -375,11 +375,10 @@ describe('entry asset pipeline', () => {
 
     currentResponse.resolve(response('current'));
     await expect(currentContent).resolves.toBe('current');
-    const laterFetch = vi.fn(() => Promise.resolve(response('later')));
     await expect(
-      getExternalScripts([{ src: source }], laterFetch, undefined, false, {})[0].contentPromise,
+      getExternalScripts([{ src: source }], currentFetch, undefined, false, {})[0].contentPromise,
     ).resolves.toBe('current');
-    expect(laterFetch).not.toHaveBeenCalled();
+    expect(currentFetch).toHaveBeenCalledTimes(1);
   });
 
   test('two live sandbox scopes may fiber-load the same URL with independent fetchers', async () => {
@@ -432,8 +431,9 @@ describe('entry asset pipeline', () => {
     );
     const currentDocument = await importHTML({ url, opts: { fetch: currentFetch, cacheScope: {} } });
     await expect(currentDocument.getExternalScripts()[0].contentPromise).resolves.toBe('current-script');
+    expect(currentFetch).toHaveBeenCalledWith(url);
     expect(currentFetch).toHaveBeenCalledWith(scriptUrl);
-    expect(currentFetch).toHaveBeenCalledTimes(1);
+    expect(currentFetch).toHaveBeenCalledTimes(2);
 
     staleScript.resolve(response('stale-script'));
     await expect(oldAsset).resolves.toBe('stale-script');

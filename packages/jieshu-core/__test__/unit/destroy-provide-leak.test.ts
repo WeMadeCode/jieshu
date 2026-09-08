@@ -24,6 +24,7 @@ describe('sandbox.destroy() 对 iframeWindow.$jieshu 的清理契约', () => {
 
     const inst: any = Object.create(Jieshu.prototype);
     inst.id = 'leak-test';
+    inst.assetCacheScope = {};
     inst.provide = provide;
     inst.shadowRoot = null;
     inst.proxyLocation = null;

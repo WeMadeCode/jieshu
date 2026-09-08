@@ -152,6 +152,111 @@ describe('SandboxCleanupRegistry', () => {
 });
 
 describe('SandboxScriptScheduler', () => {
+  test.each([false, true])('async completion waits for readiness and native execution (fiber=%s)', async (fiber) => {
+    const queue: Array<() => unknown> = [];
+    const idleQueue: Array<() => unknown> = [];
+    const ready = deferred<string>();
+    const nativeCompletion = deferred<void>();
+    const task = vi.fn(() => nativeCompletion.promise);
+    const scheduler = new SandboxScriptScheduler(queue, fiber, (callback) => idleQueue.push(callback));
+    let complete = false;
+    const completion = Promise.resolve(scheduler.executeAfter(ready.promise, task)).then(() => {
+      complete = true;
+    });
+    await flushPromises();
+    expect(complete).toBe(false);
+    ready.resolve('ready');
+    await flushPromises();
+    if (fiber) {
+      expect(task).not.toHaveBeenCalled();
+      idleQueue.shift()?.();
+    }
+    expect(task).toHaveBeenCalledWith('ready');
+    await flushPromises();
+    expect(complete).toBe(false);
+    nativeCompletion.resolve();
+    await completion;
+    expect(complete).toBe(true);
+  });
+
+  test('async cancellation settles a pending download without executing its late result', async () => {
+    const queue: Array<() => unknown> = [];
+    const ready = deferred<string>();
+    const task = vi.fn();
+    const scheduler = new SandboxScriptScheduler(queue, false, (callback) => callback());
+    let complete = false;
+    const completion = Promise.resolve(scheduler.executeAfter(ready.promise, task)).then(() => {
+      complete = true;
+    });
+    await flushPromises();
+    expect(complete).toBe(false);
+    scheduler.cancel();
+    await completion;
+    ready.resolve('late');
+    await flushPromises();
+    expect(task).not.toHaveBeenCalled();
+  });
+
+  test('async cancellation settles native execution without waiting for its promise', async () => {
+    const queue: Array<() => unknown> = [];
+    const nativeCompletion = deferred<void>();
+    const scheduler = new SandboxScriptScheduler(queue, false, (callback) => callback());
+    let complete = false;
+    const completion = Promise.resolve(scheduler.executeAfter(Promise.resolve(), () => nativeCompletion.promise)).then(
+      () => {
+        complete = true;
+      },
+    );
+    await flushPromises();
+    expect(complete).toBe(false);
+    scheduler.cancel();
+    await completion;
+    expect(complete).toBe(true);
+  });
+
+  test('async completion settles when a queued idle task loses its execution owner', async () => {
+    const queue: Array<() => unknown> = [];
+    const idleQueue: Array<() => unknown> = [];
+    let active = true;
+    const task = vi.fn();
+    const scheduler = new SandboxScriptScheduler(
+      queue,
+      true,
+      (callback) => idleQueue.push(callback),
+      () => active,
+    );
+    let complete = false;
+    const completion = Promise.resolve(scheduler.executeAfter(Promise.resolve(), task)).then(() => {
+      complete = true;
+    });
+    await flushPromises();
+    expect(complete).toBe(false);
+    active = false;
+    idleQueue.shift()?.();
+    await completion;
+    expect(task).not.toHaveBeenCalled();
+  });
+
+  test.each(['throw', 'reject'])(
+    'async task %s fails the active run and releases its completion barrier',
+    async (kind) => {
+      const queue: Array<() => unknown> = [];
+      const failure = new Error('async insertion failed');
+      const scheduler = new SandboxScriptScheduler(queue, false, (callback) => callback());
+      scheduler.schedule(() => undefined);
+      const running = scheduler.run();
+      const completion = scheduler.executeAfter(Promise.resolve(), () => {
+        if (kind === 'throw') {
+          throw failure;
+        }
+        return Promise.reject(failure);
+      });
+      await expect(running).rejects.toBe(failure);
+      await expect(Promise.resolve(completion)).resolves.toBeUndefined();
+      expect(queue).toHaveLength(0);
+    },
+  );
+
   test('registers completion before starting a synchronously self-advancing queue', async () => {
     const queue: Array<() => unknown> = [];
     const order: string[] = [];

@@ -18,6 +18,7 @@ import Sandbox from '../../src/sandbox';
 function buildUnmountReadySandbox(alive: boolean): any {
   const sandbox = Object.create(Sandbox.prototype);
   sandbox.alive = alive;
+  sandbox.assetCacheScope = {};
   sandbox.activeFlag = true;
   sandbox.mountFlag = true;
   sandbox.hrefFlag = false;

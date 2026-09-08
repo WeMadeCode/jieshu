@@ -12,7 +12,6 @@ import {
   rawRemoveEventListener,
 } from './common';
 import {
-  isFunction,
   warn,
   nextTick,
   getCurUrl,
@@ -45,39 +44,18 @@ import {
 import type { SandboxDynamicResourceCancellationReason } from './sandbox-runtime';
 import type { ScriptExecutionOutcome } from './iframe-script';
 
-function patchCustomEvent(
-  e: CustomEvent,
-  elementGetter: () => HTMLScriptElement | HTMLLinkElement | null,
-): CustomEvent {
-  Object.defineProperties(e, {
-    srcElement: {
-      get: elementGetter,
-    },
-    target: {
-      get: elementGetter,
-    },
-  });
-
-  return e;
-}
-
 /**
- * 手动触发事件回调
+ * Dispatch on the original resource so property handlers and listeners share
+ * native ordering, receiver, once/removal and exception-reporting semantics.
  */
 type ResourceElement = HTMLLinkElement | HTMLScriptElement;
 type ResourceEventName = 'load' | 'error';
 
 class ElementEventForwarder {
-  dispatch(element: ResourceElement, event: ResourceEventName): void {
-    const customEvent = new CustomEvent(event);
-    const patchedEvent = patchCustomEvent(customEvent, () => element);
-    const eventHandler = Reflect.get(element, `on${event}`);
-    if (isFunction(eventHandler)) {
-      Reflect.apply(eventHandler, element, [patchedEvent]);
-    } else {
-      element.dispatchEvent(patchedEvent);
-    }
-  }
+  dispatch = (element: ResourceElement, event: ResourceEventName) => {
+    const EventConstructor = element.ownerDocument.defaultView?.Event ?? Event;
+    element.dispatchEvent(new EventConstructor(event));
+  };
 }
 
 const elementEventForwarder = new ElementEventForwarder();

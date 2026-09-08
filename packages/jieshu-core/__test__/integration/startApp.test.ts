@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { awaitConsoleLogMessage, getTextContentByJsSelector } from './utils';
+import { getTextContentByJsSelector } from './utils';
 import { reactMainAppInfoList, reactMainUrl, vueMainAppInfoList, vueMainUrl } from './common';
 
 const describe = test.describe;
@@ -27,9 +27,8 @@ describe('main react startApp', () => {
 
   reactMainAppInfoList.forEach((appInfo) =>
     it(`${appInfo.name} startApp`, async () => {
-      const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
       await page.click(appInfo.linkSelector);
-      await appInfoMountedPromise;
+      await expect(page.getByText(appInfo.titleText, { exact: true })).toBeVisible();
       expect(await getTextContentByJsSelector(page, appInfo.titleJsSelector)).toBe(appInfo.titleText);
     }),
   );
@@ -47,9 +46,8 @@ describe('main vue startApp', () => {
 
   vueMainAppInfoList.forEach((appInfo) =>
     it(`${appInfo.name} startApp`, async () => {
-      const appInfoMountedPromise = awaitConsoleLogMessage(page, appInfo.mountedMessage);
       await page.click(appInfo.linkSelector);
-      await appInfoMountedPromise;
+      await expect(page.getByText(appInfo.titleText, { exact: true })).toBeVisible();
       expect(await getTextContentByJsSelector(page, appInfo.titleJsSelector)).toBe(appInfo.titleText);
     }),
   );

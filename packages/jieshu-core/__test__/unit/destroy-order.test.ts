@@ -26,6 +26,7 @@ function createMinimalDestroyableSandbox(id: string) {
 
   const inst: any = Object.create(Jieshu.prototype);
   inst.id = id;
+  inst.assetCacheScope = {};
   inst.destroyed = false;
   inst.provide = null;
   inst.shadowRoot = null;
