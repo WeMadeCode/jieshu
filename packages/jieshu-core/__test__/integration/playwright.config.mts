@@ -8,8 +8,9 @@ const reactMainWorkspace = process.env['JIESHU_REACT_MAIN_WORKSPACE'] ?? 'main-r
 const reactMainPort = Number(process.env['JIESHU_REACT_MAIN_PORT'] ?? 7700);
 const vueMainPort = Number(process.env['JIESHU_VUE_MAIN_PORT'] ?? 8000);
 
-const webServer = (workspace: string, script: string, port: number, environment = '') => ({
-  command: `${environment}pnpm --filter ${workspace} run ${script}`,
+const webServer = (workspace: string, script: string, port: number, environment: Record<string, string> = {}) => ({
+  command: `pnpm --filter ${workspace} run ${script}`,
+  env: environment,
   cwd: repositoryRoot,
   url: `http://127.0.0.1:${port}`,
   reuseExistingServer: process.env['JIESHU_REUSE_EXISTING_SERVERS'] === '1',
@@ -45,7 +46,7 @@ export default defineConfig({
       reactMainWorkspace,
       reactMainWorkspace === 'main-react' ? 'integration' : `integration --port ${reactMainPort}`,
       reactMainPort,
-      reactMainWorkspace === 'main-react' ? `PORT=${reactMainPort} ` : '',
+      reactMainWorkspace === 'main-react' ? { PORT: String(reactMainPort) } : {},
     ),
     webServer('main-vue', `start --port ${vueMainPort}`, vueMainPort),
   ],

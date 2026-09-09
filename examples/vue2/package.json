@@ -6,7 +6,7 @@
     "prestart": "node scripts/copy-tinymce.js",
     "start": "vue-cli-service serve --mode:development",
     "prebuild": "node scripts/copy-tinymce.js",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service build"
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build"
   },
   "dependencies": {
     "@floating-ui/dom": "0.5.4",

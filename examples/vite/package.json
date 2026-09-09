@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "vite",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && vue-tsc --noEmit && vite build"
+    "build": "cross-env-shell NODE_OPTIONS=--openssl-legacy-provider \"vue-tsc --noEmit && vite build\""
   },
   "dependencies": {
     "ant-design-vue": "2.2.8",

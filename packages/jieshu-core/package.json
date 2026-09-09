@@ -34,7 +34,7 @@
     "test:unit": "vitest run --config __test__/unit/vitest.config.mts --coverage",
     "test:browser": "pnpm run install-playwright-browser && playwright test --config __test__/browser/playwright.config.mts",
     "install-playwright-browser": "playwright install chromium",
-    "test:integration": "pnpm run install-playwright-browser && NODE_OPTIONS=--openssl-legacy-provider playwright test --config __test__/integration/playwright.config.mts"
+    "test:integration": "pnpm run install-playwright-browser && cross-env NODE_OPTIONS=--openssl-legacy-provider playwright test --config __test__/integration/playwright.config.mts"
   },
   "repository": {
     "type": "git",

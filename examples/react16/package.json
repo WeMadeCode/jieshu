@@ -60,7 +60,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "export NODE_OPTIONS=--openssl-legacy-provider && node scripts/build.js",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider node scripts/build.js",
     "test": "node scripts/test.js"
   },
   "browserslist": {
