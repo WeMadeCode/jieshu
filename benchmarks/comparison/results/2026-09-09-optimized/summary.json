@@ -1,0 +1,3411 @@
+{
+  "generatedAt": "2026-09-09T08:08:11.729Z",
+  "inputs": [
+    {
+      "directory": "/Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/results/2026-09-09-optimized",
+      "environment": {
+        "startedAt": "2026-09-09T08:03:28.974Z",
+        "mode": "all",
+        "samples": 30,
+        "memoryRounds": 5,
+        "stabilityRounds": 3,
+        "cycles": 30,
+        "platform": "darwin",
+        "release": "25.6.0",
+        "arch": "arm64",
+        "totalMemoryBytes": 17179869184,
+        "cpu": "Apple M1 Pro",
+        "cpuCount": 8,
+        "loadAverage": [2.513671875, 3.17919921875, 3.55615234375],
+        "node": "v26.7.0",
+        "browser": "151.0.7922.34",
+        "playwright": "1.62.1",
+        "vite": "8.2.2",
+        "revisions": {
+          "jieshu": {
+            "commit": "b0c73aaa944ea8603c6fb13f3126e341b320d2cb",
+            "status": "M AGENTS.md\n M docs/api/startApp.md\n M packages/jieshu-core/__test__/unit/sandbox-start.test.ts\n M packages/jieshu-core/src/function-binding.ts\n M packages/jieshu-core/src/iframe-inline-events.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/sandbox.ts\n M packages/jieshu-core/src/shadow.ts\n M packages/jieshu-core/src/utils.ts\n?? benchmarks/\n?? docs/notes/jieshu-performance-optimization.md\n?? packages/jieshu-core/__test__/browser/startup-loading.test.mts\n?? packages/jieshu-core/__test__/unit/iframe-allocation.test.ts\n?? packages/jieshu-core/__test__/unit/runtime-callables.test.ts\n?? packages/jieshu-core/__test__/unit/startup-loading.test.ts",
+            "package": "0.0.5",
+            "packageManager": "pnpm@10.28.2",
+            "bundleBytes": 108681,
+            "gzipBytes": 32759,
+            "sha256": "2d98842d46df3c3dbd89041f927fd1b16e9ebc827fafc7c98d1c2069b42f034e"
+          },
+          "wujie": {
+            "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+            "status": "",
+            "package": "2.1.0",
+            "packageManager": "pnpm@10.33.0",
+            "bundleBytes": 65660,
+            "gzipBytes": 19802,
+            "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+          }
+        },
+        "build": {
+          "target": "es2018",
+          "minify": true,
+          "format": "iife",
+          "mode": "production"
+        },
+        "fixture": {
+          "jsBytes": 3634,
+          "cssBytes": 65,
+          "domItems": 300,
+          "heapItems": 4000
+        },
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "limitations": [
+          "Headless Chromium only",
+          "Local HTTP, cross-origin ports",
+          "No browser total RSS measurement",
+          "Background desktop activity uncontrolled"
+        ],
+        "finishedAt": "2026-09-09T08:07:52.677Z",
+        "counts": {
+          "observations": 646,
+          "failures": 6
+        }
+      }
+    }
+  ],
+  "methodology": {
+    "percentile": "Linear interpolation at (N - 1) * p",
+    "startup": "Successful non-warmup observations only; separate fresh browser contexts with alternating framework order",
+    "readyMedianChangePercent": "(median(jieshu.readyMs) / median(wujie.readyMs) - 1) * 100",
+    "bootstrapIterations": 5000,
+    "bootstrapSeed": 20260909,
+    "bootstrapPrimary": "Independent sample percentile bootstrap for median(J) - median(W), in ms",
+    "bootstrapSensitivity": "Complete same-source, same-round pairs resampled together; statistic remains median(J) - median(W)",
+    "memory": "Successful rounds only; medians across rounds per stage/cycle; CDP after forced GC; MiB = 1048576 bytes",
+    "memoryDelta": "Median of per-round stage heap minus that same round core heap"
+  },
+  "counts": {
+    "total": 646,
+    "passed": 640,
+    "failed": 6
+  },
+  "warmupRecords": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "failures": []
+  },
+  "startup": [
+    {
+      "scenario": "cold",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 24.699999999254942,
+              "p95": 26.699999999254942
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 33.79999999888241,
+              "p95": 38.454999999329445
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.699999999254942,
+              "p95": 4.800000000745058
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 22.25,
+              "p95": 26.030000000074505
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 30.34999999962747,
+              "p95": 36.33000000081956
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.899999998509884,
+              "p95": 6
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -10.20710058984916,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -3.449999999254942,
+        "interval95Ms": [-7.399999998509884, 3.8000000007916244]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -3.449999999254942,
+        "interval95Ms": [-7.499999998137355, 3.899999996693805]
+      }
+    },
+    {
+      "scenario": "cold-fiber",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 36.250000001862645,
+              "p95": 38.0099999981001
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 46.65000000037253,
+              "p95": 47.7550000000745
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.699999999254942,
+              "p95": 4.800000000745058
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 35.100000001490116,
+              "p95": 36.69999999925494
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 45.59999999962747,
+              "p95": 46.399999998509884
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.899999998509884,
+              "p95": 6
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -2.250803860100048,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -1.050000000745058,
+        "interval95Ms": [-1.7999999970663338, -0.7500000018626451]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -1.050000000745058,
+        "interval95Ms": [-1.75, -0.7500000018626451]
+      }
+    },
+    {
+      "scenario": "warm-rebuild",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 9.199999999254942,
+              "p95": 9.854999999515712
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 15.549999998882413,
+              "p95": 15.865000001341103
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.699999999254942,
+              "p95": 4.855000001564622
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 37.84999999962747,
+              "p95": 39.91000000033527
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 7.200000002980232,
+              "p95": 7.65500000026077
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 15.199999999254942,
+              "p95": 16.185000000335275
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.849999999627471,
+              "p95": 6
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 31.099999997764826,
+              "p95": 38.18500000033527
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -2.250803856286987,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -0.34999999962747097,
+        "interval95Ms": [-0.6499999966472387, 0]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -0.34999999962747097,
+        "interval95Ms": [-0.5999999977648258, 0]
+      }
+    },
+    {
+      "scenario": "singleton-remount",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 1.699999999254942,
+              "p95": 1.7999999990686775
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 16.699999999254942,
+              "p95": 18.65500000026077
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.699999999254942,
+              "p95": 4.900000000558793
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 54.25,
+              "p95": 56.480000000260766
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 1.5999999977648258,
+              "p95": 1.699999999254942
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 16.699999999254942,
+              "p95": 16.800000000745058
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.899999998509884,
+              "p95": 5.955000001005828
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 51.69999999925494,
+              "p95": 55.364999999664725
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": 0,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": 0,
+        "interval95Ms": [-0.15125000216066795, 0.09999999776482582]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": 0,
+        "interval95Ms": [-0.15000000037252903, 0.09999999776482582]
+      }
+    },
+    {
+      "scenario": "alive-reactivate",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 0.10000000149011612,
+              "p95": 0.19999999925494194
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 16.699999999254942,
+              "p95": 17.44000000040978
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.699999999254942,
+              "p95": 4.755000001750886
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 54.399999998509884,
+              "p95": 56.49500000122934
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 0.10000000149011612,
+              "p95": 0.19999999925494194
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 16.699999999254942,
+              "p95": 17.735000000335273
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.800000000745058,
+              "p95": 5.955000001005828
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 46,
+              "p95": 53.91000000033527
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": 0,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": 0,
+        "interval95Ms": [-0.09999999776482582, 0.09999999776482582]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": 0,
+        "interval95Ms": [-0.09999999776482582, 0.09999999776482582]
+      }
+    },
+    {
+      "scenario": "preloaded-enter",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 2.099999999627471,
+              "p95": 2.300000000745058
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 16.5,
+              "p95": 16.700000001303852
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.699999999254942,
+              "p95": 5.054999998770654
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 37.65000000037253,
+              "p95": 40.454999999329445
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 2.200000001117587,
+              "p95": 2.400000002235174
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 16.5,
+              "p95": 16.65500000026077
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.949999999254942,
+              "p95": 6.300000000745058
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 35.850000001490116,
+              "p95": 38.720000001229344
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": 0,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": 0,
+        "interval95Ms": [-0.34999999781139196, 1.5]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": 0,
+        "interval95Ms": [-0.30000000074505806, 1.5]
+      }
+    },
+    {
+      "scenario": "concurrent-5",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 58.15000000037253,
+              "p95": 61.39499999973923
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 72.5,
+              "p95": 75.5
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.800000000745058,
+              "p95": 5.099999997764826
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 57.54999999888241,
+              "p95": 59.65499999858439
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 70.05000000074506,
+              "p95": 78.07499999906868
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 6,
+              "p95": 6.255000000074506
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -3.379310343799924,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -2.449999999254942,
+        "interval95Ms": [-4.150000000372529, -0.900000000325963]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -2.449999999254942,
+        "interval95Ms": [-4.300000000745058, -1]
+      }
+    },
+    {
+      "scenario": "slow-resources",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 478.90000000037253,
+              "p95": 485.87999999877064
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 485.3500000014901,
+              "p95": 496.9749999992549
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.900000002235174,
+              "p95": 5.200000001303851
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 483.34999999962747,
+              "p95": 487.6199999997392
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 494.80000000074506,
+              "p95": 499.30999999884517
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 6.049999998882413,
+              "p95": 6.554999998770654
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": 1.947048521525896,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": 9.449999999254942,
+        "interval95Ms": [-7.601250001462176, 12.349999997811391]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": 9.449999999254942,
+        "interval95Ms": [-9.100000001490116, 12.700000001117587]
+      }
+    },
+    {
+      "scenario": "cpu4x",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 108.79999999888241,
+              "p95": 121.44999999850988
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 128.64999999850988,
+              "p95": 143.28999999910593
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 8.150000000372529,
+              "p95": 9.354999999515712
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 103.69999999925494,
+              "p95": 117.80999999884516
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 123.55000000074506,
+              "p95": 139.08499999884515
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 10.399999998509884,
+              "p95": 11.864999999664724
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -3.964244071374967,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -5.099999997764826,
+        "interval95Ms": [-14.800000002607703, 5.400000000372529]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -5.099999997764826,
+        "interval95Ms": [-14.699999999254942, 5.650000000372529]
+      }
+    }
+  ],
+  "memory": {
+    "rounds": {
+      "wujie": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0
+      },
+      "jieshu": {
+        "total": 5,
+        "passed": 5,
+        "failed": 0
+      }
+    },
+    "stages": [
+      {
+        "stage": "blank",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 0.5283126831054688,
+              "p95": 0.5283126831054688
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 9,
+              "p95": 9
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 0,
+              "p95": 0
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": -0.1315460205078125,
+              "p95": -0.1315460205078125
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 0.5283126831054688,
+              "p95": 0.5283126831054688
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 9,
+              "p95": 9
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 0,
+              "p95": 0
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": -0.18519973754882812,
+              "p95": -0.18519973754882812
+            }
+          }
+        }
+      },
+      {
+        "stage": "core",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 0.6598587036132812,
+              "p95": 0.6598587036132812
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 1.25,
+              "p95": 1.25
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 10,
+              "p95": 10
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 0,
+              "p95": 0
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 0.7135124206542969,
+              "p95": 0.7135124206542969
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 1.25,
+              "p95": 1.25
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 10,
+              "p95": 10
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      {
+        "stage": "mounted-1",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 4.009754180908203,
+              "p95": 4.009754180908203
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.75,
+              "p95": 5.2
+            },
+            "documents": {
+              "n": 5,
+              "median": 2,
+              "p95": 2
+            },
+            "nodes": {
+              "n": 5,
+              "median": 950,
+              "p95": 950
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 9,
+              "p95": 9
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 3.349895477294922,
+              "p95": 3.349895477294922
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.7623977661132812,
+              "p95": 3.762498474121094
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.5,
+              "p95": 4.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 2,
+              "p95": 2
+            },
+            "nodes": {
+              "n": 5,
+              "median": 953,
+              "p95": 953
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 9,
+              "p95": 9
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 3.0488853454589844,
+              "p95": 3.048986053466797
+            }
+          }
+        }
+      },
+      {
+        "stage": "destroyed-first",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.671398162841797,
+              "p95": 3.671398162841797
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.5,
+              "p95": 4.5
+            },
+            "documents": {
+              "n": 5,
+              "median": 2,
+              "p95": 2
+            },
+            "nodes": {
+              "n": 5,
+              "median": 32,
+              "p95": 32
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 3.0115394592285156,
+              "p95": 3.0115394592285156
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 2.7348060607910156,
+              "p95": 2.734894561767578
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 3.75,
+              "p95": 3.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.0212936401367188,
+              "p95": 2.021382141113281
+            }
+          }
+        }
+      },
+      {
+        "stage": "same-assets",
+        "cycle": 1,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 4.754772186279297,
+              "p95": 4.754772186279297
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 5.5,
+              "p95": 5.5
+            },
+            "documents": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "nodes": {
+              "n": 5,
+              "median": 53,
+              "p95": 53
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 4.094913482666016,
+              "p95": 4.094913482666016
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 2.7872886657714844,
+              "p95": 2.7873329162597655
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 3.75,
+              "p95": 3.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.0737762451171875,
+              "p95": 2.0738204956054687
+            }
+          }
+        }
+      },
+      {
+        "stage": "same-assets",
+        "cycle": 5,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 9.052841186523438,
+              "p95": 9.052841186523438
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 10,
+              "p95": 10.2
+            },
+            "documents": {
+              "n": 5,
+              "median": 7,
+              "p95": 7
+            },
+            "nodes": {
+              "n": 5,
+              "median": 137,
+              "p95": 137
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 8.392982482910156,
+              "p95": 8.392982482910156
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 2.9314842224121094,
+              "p95": 2.9315284729003905
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4,
+              "p95": 4.25
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.2179718017578125,
+              "p95": 2.2180160522460937
+            }
+          }
+        }
+      },
+      {
+        "stage": "same-assets",
+        "cycle": 10,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 14.430736541748047,
+              "p95": 14.430736541748047
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 15.75,
+              "p95": 15.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 12,
+              "p95": 12
+            },
+            "nodes": {
+              "n": 5,
+              "median": 242,
+              "p95": 242
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 13.770877838134766,
+              "p95": 13.770877838134766
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.162494659423828,
+              "p95": 3.1625389099121093
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.5,
+              "p95": 4.5
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.4489822387695312,
+              "p95": 2.4490264892578124
+            }
+          }
+        }
+      },
+      {
+        "stage": "same-assets",
+        "cycle": 15,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 19.676311492919922,
+              "p95": 19.67632293701172
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 21.25,
+              "p95": 21.25
+            },
+            "documents": {
+              "n": 5,
+              "median": 17,
+              "p95": 17
+            },
+            "nodes": {
+              "n": 5,
+              "median": 347,
+              "p95": 347
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 19.01645278930664,
+              "p95": 19.016464233398438
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.1676864624023438,
+              "p95": 3.1680030822753906
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.5,
+              "p95": 4.7
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.454174041748047,
+              "p95": 2.4544906616210938
+            }
+          }
+        }
+      },
+      {
+        "stage": "same-assets",
+        "cycle": 20,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 24.92733383178711,
+              "p95": 24.927694702148436
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 26.5,
+              "p95": 26.5
+            },
+            "documents": {
+              "n": 5,
+              "median": 22,
+              "p95": 22
+            },
+            "nodes": {
+              "n": 5,
+              "median": 452,
+              "p95": 452
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 24.267475128173828,
+              "p95": 24.267835998535155
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.165435791015625,
+              "p95": 3.168390655517578
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.25,
+              "p95": 4.65
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.451923370361328,
+              "p95": 2.454878234863281
+            }
+          }
+        }
+      },
+      {
+        "stage": "same-assets",
+        "cycle": 25,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 30.179630279541016,
+              "p95": 30.179963684082033
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 31.75,
+              "p95": 31.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 27,
+              "p95": 27
+            },
+            "nodes": {
+              "n": 5,
+              "median": 557,
+              "p95": 557
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 29.519771575927734,
+              "p95": 29.52010498046875
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.1655502319335938,
+              "p95": 3.1686752319335936
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.5,
+              "p95": 4.7
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.452037811279297,
+              "p95": 2.4551628112792967
+            }
+          }
+        }
+      },
+      {
+        "stage": "same-assets",
+        "cycle": 30,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 35.428863525390625,
+              "p95": 35.42891387939453
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 37,
+              "p95": 37.2
+            },
+            "documents": {
+              "n": 5,
+              "median": 32,
+              "p95": 32
+            },
+            "nodes": {
+              "n": 5,
+              "median": 662,
+              "p95": 662
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 34.769004821777344,
+              "p95": 34.76905517578125
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.1573524475097656,
+              "p95": 3.1577476501464843
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.25,
+              "p95": 4.25
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.4438400268554688,
+              "p95": 2.4442352294921874
+            }
+          }
+        }
+      },
+      {
+        "stage": "unique-assets",
+        "cycle": 1,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 36.50849914550781,
+              "p95": 36.50852890014649
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 38,
+              "p95": 38
+            },
+            "documents": {
+              "n": 5,
+              "median": 33,
+              "p95": 33
+            },
+            "nodes": {
+              "n": 5,
+              "median": 683,
+              "p95": 683
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 35.84864044189453,
+              "p95": 35.848670196533206
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.1677169799804688,
+              "p95": 3.1680366516113283
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4,
+              "p95": 4
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.454204559326172,
+              "p95": 2.4545242309570314
+            }
+          }
+        }
+      },
+      {
+        "stage": "unique-assets",
+        "cycle": 5,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 40.71896743774414,
+              "p95": 40.71928100585937
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 42.25,
+              "p95": 42.25
+            },
+            "documents": {
+              "n": 5,
+              "median": 37,
+              "p95": 37
+            },
+            "nodes": {
+              "n": 5,
+              "median": 767,
+              "p95": 767
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 40.05910873413086,
+              "p95": 40.05942230224609
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.1936569213867188,
+              "p95": 3.193951416015625
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.25,
+              "p95": 4.45
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.480144500732422,
+              "p95": 2.480438995361328
+            }
+          }
+        }
+      },
+      {
+        "stage": "unique-assets",
+        "cycle": 10,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 46.001712799072266,
+              "p95": 46.00212478637695
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 47.75,
+              "p95": 47.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 42,
+              "p95": 42
+            },
+            "nodes": {
+              "n": 5,
+              "median": 872,
+              "p95": 872
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 45.341854095458984,
+              "p95": 45.34226608276367
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.2358169555664062,
+              "p95": 3.235991668701172
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 3.75,
+              "p95": 3.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.5223045349121094,
+              "p95": 2.522479248046875
+            }
+          }
+        }
+      },
+      {
+        "stage": "unique-assets",
+        "cycle": 15,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 51.263023376464844,
+              "p95": 51.263451385498044
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 53,
+              "p95": 53.2
+            },
+            "documents": {
+              "n": 5,
+              "median": 47,
+              "p95": 47
+            },
+            "nodes": {
+              "n": 5,
+              "median": 977,
+              "p95": 977
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 50.60316467285156,
+              "p95": 50.60359268188476
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.2492599487304688,
+              "p95": 3.249407196044922
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 3.75,
+              "p95": 3.95
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.535747528076172,
+              "p95": 2.535894775390625
+            }
+          }
+        }
+      },
+      {
+        "stage": "unique-assets",
+        "cycle": 20,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 56.5168342590332,
+              "p95": 56.51730575561523
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 58.25,
+              "p95": 58.25
+            },
+            "documents": {
+              "n": 5,
+              "median": 52,
+              "p95": 52
+            },
+            "nodes": {
+              "n": 5,
+              "median": 1082,
+              "p95": 1082
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 55.85697555541992,
+              "p95": 55.85744705200195
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.2584609985351562,
+              "p95": 3.258655548095703
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 3.75,
+              "p95": 3.95
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.5449485778808594,
+              "p95": 2.5451431274414062
+            }
+          }
+        }
+      },
+      {
+        "stage": "unique-assets",
+        "cycle": 25,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 61.784183502197266,
+              "p95": 61.78577194213867
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 63.5,
+              "p95": 63.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 57,
+              "p95": 57
+            },
+            "nodes": {
+              "n": 5,
+              "median": 1187,
+              "p95": 1187
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 61.124324798583984,
+              "p95": 61.12591323852539
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.2712440490722656,
+              "p95": 3.271345520019531
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4,
+              "p95": 4
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.5577316284179688,
+              "p95": 2.5578330993652343
+            }
+          }
+        }
+      },
+      {
+        "stage": "unique-assets",
+        "cycle": 30,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 67.0489501953125,
+              "p95": 67.05030059814453
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 69,
+              "p95": 69.2
+            },
+            "documents": {
+              "n": 5,
+              "median": 62,
+              "p95": 62
+            },
+            "nodes": {
+              "n": 5,
+              "median": 1292,
+              "p95": 1292
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 66.38909149169922,
+              "p95": 66.39044189453125
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.297657012939453,
+              "p95": 3.2980392456054686
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.25,
+              "p95": 4.25
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.5841445922851562,
+              "p95": 2.5845268249511717
+            }
+          }
+        }
+      },
+      {
+        "stage": "cache-cleared",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 67.02650833129883,
+              "p95": 67.02785873413086
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 68.5,
+              "p95": 68.75
+            },
+            "documents": {
+              "n": 5,
+              "median": 62,
+              "p95": 62
+            },
+            "nodes": {
+              "n": 5,
+              "median": 1292,
+              "p95": 1292
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 66.36664962768555,
+              "p95": 66.36800003051758
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.233318328857422,
+              "p95": 3.2337020874023437
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 3.75,
+              "p95": 3.95
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.519805908203125,
+              "p95": 2.520189666748047
+            }
+          }
+        }
+      },
+      {
+        "stage": "cache-cleared-settled-5.5s",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 2.921123504638672,
+              "p95": 2.9225364685058595
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4.25,
+              "p95": 4.7
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.2612648010253906,
+              "p95": 2.262677764892578
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.233318328857422,
+              "p95": 3.2337020874023437
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 3.75,
+              "p95": 3.95
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.519805908203125,
+              "p95": 2.520189666748047
+            }
+          }
+        }
+      },
+      {
+        "stage": "mounted-5-alive",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 9.892383575439453,
+              "p95": 9.894120788574218
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 10.5,
+              "p95": 10.7
+            },
+            "documents": {
+              "n": 5,
+              "median": 6,
+              "p95": 6
+            },
+            "nodes": {
+              "n": 5,
+              "median": 4711,
+              "p95": 4711
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 33,
+              "p95": 33
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 9.232524871826172,
+              "p95": 9.234262084960937
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 8.43722915649414,
+              "p95": 8.438484954833985
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 9,
+              "p95": 9
+            },
+            "documents": {
+              "n": 5,
+              "median": 6,
+              "p95": 6
+            },
+            "nodes": {
+              "n": 5,
+              "median": 4726,
+              "p95": 4726
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 33,
+              "p95": 33
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 7.723716735839844,
+              "p95": 7.724972534179687
+            }
+          }
+        }
+      },
+      {
+        "stage": "deactivated-5-alive",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 9.892242431640625,
+              "p95": 9.89397964477539
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 10.5,
+              "p95": 10.7
+            },
+            "documents": {
+              "n": 5,
+              "median": 6,
+              "p95": 6
+            },
+            "nodes": {
+              "n": 5,
+              "median": 3211,
+              "p95": 3211
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 33,
+              "p95": 33
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 9.232383728027344,
+              "p95": 9.234120941162109
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 8.437591552734375,
+              "p95": 8.43884735107422
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 9,
+              "p95": 9
+            },
+            "documents": {
+              "n": 5,
+              "median": 6,
+              "p95": 6
+            },
+            "nodes": {
+              "n": 5,
+              "median": 3226,
+              "p95": 3226
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 33,
+              "p95": 33
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 7.724079132080078,
+              "p95": 7.725334930419922
+            }
+          }
+        }
+      },
+      {
+        "stage": "final-cleanup",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 9.877849578857422,
+              "p95": 9.879586791992187
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 10.5,
+              "p95": 10.7
+            },
+            "documents": {
+              "n": 5,
+              "median": 6,
+              "p95": 6
+            },
+            "nodes": {
+              "n": 5,
+              "median": 3186,
+              "p95": 3186
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 18,
+              "p95": 18
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 9.21799087524414,
+              "p95": 9.219728088378906
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.2379150390625,
+              "p95": 3.2379829406738283
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4,
+              "p95": 4.2
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.524402618408203,
+              "p95": 2.5244705200195314
+            }
+          }
+        }
+      },
+      {
+        "stage": "final-settled-5.5s",
+        "cycle": null,
+        "frameworks": {
+          "wujie": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 2.92193603515625,
+              "p95": 2.9236732482910157
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4,
+              "p95": 4
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.2620773315429688,
+              "p95": 2.2638145446777345
+            }
+          },
+          "jieshu": {
+            "heapUsedMiB": {
+              "n": 5,
+              "median": 3.2379150390625,
+              "p95": 3.2379829406738283
+            },
+            "heapTotalMiB": {
+              "n": 5,
+              "median": 4,
+              "p95": 4
+            },
+            "documents": {
+              "n": 5,
+              "median": 1,
+              "p95": 1
+            },
+            "nodes": {
+              "n": 5,
+              "median": 11,
+              "p95": 11
+            },
+            "jsEventListeners": {
+              "n": 5,
+              "median": 3,
+              "p95": 3
+            },
+            "deltaCoreHeapMiB": {
+              "n": 5,
+              "median": 2.524402618408203,
+              "p95": 2.5244705200195314
+            }
+          }
+        }
+      }
+    ]
+  },
+  "stability": [
+    {
+      "scenario": "mount-interaction-lifecycle",
+      "contract": "shared-public-behavior",
+      "expected": "A visible child handles a click and invokes mount/unmount lifecycle hooks in order.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "props-and-event-bus",
+      "contract": "shared-public-behavior",
+      "expected": "Props reach the child and a targeted host ping receives exactly one child pong.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "javascript-global-isolation",
+      "contract": "shared-public-behavior",
+      "expected": "Child global writes do not mutate the host global with the same name.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "stylesheet-isolation",
+      "contract": "shared-public-behavior",
+      "expected": "Child CSS applies inside the child and cannot recolor a matching host element.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "two-apps-independent-state",
+      "contract": "shared-public-behavior",
+      "expected": "Two concurrent apps render and keep click state and targeted bus messages independent.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "destroy-and-recreate",
+      "contract": "shared-public-behavior",
+      "expected": "Explicit destroy removes the child; a new instance resets state and has one bus subscription.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "keep-alive-switch",
+      "contract": "shared-public-behavior",
+      "expected": "Switching away from a kept-alive app and back preserves its DOM state without remount.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "route-sync-disabled",
+      "contract": "shared-public-behavior",
+      "expected": "Child pushState updates its own route while the host URL stays unchanged.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "route-sync-enabled",
+      "contract": "shared-public-behavior",
+      "expected": "Child pushState updates its route and the named host query parameter without changing host pathname.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "async-unmount-completion",
+      "contract": "shared-public-behavior",
+      "expected": "The destroy Promise completes only after the 80 ms async unmount hook and afterUnmount event.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "start-destroy-race",
+      "contract": "robustness-observation",
+      "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 0,
+          "failed": 3
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "same-name-concurrent-containers",
+      "contract": "robustness-observation",
+      "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 0,
+          "failed": 3
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "preload-execute-then-activate",
+      "contract": "shared-public-behavior",
+      "expected": "An executed preload can be activated, rendered in the requested container and interacted with.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "dynamic-script-and-stylesheet",
+      "contract": "shared-public-behavior",
+      "expected": "Dynamically appended script and stylesheet finish loading and survive a kept-alive switch.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "missing-script-error-and-recovery",
+      "contract": "shared-public-behavior",
+      "expected": "A script HTTP 404 is observable; after explicit cleanup, the same name starts successfully with a valid URL.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "fiber-enabled-interaction",
+      "contract": "shared-public-behavior",
+      "expected": "With fiber scheduling enabled, rendering, interaction and destroy still complete correctly.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    }
+  ],
+  "failures": [
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "start-destroy-race",
+      "round": 0,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+        "observations": {
+          "failureObservations": {
+            "destruction": [
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "starting": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              }
+            ],
+            "readyCount": 0,
+            "loadingCount": 1,
+            "observationWindowMs": 250
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:63040/",
+            "events": [
+              {
+                "name": "cancelled-start",
+                "type": "beforeLoad"
+              }
+            ],
+            "states": [
+              {
+                "name": "cancelled-start"
+              }
+            ],
+            "iframes": 0,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      ["data-loading-flag", ""],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection during cancellation.",
+        "stack": "Error: Unexpected startup rejection during cancellation.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:329:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 571
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "same-name-concurrent-containers",
+      "round": 0,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+        "observations": {
+          "failureObservations": {
+            "outcomes": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              },
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "firstReady": 0,
+            "secondReady": 1,
+            "loadingCount": 1
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:63040/",
+            "events": [
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeMount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": false,
+                "name": "same-name",
+                "type": "mount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": true,
+                "name": "same-name",
+                "type": "ready"
+              },
+              {
+                "name": "same-name",
+                "type": "afterMount"
+              }
+            ],
+            "states": [
+              {
+                "name": "same-name",
+                "state": {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                }
+              }
+            ],
+            "iframes": 1,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      ["data-loading-flag", ""],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": [
+                  {
+                    "tag": "WUJIE-APP",
+                    "attributes": [
+                      ["data-wujie-id", "same-name"],
+                      ["class", "wujie_iframe"]
+                    ],
+                    "readyElements": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection in the superseded request.",
+        "stack": "Error: Unexpected startup rejection in the superseded request.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:367:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 573
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "start-destroy-race",
+      "round": 1,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+        "observations": {
+          "failureObservations": {
+            "destruction": [
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "starting": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              }
+            ],
+            "readyCount": 0,
+            "loadingCount": 1,
+            "observationWindowMs": 250
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:63040/",
+            "events": [
+              {
+                "name": "cancelled-start",
+                "type": "beforeLoad"
+              }
+            ],
+            "states": [
+              {
+                "name": "cancelled-start"
+              }
+            ],
+            "iframes": 0,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      ["data-loading-flag", ""],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection during cancellation.",
+        "stack": "Error: Unexpected startup rejection during cancellation.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:329:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 604
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "same-name-concurrent-containers",
+      "round": 1,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+        "observations": {
+          "failureObservations": {
+            "outcomes": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              },
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "firstReady": 0,
+            "secondReady": 1,
+            "loadingCount": 1
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:63040/",
+            "events": [
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeMount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": false,
+                "name": "same-name",
+                "type": "mount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": true,
+                "name": "same-name",
+                "type": "ready"
+              },
+              {
+                "name": "same-name",
+                "type": "afterMount"
+              }
+            ],
+            "states": [
+              {
+                "name": "same-name",
+                "state": {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                }
+              }
+            ],
+            "iframes": 1,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      ["data-loading-flag", ""],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": [
+                  {
+                    "tag": "WUJIE-APP",
+                    "attributes": [
+                      ["data-wujie-id", "same-name"],
+                      ["class", "wujie_iframe"]
+                    ],
+                    "readyElements": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection in the superseded request.",
+        "stack": "Error: Unexpected startup rejection in the superseded request.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:367:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 606
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "start-destroy-race",
+      "round": 2,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+        "observations": {
+          "failureObservations": {
+            "destruction": [
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "starting": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              }
+            ],
+            "readyCount": 0,
+            "loadingCount": 1,
+            "observationWindowMs": 250
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:63040/",
+            "events": [
+              {
+                "name": "cancelled-start",
+                "type": "beforeLoad"
+              }
+            ],
+            "states": [
+              {
+                "name": "cancelled-start"
+              }
+            ],
+            "iframes": 0,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      ["data-loading-flag", ""],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection during cancellation.",
+        "stack": "Error: Unexpected startup rejection during cancellation.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:329:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 635
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "same-name-concurrent-containers",
+      "round": 2,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+        "observations": {
+          "failureObservations": {
+            "outcomes": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              },
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "firstReady": 0,
+            "secondReady": 1,
+            "loadingCount": 1
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:63040/",
+            "events": [
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeMount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": false,
+                "name": "same-name",
+                "type": "mount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": true,
+                "name": "same-name",
+                "type": "ready"
+              },
+              {
+                "name": "same-name",
+                "type": "afterMount"
+              }
+            ],
+            "states": [
+              {
+                "name": "same-name",
+                "state": {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                }
+              }
+            ],
+            "iframes": 1,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      ["data-loading-flag", ""],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": [
+                  {
+                    "tag": "WUJIE-APP",
+                    "attributes": [
+                      ["data-wujie-id", "same-name"],
+                      ["class", "wujie_iframe"]
+                    ],
+                    "readyElements": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection in the superseded request.",
+        "stack": "Error: Unexpected startup rejection in the superseded request.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:367:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 637
+    }
+  ]
+}

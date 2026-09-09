@@ -26,7 +26,7 @@ import { EventBus } from './event';
 import { RuntimeAppController } from './controller';
 import { beginOperation, isOperationCurrent, observeOperation } from './operation-intent';
 import type { OperationIntent } from './operation-intent';
-import type { CacheOptions, DestroyHandler, PreOptions, StartOptions } from './contracts';
+import type { CacheOptions, PreOptions, StartOptions } from './contracts';
 import type { AppController } from './controller';
 
 export type {
@@ -57,6 +57,10 @@ export type { ResolvedOptions } from './options';
 export const bus = new EventBus(Date.now().toString());
 
 type ContinuationGuard = () => boolean;
+
+interface StartupCleanup {
+  releaseLoading?: () => void;
+}
 
 function isChildSelfUnmountOperation(id: string): boolean {
   try {
@@ -131,6 +135,16 @@ function settleWhenCancelled<Value>(work: Promise<Value>, intent: OperationInten
   return Promise.race([work, intent.cancelled.then((): void => undefined)]);
 }
 
+const completeStartup = <Value>(work: Promise<Value>, intent: OperationIntent, cleanup: StartupCleanup) => {
+  // Cancellation can finish while a resource request is still pending. Release
+  // startup-owned loading at public completion, not when that request unwinds.
+  return settleWhenCancelled(work, intent).finally(() => {
+    const releaseLoading = cleanup.releaseLoading;
+    cleanup.releaseLoading = undefined;
+    releaseLoading?.();
+  });
+};
+
 async function discardSandboxIfOwned(sandbox: Jieshu): Promise<void> {
   if (sandbox.destroyed || getJieshuById(sandbox.id) !== sandbox) return;
   try {
@@ -176,7 +190,7 @@ export function setupApp(options: CacheOptions): void {
 /**
  * 运行界枢app
  */
-async function startAppNow(startOptions: StartOptions, canContinue: ContinuationGuard): Promise<DestroyHandler | void> {
+const startAppNow = async (startOptions: StartOptions, canContinue: ContinuationGuard, cleanup: StartupCleanup) => {
   assertJieshuSupport();
   // 初始化内联事件处理器辅助函数
   initInlineEventHelper();
@@ -316,7 +330,7 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
   }
 
   // 设置loading
-  addLoading(el, loading);
+  cleanup.releaseLoading = addLoading(el, loading);
   if (!canContinue()) {
     return undefined;
   }
@@ -385,21 +399,25 @@ async function startAppNow(startOptions: StartOptions, canContinue: Continuation
     if (canContinue()) await discardSandboxIfOwned(newSandbox);
     throw cause;
   }
-}
+};
 
-function startAppWithCompletion(request: StartOptions): Promise<DestroyHandler | void> {
+const startAppWithCompletion = (request: StartOptions) => {
   const reentrantUnmount = isReentrantUnmountOperation(request.name);
   // Starting the application that is currently executing its own unmount
   // hook has no stable owner realm. Treat it as already superseded; callers
   // can initiate the next start from the host after unmount completion.
-  if (reentrantUnmount) return Promise.resolve();
+  if (reentrantUnmount) {
+    return Promise.resolve();
+  }
   const intent = beginOperation(request.name);
-  const starting = settleWhenCancelled(
-    startAppNow(request, () => isOperationCurrent(intent)),
+  const cleanup: StartupCleanup = {};
+  const starting = completeStartup(
+    startAppNow(request, () => isOperationCurrent(intent), cleanup),
     intent,
+    cleanup,
   );
   return starting;
-}
+};
 
 export const startApp = (startOptions: StartOptions) => startAppWithCompletion({ ...startOptions });
 
@@ -561,17 +579,20 @@ export const destroyApp = (id: string) => destroyAppWithCompletion(id);
  * 先销毁当前子应用实例，再以传入配置全量重建（等价于「重建模式」）
  * 等待 destroyApp 完成后再 startApp，避免销毁未结束就重启导致的竞态
  */
-function refreshAppWithCompletion(request: StartOptions): Promise<DestroyHandler | void> {
+const refreshAppWithCompletion = (request: StartOptions) => {
   const reentrantUnmount = isReentrantUnmountOperation(request.name);
-  if (reentrantUnmount) return Promise.resolve();
+  if (reentrantUnmount) {
+    return Promise.resolve();
+  }
   const intent = beginOperation(request.name);
   const canContinue = () => isOperationCurrent(intent);
+  const cleanup: StartupCleanup = {};
   const work = destroyAppNow(request.name, canContinue).then(() =>
-    canContinue() ? startAppNow(request, canContinue) : undefined,
+    canContinue() ? startAppNow(request, canContinue, cleanup) : undefined,
   );
-  const refreshing = settleWhenCancelled(work, intent);
+  const refreshing = completeStartup(work, intent, cleanup);
   return refreshing;
-}
+};
 
 export const refreshApp = (startOptions: StartOptions) => refreshAppWithCompletion({ ...startOptions });
 

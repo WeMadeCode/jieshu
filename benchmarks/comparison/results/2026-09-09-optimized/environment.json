@@ -1,0 +1,66 @@
+{
+  "startedAt": "2026-09-09T08:03:28.974Z",
+  "mode": "all",
+  "samples": 30,
+  "memoryRounds": 5,
+  "stabilityRounds": 3,
+  "cycles": 30,
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "totalMemoryBytes": 17179869184,
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "loadAverage": [2.513671875, 3.17919921875, 3.55615234375],
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "jieshu": {
+      "commit": "b0c73aaa944ea8603c6fb13f3126e341b320d2cb",
+      "status": "M AGENTS.md\n M docs/api/startApp.md\n M packages/jieshu-core/__test__/unit/sandbox-start.test.ts\n M packages/jieshu-core/src/function-binding.ts\n M packages/jieshu-core/src/iframe-inline-events.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/sandbox.ts\n M packages/jieshu-core/src/shadow.ts\n M packages/jieshu-core/src/utils.ts\n?? benchmarks/\n?? docs/notes/jieshu-performance-optimization.md\n?? packages/jieshu-core/__test__/browser/startup-loading.test.mts\n?? packages/jieshu-core/__test__/unit/iframe-allocation.test.ts\n?? packages/jieshu-core/__test__/unit/runtime-callables.test.ts\n?? packages/jieshu-core/__test__/unit/startup-loading.test.ts",
+      "package": "0.0.5",
+      "packageManager": "pnpm@10.28.2",
+      "bundleBytes": 108681,
+      "gzipBytes": 32759,
+      "sha256": "2d98842d46df3c3dbd89041f927fd1b16e9ebc827fafc7c98d1c2069b42f034e"
+    },
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "status": "",
+      "package": "2.1.0",
+      "packageManager": "pnpm@10.33.0",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    }
+  },
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production"
+  },
+  "fixture": {
+    "jsBytes": 3634,
+    "cssBytes": 65,
+    "domItems": 300,
+    "heapItems": 4000
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "limitations": [
+    "Headless Chromium only",
+    "Local HTTP, cross-origin ports",
+    "No browser total RSS measurement",
+    "Background desktop activity uncontrolled"
+  ],
+  "finishedAt": "2026-09-09T08:07:52.677Z",
+  "counts": {
+    "observations": 646,
+    "failures": 6
+  }
+}

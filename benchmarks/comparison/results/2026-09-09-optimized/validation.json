@@ -1,0 +1,176 @@
+{
+  "date": "2026-09-09",
+  "comparison": {
+    "command": "BENCH_OUTPUT=benchmarks/comparison/results/2026-09-09-optimized node benchmarks/comparison/run.mjs",
+    "exitCode": 0,
+    "counts": {
+      "startup": {
+        "wujie": {
+          "total": 270,
+          "passed": 270,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 270,
+          "passed": 270,
+          "failed": 0
+        }
+      },
+      "memory": {
+        "wujie": {
+          "total": 5,
+          "passed": 5,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 5,
+          "passed": 5,
+          "failed": 0
+        }
+      },
+      "stability": {
+        "wujie": {
+          "total": 48,
+          "passed": 42,
+          "failed": 6
+        },
+        "jieshu": {
+          "total": 48,
+          "passed": 48,
+          "failed": 0
+        }
+      }
+    },
+    "log": "test-results/optimization-final-comparison.log",
+    "logSha256": "76f90e600d301f050920aafdec7f299a4e078f8b72e97fd49abebd1aa326c3ac"
+  },
+  "checks": [
+    {
+      "scope": "core unit",
+      "command": "pnpm --filter @cloud/jieshu-core run test:unit",
+      "passed": 515,
+      "files": 53,
+      "durationSeconds": 4.52,
+      "coverage": {
+        "statements": 78.65,
+        "branches": 71.52,
+        "functions": 83.85,
+        "lines": 80.65
+      },
+      "log": "test-results/optimization-final-unit.log",
+      "exitCode": 0,
+      "logSha256": "38d45d4bc4f93ab46c5abcfc0f5d1cda6dc90ed783d5fde320f05ed4d574bf79"
+    },
+    {
+      "scope": "core Chromium",
+      "command": "node node_modules/@playwright/test/cli.js test --config packages/jieshu-core/__test__/browser/playwright.config.mts",
+      "passed": 137,
+      "durationSeconds": 44.9,
+      "log": "test-results/optimization-final-browser.log",
+      "exitCode": 0,
+      "logSha256": "509441b05e749803e8bd9daab44846151a255037b9fb4bf4878e1d43cbce9649"
+    },
+    {
+      "scope": "core examples integration with Rspack React host and Vue host",
+      "command": "PATH=/tmp/jieshu-pnpm-HDQBCf/bin:$PATH NODE_OPTIONS=--openssl-legacy-provider JIESHU_REACT_MAIN_WORKSPACE=main-react-ts JIESHU_REACT_MAIN_PORT=7800 JIESHU_REACT_MAIN_URL=http://localhost:7800/ node node_modules/@playwright/test/cli.js test --config /tmp/jieshu-optimization-integration.config.mts",
+      "passed": 77,
+      "reportedDuration": "1.2m",
+      "log": "test-results/optimization-final-integration.log",
+      "configuration": "import base from '/Users/zhouxiang/Documents/Github/jieshu/packages/jieshu-core/__test__/integration/playwright.config.mts';\n\nexport default {\n  ...base,\n  testDir: '/Users/zhouxiang/Documents/Github/jieshu/packages/jieshu-core/__test__/integration',\n  outputDir: '/Users/zhouxiang/Documents/Github/jieshu/test-results/optimization-integration',\n  webServer: base.webServer.map((server) => {\n    if (server.command.includes('--filter main-react-ts')) {\n      return {\n        ...server,\n        command: 'pnpm --filter main-react-ts exec rspack dev --mode development --port 7800 --no-open',\n      };\n    }\n    return server;\n  }),\n};\n",
+      "note": "Temporary config replaces only the duplicate --port main-react-ts server command. All original tests and assertions retained, retries=0.",
+      "exitCode": 0,
+      "logSha256": "d838912ca31bad6cdc9314b1352fe454a9b67fd52a870f6af01b20f483fff7e5"
+    },
+    {
+      "scope": "core examples integration with default Webpack React host and Vue host",
+      "command": "PATH=/tmp/jieshu-pnpm-HDQBCf/bin:$PATH NODE_OPTIONS=--openssl-legacy-provider JIESHU_REACT_MAIN_WORKSPACE=main-react JIESHU_REACT_MAIN_PORT=7700 JIESHU_REACT_MAIN_URL=http://localhost:7700/ node node_modules/@playwright/test/cli.js test --config packages/jieshu-core/__test__/integration/playwright.config.mts",
+      "passed": 77,
+      "reportedDuration": "1.2m",
+      "log": "test-results/optimization-final-integration-webpack.log",
+      "note": "Original integration configuration, no overrides to tests or services; retries=0. Same 77-case matrix as Rspack run with a different React host, not 154 independent test cases.",
+      "exitCode": 0,
+      "logSha256": "8e6e499d12a5038025a179657526d6d92084176d170d40fcf124a4b9e2eb6ad6"
+    },
+    {
+      "scope": "core typecheck",
+      "command": "pnpm --filter @cloud/jieshu-core run typecheck",
+      "configurations": ["source", "unit", "browser", "integration"],
+      "log": "test-results/optimization-final-typecheck.log",
+      "exitCode": 0,
+      "logSha256": "6ec2b736a096580a80940cb4397bc33af615ff65b80c8c9a27a305e2667bff8d"
+    },
+    {
+      "scope": "core ESM build",
+      "command": "pnpm --filter @cloud/jieshu-core run build:esm",
+      "log": "test-results/optimization-final-build.log",
+      "exitCode": 0,
+      "logSha256": "985e634f30407fe5e34c185e4205c69aeab3cad31b4605c72a718f523cfa101d"
+    },
+    {
+      "scope": "read-only lint",
+      "command": "node node_modules/eslint/bin/eslint.js packages/jieshu-core/src/function-binding.ts packages/jieshu-core/src/iframe-inline-events.ts packages/jieshu-core/src/iframe.ts packages/jieshu-core/src/index.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/shadow.ts packages/jieshu-core/src/utils.ts packages/jieshu-core/__test__/unit/iframe-allocation.test.ts packages/jieshu-core/__test__/unit/runtime-callables.test.ts packages/jieshu-core/__test__/unit/sandbox-start.test.ts packages/jieshu-core/__test__/unit/startup-loading.test.ts packages/jieshu-core/__test__/browser/startup-loading.test.mts benchmarks/comparison/*.mjs --max-warnings=0",
+      "log": "test-results/optimization-final-lint.log",
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "code format",
+      "command": "node node_modules/prettier/bin/prettier.cjs --check packages/jieshu-core/src/function-binding.ts packages/jieshu-core/src/iframe-inline-events.ts packages/jieshu-core/src/iframe.ts packages/jieshu-core/src/index.ts packages/jieshu-core/src/sandbox.ts packages/jieshu-core/src/shadow.ts packages/jieshu-core/src/utils.ts packages/jieshu-core/__test__/unit/iframe-allocation.test.ts packages/jieshu-core/__test__/unit/runtime-callables.test.ts packages/jieshu-core/__test__/unit/sandbox-start.test.ts packages/jieshu-core/__test__/unit/startup-loading.test.ts packages/jieshu-core/__test__/browser/startup-loading.test.mts benchmarks/comparison/*.mjs",
+      "log": "test-results/optimization-final-format.log",
+      "exitCode": 0,
+      "logSha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    }
+  ],
+  "knownEnvironmentIssue": {
+    "command": "Original integration config with main-react-ts / port 7800",
+    "exitCode": 1,
+    "testsExecuted": 0,
+    "error": "Rspack dev server receives duplicate --port values as [7700, 7800]; ERR_INVALID_ARG_VALUE.",
+    "log": "test-results/optimization-core-integration.log",
+    "logSha256": "773aecb6532152ac708a5a3680b7db07442f28c081b634c4a0d5b5142e00ccfd",
+    "resolution": "Temporary config source and final passing command preserved in checks above; no example or repository configuration changes."
+  },
+  "runtime": {
+    "pnpm": "10.28.2",
+    "pnpmCli": "/tmp/jieshu-pnpm-HDQBCf/package/bin/pnpm.cjs",
+    "dependencyInstall": false
+  },
+  "sourceSha256": {
+    "packages/jieshu-core/src/function-binding.ts": "b2d98b9558838f56a1e5062d90bd9bba153f7fb66e32613dc0c9205b08c6c71b",
+    "packages/jieshu-core/src/iframe-inline-events.ts": "229dfb2874156f4928a4410fc1ec7a92d27ddfbac50e7880bde924a423f6b13e",
+    "packages/jieshu-core/src/iframe.ts": "bf0638f9ee98a59bb7d318872b9b2ca6faba58507f0cbd7ddbe6d330a575ec40",
+    "packages/jieshu-core/src/index.ts": "1236f0b4ba8e1199290f8121d7c9eaacb5773f46180d0a54d5f35db447191981",
+    "packages/jieshu-core/src/sandbox.ts": "34df43dfef90418cc933b5a2579652bd60e30298d02595fba3e5ad70ba63a4b6",
+    "packages/jieshu-core/src/shadow.ts": "22816201e9ea70301bec61dac6927660c88d6bec8bf5c0e2cd15a6528bf6edb0",
+    "packages/jieshu-core/src/utils.ts": "76f301873355a336e75c975618136ffa392343b82fa2215f1cf618cf41c076bd",
+    "packages/jieshu-core/__test__/unit/iframe-allocation.test.ts": "56fae7fb9a26a320051551c06b632f77b53a04996b731087fa7e977df4ca91d1",
+    "packages/jieshu-core/__test__/unit/runtime-callables.test.ts": "ec8d7b68c15101d617dcc21a019a6d16b8cdbf04e60f3d48d9c381c2b077fbca",
+    "packages/jieshu-core/__test__/unit/sandbox-start.test.ts": "396c2420d6c64244e267104e515944559eced85eb322b17caf753b8de8117752",
+    "packages/jieshu-core/__test__/unit/startup-loading.test.ts": "d675566742f7e2e683b4d17b5624e4f91159ab354119c5adaa49799d06858072",
+    "packages/jieshu-core/__test__/browser/startup-loading.test.mts": "d069095608bd2a762b5953dfa8a70e41715d800148e641177f7db8034538a236"
+  },
+  "scriptsSha256": {
+    "run.mjs": "f5480c2857cd3c7f6e75b9bd84a0464f1a3e8d524cc0c91a28465dbc60077f9e",
+    "fixture.mjs": "d16cff15959683f7533cca9de2177226b6da71f535c1816679184e242cbea94c",
+    "stability.mjs": "8e55452b200697e4db4e8d22eee53a2e3e817b37c4b5c92b880b8837db53471d",
+    "summarize.mjs": "d812d5264ec39be4ec2fe45a6e014568ff14a75b0a0a04f2faac8432de684cd8",
+    "inspect-heap.mjs": "b810148e7bff3f63f0984da9ab4611412db0f5dd58d590bf9380fa135e114f85"
+  },
+  "exclusions": [
+    "No Wujie changes",
+    "No adapter source changes or dedicated adapter test runs",
+    "No dependency or lockfile changes",
+    "No commits created",
+    "Existing AGENTS.md changes preserved",
+    "Headless Chromium benchmark only; no Firefox, WebKit, mobile devices, total browser RSS or long-duration soak"
+  ],
+  "finalIntegrityChecks": {
+    "gitDiffCheck": "passed",
+    "fixtureStabilitySummarizerHashesMatchBaseline": true,
+    "wujieBundleHashMatchesBaseline": true,
+    "wujieWorkingTreeClean": true,
+    "sourceHashesMatchValidatedFiles": true,
+    "reportLocalLinksResolve": true,
+    "ownedExampleServersStopped": true
+  }
+}

@@ -165,18 +165,30 @@ export function nextTick(cb: () => unknown): void {
 }
 
 //执行钩子函数
-export function execHooks(plugins: Array<JieshuPlugin>, hookName: JieshuHookName, ...args: Array<unknown>): void {
+export const execHooks = (plugins: Array<JieshuPlugin>, hookName: JieshuHookName, ...args: Array<unknown>) => {
   try {
-    if (plugins && plugins.length > 0) {
-      plugins
-        .map((plugin) => plugin[hookName])
-        .filter((hook) => isFunction(hook))
-        .forEach((hook) => (hook as (...hookArgs: Array<unknown>) => unknown)(...args));
+    if (!plugins?.length) {
+      return;
+    }
+    let hooks: Array<(...hookArgs: Array<unknown>) => unknown> | undefined;
+    // Read the complete snapshot before invoking hooks; a hook can mutate its
+    // plugin or the plugin list without changing the current dispatch.
+    plugins.forEach((plugin) => {
+      const hook = plugin[hookName];
+      if (isFunction(hook)) {
+        (hooks ??= []).push(hook);
+      }
+    });
+    if (!hooks) {
+      return;
+    }
+    for (const hook of hooks) {
+      hook(...args);
     }
   } catch (e) {
     error(e);
   }
-}
+};
 
 export function isScriptElement(element: HTMLElement): boolean {
   return element.tagName?.toUpperCase() === 'SCRIPT';

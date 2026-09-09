@@ -1,0 +1,66 @@
+{
+  "startedAt": "2026-09-09T07:18:50.268Z",
+  "mode": "all",
+  "samples": 30,
+  "memoryRounds": 5,
+  "stabilityRounds": 3,
+  "cycles": 30,
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "totalMemoryBytes": 17179869184,
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "loadAverage": [2.78564453125, 2.82666015625, 2.88623046875],
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "jieshu": {
+      "commit": "b0c73aaa944ea8603c6fb13f3126e341b320d2cb",
+      "status": "?? benchmarks/",
+      "package": "0.0.5",
+      "packageManager": "pnpm@10.28.2",
+      "bundleBytes": 108242,
+      "gzipBytes": 32603,
+      "sha256": "d53130f0053d9784c08c2b139759532eabf068edaaacc33698e6b00646712700"
+    },
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "status": "",
+      "package": "2.1.0",
+      "packageManager": "pnpm@10.33.0",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    }
+  },
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production"
+  },
+  "fixture": {
+    "jsBytes": 3634,
+    "cssBytes": 65,
+    "domItems": 300,
+    "heapItems": 4000
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "limitations": [
+    "Headless Chromium only",
+    "Local HTTP, cross-origin ports",
+    "No browser total RSS measurement",
+    "Background desktop activity uncontrolled"
+  ],
+  "finishedAt": "2026-09-09T07:23:25.615Z",
+  "counts": {
+    "observations": 646,
+    "failures": 12
+  }
+}

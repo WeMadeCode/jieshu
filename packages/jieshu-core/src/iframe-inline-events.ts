@@ -24,19 +24,33 @@ export function wrapInlineEventHandler(handler: string, appId: string): string {
 }
 
 /** Compile existing inline handlers on an element subtree. */
-export function compileInlineEvents(element: Element, iframeWindow: Window): void {
-  if (element.nodeType !== Node.ELEMENT_NODE) return;
+export const compileInlineEvents = (element: Element, iframeWindow: Window) => {
+  if (element.nodeType !== Node.ELEMENT_NODE) {
+    return;
+  }
   const appId = iframeWindow.__JIESHU?.id;
-  if (!appId) return;
+  if (!appId) {
+    return;
+  }
 
-  Array.from(element.attributes).forEach((attribute) => {
-    if (!isInlineEventAttribute(attribute.name)) return;
-    const compiledHandler = wrapInlineEventHandler(attribute.value, appId);
-    if (compiledHandler !== attribute.value) element.setAttribute(attribute.name, compiledHandler);
-  });
-
-  Array.from(element.children).forEach((child) => compileInlineEvents(child, iframeWindow));
-}
+  const attributes = element.attributes;
+  if (attributes.length) {
+    // Retain a snapshot: custom attribute setters can mutate the live list.
+    Array.from(attributes).forEach((attribute) => {
+      if (!isInlineEventAttribute(attribute.name)) {
+        return;
+      }
+      const compiledHandler = wrapInlineEventHandler(attribute.value, appId);
+      if (compiledHandler !== attribute.value) {
+        element.setAttribute(attribute.name, compiledHandler);
+      }
+    });
+  }
+  const children = element.children;
+  if (children.length) {
+    Array.from(children).forEach((child) => compileInlineEvents(child, iframeWindow));
+  }
+};
 
 function patchMarkupSetter(iframeWindow: Window, prototype: object, property: 'innerHTML' | 'outerHTML'): void {
   const descriptor = Object.getOwnPropertyDescriptor(prototype, property);

@@ -373,9 +373,10 @@ export function patchWindowEffect(iframeWindow: Window): void {
     });
   });
   // onEvent set
+  const childWindowOnEvents = new Set([...appWindowOnEvent, ...(iframeWindow.__JIESHU.iframeOnEvents ?? [])]);
   const windowOnEvents = Object.getOwnPropertyNames(window)
     .filter((p) => /^on/.test(p))
-    .filter((e) => !appWindowOnEvent.concat(iframeWindow.__JIESHU.iframeOnEvents ?? []).includes(e));
+    .filter((e) => !childWindowOnEvents.has(e));
 
   // 走主应用window
   windowOnEvents.forEach((e) => {
@@ -526,34 +527,44 @@ function isDomConstructor(name: string, ctor: DomConstructor, peerWindow: Window
 /**
  * 让子应用 JS iframe 中的 DOM 构造函数 instanceof 同时认可主应用 realm 的对象。
  */
-export function patchInstanceofAcrossRealms(targetWindow: Window, peerWindow: Window = window): () => void {
+export const patchInstanceofAcrossRealms = (targetWindow: Window, peerWindow: Window = window) => {
   const releases: Array<() => void> = [];
   // DOM 构造函数之间存在继承链（HTMLIFrameElement -> HTMLElement -> Element -> Node ...）。
   // Each concrete constructor receives its own realm registration; inherited
   // Symbol.hasInstance behavior must not make one constructor claim a sibling.
   Object.getOwnPropertyNames(targetWindow).forEach((name) => {
-    let targetConstructor: DomConstructor;
-    let peerConstructor: DomConstructor;
-
+    let peerConstructor: unknown;
     try {
-      targetConstructor = Reflect.get(targetWindow, name) as DomConstructor;
-      peerConstructor = Reflect.get(peerWindow, name) as DomConstructor;
+      peerConstructor = Reflect.get(peerWindow, name);
+      if (typeof peerConstructor !== 'function' || !isDomConstructor(name, peerConstructor, peerWindow)) {
+        return;
+      }
+    } catch (error) {
+      // User-owned constructors may also throw while inspecting their prototype.
+      return;
+    }
+    // Reading a browser global can materialize its interface in this realm.
+    // Only initialize child constructors that actually need a DOM peer.
+    let targetConstructor: unknown;
+    try {
+      targetConstructor = Reflect.get(targetWindow, name);
     } catch (error) {
       return;
     }
-
-    if (typeof targetConstructor !== 'function' || typeof peerConstructor !== 'function') return;
-    if (targetConstructor === peerConstructor) return;
-    if (!isDomConstructor(name, peerConstructor, peerWindow)) return;
+    if (typeof targetConstructor !== 'function' || targetConstructor === peerConstructor) {
+      return;
+    }
     const isolatedConstructor = isolateSharedConstructor(targetWindow, name, targetConstructor);
-    if (isolatedConstructor) releases.push(registerInstanceofPeer(isolatedConstructor, peerConstructor));
+    if (isolatedConstructor) {
+      releases.push(registerInstanceofPeer(isolatedConstructor, peerConstructor));
+    }
   });
-  const jieshu = (targetWindow as Window & { __JIESHU?: Jieshu }).__JIESHU;
+  const jieshu = targetWindow.__JIESHU;
   if (jieshu) {
     execHooks(jieshu.plugins, 'windowPropertyOverride', targetWindow);
   }
   return () => releases.forEach((release) => release());
-}
+};
 
 function listenerUsesCapture(options?: boolean | EventListenerOptions): boolean {
   return typeof options === 'boolean' ? options : options?.capture === true;
@@ -1031,45 +1042,67 @@ function stopIframeLoading(iframe: HTMLIFrameElement, options: { fallbackSrc: st
  *
  * WeakRef 是 ES2021 标准（Chrome 84+ / Node 14.6+）；旧环境使用强引用以保兼容。
  */
-export function patchElementEffect(
+interface WindowReference {
+  deref(): Window | undefined;
+}
+
+const elementDescriptorCache = new WeakMap<Window, PropertyDescriptorMap>();
+
+// Getters share one weak reference per child realm, never the sandbox itself.
+// Keeping this factory separate prevents retained DOM from capturing a Window
+// through the scope that creates the WeakRef.
+const createElementDescriptors = (reference: WindowReference) => ({
+  baseURI: {
+    configurable: true,
+    get: () => {
+      const proxyLocation = reference.deref()?.__JIESHU?.proxyLocation;
+      if (!proxyLocation) {
+        return window.document.baseURI;
+      }
+      return proxyLocation.protocol + '//' + proxyLocation.host + proxyLocation.pathname;
+    },
+    set: undefined,
+  },
+  ownerDocument: {
+    configurable: true,
+    get: () => {
+      const childWindow = reference.deref();
+      return childWindow?.__JIESHU ? childWindow.document : window.document;
+    },
+  },
+  _hasPatch: { value: true },
+});
+
+const getElementDescriptors = (iframeWindow: Window) => {
+  const cached = elementDescriptorCache.get(iframeWindow);
+  if (cached) {
+    return cached;
+  }
+  type WeakRefConstructor = new <T extends object>(target: T) => { deref(): T | undefined };
+  // ES2018 typings do not include the optional native WeakRef global.
+  const WeakRefCtor = (globalThis as typeof globalThis & { WeakRef?: WeakRefConstructor }).WeakRef;
+  const reference = WeakRefCtor ? new WeakRefCtor(iframeWindow) : { deref: () => iframeWindow };
+  const descriptors = createElementDescriptors(reference);
+  elementDescriptorCache.set(iframeWindow, descriptors);
+  return descriptors;
+};
+
+export const patchElementEffect = (
   element: (HTMLElement | Node | ShadowRoot) & { _hasPatch?: boolean },
   iframeWindow: Window,
-): void {
-  if (element._hasPatch) return;
-  type WeakRefConstructor = new <T extends object>(target: T) => { deref(): T | undefined };
-  const WeakRefCtor = (globalThis as typeof globalThis & { WeakRef?: WeakRefConstructor }).WeakRef;
-  const iframeWindowRef = WeakRefCtor ? new WeakRefCtor(iframeWindow) : { deref: () => iframeWindow };
+) => {
+  if (element._hasPatch) {
+    return;
+  }
   try {
-    Object.defineProperties(element, {
-      baseURI: {
-        configurable: true,
-        get: () => {
-          const win = iframeWindowRef.deref();
-          const proxyLocation = win?.__JIESHU?.proxyLocation as Location | undefined;
-          if (!proxyLocation) return window.document.baseURI;
-          return proxyLocation.protocol + '//' + proxyLocation.host + proxyLocation.pathname;
-        },
-        set: undefined,
-      },
-      ownerDocument: {
-        configurable: true,
-        get: () => {
-          const win = iframeWindowRef.deref();
-          // win.__JIESHU 被置 null（destroy 后）或 win 本身已 GC 时回退到主 document，
-          // 防止 element 永久把 iframeWindow 钉在内存中。
-          if (!win || !win.__JIESHU) return window.document;
-          return win.document;
-        },
-      },
-      _hasPatch: { get: () => true },
-    });
+    Object.defineProperties(element, getElementDescriptors(iframeWindow));
   } catch (error) {
     console.warn(error);
   }
   execHooks(iframeWindow.__JIESHU.plugins, 'patchElementHook', element, iframeWindow);
   // 编译内联事件处理器
   compileInlineEvents(element as Element, iframeWindow);
-}
+};
 
 /**
  * 子应用前进后退，同步路由到主应用

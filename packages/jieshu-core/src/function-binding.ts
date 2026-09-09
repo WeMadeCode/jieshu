@@ -1,7 +1,5 @@
 export type ProxyTarget = Window | Document | ShadowRoot | Location;
 
-const safariDocumentAllIsCallable = typeof document.all === 'function' && typeof document.all === 'undefined';
-const callableCache = new WeakMap<CallableFunction, boolean>();
 const boundedCache = new WeakMap<CallableFunction, boolean>();
 const constructableCache = new WeakMap<CallableFunction, boolean>();
 const targetBindingCaches = new WeakMap<ProxyTarget, WeakMap<CallableFunction, CallableFunction>>();
@@ -11,20 +9,8 @@ export const isFunction = (value: unknown): value is (...args: Array<unknown>) =
 };
 
 export const isCallable = (value: unknown): value is CallableFunction => {
-  if (typeof value !== 'function') {
-    return false;
-  }
-  if (callableCache.has(value)) {
-    return true;
-  }
-
-  const callable = safariDocumentAllIsCallable
-    ? typeof value === 'function' && typeof value !== 'undefined'
-    : typeof value === 'function';
-  if (callable) {
-    callableCache.set(value, true);
-  }
-  return callable;
+  // typeof also excludes document.all's HTMLDDA value and accepts other realms.
+  return typeof value === 'function';
 };
 
 export const isBoundedFunction = (fn: CallableFunction) => {
@@ -99,11 +85,14 @@ const copyCallableProperties = (source: CallableFunction, destination: CallableF
 
 export const getTargetValue = (target: ProxyTarget, property: PropertyKey) => {
   const value: unknown = Reflect.get(target, property);
-  const bindings = targetBindingCaches.get(target);
-  if (isCallable(value) && bindings?.has(value)) {
-    return bindings.get(value);
+  if (!isCallable(value)) {
+    return value;
   }
-  if (!isCallable(value) || isBoundedFunction(value) || isConstructable(value)) {
+  const cached = targetBindingCaches.get(target)?.get(value);
+  if (cached !== undefined) {
+    return cached;
+  }
+  if (isBoundedFunction(value) || isConstructable(value)) {
     return value;
   }
 

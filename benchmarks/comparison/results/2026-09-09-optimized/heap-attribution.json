@@ -1,0 +1,1069 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-09T08:06:51.093Z",
+  "scope": "Read-only attribution of existing final-after-destroy snapshots; no browser run, build, or core modification performed for this artifact.",
+  "deltaConvention": "jieshu minus wujie",
+  "inputs": {
+    "wujie": {
+      "path": "test-results/comparison-opt-heaps/wujie-final.heapsnapshot",
+      "bytes": 7971055,
+      "sha256": "627d74d58ed887ff2032719da8b393d0aae35f9b072235eee320e891a338854c",
+      "nodeFields": ["type", "name", "id", "self_size", "edge_count", "detachedness"],
+      "edgeFields": ["type", "name_or_index", "to_node"]
+    },
+    "jieshu": {
+      "path": "test-results/comparison-opt-heaps/jieshu-final.heapsnapshot",
+      "bytes": 8754511,
+      "sha256": "cc4e5786dd5f5845f40e4fa78cf9a0b387aae243547de02d5e815d1dd6a08fe5",
+      "nodeFields": ["type", "name", "id", "self_size", "edge_count", "detachedness"],
+      "edgeFields": ["type", "name_or_index", "to_node"]
+    },
+    "environment": {
+      "path": "test-results/comparison-opt-heaps/environment.json",
+      "sha256": "2a67b2326c1537b548233e32891fa0643d96150bbc3bda4eb9733d5b6d32e4d7"
+    },
+    "aggregateAnalysis": {
+      "path": "test-results/comparison-opt-heaps/analysis.json",
+      "sha256": "740223a6bfaa54013d0271b7d8b4cf8e8154dcac53aafa0990855ce641e08482"
+    }
+  },
+  "run": {
+    "startedAt": "2026-09-09T07:46:26.119Z",
+    "finishedAt": "2026-09-09T07:46:52.710Z",
+    "browser": "151.0.7922.34",
+    "build": {
+      "target": "es2018",
+      "minify": true,
+      "format": "iife",
+      "mode": "production"
+    },
+    "memoryRounds": 1,
+    "cycles": 10
+  },
+  "method": [
+    "Read node and edge field positions and type enums from snapshot.meta; do not assume array field order. Accumulate edge_count to find each node outgoing-edge range; to_node is a flat nodes-array offset.",
+    "Locate the unique code node named system / Script / .../{framework}.js. Follow its internal source edge to the ComparisonCore string; record the internal name edge for the served URL.",
+    "Follow source internal length -> number node -> internal value -> decimal string to read complete source length despite the 1024-character preview limit. Follow source map and backing_store edges to identify ExternalTwoByteString and ExternalStringData.",
+    "Hash original snapshot bytes. Cross-reference route and recorded bundle byte/hash metadata with run.mjs. Copy aggregate self_size and type/name deltas from the hashed analysis.json.",
+    "Inspect current local source modules for added behavior and small redundant implementations. Raw TypeScript file byte counts include types/comments and are not bundle contribution estimates; source hashes distinguish this later read from snapshot capture."
+  ],
+  "coreSourceEvidence": {
+    "wujie": {
+      "evidenceClass": "direct_snapshot_edges_and_recorded_build_metadata",
+      "script": {
+        "flatOffset": 158106,
+        "id": 52705,
+        "type": "code",
+        "name": "system / Script / http://127.0.0.1:58305/wujie.js",
+        "selfSizeBytes": 80
+      },
+      "scriptNameEdge": {
+        "type": "internal",
+        "name": "name",
+        "fromId": 52705,
+        "to": {
+          "flatOffset": 93078,
+          "id": 31027,
+          "type": "string",
+          "name": "http://127.0.0.1:58305/wujie.js",
+          "selfSizeBytes": 52
+        }
+      },
+      "sourceEdge": {
+        "type": "internal",
+        "name": "source",
+        "fromId": 52705,
+        "to": {
+          "flatOffset": 93084,
+          "id": 31029,
+          "type": "string",
+          "name": "var ComparisonCore=(function(e){Object.defineProperty(e,Symbol.toStringTag,{value:`Module`});var t=`data-wujie-id`,n=`data-wujie-script-id`,r=`data-wujie-Flag`,…",
+          "selfSizeBytes": 52,
+          "snapshotStoredNameLength": 1024
+        }
+      },
+      "completeSourceLength": {
+        "value": 65660,
+        "unit": "UTF-16 code units (V8 string length)",
+        "lengthEdge": {
+          "type": "internal",
+          "name": "length",
+          "fromId": 31029,
+          "to": {
+            "flatOffset": 303516,
+            "id": 101173,
+            "type": "number",
+            "name": "int",
+            "selfSizeBytes": 0
+          }
+        },
+        "valueEdge": {
+          "type": "internal",
+          "name": "value",
+          "fromId": 101173,
+          "to": {
+            "flatOffset": 303510,
+            "id": 101171,
+            "type": "string",
+            "name": "65660",
+            "selfSizeBytes": 0
+          }
+        }
+      },
+      "sourceRepresentationEdge": {
+        "type": "internal",
+        "name": "map",
+        "fromId": 31029,
+        "to": {
+          "flatOffset": 978,
+          "id": 327,
+          "type": "native",
+          "name": "system / Map (ExternalTwoByteString)",
+          "selfSizeBytes": 0
+        }
+      },
+      "externalBackingStoreEdges": [
+        {
+          "type": "internal",
+          "name": "1 / backing_store",
+          "fromId": 31029,
+          "to": {
+            "flatOffset": 303522,
+            "id": 101175,
+            "type": "native",
+            "name": "system / ExternalStringData",
+            "selfSizeBytes": 24
+          }
+        },
+        {
+          "type": "internal",
+          "name": "2 / backing_store",
+          "fromId": 31029,
+          "to": {
+            "flatOffset": 303528,
+            "id": 101177,
+            "type": "native",
+            "name": "system / ExternalStringData",
+            "selfSizeBytes": 131332
+          }
+        }
+      ],
+      "coreSourceBackingBytes": 131356,
+      "principalBackingBytes": 131332,
+      "bundle": {
+        "servedUrl": "http://127.0.0.1:58305/wujie.js",
+        "sourceEntry": "/Users/zhouxiang/Documents/Github/wujie/packages/wujie-core/src/index.ts",
+        "version": "2.1.0",
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "dirty": false,
+        "utf8Bytes": 65660,
+        "gzipBytes": 19802,
+        "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+        "matchBasis": "The Script node URL identifies the /{framework}.js route. run.mjs serves bundles[framework] and records byte count and SHA-256 for that same string. Bundle hash comes from environment.json; truncated heap source text cannot independently reproduce it."
+      }
+    },
+    "jieshu": {
+      "evidenceClass": "direct_snapshot_edges_and_recorded_build_metadata",
+      "script": {
+        "flatOffset": 238620,
+        "id": 79541,
+        "type": "code",
+        "name": "system / Script / http://127.0.0.1:58305/jieshu.js",
+        "selfSizeBytes": 80
+      },
+      "scriptNameEdge": {
+        "type": "internal",
+        "name": "name",
+        "fromId": 79541,
+        "to": {
+          "flatOffset": 95160,
+          "id": 31721,
+          "type": "string",
+          "name": "http://127.0.0.1:58305/jieshu.js",
+          "selfSizeBytes": 52
+        }
+      },
+      "sourceEdge": {
+        "type": "internal",
+        "name": "source",
+        "fromId": 79541,
+        "to": {
+          "flatOffset": 95166,
+          "id": 31723,
+          "type": "string",
+          "name": "var ComparisonCore=(function(e){Object.defineProperty(e,Symbol.toStringTag,{value:`Module`});var t=new Set([`text/javascript`,`module`,`application/javascript`,…",
+          "selfSizeBytes": 52,
+          "snapshotStoredNameLength": 1024
+        }
+      },
+      "completeSourceLength": {
+        "value": 108547,
+        "unit": "UTF-16 code units (V8 string length)",
+        "lengthEdge": {
+          "type": "internal",
+          "name": "length",
+          "fromId": 31723,
+          "to": {
+            "flatOffset": 347670,
+            "id": 115891,
+            "type": "number",
+            "name": "int",
+            "selfSizeBytes": 0
+          }
+        },
+        "valueEdge": {
+          "type": "internal",
+          "name": "value",
+          "fromId": 115891,
+          "to": {
+            "flatOffset": 347664,
+            "id": 115889,
+            "type": "string",
+            "name": "108547",
+            "selfSizeBytes": 0
+          }
+        }
+      },
+      "sourceRepresentationEdge": {
+        "type": "internal",
+        "name": "map",
+        "fromId": 31723,
+        "to": {
+          "flatOffset": 978,
+          "id": 327,
+          "type": "native",
+          "name": "system / Map (ExternalTwoByteString)",
+          "selfSizeBytes": 0
+        }
+      },
+      "externalBackingStoreEdges": [
+        {
+          "type": "internal",
+          "name": "1 / backing_store",
+          "fromId": 31723,
+          "to": {
+            "flatOffset": 347676,
+            "id": 115893,
+            "type": "native",
+            "name": "system / ExternalStringData",
+            "selfSizeBytes": 24
+          }
+        },
+        {
+          "type": "internal",
+          "name": "2 / backing_store",
+          "fromId": 31723,
+          "to": {
+            "flatOffset": 347682,
+            "id": 115895,
+            "type": "native",
+            "name": "system / ExternalStringData",
+            "selfSizeBytes": 217106
+          }
+        }
+      ],
+      "coreSourceBackingBytes": 217130,
+      "principalBackingBytes": 217106,
+      "bundle": {
+        "servedUrl": "http://127.0.0.1:58305/jieshu.js",
+        "sourceEntry": "/Users/zhouxiang/Documents/Github/jieshu/packages/jieshu-core/src/index.ts",
+        "version": "0.0.5",
+        "commit": "b0c73aaa944ea8603c6fb13f3126e341b320d2cb",
+        "dirty": true,
+        "utf8Bytes": 108547,
+        "gzipBytes": 32714,
+        "sha256": "d727b065ccfa6de8f3580ffa31d2404a7ee939e0f6861ffe66633f5c6c1dc57b",
+        "matchBasis": "The Script node URL identifies the /{framework}.js route. run.mjs serves bundles[framework] and records byte count and SHA-256 for that same string. Bundle hash comes from environment.json; truncated heap source text cannot independently reproduce it."
+      }
+    }
+  },
+  "measured": {
+    "heapSelfSize": {
+      "wujie": {
+        "count": 75670,
+        "bytes": 3604285
+      },
+      "jieshu": {
+        "count": 82387,
+        "bytes": 4011444
+      },
+      "delta": {
+        "count": 6717,
+        "bytes": 407159
+      },
+      "bytesChangePercent": 11.296526218098734
+    },
+    "categoryTotals": [
+      {
+        "category": "code",
+        "wujie": {
+          "count": 14672,
+          "bytes": 710716
+        },
+        "jieshu": {
+          "count": 18400,
+          "bytes": 968932
+        },
+        "delta": {
+          "count": 3728,
+          "bytes": 258216
+        },
+        "bytesChangePercent": 36.33181186296636
+      },
+      {
+        "category": "string",
+        "wujie": {
+          "count": 15463,
+          "bytes": 233836
+        },
+        "jieshu": {
+          "count": 16773,
+          "bytes": 242508
+        },
+        "delta": {
+          "count": 1310,
+          "bytes": 8672
+        },
+        "bytesChangePercent": 3.708582083169401
+      },
+      {
+        "category": "closure",
+        "wujie": {
+          "count": 5557,
+          "bytes": 160512
+        },
+        "jieshu": {
+          "count": 5846,
+          "bytes": 169100
+        },
+        "delta": {
+          "count": 289,
+          "bytes": 8588
+        },
+        "bytesChangePercent": 5.350378787878788
+      },
+      {
+        "category": "object",
+        "wujie": {
+          "count": 7759,
+          "bytes": 803980
+        },
+        "jieshu": {
+          "count": 8230,
+          "bytes": 850132
+        },
+        "delta": {
+          "count": 471,
+          "bytes": 46152
+        },
+        "bytesChangePercent": 5.740441304510062
+      },
+      {
+        "category": "other",
+        "wujie": {
+          "count": 32219,
+          "bytes": 1695241
+        },
+        "jieshu": {
+          "count": 33138,
+          "bytes": 1780772
+        },
+        "delta": {
+          "count": 919,
+          "bytes": 85531
+        },
+        "bytesChangePercent": 5.045359332389908
+      }
+    ],
+    "largestChangedGroups": [
+      {
+        "category": "code",
+        "type": "code",
+        "name": "system / InstructionStream",
+        "wujie": {
+          "count": 265,
+          "bytes": 278656
+        },
+        "jieshu": {
+          "count": 484,
+          "bytes": 381664
+        },
+        "delta": {
+          "count": 219,
+          "bytes": 103008
+        },
+        "bytesChangePercent": 36.966008268259074
+      },
+      {
+        "category": "other",
+        "type": "native",
+        "name": "system / ExternalStringData",
+        "wujie": {
+          "count": 55,
+          "bytes": 134233
+        },
+        "jieshu": {
+          "count": 64,
+          "bytes": 220248
+        },
+        "delta": {
+          "count": 9,
+          "bytes": 86015
+        },
+        "bytesChangePercent": 64.07887777223186
+      },
+      {
+        "category": "object",
+        "type": "array",
+        "name": "",
+        "wujie": {
+          "count": 276,
+          "bytes": 161748
+        },
+        "jieshu": {
+          "count": 293,
+          "bytes": 190244
+        },
+        "delta": {
+          "count": 17,
+          "bytes": 28496
+        },
+        "bytesChangePercent": 17.617528501125207
+      },
+      {
+        "category": "code",
+        "type": "code",
+        "name": "system / BytecodeArray",
+        "wujie": {
+          "count": 241,
+          "bytes": 41900
+        },
+        "jieshu": {
+          "count": 470,
+          "bytes": 69388
+        },
+        "delta": {
+          "count": 229,
+          "bytes": 27488
+        },
+        "bytesChangePercent": 65.60381861575179
+      },
+      {
+        "category": "code",
+        "type": "code",
+        "name": "system / TrustedByteArray",
+        "wujie": {
+          "count": 567,
+          "bytes": 38184
+        },
+        "jieshu": {
+          "count": 1065,
+          "bytes": 64916
+        },
+        "delta": {
+          "count": 498,
+          "bytes": 26732
+        },
+        "bytesChangePercent": 70.00838047349676
+      },
+      {
+        "category": "code",
+        "type": "code",
+        "name": "system / FeedbackVector",
+        "wujie": {
+          "count": 229,
+          "bytes": 29636
+        },
+        "jieshu": {
+          "count": 450,
+          "bytes": 46840
+        },
+        "delta": {
+          "count": 221,
+          "bytes": 17204
+        },
+        "bytesChangePercent": 58.05101903090836
+      },
+      {
+        "category": "code",
+        "type": "code",
+        "name": "system / Code",
+        "wujie": {
+          "count": 265,
+          "bytes": 19080
+        },
+        "jieshu": {
+          "count": 484,
+          "bytes": 34848
+        },
+        "delta": {
+          "count": 219,
+          "bytes": 15768
+        },
+        "bytesChangePercent": 82.64150943396227
+      },
+      {
+        "category": "code",
+        "type": "code",
+        "name": "system / ScopeInfo",
+        "wujie": {
+          "count": 289,
+          "bytes": 14552
+        },
+        "jieshu": {
+          "count": 560,
+          "bytes": 27828
+        },
+        "delta": {
+          "count": 271,
+          "bytes": 13276
+        },
+        "bytesChangePercent": 91.23144584936779
+      },
+      {
+        "category": "object",
+        "type": "object shape",
+        "name": "system / Map",
+        "wujie": {
+          "count": 3904,
+          "bytes": 167560
+        },
+        "jieshu": {
+          "count": 4086,
+          "bytes": 174828
+        },
+        "delta": {
+          "count": 182,
+          "bytes": 7268
+        },
+        "bytesChangePercent": 4.337550728097398
+      },
+      {
+        "category": "code",
+        "type": "code",
+        "name": "(constant pool)",
+        "wujie": {
+          "count": 225,
+          "bytes": 10248
+        },
+        "jieshu": {
+          "count": 432,
+          "bytes": 16088
+        },
+        "delta": {
+          "count": 207,
+          "bytes": 5840
+        },
+        "bytesChangePercent": 56.986729117876656
+      },
+      {
+        "category": "code",
+        "type": "code",
+        "name": "system / FeedbackCell",
+        "wujie": {
+          "count": 376,
+          "bytes": 6000
+        },
+        "jieshu": {
+          "count": 725,
+          "bytes": 11584
+        },
+        "delta": {
+          "count": 349,
+          "bytes": 5584
+        },
+        "bytesChangePercent": 93.06666666666666
+      },
+      {
+        "category": "code",
+        "type": "code",
+        "name": "system / FeedbackMetadata",
+        "wujie": {
+          "count": 234,
+          "bytes": 7836
+        },
+        "jieshu": {
+          "count": 455,
+          "bytes": 12988
+        },
+        "delta": {
+          "count": 221,
+          "bytes": 5152
+        },
+        "bytesChangePercent": 65.74783052577845
+      }
+    ],
+    "bundleDeltaBytes": 42887,
+    "bundleGzipDeltaBytes": 12912,
+    "principalSourceBackingDeltaBytes": 85774,
+    "allCoreSourceBackingDeltaBytes": 85774,
+    "allExternalStringData": {
+      "category": "other",
+      "type": "native",
+      "name": "system / ExternalStringData",
+      "wujie": {
+        "count": 55,
+        "bytes": 134233
+      },
+      "jieshu": {
+        "count": 64,
+        "bytes": 220248
+      },
+      "delta": {
+        "count": 9,
+        "bytes": 86015
+      },
+      "bytesChangePercent": 64.07887777223186
+    },
+    "externalStringDataRemainderDeltaBytes": 241,
+    "principalBackingArithmetic": {
+      "wujie": "131332 = 2 * 65660 + 12",
+      "jieshu": "217106 = 2 * 108547 + 12",
+      "deltaEqualsTwiceBundleDelta": true
+    }
+  },
+  "directConclusions": [
+    "The identified native backing stores belong to the loaded framework script source, rather than an unidentified child-app allocation. The 85774-byte source-backing delta accounts for all but 241 bytes of the 86015-byte total ExternalStringData delta.",
+    "V8 code-category self_size differs by 258216 bytes, including InstructionStream +103008, BytecodeArray +27488 and FeedbackVector +17204. These node groups describe code/metadata, not a per-module allocation profile.",
+    "A total snapshot self_size delta of 407159 bytes is not the same metric as Performance.JSHeapUsedSize, retained size or browser RSS. This evidence cannot by itself classify every remaining object or prove absence of leaks."
+  ],
+  "sourceLocalization": [
+    {
+      "area": "HTML parser and resource extraction",
+      "evidenceClass": "source_inspection_not_emitted_byte_attribution",
+      "jieshu": [
+        {
+          "path": "packages/jieshu-core/src/template.ts",
+          "currentSourceUtf8Bytes": 27926,
+          "currentSourceSha256": "3048e3ce196b1fac7922d4a85b3590fb82021724caa5c4024a49e1e0367129a9",
+          "anchors": [
+            {
+              "text": "function tokenizeTemplate(",
+              "line": 480
+            },
+            {
+              "text": "function namespaceForOpeningTag(",
+              "line": 361
+            },
+            {
+              "text": "class TemplateCompiler",
+              "line": 680
+            }
+          ]
+        }
+      ],
+      "wujie": [
+        {
+          "path": "../wujie/packages/wujie-core/src/template.ts",
+          "currentSourceUtf8Bytes": 11320,
+          "currentSourceSha256": "c7736235d48421ec2105a9ee346cc22c39c57da92b82377c32f68bf2b8b54b83",
+          "anchors": [
+            {
+              "text": "const ALL_SCRIPT_REGEX",
+              "line": 3
+            },
+            {
+              "text": "export default function processTpl",
+              "line": 144
+            }
+          ]
+        }
+      ],
+      "incrementalBehavior": "Tokenization preserves raw-text/RCDATA and template/foreign namespace contexts, parses attributes/entities, and retains stylesheet fallback metadata. Wujie primarily extracts resources with chained regular-expression replacements.",
+      "interpretation": "Compatibility and resource isolation behavior, not evidence of a retained app. Replacing it with the shorter regex parser would remove behavior."
+    },
+    {
+      "area": "Resource cache ownership and invalidation",
+      "evidenceClass": "source_inspection_not_emitted_byte_attribution",
+      "jieshu": [
+        {
+          "path": "packages/jieshu-core/src/entry.ts",
+          "currentSourceUtf8Bytes": 26850,
+          "currentSourceSha256": "97bc3cacb88afaa4faf98561cdfe472f043bf3d726f87bf16fca39b49cf7ff5d",
+          "anchors": [
+            {
+              "text": "class AssetCache",
+              "line": 95
+            },
+            {
+              "text": "getOrCreate =",
+              "line": 118
+            },
+            {
+              "text": "export async function processCssLoader",
+              "line": 332
+            }
+          ]
+        }
+      ],
+      "wujie": [
+        {
+          "path": "../wujie/packages/wujie-core/src/entry.ts",
+          "currentSourceUtf8Bytes": 13473,
+          "currentSourceSha256": "fc94ef09a8501531eeb83807e9f37d546de6e40b72b01c7f0d9f659de18c4c44",
+          "anchors": [
+            {
+              "text": "export",
+              "line": 19
+            }
+          ]
+        }
+      ],
+      "incrementalBehavior": "Caches partition requests by fetch identity and activation scope, invalidate stale pending work, protect newer records from late failures, and preserve stylesheet attributes/fallback.",
+      "interpretation": "The module-level cache infrastructure is expected loaded-core state. These snapshots alone do not establish retained live cache entries or a leak."
+    },
+    {
+      "area": "Script completion, cancellation, and stale-generation guards",
+      "evidenceClass": "source_inspection_not_emitted_byte_attribution",
+      "jieshu": [
+        {
+          "path": "packages/jieshu-core/src/iframe-script.ts",
+          "currentSourceUtf8Bytes": 12988,
+          "currentSourceSha256": "be6e755573c5388a224f70090954e8d283f3e8372fd6d77c5a7973e2b51e7b32",
+          "anchors": [
+            {
+              "text": "const observeInlineModule",
+              "line": 50
+            },
+            {
+              "text": "function createExecutionContext(",
+              "line": 90
+            },
+            {
+              "text": "class IframeScriptExecutionPipeline",
+              "line": 206
+            }
+          ]
+        },
+        {
+          "path": "packages/jieshu-core/src/sandbox-runtime.ts",
+          "currentSourceUtf8Bytes": 13436,
+          "currentSourceSha256": "4cab9548d3e998561614a344b46c4eb1ae98dd162269ab911878cca5f4b94fff",
+          "anchors": [
+            {
+              "text": "export function registerSandboxDynamicResource",
+              "line": 130
+            }
+          ]
+        }
+      ],
+      "wujie": [
+        {
+          "path": "../wujie/packages/wujie-core/src/iframe.ts",
+          "currentSourceUtf8Bytes": 47662,
+          "currentSourceSha256": "3e8591aa5e9d14db28508c1deb5f9877ef723642f6dc3c585e08a2ecf9e688eb",
+          "anchors": [
+            {
+              "text": "insertScriptToIframe",
+              "line": 956
+            }
+          ]
+        }
+      ],
+      "incrementalBehavior": "Execution handles expose completion and cancellation; serial inline modules get observation markers; stale owner checks prevent execution after synchronous lifecycle reentry; import maps bypass JavaScript rewriting.",
+      "interpretation": "Functional lifecycle and ordering safeguards. Snapshot code totals do not isolate their exact share."
+    },
+    {
+      "area": "Dynamic DOM resource effects",
+      "evidenceClass": "source_inspection_not_emitted_byte_attribution",
+      "jieshu": [
+        {
+          "path": "packages/jieshu-core/src/effect.ts",
+          "currentSourceUtf8Bytes": 41061,
+          "currentSourceSha256": "57989ac98da0eb3dd8ea056ea74184f5f8e5f06f650b2b5d6b31286fdcd18cdf",
+          "anchors": [
+            {
+              "text": "class StylesheetResourceLoader",
+              "line": 411
+            },
+            {
+              "text": "class DynamicScriptScheduler",
+              "line": 528
+            },
+            {
+              "text": "const insertionPipeline",
+              "line": 828
+            }
+          ]
+        }
+      ],
+      "wujie": [
+        {
+          "path": "../wujie/packages/wujie-core/src/effect.ts",
+          "currentSourceUtf8Bytes": 24889,
+          "currentSourceSha256": "093710f8cb5dfb1423cbbe1669f42afb2cef479c92865b19be99ca45070c744d",
+          "anchors": [
+            {
+              "text": "export",
+              "line": 96
+            }
+          ]
+        }
+      ],
+      "incrementalBehavior": "Dynamic resource generation ownership, cancellation and virtual script parent/remove behavior; additional classes and handlers must remain loaded after apps are destroyed.",
+      "interpretation": "More loaded implementation code is distinct from retained app-owned resources. A full retaining-path audit would be required to classify remaining objects."
+    },
+    {
+      "area": "Lifecycle controller and shared operation registries",
+      "evidenceClass": "source_inspection_not_emitted_byte_attribution",
+      "jieshu": [
+        {
+          "path": "packages/jieshu-core/src/index.ts",
+          "currentSourceUtf8Bytes": 20710,
+          "currentSourceSha256": "1236f0b4ba8e1199290f8121d7c9eaacb5773f46180d0a54d5f35db447191981",
+          "anchors": [
+            {
+              "text": "export const runAsUnmountReentry",
+              "line": 97
+            },
+            {
+              "text": "export function createAppController",
+              "line": 603
+            }
+          ]
+        },
+        {
+          "path": "packages/jieshu-core/src/controller.ts",
+          "currentSourceUtf8Bytes": 7285,
+          "currentSourceSha256": "a4d45a0d1d016ac47b62bceb02ff09ea1730d15d94fd9635e3daa1f9e74bbc96",
+          "anchors": [
+            {
+              "text": "export",
+              "line": 3
+            }
+          ]
+        },
+        {
+          "path": "packages/jieshu-core/src/operation-intent.ts",
+          "currentSourceUtf8Bytes": 2424,
+          "currentSourceSha256": "1a8b364e2b34deb0f2481feaa3c5b48c9b2c24ac16691c78ff13f1338e00763d",
+          "anchors": [
+            {
+              "text": "export function beginOperation",
+              "line": 54
+            }
+          ]
+        },
+        {
+          "path": "packages/jieshu-core/src/sandbox-registry.ts",
+          "currentSourceUtf8Bytes": 5072,
+          "currentSourceSha256": "85d78f3d12f51fb2599ea213d45f594c0c876c13ded2edc78eeb73c30ce40887",
+          "anchors": [
+            {
+              "text": "export function registerSandboxTeardown",
+              "line": 88
+            }
+          ]
+        }
+      ],
+      "wujie": [
+        {
+          "path": "../wujie/packages/wujie-core/src/index.ts",
+          "currentSourceUtf8Bytes": 12099,
+          "currentSourceSha256": "ab8340aee38735a15ab80dd5bad54218a21f98895898c6331cf15340d5eafe2a",
+          "anchors": [
+            {
+              "text": "export",
+              "line": 4
+            }
+          ]
+        }
+      ],
+      "incrementalBehavior": "Public controller APIs and operation/teardown coordination protect overlapping starts, destroys and unmount reentry. Public exports are retained in the whole-core IIFE even when this fixture does not call every API.",
+      "interpretation": "Public capability contributes a baseline cost; removing exports to improve this benchmark would change the compared product. Per-application-name registry growth needs a separate distinct-name retention test."
+    },
+    {
+      "area": "Event and inline-markup isolation coverage",
+      "evidenceClass": "source_inspection_not_emitted_byte_attribution",
+      "jieshu": [
+        {
+          "path": "packages/jieshu-core/src/iframe-inline-events.ts",
+          "currentSourceUtf8Bytes": 5563,
+          "currentSourceSha256": "229dfb2874156f4928a4410fc1ec7a92d27ddfbac50e7880bde924a423f6b13e",
+          "anchors": [
+            {
+              "text": "function patchMarkupSetter",
+              "line": 55
+            }
+          ]
+        },
+        {
+          "path": "packages/jieshu-core/src/tracker.ts",
+          "currentSourceUtf8Bytes": 7573,
+          "currentSourceSha256": "8a31cc951e76cd3fdb218dd1e8ff98673f5e33e8c02ba083d9c0a99d90fd94f7",
+          "anchors": [
+            {
+              "text": "const windowOverrideStacks",
+              "line": 60
+            },
+            {
+              "text": "export class EventCleanupTracker",
+              "line": 80
+            }
+          ]
+        },
+        {
+          "path": "packages/jieshu-core/src/event.ts",
+          "currentSourceUtf8Bytes": 6830,
+          "currentSourceSha256": "beb4994f870d2ed8110fc8e7810fc4403e331a53db8f22d83d6be378e2b4b3b7",
+          "anchors": [
+            {
+              "text": "export class EventBus",
+              "line": 77
+            }
+          ]
+        }
+      ],
+      "wujie": [
+        {
+          "path": "../wujie/packages/wujie-core/src/tracker.ts",
+          "currentSourceUtf8Bytes": 4055,
+          "currentSourceSha256": "db9e4fc0dcffe9d58b9b877e35e31433aa6177f9184f5e591063e60c9fe555b1",
+          "anchors": [
+            {
+              "text": "export",
+              "line": 12
+            }
+          ]
+        },
+        {
+          "path": "../wujie/packages/wujie-core/src/event.ts",
+          "currentSourceUtf8Bytes": 3431,
+          "currentSourceSha256": "5e06c9aa79f807fefb163ca2c8678ead51b81f58c6ee0e79b2194f9fe6380163",
+          "anchors": [
+            {
+              "text": "export",
+              "line": 4
+            }
+          ]
+        }
+      ],
+      "incrementalBehavior": "Additional innerHTML/outerHTML/ShadowRoot and attribute mutation paths, event listener snapshot rules, and window on-event ownership stacks that restore correctly out of order.",
+      "interpretation": "Expanded compatibility and cleanup semantics; not safe to remove wholesale."
+    }
+  ],
+  "optimizationCandidates": [
+    {
+      "evidenceClass": "verified_source_duplication_unmeasured_saving",
+      "locations": [
+        {
+          "path": "packages/jieshu-core/src/entry.ts",
+          "currentSourceUtf8Bytes": 26850,
+          "currentSourceSha256": "97bc3cacb88afaa4faf98561cdfe472f043bf3d726f87bf16fca39b49cf7ff5d",
+          "anchors": [
+            {
+              "text": "const STYLE_ATTRIBUTE_NAMES",
+              "line": 290
+            },
+            {
+              "text": "function escapeAttributeValue(",
+              "line": 303
+            }
+          ]
+        },
+        {
+          "path": "packages/jieshu-core/src/template.ts",
+          "currentSourceUtf8Bytes": 27926,
+          "currentSourceSha256": "3048e3ce196b1fac7922d4a85b3590fb82021724caa5c4024a49e1e0367129a9",
+          "anchors": [
+            {
+              "text": "const STYLE_ATTRIBUTE_NAMES",
+              "line": 83
+            },
+            {
+              "text": "function escapeAttributeValue(",
+              "line": 618
+            }
+          ]
+        }
+      ],
+      "proposedChange": "Share the identical attribute-value escaping pure function and possibly the identical fixed style-attribute list. Keep the two serialization flows separate because one whitelists style attributes and the other preserves arbitrary valid link attributes/order.",
+      "tests": [
+        "&, double quote, < and > escape exactly once",
+        "boolean and false attributes retain existing behavior",
+        "mixed-case attributes, nonce/media/disabled and native stylesheet fallback preserve output and order"
+      ],
+      "expectedImpact": "Small; measure emitted byte/gzip delta before claiming benefit. No estimate for whole bundle gap."
+    },
+    {
+      "evidenceClass": "source_inspection_optimization_hypothesis",
+      "locations": [
+        {
+          "path": "packages/jieshu-core/src/iframe-script.ts",
+          "currentSourceUtf8Bytes": 12988,
+          "currentSourceSha256": "be6e755573c5388a224f70090954e8d283f3e8372fd6d77c5a7973e2b51e7b32",
+          "anchors": [
+            {
+              "text": "class IframeScriptExecutionPipeline",
+              "line": 206
+            },
+            {
+              "text": "const scriptExecutionPipeline",
+              "line": 344
+            }
+          ]
+        }
+      ],
+      "proposedChange": "Collapse a single-instance class containing only one execute arrow field into a module function while keeping the existing cancellation/completion and owner checks in the same order.",
+      "tests": [
+        "classic/external/inline module completion and queue order",
+        "cancellation before/after DOM insertion",
+        "reentrant replace/jsLoader unmount/destroy",
+        "callback/hook error releases resources and preserves rejection behavior"
+      ],
+      "expectedImpact": "Likely small fixed baseline cost; not a large per-app or per-script allocation saving because the class is instantiated only once."
+    },
+    {
+      "evidenceClass": "source_inspection_optimization_hypothesis",
+      "locations": [
+        {
+          "path": "packages/jieshu-core/src/effect-pipeline.ts",
+          "currentSourceUtf8Bytes": 1118,
+          "currentSourceSha256": "86339d701046842c341de4d66c136717cf6c88e64f4bab513d5dccb879be76aa",
+          "anchors": [
+            {
+              "text": "export class HandlerPipeline",
+              "line": 13
+            }
+          ]
+        },
+        {
+          "path": "packages/jieshu-core/src/proxy-resolver.ts",
+          "currentSourceUtf8Bytes": 1953,
+          "currentSourceSha256": "fb18091bc4146797642242d82350129a275c00e0528476ae22775029cde7bd55",
+          "anchors": [
+            {
+              "text": "export function resolvedProperty",
+              "line": 19
+            },
+            {
+              "text": "export function createResolverPipeline",
+              "line": 28
+            }
+          ]
+        }
+      ],
+      "proposedChange": "Measure whether fixed handler dispatch and resolver wrappers can be simplified without changing first-match/fallback behavior. Do not count unused type declarations or tree-shaken helper exports as shipped runtime code.",
+      "tests": [
+        "all four managed insertion tags and native fallback",
+        "Proxy special/document-group precedence",
+        "cross-realm receiver binding and revoked/destroyed owner behavior"
+      ],
+      "expectedImpact": "Unmeasured, bounded generic-plumbing candidate; larger reductions require source-map/module emitted-byte attribution."
+    }
+  ],
+  "nextSteps": [
+    "Produce a source-map or bundler module contribution report with the exact same target/minifier settings before prioritizing larger refactors; preserve emitted source and build hash for repeatability.",
+    "Apply only a small semantics-preserving candidate, run targeted behavior tests, then remeasure bundle bytes and paired heap/code categories with the same fixture.",
+    "If app-object leakage remains suspected, compare increasing cycle and distinct-name counts with retaining paths after GC; code/source baseline should be reported separately from growing app-owned objects."
+  ],
+  "limitations": [
+    "These are standardized local source builds of local repositories, not published npm distribution bundles; the local Wujie revision must not automatically be described as upstream Wujie.",
+    "Jieshu was dirty at capture. Source-localization hashes describe files as inspected when this artifact was written, not a reconstructed exact historical dirty tree.",
+    "Heap source name previews are truncated to 1024 characters; the complete length is independently available through the explicit length/value edges. No full source text is embedded here.",
+    "Framework byte counts and bundle SHA-256 are recorded build metadata, not recomputed from truncated snapshot text.",
+    "The server supplies neither an HTTP charset nor a host-document meta charset. Snapshot representation/length are measured facts for this run; equivalent decoded length and backing-store cost in a UTF-8 production document have not been validated.",
+    "Current source inspection identifies behavior increments but does not assign exact minified bytes or retained-code sizes per module. Splitting modules or deleting TypeScript-only declarations/comments does not inherently reduce emitted code.",
+    "One memory round and final snapshots do not establish statistical stability or absence of leaks. CPU profiles from comparison-profile-before used nonminified named code and cannot numerically attribute this minified heap delta."
+  ]
+}

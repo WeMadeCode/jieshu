@@ -122,7 +122,14 @@ export function createJieshuWebComponent(id: string): HTMLElement {
 }
 
 const getLoadingIndicator = (container: HTMLElement) => {
-  return container.querySelector<HTMLDivElement>(`div[${LOADING_DATA_FLAG}]`);
+  const indicators = container.querySelectorAll<HTMLDivElement>(`div[${LOADING_DATA_FLAG}]`);
+  for (let index = 0; index < indicators.length; index += 1) {
+    const indicator = indicators[index];
+    if (indicator.parentNode === container) {
+      return indicator;
+    }
+  }
+  return null;
 };
 
 // Bind an overlay to its concrete host without retaining that host through a detached overlay.
@@ -422,9 +429,14 @@ function createLoadingIndicator(loading?: HTMLElement): HTMLDivElement {
   return indicator;
 }
 
-/** Clear a host container and display a stable loading overlay. */
-export function addLoading(el: string | HTMLElement, loading?: HTMLElement): void {
+/** Return a release callback for the startup overlay until a render adopts it. */
+export const addLoading = (el: string | HTMLElement, loading?: HTMLElement) => {
   const container = getContainer(el);
+  if (getLoadingIndicator(container)?.parentNode === container) {
+    // Restore the previous overlay's layout before recording the next one;
+    // otherwise a replacement would remember "hidden" as the original overflow.
+    removeLoading(container);
+  }
   clearChild(container);
 
   let styles: CSSStyleDeclaration;
@@ -435,8 +447,16 @@ export function addLoading(el: string | HTMLElement, loading?: HTMLElement): voi
   }
 
   lockContainerLayout(container, styles);
-  rawElementAppendChild.call(container, createLoadingIndicator(loading));
-}
+  const indicator = createLoadingIndicator(loading);
+  const owner = Symbol();
+  loadingOwners.set(indicator, owner);
+  rawElementAppendChild.call(container, indicator);
+  return () => {
+    if (indicator.parentNode === container && loadingOwners.get(indicator) === owner) {
+      removeLoading(container);
+    }
+  };
+};
 
 /** Remove a loading overlay and restore layout properties changed by addLoading. */
 export const removeLoading = (container: HTMLElement) => {

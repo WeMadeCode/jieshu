@@ -2,10 +2,10 @@
 
 ## 仓库概览
 
-- 本仓库是 pnpm workspace + Lerna 管理的微前端 monorepo。
+- 本仓库是 pnpm workspace 管理的微前端 monorepo。
 - 框架核心在 `packages/jieshu-core`；框架适配包在 `packages/jieshu-react`、`packages/jieshu-vue3`。
-- `examples/*` 是各框架示例，`docs/` 是 VitePress 文档站点。
-- 以根目录 `package.json` 的 `packageManager` 字段为准，使用 pnpm 11.13.0；不要混用 npm 或 yarn 安装依赖。
+- `examples/*` 是各框架示例，`docs/` 是 所有文档。
+- 以根目录 `package.json` 的 `packageManager` 字段为准，使用 pnpm 10.28.2；不要混用 npm 或 yarn 安装依赖。
 - `.codex/config.toml` 提供受信任仓库的共享 Codex 默认权限；不要在其中放置密钥、个人账号或机器专属路径。
 
 ## 开发约定

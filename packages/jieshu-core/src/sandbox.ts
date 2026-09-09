@@ -402,7 +402,12 @@ export default class Jieshu {
     // Initial async scripts do not delay DOMContentLoaded, but load and start()
     // must observe their actual load/error completion. Explicitly async inline
     // modules only acknowledge scheduling; their native semantics stay intact.
-    scheduler.scheduleAfter(Promise.all(asyncCompletions), () => scheduler.advance());
+    // Without async scripts, the next fiber task already leaves a microtask
+    // checkpoint for lifecycle cancellation. Non-fiber execution still needs
+    // that checkpoint before load, but neither path needs an extra idle task.
+    if (asyncCompletions.length > 0 || !this.fiber) {
+      scheduler.scheduleAfter(Promise.all(asyncCompletions), () => scheduler.advance());
+    }
     this.scheduleLifecycleEvent(scheduler, iframeWindow, 'load');
     // 由于没有办法准确定位是哪个代码做了mount，保活、重建模式提前关闭loading
     if (this.alive || !isFunction(iframeWindow.__JIESHU_UNMOUNT)) removeLoading(this.el);

@@ -1,0 +1,90 @@
+{
+  "date": "2026-09-09",
+  "comparison": {
+    "command": "BENCH_OUTPUT=benchmarks/comparison/results/2026-09-09 node benchmarks/comparison/run.mjs",
+    "exitCode": 0,
+    "startup": {
+      "passed": 540,
+      "failed": 0
+    },
+    "memory": {
+      "passed": 10,
+      "failed": 0
+    },
+    "stability": {
+      "passed": 84,
+      "failed": 12
+    }
+  },
+  "regressions": [
+    {
+      "framework": "jieshu",
+      "scope": "core unit",
+      "command": "node node_modules/vitest/vitest.mjs run --config packages/jieshu-core/__test__/unit/vitest.config.mts --coverage",
+      "cwd": "jieshu repository root",
+      "exitCode": 0,
+      "files": 50,
+      "passed": 478,
+      "failed": 0,
+      "durationSeconds": 5.92,
+      "coverage": {
+        "statements": 77.61,
+        "branches": 70.64,
+        "functions": 82.25,
+        "lines": 79.73
+      },
+      "log": "test-results/comparison-jieshu-unit.log"
+    },
+    {
+      "framework": "jieshu",
+      "scope": "core Chromium",
+      "command": "node node_modules/@playwright/test/cli.js test --config packages/jieshu-core/__test__/browser/playwright.config.mts",
+      "cwd": "jieshu repository root",
+      "exitCode": 0,
+      "passed": 130,
+      "failed": 0,
+      "durationSeconds": 48.1,
+      "log": "test-results/comparison-jieshu-browser.log"
+    },
+    {
+      "framework": "wujie",
+      "scope": "core unit",
+      "command": "node node_modules/jest/bin/jest.js -c __test__/unit/jest.config.js --runInBand --watchman=false",
+      "cwd": "wujie/packages/wujie-core",
+      "exitCode": 0,
+      "files": 20,
+      "passed": 94,
+      "failed": 0,
+      "durationSeconds": 5.979,
+      "coverage": null,
+      "coverageNote": "Coverage collection produced an empty coverage-final.json; printed zero percentages are not valid source coverage.",
+      "log": "test-results/comparison-wujie-unit.log"
+    }
+  ],
+  "lint": {
+    "command": "node node_modules/eslint/bin/eslint.js benchmarks/comparison/*.mjs --max-warnings=0",
+    "exitCode": 0
+  },
+  "codeFormat": {
+    "command": "node node_modules/prettier/bin/prettier.cjs --check benchmarks/comparison/*.mjs",
+    "exitCode": 0
+  },
+  "scriptsSha256": {
+    "run.mjs": "1abc970100335956e087b68534ab61ed4a44e36ee72e3869ebee6d06b5098c1f",
+    "fixture.mjs": "d16cff15959683f7533cca9de2177226b6da71f535c1816679184e242cbea94c",
+    "stability.mjs": "8e55452b200697e4db4e8d22eee53a2e3e817b37c4b5c92b880b8837db53471d",
+    "summarize.mjs": "d812d5264ec39be4ec2fe45a6e014568ff14a75b0a0a04f2faac8432de684cd8"
+  },
+  "logSha256": {
+    "jieshu-unit": "95e2af65f8ee59de4d8904253f4451c13c0f82df2b6842bd8216b16e35e7efbd",
+    "jieshu-browser": "7da8730e2b4367fe3298fa43172a3feb5fe3b49532d690d2f66aa275320ffb46",
+    "wujie-unit": "512cbb0cc7d1454f9895121f63bb887efb6841e6cff8839b404a286ebaf16f4a"
+  },
+  "exclusions": [
+    "No adapter source changes or adapter test runs",
+    "No full examples integration suites",
+    "No framework source changes",
+    "No dependency installation",
+    "No commits created"
+  ]
+}

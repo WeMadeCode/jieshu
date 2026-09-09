@@ -73,6 +73,8 @@ type startOption  {
 
 同名的后续 start、refresh 或 destroy 会取消尚未完成的旧启动请求。被取消的请求返回 `undefined`，因此使用返回值前需要判断。仍然有效的启动请求发生初始化错误时，Promise 会拒绝。
 
+启动在挂载前被取消或失败时，也会移除该请求的 loading 并恢复容器布局，无需等待尚未返回的资源请求。清理只处理当前请求仍拥有的 loading；同一容器被后续应用接管后，不会删除新应用的 loading 或内容。
+
 ```typescript
 import { startApp } from '@cloud/jieshu-core';
 
