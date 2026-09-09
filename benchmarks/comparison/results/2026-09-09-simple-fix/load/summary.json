@@ -1,0 +1,306 @@
+[
+  {
+    "encoding": "legacy",
+    "framework": "wujie",
+    "passed": 30,
+    "characterSets": ["windows-1252"],
+    "totalLoadMs": {
+      "n": 30,
+      "median": 3.100000001490116,
+      "p95": 3.300000000745058,
+      "min": 2.899999998509884,
+      "max": 3.5
+    },
+    "requestAndResponseMs": {
+      "n": 30,
+      "median": 0.9000000022351742,
+      "p95": 1,
+      "min": 0.6999999992549419,
+      "max": 1
+    },
+    "responseEndToOnloadMs": {
+      "n": 30,
+      "median": 1.699999999254942,
+      "p95": 1.800000000745058,
+      "min": 1.5,
+      "max": 1.8999999985098839
+    },
+    "scriptDurationMs": {
+      "n": 30,
+      "median": 0.268,
+      "p95": 0.30094999999999994,
+      "min": 0.245,
+      "max": 0.326
+    },
+    "v8CompileDurationMs": {
+      "n": 30,
+      "median": 0.012,
+      "p95": 0.015549999999999998,
+      "min": 0.01,
+      "max": 0.016
+    },
+    "heapDeltaBytes": {
+      "n": 30,
+      "median": 161808,
+      "p95": 161808,
+      "min": 161808,
+      "max": 161808
+    },
+    "beforeHeapBytes": {
+      "n": 30,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 30,
+      "median": 717144,
+      "p95": 717144,
+      "min": 717144,
+      "max": 717144
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 6,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 3
+      }
+    ]
+  },
+  {
+    "encoding": "legacy",
+    "framework": "jieshu",
+    "passed": 30,
+    "characterSets": ["windows-1252"],
+    "totalLoadMs": {
+      "n": 30,
+      "median": 4.300000000745058,
+      "p95": 4.454999999329448,
+      "min": 4.100000001490116,
+      "max": 4.699999999254942
+    },
+    "requestAndResponseMs": {
+      "n": 30,
+      "median": 1,
+      "p95": 1.1000000014901161,
+      "min": 0.8999999985098839,
+      "max": 1.199999999254942
+    },
+    "responseEndToOnloadMs": {
+      "n": 30,
+      "median": 2.7000000029802322,
+      "p95": 2.800000000745058,
+      "min": 2.600000001490116,
+      "max": 3.100000001490116
+    },
+    "scriptDurationMs": {
+      "n": 30,
+      "median": 0.48650000000000004,
+      "p95": 0.5235500000000001,
+      "min": 0.457,
+      "max": 0.528
+    },
+    "v8CompileDurationMs": {
+      "n": 30,
+      "median": 0.0125,
+      "p95": 0.01755,
+      "min": 0.011,
+      "max": 0.018000000000000002
+    },
+    "heapDeltaBytes": {
+      "n": 30,
+      "median": 217900,
+      "p95": 217900,
+      "min": 217900,
+      "max": 217900
+    },
+    "beforeHeapBytes": {
+      "n": 30,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 30,
+      "median": 773236,
+      "p95": 773236,
+      "min": 773236,
+      "max": 773236
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 6,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 3
+      }
+    ]
+  },
+  {
+    "encoding": "utf8",
+    "framework": "wujie",
+    "passed": 30,
+    "characterSets": ["UTF-8"],
+    "totalLoadMs": {
+      "n": 30,
+      "median": 3.199999999254942,
+      "p95": 3.300000000745058,
+      "min": 3,
+      "max": 3.300000000745058
+    },
+    "requestAndResponseMs": {
+      "n": 30,
+      "median": 0.9000000022351742,
+      "p95": 1.0550000008195637,
+      "min": 0.8000000007450581,
+      "max": 1.199999999254942
+    },
+    "responseEndToOnloadMs": {
+      "n": 30,
+      "median": 1.699999999254942,
+      "p95": 1.854999999515712,
+      "min": 1.6000000014901161,
+      "max": 1.9000000022351742
+    },
+    "scriptDurationMs": {
+      "n": 30,
+      "median": 0.26949999999999996,
+      "p95": 0.29529999999999995,
+      "min": 0.251,
+      "max": 0.316
+    },
+    "v8CompileDurationMs": {
+      "n": 30,
+      "median": 0.0125,
+      "p95": 0.01819999999999999,
+      "min": 0.01,
+      "max": 0.024
+    },
+    "heapDeltaBytes": {
+      "n": 30,
+      "median": 161244,
+      "p95": 161244,
+      "min": 161244,
+      "max": 161244
+    },
+    "beforeHeapBytes": {
+      "n": 30,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 30,
+      "median": 716580,
+      "p95": 716580,
+      "min": 716580,
+      "max": 716580
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 8,
+        "jsEventListeners": 3
+      }
+    ]
+  },
+  {
+    "encoding": "utf8",
+    "framework": "jieshu",
+    "passed": 30,
+    "characterSets": ["UTF-8"],
+    "totalLoadMs": {
+      "n": 30,
+      "median": 4.25,
+      "p95": 4.509999999776482,
+      "min": 4.100000001490116,
+      "max": 4.600000001490116
+    },
+    "requestAndResponseMs": {
+      "n": 30,
+      "median": 1,
+      "p95": 1.1000000014901161,
+      "min": 0.9000000022351742,
+      "max": 1.199999999254942
+    },
+    "responseEndToOnloadMs": {
+      "n": 30,
+      "median": 2.75,
+      "p95": 2.9000000005587934,
+      "min": 2.600000001490116,
+      "max": 2.900000002235174
+    },
+    "scriptDurationMs": {
+      "n": 30,
+      "median": 0.48550000000000004,
+      "p95": 0.5342,
+      "min": 0.46,
+      "max": 0.537
+    },
+    "v8CompileDurationMs": {
+      "n": 30,
+      "median": 0.014,
+      "p95": 0.01755,
+      "min": 0.011,
+      "max": 0.02
+    },
+    "heapDeltaBytes": {
+      "n": 30,
+      "median": 217328,
+      "p95": 217328,
+      "min": 217328,
+      "max": 217328
+    },
+    "beforeHeapBytes": {
+      "n": 30,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 30,
+      "median": 772664,
+      "p95": 772664,
+      "min": 772664,
+      "max": 772664
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 8,
+        "jsEventListeners": 3
+      }
+    ]
+  }
+]

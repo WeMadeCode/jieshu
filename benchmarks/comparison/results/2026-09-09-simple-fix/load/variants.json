@@ -1,0 +1,527 @@
+[
+  {
+    "name": "query-wrapper",
+    "source": "test-results/footprint-simple-load/summary.json",
+    "summarySha256": "0bbb2b3405fa3b6e6ea93e4935b875c4486ad74f9a9188629a750e4bc9356165",
+    "revisions": {
+      "wujie": {
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "status": "",
+        "bundleBytes": 65660,
+        "gzipBytes": 19802,
+        "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+      },
+      "jieshu": {
+        "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+        "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md",
+        "bundleBytes": 108214,
+        "gzipBytes": 32605,
+        "sha256": "eca3ef5b51d48637dd2e289f7f8d82e3bcd5ee5538e695621199fb83f3762f63"
+      }
+    },
+    "utf8": [
+      {
+        "encoding": "utf8",
+        "framework": "wujie",
+        "passed": 30,
+        "characterSets": ["UTF-8"],
+        "totalLoadMs": {
+          "n": 30,
+          "median": 3.599999997764826,
+          "p95": 3.8550000015646217,
+          "min": 3.2000000029802322,
+          "max": 4
+        },
+        "requestAndResponseMs": {
+          "n": 30,
+          "median": 1.0999999977648258,
+          "p95": 1.2999999970197678,
+          "min": 0.8999999985098839,
+          "max": 1.300000000745058
+        },
+        "responseEndToOnloadMs": {
+          "n": 30,
+          "median": 1.8999999985098839,
+          "p95": 2.0999999998137353,
+          "min": 1.6000000014901161,
+          "max": 2.199999999254942
+        },
+        "scriptDurationMs": {
+          "n": 30,
+          "median": 0.28200000000000003,
+          "p95": 0.3801999999999999,
+          "min": 0.255,
+          "max": 0.408
+        },
+        "v8CompileDurationMs": {
+          "n": 30,
+          "median": 0.013,
+          "p95": 0.019,
+          "min": 0.011,
+          "max": 0.024
+        },
+        "heapDeltaBytes": {
+          "n": 30,
+          "median": 161244,
+          "p95": 161244,
+          "min": 161244,
+          "max": 161244
+        },
+        "beforeHeapBytes": {
+          "n": 30,
+          "median": 555336,
+          "p95": 555336,
+          "min": 555336,
+          "max": 555336
+        },
+        "afterHeapBytes": {
+          "n": 30,
+          "median": 716580,
+          "p95": 716580,
+          "min": 716580,
+          "max": 716580
+        },
+        "beforeDom": [
+          {
+            "documents": 1,
+            "nodes": 7,
+            "jsEventListeners": 0
+          }
+        ],
+        "afterDom": [
+          {
+            "documents": 1,
+            "nodes": 8,
+            "jsEventListeners": 3
+          }
+        ]
+      },
+      {
+        "encoding": "utf8",
+        "framework": "jieshu",
+        "passed": 30,
+        "characterSets": ["UTF-8"],
+        "totalLoadMs": {
+          "n": 30,
+          "median": 4.800000000745058,
+          "p95": 5.255000000074506,
+          "min": 4.399999998509884,
+          "max": 5.300000000745058
+        },
+        "requestAndResponseMs": {
+          "n": 30,
+          "median": 1.199999999254942,
+          "p95": 1.4000000005587936,
+          "min": 1,
+          "max": 1.7000000029802322
+        },
+        "responseEndToOnloadMs": {
+          "n": 30,
+          "median": 3,
+          "p95": 3.2549999980255957,
+          "min": 2.600000001490116,
+          "max": 3.300000000745058
+        },
+        "scriptDurationMs": {
+          "n": 30,
+          "median": 0.5235000000000001,
+          "p95": 0.6648,
+          "min": 0.47100000000000003,
+          "max": 0.694
+        },
+        "v8CompileDurationMs": {
+          "n": 30,
+          "median": 0.016,
+          "p95": 0.02464999999999999,
+          "min": 0.014,
+          "max": 0.026
+        },
+        "heapDeltaBytes": {
+          "n": 30,
+          "median": 217604,
+          "p95": 217604,
+          "min": 217604,
+          "max": 217604
+        },
+        "beforeHeapBytes": {
+          "n": 30,
+          "median": 555336,
+          "p95": 555336,
+          "min": 555336,
+          "max": 555336
+        },
+        "afterHeapBytes": {
+          "n": 30,
+          "median": 772940,
+          "p95": 772940,
+          "min": 772940,
+          "max": 772940
+        },
+        "beforeDom": [
+          {
+            "documents": 1,
+            "nodes": 7,
+            "jsEventListeners": 0
+          }
+        ],
+        "afterDom": [
+          {
+            "documents": 1,
+            "nodes": 8,
+            "jsEventListeners": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "direct-query",
+    "source": "test-results/footprint-simple-direct-load/summary.json",
+    "summarySha256": "b53627e26634cacdb6e3f3d4415728e19a891762045fc755e52b90fa5d7e822e",
+    "revisions": {
+      "wujie": {
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "status": "",
+        "bundleBytes": 65660,
+        "gzipBytes": 19802,
+        "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+      },
+      "jieshu": {
+        "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+        "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md",
+        "bundleBytes": 108192,
+        "gzipBytes": 32606,
+        "sha256": "9dd94defa0d893f1cf44aca883308c72b73340ebd05c183467c29dbdb4d97cfc"
+      }
+    },
+    "utf8": [
+      {
+        "encoding": "utf8",
+        "framework": "wujie",
+        "passed": 30,
+        "characterSets": ["UTF-8"],
+        "totalLoadMs": {
+          "n": 30,
+          "median": 3.199999999254942,
+          "p95": 3.6549999985843895,
+          "min": 3,
+          "max": 3.800000000745058
+        },
+        "requestAndResponseMs": {
+          "n": 30,
+          "median": 0.9000000022351742,
+          "p95": 1.2100000010803336,
+          "min": 0.8000000007450581,
+          "max": 1.3999999985098839
+        },
+        "responseEndToOnloadMs": {
+          "n": 30,
+          "median": 1.7000000029802322,
+          "p95": 1.8999999985098839,
+          "min": 1.5,
+          "max": 1.9000000022351742
+        },
+        "scriptDurationMs": {
+          "n": 30,
+          "median": 0.27099999999999996,
+          "p95": 0.32555,
+          "min": 0.247,
+          "max": 0.32699999999999996
+        },
+        "v8CompileDurationMs": {
+          "n": 30,
+          "median": 0.013,
+          "p95": 0.015549999999999998,
+          "min": 0.01,
+          "max": 0.018000000000000002
+        },
+        "heapDeltaBytes": {
+          "n": 30,
+          "median": 161244,
+          "p95": 161244,
+          "min": 161244,
+          "max": 161244
+        },
+        "beforeHeapBytes": {
+          "n": 30,
+          "median": 555336,
+          "p95": 555336,
+          "min": 555336,
+          "max": 555336
+        },
+        "afterHeapBytes": {
+          "n": 30,
+          "median": 716580,
+          "p95": 716580,
+          "min": 716580,
+          "max": 716580
+        },
+        "beforeDom": [
+          {
+            "documents": 1,
+            "nodes": 7,
+            "jsEventListeners": 0
+          }
+        ],
+        "afterDom": [
+          {
+            "documents": 1,
+            "nodes": 8,
+            "jsEventListeners": 3
+          }
+        ]
+      },
+      {
+        "encoding": "utf8",
+        "framework": "jieshu",
+        "passed": 30,
+        "characterSets": ["UTF-8"],
+        "totalLoadMs": {
+          "n": 30,
+          "median": 4.300000000745058,
+          "p95": 4.955000001005828,
+          "min": 4.099999997764826,
+          "max": 5.099999997764826
+        },
+        "requestAndResponseMs": {
+          "n": 30,
+          "median": 1,
+          "p95": 1.3550000015646217,
+          "min": 0.8999999985098839,
+          "max": 1.4000000022351742
+        },
+        "responseEndToOnloadMs": {
+          "n": 30,
+          "median": 2.800000000745058,
+          "p95": 3.0549999987706538,
+          "min": 2.599999997764826,
+          "max": 3.100000001490116
+        },
+        "scriptDurationMs": {
+          "n": 30,
+          "median": 0.484,
+          "p95": 0.5856999999999999,
+          "min": 0.462,
+          "max": 0.642
+        },
+        "v8CompileDurationMs": {
+          "n": 30,
+          "median": 0.013,
+          "p95": 0.017,
+          "min": 0.011,
+          "max": 0.026
+        },
+        "heapDeltaBytes": {
+          "n": 30,
+          "median": 217464,
+          "p95": 217464,
+          "min": 217464,
+          "max": 217464
+        },
+        "beforeHeapBytes": {
+          "n": 30,
+          "median": 555336,
+          "p95": 555336,
+          "min": 555336,
+          "max": 555336
+        },
+        "afterHeapBytes": {
+          "n": 30,
+          "median": 772800,
+          "p95": 772800,
+          "min": 772800,
+          "max": 772800
+        },
+        "beforeDom": [
+          {
+            "documents": 1,
+            "nodes": 7,
+            "jsEventListeners": 0
+          }
+        ],
+        "afterDom": [
+          {
+            "documents": 1,
+            "nodes": 8,
+            "jsEventListeners": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "shared-function",
+    "source": "test-results/footprint-simple-final-load/summary.json",
+    "summarySha256": "2c24eb386bdc9e398ef406f6a8d987293cd80a139e06f0ebd12229e012907137",
+    "revisions": {
+      "wujie": {
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "status": "",
+        "bundleBytes": 65660,
+        "gzipBytes": 19802,
+        "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+      },
+      "jieshu": {
+        "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+        "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md",
+        "bundleBytes": 108183,
+        "gzipBytes": 32603,
+        "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433"
+      }
+    },
+    "utf8": [
+      {
+        "encoding": "utf8",
+        "framework": "wujie",
+        "passed": 30,
+        "characterSets": ["UTF-8"],
+        "totalLoadMs": {
+          "n": 30,
+          "median": 3.199999999254942,
+          "p95": 3.300000000745058,
+          "min": 3,
+          "max": 3.300000000745058
+        },
+        "requestAndResponseMs": {
+          "n": 30,
+          "median": 0.9000000022351742,
+          "p95": 1.0550000008195637,
+          "min": 0.8000000007450581,
+          "max": 1.199999999254942
+        },
+        "responseEndToOnloadMs": {
+          "n": 30,
+          "median": 1.699999999254942,
+          "p95": 1.854999999515712,
+          "min": 1.6000000014901161,
+          "max": 1.9000000022351742
+        },
+        "scriptDurationMs": {
+          "n": 30,
+          "median": 0.26949999999999996,
+          "p95": 0.29529999999999995,
+          "min": 0.251,
+          "max": 0.316
+        },
+        "v8CompileDurationMs": {
+          "n": 30,
+          "median": 0.0125,
+          "p95": 0.01819999999999999,
+          "min": 0.01,
+          "max": 0.024
+        },
+        "heapDeltaBytes": {
+          "n": 30,
+          "median": 161244,
+          "p95": 161244,
+          "min": 161244,
+          "max": 161244
+        },
+        "beforeHeapBytes": {
+          "n": 30,
+          "median": 555336,
+          "p95": 555336,
+          "min": 555336,
+          "max": 555336
+        },
+        "afterHeapBytes": {
+          "n": 30,
+          "median": 716580,
+          "p95": 716580,
+          "min": 716580,
+          "max": 716580
+        },
+        "beforeDom": [
+          {
+            "documents": 1,
+            "nodes": 7,
+            "jsEventListeners": 0
+          }
+        ],
+        "afterDom": [
+          {
+            "documents": 1,
+            "nodes": 8,
+            "jsEventListeners": 3
+          }
+        ]
+      },
+      {
+        "encoding": "utf8",
+        "framework": "jieshu",
+        "passed": 30,
+        "characterSets": ["UTF-8"],
+        "totalLoadMs": {
+          "n": 30,
+          "median": 4.25,
+          "p95": 4.509999999776482,
+          "min": 4.100000001490116,
+          "max": 4.600000001490116
+        },
+        "requestAndResponseMs": {
+          "n": 30,
+          "median": 1,
+          "p95": 1.1000000014901161,
+          "min": 0.9000000022351742,
+          "max": 1.199999999254942
+        },
+        "responseEndToOnloadMs": {
+          "n": 30,
+          "median": 2.75,
+          "p95": 2.9000000005587934,
+          "min": 2.600000001490116,
+          "max": 2.900000002235174
+        },
+        "scriptDurationMs": {
+          "n": 30,
+          "median": 0.48550000000000004,
+          "p95": 0.5342,
+          "min": 0.46,
+          "max": 0.537
+        },
+        "v8CompileDurationMs": {
+          "n": 30,
+          "median": 0.014,
+          "p95": 0.01755,
+          "min": 0.011,
+          "max": 0.02
+        },
+        "heapDeltaBytes": {
+          "n": 30,
+          "median": 217328,
+          "p95": 217328,
+          "min": 217328,
+          "max": 217328
+        },
+        "beforeHeapBytes": {
+          "n": 30,
+          "median": 555336,
+          "p95": 555336,
+          "min": 555336,
+          "max": 555336
+        },
+        "afterHeapBytes": {
+          "n": 30,
+          "median": 772664,
+          "p95": 772664,
+          "min": 772664,
+          "max": 772664
+        },
+        "beforeDom": [
+          {
+            "documents": 1,
+            "nodes": 7,
+            "jsEventListeners": 0
+          }
+        ],
+        "afterDom": [
+          {
+            "documents": 1,
+            "nodes": 8,
+            "jsEventListeners": 3
+          }
+        ]
+      }
+    ]
+  }
+]

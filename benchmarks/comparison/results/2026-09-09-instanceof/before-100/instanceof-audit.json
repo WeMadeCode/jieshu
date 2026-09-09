@@ -1,0 +1,1159 @@
+{
+  "input": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-before-100/jieshu-final.heapsnapshot",
+  "bundle": {
+    "filename": "/Users/zhouxiang/Documents/Github/jieshu/test-results/footprint-simple-final-load/jieshu.js",
+    "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433"
+  },
+  "run": {
+    "cycles": 100,
+    "memoryRounds": 1,
+    "revision": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md",
+      "package": "0.0.5",
+      "packageManager": "pnpm@10.28.2",
+      "bundleBytes": 108183,
+      "gzipBytes": 32603,
+      "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433"
+    }
+  },
+  "identification": "unique-structural-match",
+  "sourceRegistry": {
+    "binding": "Oa",
+    "declarationOffset": 68117,
+    "initialization": "eager-WeakMap",
+    "writes": [],
+    "allRecordedAssignmentsCreateWeakMap": true,
+    "stateRegistrationOffset": 69104
+  },
+  "sourcePrivateSymbols": [],
+  "heapScript": {
+    "index": 25987,
+    "url": "http://127.0.0.1:52650/jieshu.js",
+    "sourcePrefixBytes": 1024
+  },
+  "allocationState": "eager-WeakMap-allocated",
+  "registryBindings": [
+    {
+      "owner": {
+        "index": 51624,
+        "id": 103249,
+        "type": "object",
+        "name": "system / Context / scope @51943",
+        "selfBytes": 1664
+      },
+      "binding": "Oa",
+      "value": {
+        "index": 51745,
+        "id": 103491,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "valueEdges": [
+        {
+          "type": "internal",
+          "name": "table",
+          "to": {
+            "index": 53306,
+            "id": 106613,
+            "type": "array",
+            "name": "",
+            "selfBytes": 32788
+          }
+        },
+        {
+          "type": "property",
+          "name": "__proto__",
+          "to": {
+            "index": 40524,
+            "id": 81051,
+            "type": "object",
+            "name": "WeakMap",
+            "selfBytes": 28
+          }
+        },
+        {
+          "type": "internal",
+          "name": "map",
+          "to": {
+            "index": 26331,
+            "id": 52663,
+            "type": "object shape",
+            "name": "system / Map",
+            "selfBytes": 40
+          }
+        }
+      ],
+      "scriptEvidence": [
+        {
+          "closure": {
+            "index": 26108,
+            "id": 52217,
+            "type": "closure",
+            "name": "w",
+            "selfBytes": 28
+          },
+          "location": {
+            "script": 25987,
+            "line": 14,
+            "column": 1881
+          }
+        },
+        {
+          "closure": {
+            "index": 26247,
+            "id": 52495,
+            "type": "closure",
+            "name": "X",
+            "selfBytes": 32
+          },
+          "location": {
+            "script": 25987,
+            "line": 21,
+            "column": 16625
+          }
+        },
+        {
+          "closure": {
+            "index": 26248,
+            "id": 52497,
+            "type": "closure",
+            "name": "Z",
+            "selfBytes": 32
+          },
+          "location": {
+            "script": 25987,
+            "line": 21,
+            "column": 16667
+          }
+        }
+      ],
+      "strongRootPath": [
+        {
+          "from": {
+            "index": 0,
+            "id": 1,
+            "type": "synthetic",
+            "name": "",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "element",
+            "name": 1
+          },
+          "to": {
+            "index": 1,
+            "id": 3,
+            "type": "synthetic",
+            "name": "(GC roots)",
+            "selfBytes": 0
+          }
+        },
+        {
+          "from": {
+            "index": 1,
+            "id": 3,
+            "type": "synthetic",
+            "name": "(GC roots)",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "element",
+            "name": 10
+          },
+          "to": {
+            "index": 11,
+            "id": 23,
+            "type": "synthetic",
+            "name": "(Global handles)",
+            "selfBytes": 0
+          }
+        },
+        {
+          "from": {
+            "index": 11,
+            "id": 23,
+            "type": "synthetic",
+            "name": "(Global handles)",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "internal",
+            "name": "1 / V8PerContextData::context_"
+          },
+          "to": {
+            "index": 3634,
+            "id": 7269,
+            "type": "native",
+            "name": "system / NativeContext / http://127.0.0.1:52650",
+            "selfBytes": 1256
+          }
+        },
+        {
+          "from": {
+            "index": 3634,
+            "id": 7269,
+            "type": "native",
+            "name": "system / NativeContext / http://127.0.0.1:52650",
+            "selfBytes": 1256
+          },
+          "edge": {
+            "type": "internal",
+            "name": "global_object"
+          },
+          "to": {
+            "index": 39546,
+            "id": 79095,
+            "type": "object",
+            "name": "Window [JSGlobalObject] / http://127.0.0.1:52650",
+            "selfBytes": 24
+          }
+        },
+        {
+          "from": {
+            "index": 39546,
+            "id": 79095,
+            "type": "object",
+            "name": "Window [JSGlobalObject] / http://127.0.0.1:52650",
+            "selfBytes": 24
+          },
+          "edge": {
+            "type": "property",
+            "name": "__getJieshuWindow__"
+          },
+          "to": {
+            "index": 41279,
+            "id": 82561,
+            "type": "closure",
+            "name": "In",
+            "selfBytes": 32
+          }
+        },
+        {
+          "from": {
+            "index": 41279,
+            "id": 82561,
+            "type": "closure",
+            "name": "In",
+            "selfBytes": 32
+          },
+          "edge": {
+            "type": "internal",
+            "name": "context"
+          },
+          "to": {
+            "index": 51624,
+            "id": 103249,
+            "type": "object",
+            "name": "system / Context / scope @51943",
+            "selfBytes": 1664
+          }
+        },
+        {
+          "from": {
+            "index": 51624,
+            "id": 103249,
+            "type": "object",
+            "name": "system / Context / scope @51943",
+            "selfBytes": 1664
+          },
+          "edge": {
+            "type": "context",
+            "name": "Oa"
+          },
+          "to": {
+            "index": 51745,
+            "id": 103491,
+            "type": "object",
+            "name": "WeakMap",
+            "selfBytes": 16
+          }
+        }
+      ]
+    }
+  ],
+  "stateSymbolBindings": [],
+  "candidates": [
+    {
+      "weakMap": {
+        "index": 51745,
+        "id": 103491,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 53306,
+        "id": 106613,
+        "type": "array",
+        "name": "",
+        "selfBytes": 32788
+      },
+      "holePairRecords": 2145,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106613)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "2 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106613)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "3 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106613)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": [
+        {
+          "owner": {
+            "index": 51624,
+            "id": 103249,
+            "type": "object",
+            "name": "system / Context / scope @51943",
+            "selfBytes": 1664
+          },
+          "binding": "Oa",
+          "scriptEvidence": [
+            {
+              "closure": {
+                "index": 26108,
+                "id": 52217,
+                "type": "closure",
+                "name": "w",
+                "selfBytes": 28
+              },
+              "location": {
+                "script": 25987,
+                "line": 14,
+                "column": 1881
+              }
+            },
+            {
+              "closure": {
+                "index": 26247,
+                "id": 52495,
+                "type": "closure",
+                "name": "X",
+                "selfBytes": 32
+              },
+              "location": {
+                "script": 25987,
+                "line": 21,
+                "column": 16625
+              }
+            },
+            {
+              "closure": {
+                "index": 26248,
+                "id": 52497,
+                "type": "closure",
+                "name": "Z",
+                "selfBytes": 32
+              },
+              "location": {
+                "script": 25987,
+                "line": 21,
+                "column": 16667
+              }
+            }
+          ]
+        }
+      ],
+      "strongRootPath": [
+        {
+          "from": {
+            "index": 0,
+            "id": 1,
+            "type": "synthetic",
+            "name": "",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "element",
+            "name": 1
+          },
+          "to": {
+            "index": 1,
+            "id": 3,
+            "type": "synthetic",
+            "name": "(GC roots)",
+            "selfBytes": 0
+          }
+        },
+        {
+          "from": {
+            "index": 1,
+            "id": 3,
+            "type": "synthetic",
+            "name": "(GC roots)",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "element",
+            "name": 10
+          },
+          "to": {
+            "index": 11,
+            "id": 23,
+            "type": "synthetic",
+            "name": "(Global handles)",
+            "selfBytes": 0
+          }
+        },
+        {
+          "from": {
+            "index": 11,
+            "id": 23,
+            "type": "synthetic",
+            "name": "(Global handles)",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "internal",
+            "name": "1 / V8PerContextData::context_"
+          },
+          "to": {
+            "index": 3634,
+            "id": 7269,
+            "type": "native",
+            "name": "system / NativeContext / http://127.0.0.1:52650",
+            "selfBytes": 1256
+          }
+        },
+        {
+          "from": {
+            "index": 3634,
+            "id": 7269,
+            "type": "native",
+            "name": "system / NativeContext / http://127.0.0.1:52650",
+            "selfBytes": 1256
+          },
+          "edge": {
+            "type": "internal",
+            "name": "global_object"
+          },
+          "to": {
+            "index": 39546,
+            "id": 79095,
+            "type": "object",
+            "name": "Window [JSGlobalObject] / http://127.0.0.1:52650",
+            "selfBytes": 24
+          }
+        },
+        {
+          "from": {
+            "index": 39546,
+            "id": 79095,
+            "type": "object",
+            "name": "Window [JSGlobalObject] / http://127.0.0.1:52650",
+            "selfBytes": 24
+          },
+          "edge": {
+            "type": "property",
+            "name": "__getJieshuWindow__"
+          },
+          "to": {
+            "index": 41279,
+            "id": 82561,
+            "type": "closure",
+            "name": "In",
+            "selfBytes": 32
+          }
+        },
+        {
+          "from": {
+            "index": 41279,
+            "id": 82561,
+            "type": "closure",
+            "name": "In",
+            "selfBytes": 32
+          },
+          "edge": {
+            "type": "internal",
+            "name": "context"
+          },
+          "to": {
+            "index": 51624,
+            "id": 103249,
+            "type": "object",
+            "name": "system / Context / scope @51943",
+            "selfBytes": 1664
+          }
+        },
+        {
+          "from": {
+            "index": 51624,
+            "id": 103249,
+            "type": "object",
+            "name": "system / Context / scope @51943",
+            "selfBytes": 1664
+          },
+          "edge": {
+            "type": "context",
+            "name": "Oa"
+          },
+          "to": {
+            "index": 51745,
+            "id": 103491,
+            "type": "object",
+            "name": "WeakMap",
+            "selfBytes": 16
+          }
+        },
+        {
+          "from": {
+            "index": 51745,
+            "id": 103491,
+            "type": "object",
+            "name": "WeakMap",
+            "selfBytes": 16
+          },
+          "edge": {
+            "type": "internal",
+            "name": "table"
+          },
+          "to": {
+            "index": 53306,
+            "id": 106613,
+            "type": "array",
+            "name": "",
+            "selfBytes": 32788
+          }
+        }
+      ]
+    }
+  ],
+  "largestWeakMapTables": [
+    {
+      "weakMap": {
+        "index": 51745,
+        "id": 103491,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 53306,
+        "id": 106613,
+        "type": "array",
+        "name": "",
+        "selfBytes": 32788
+      },
+      "holePairRecords": 2145,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106613)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "2 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106613)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "3 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106613)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": [
+        {
+          "owner": {
+            "index": 51624,
+            "id": 103249,
+            "type": "object",
+            "name": "system / Context / scope @51943",
+            "selfBytes": 1664
+          },
+          "binding": "Oa",
+          "scriptEvidence": [
+            {
+              "closure": {
+                "index": 26108,
+                "id": 52217,
+                "type": "closure",
+                "name": "w",
+                "selfBytes": 28
+              },
+              "location": {
+                "script": 25987,
+                "line": 14,
+                "column": 1881
+              }
+            },
+            {
+              "closure": {
+                "index": 26247,
+                "id": 52495,
+                "type": "closure",
+                "name": "X",
+                "selfBytes": 32
+              },
+              "location": {
+                "script": 25987,
+                "line": 21,
+                "column": 16625
+              }
+            },
+            {
+              "closure": {
+                "index": 26248,
+                "id": 52497,
+                "type": "closure",
+                "name": "Z",
+                "selfBytes": 32
+              },
+              "location": {
+                "script": 25987,
+                "line": 21,
+                "column": 16667
+              }
+            }
+          ]
+        }
+      ],
+      "strongRootPath": [
+        {
+          "from": {
+            "index": 0,
+            "id": 1,
+            "type": "synthetic",
+            "name": "",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "element",
+            "name": 1
+          },
+          "to": {
+            "index": 1,
+            "id": 3,
+            "type": "synthetic",
+            "name": "(GC roots)",
+            "selfBytes": 0
+          }
+        },
+        {
+          "from": {
+            "index": 1,
+            "id": 3,
+            "type": "synthetic",
+            "name": "(GC roots)",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "element",
+            "name": 10
+          },
+          "to": {
+            "index": 11,
+            "id": 23,
+            "type": "synthetic",
+            "name": "(Global handles)",
+            "selfBytes": 0
+          }
+        },
+        {
+          "from": {
+            "index": 11,
+            "id": 23,
+            "type": "synthetic",
+            "name": "(Global handles)",
+            "selfBytes": 0
+          },
+          "edge": {
+            "type": "internal",
+            "name": "1 / V8PerContextData::context_"
+          },
+          "to": {
+            "index": 3634,
+            "id": 7269,
+            "type": "native",
+            "name": "system / NativeContext / http://127.0.0.1:52650",
+            "selfBytes": 1256
+          }
+        },
+        {
+          "from": {
+            "index": 3634,
+            "id": 7269,
+            "type": "native",
+            "name": "system / NativeContext / http://127.0.0.1:52650",
+            "selfBytes": 1256
+          },
+          "edge": {
+            "type": "internal",
+            "name": "global_object"
+          },
+          "to": {
+            "index": 39546,
+            "id": 79095,
+            "type": "object",
+            "name": "Window [JSGlobalObject] / http://127.0.0.1:52650",
+            "selfBytes": 24
+          }
+        },
+        {
+          "from": {
+            "index": 39546,
+            "id": 79095,
+            "type": "object",
+            "name": "Window [JSGlobalObject] / http://127.0.0.1:52650",
+            "selfBytes": 24
+          },
+          "edge": {
+            "type": "property",
+            "name": "__getJieshuWindow__"
+          },
+          "to": {
+            "index": 41279,
+            "id": 82561,
+            "type": "closure",
+            "name": "In",
+            "selfBytes": 32
+          }
+        },
+        {
+          "from": {
+            "index": 41279,
+            "id": 82561,
+            "type": "closure",
+            "name": "In",
+            "selfBytes": 32
+          },
+          "edge": {
+            "type": "internal",
+            "name": "context"
+          },
+          "to": {
+            "index": 51624,
+            "id": 103249,
+            "type": "object",
+            "name": "system / Context / scope @51943",
+            "selfBytes": 1664
+          }
+        },
+        {
+          "from": {
+            "index": 51624,
+            "id": 103249,
+            "type": "object",
+            "name": "system / Context / scope @51943",
+            "selfBytes": 1664
+          },
+          "edge": {
+            "type": "context",
+            "name": "Oa"
+          },
+          "to": {
+            "index": 51745,
+            "id": 103491,
+            "type": "object",
+            "name": "WeakMap",
+            "selfBytes": 16
+          }
+        },
+        {
+          "from": {
+            "index": 51745,
+            "id": 103491,
+            "type": "object",
+            "name": "WeakMap",
+            "selfBytes": 16
+          },
+          "edge": {
+            "type": "internal",
+            "name": "table"
+          },
+          "to": {
+            "index": 53306,
+            "id": 106613,
+            "type": "array",
+            "name": "",
+            "selfBytes": 32788
+          }
+        }
+      ]
+    },
+    {
+      "weakMap": {
+        "index": 52731,
+        "id": 105463,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 52741,
+        "id": 105483,
+        "type": "array",
+        "name": "",
+        "selfBytes": 2068
+      },
+      "holePairRecords": 1,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105483)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": []
+    },
+    {
+      "weakMap": {
+        "index": 52750,
+        "id": 105501,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 52760,
+        "id": 105521,
+        "type": "array",
+        "name": "",
+        "selfBytes": 2068
+      },
+      "holePairRecords": 1,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105521)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": []
+    },
+    {
+      "weakMap": {
+        "index": 52766,
+        "id": 105533,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 52776,
+        "id": 105553,
+        "type": "array",
+        "name": "",
+        "selfBytes": 2068
+      },
+      "holePairRecords": 1,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105553)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": []
+    },
+    {
+      "weakMap": {
+        "index": 51819,
+        "id": 103639,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 52639,
+        "id": 105279,
+        "type": "array",
+        "name": "",
+        "selfBytes": 1044
+      },
+      "holePairRecords": 45,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105279)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "2 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105279)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "3 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105279)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": []
+    },
+    {
+      "weakMap": {
+        "index": 51637,
+        "id": 103275,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 52637,
+        "id": 105275,
+        "type": "array",
+        "name": "",
+        "selfBytes": 276
+      },
+      "holePairRecords": 15,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105275)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "2 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105275)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "3 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105275)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": []
+    },
+    {
+      "weakMap": {
+        "index": 51644,
+        "id": 103289,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 52966,
+        "id": 105933,
+        "type": "array",
+        "name": "",
+        "selfBytes": 84
+      },
+      "holePairRecords": 5,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105933)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "2 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105933)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "3 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @105933)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": []
+    },
+    {
+      "weakMap": {
+        "index": 51728,
+        "id": 103457,
+        "type": "object",
+        "name": "WeakMap",
+        "selfBytes": 16
+      },
+      "table": {
+        "index": 53258,
+        "id": 106517,
+        "type": "array",
+        "name": "",
+        "selfBytes": 84
+      },
+      "holePairRecords": 5,
+      "nonHolePairRecords": 0,
+      "weakEdges": 0,
+      "otherPayloadEdges": 0,
+      "emptyUnderRecognizedSchema": true,
+      "pairExamples": [
+        {
+          "annotation": "1 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106517)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "2 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106517)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        },
+        {
+          "annotation": "3 / part of key (system / Hole @63) -> value (system / Hole @63) pair in WeakMap (table @106517)",
+          "target": {
+            "index": 31,
+            "id": 63,
+            "type": "native",
+            "name": "system / Hole",
+            "selfBytes": 0
+          }
+        }
+      ],
+      "otherPayloadExamples": [],
+      "bindings": []
+    }
+  ],
+  "limitations": [
+    "Identification uses the measured bundle AST, its run SHA256, current context binding and heap script locations; no old minified binding is hard-coded.",
+    "Heap source text may be truncated. Full bundle identity relies on the supplied run metadata; the heap script prefix is an additional check.",
+    "Table self_size is allocated backing storage, not retained size or a portable bucket count.",
+    "Ephemeron record counts are snapshot records, not a portable WeakMap.size API. Unknown layouts are not classified as empty.",
+    "The root path excludes weak and conditional ephemeron edges; it demonstrates reachability rather than computing dominators.",
+    "An empty retained backing table is storage overhead, not proof that child constructors, states or Windows remain alive.",
+    "A lazy fallback is reported as undefined only when its measured-bundle Context binding explicitly points to the native Undefined node; a missing binding is inconclusive."
+  ]
+}

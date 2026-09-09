@@ -1,0 +1,90 @@
+{
+  "sourceHashes": [
+    {
+      "file": "packages/jieshu-core/src/index.ts",
+      "sha256": "92d25ee3f41375d22644d3dde7d8a6db42520e33859a47293f85d6be1d4a2bef"
+    },
+    {
+      "file": "packages/jieshu-core/src/operation-intent.ts",
+      "sha256": "9b2a529ff5e032934fb6e4333265ad7b4447ecfd04a574c6ab4bfa9e795cbf26"
+    },
+    {
+      "file": "packages/jieshu-core/src/constant.ts",
+      "sha256": "25c41f9f80ab7fbf80a0e65b87afef201789c8d496cd00ee60fb2b8dfc9a8209"
+    },
+    {
+      "file": "packages/jieshu-core/__test__/unit/public-operation-race.test.ts",
+      "sha256": "a0e87f0f12070501ba9916270a7915d4a9281fb146bc57e0647892c44ce1ebcd"
+    },
+    {
+      "file": "benchmarks/comparison/analyze-bundle.mjs",
+      "sha256": "8b19c8b5e1f6b15de7aeb746a70228a227feedb8d00fbb912c22fd96c0e578ba"
+    },
+    {
+      "file": "benchmarks/comparison/probe-bundle-candidates.mjs",
+      "sha256": "181e85e4e4734cf91e3caed99f39e616f0204ba255bcb2c68a43e26f8ada87fd"
+    },
+    {
+      "file": "benchmarks/comparison/measure-core-load.mjs",
+      "sha256": "dbcac300a79904e593aa3591979fbba857c5d3b8edc0a30d5737cefe21a52103"
+    },
+    {
+      "file": "benchmarks/comparison/measure-idle-retention.mjs",
+      "sha256": "5c7689d4e15cd26a600b46fb9b4b924e4f1a1f493931553ae89d19f91c3c4bc8"
+    }
+  ],
+  "checks": [
+    {
+      "name": "unit",
+      "log": "test-results/footprint-simple-verified-unit.log",
+      "logSha256": "a70afe95d9ed7fbca0ed3edabb23b661acf145c35d8b950aad8d2ca3776a41a5",
+      "exitCode": 0,
+      "expectation": "520 passed"
+    },
+    {
+      "name": "browser",
+      "log": "test-results/footprint-simple-verified-browser.log",
+      "logSha256": "19fdf26be8d0c12051d5a4a742b5944c5a31cff9fb906f0a040e827f961bc00c",
+      "exitCode": 0,
+      "expectation": "137 passed"
+    },
+    {
+      "name": "integration",
+      "log": "test-results/footprint-simple-verified-integration.log",
+      "logSha256": "a1a998203748342b935244c7ce83150414badc3e2c9a5573b467053fc217a4b5",
+      "exitCode": 0,
+      "expectation": "77 passed"
+    },
+    {
+      "name": "typecheck",
+      "log": "test-results/footprint-simple-verified-typecheck.log",
+      "logSha256": "6ec2b736a096580a80940cb4397bc33af615ff65b80c8c9a27a305e2667bff8d",
+      "exitCode": 0,
+      "expectation": null
+    },
+    {
+      "name": "build",
+      "log": "test-results/footprint-simple-verified-build.log",
+      "logSha256": "4244915956dd51f442c8d67aab9d3bba29283051ebffd04c504016f678b9cadc",
+      "exitCode": 0,
+      "expectation": null
+    }
+  ],
+  "diagnostics": {
+    "regularLoads": 120,
+    "tracedLoads": 12,
+    "idleCheckpoints": 60,
+    "idleContexts": 12,
+    "publicDestroyCalls": 12000,
+    "allPassed": true
+  },
+  "runtimeVerification": {
+    "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433",
+    "bundleBytes": 108183,
+    "matchesMeasuredFinalRuntime": true,
+    "note": "Only scoped ESLint comments for valid TypeScript overloads were added after the final measurements; the production runtime hash is unchanged."
+  },
+  "review": "Independent read-only review of operation flow found no definite regression; constant export values and types were separately compared to bc688b2.",
+  "adaptersModified": false,
+  "newCommitCreated": false
+}

@@ -1,5 +1,5 @@
 import { clearAssetsCache, destroyApp, preloadApp, setupApp, startApp } from '../../src/index';
-import { getJieshuById, idToSandboxCacheMap, sandboxTeardownById } from '../../src/common';
+import { getJieshuById, idToSandboxCacheMap, registerSandboxTeardown, sandboxTeardownById } from '../../src/common';
 
 function deferred<Value>() {
   let resolve!: (value: Value | PromiseLike<Value>) => void;
@@ -27,6 +27,9 @@ function startOptions(name: string, container: HTMLElement) {
 describe('public operation races', () => {
   beforeEach(() => {
     window.__JIESHU_CORE_INTENTS = undefined;
+    if (window.__JIESHU_INJECT) {
+      window.__JIESHU_INJECT.coreOperationSlots = undefined;
+    }
     idToSandboxCacheMap.clear();
     sandboxTeardownById.clear();
     clearAssetsCache();
@@ -37,6 +40,59 @@ describe('public operation races', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
+
+  test('destroying unknown names does not allocate shared operation records', async () => {
+    for (let index = 0; index < 1000; index += 1) {
+      await destroyApp(`unknown-${index}`);
+    }
+
+    expect(window.__JIESHU_CORE_INTENTS).toBeUndefined();
+    expect(window.__JIESHU_INJECT?.coreOperationSlots).toBeUndefined();
+    expect(idToSandboxCacheMap.size).toBe(0);
+    expect(sandboxTeardownById.size).toBe(0);
+  });
+
+  test('destroying a configured but unused app preserves its options without an operation record', async () => {
+    const name = 'configured-only';
+    setupApp({ name, url: `https://example.test/${name}/` });
+    const cached = idToSandboxCacheMap.get(name);
+
+    await destroyApp(name);
+
+    expect(cached?.options?.name).toBe(name);
+    expect(idToSandboxCacheMap.get(name)).toBe(cached);
+    expect(window.__JIESHU_CORE_INTENTS).toBeUndefined();
+    expect(window.__JIESHU_INJECT?.coreOperationSlots).toBeUndefined();
+  });
+
+  test.each([false, true])(
+    'destroy without an instance still awaits pending teardown (rejects=%s)',
+    async (rejects) => {
+      const name = 'teardown-only';
+      const gate = deferred<void>();
+      registerSandboxTeardown(name, gate.promise);
+      let completed = false;
+      const destroying = destroyApp(name).finally(() => {
+        completed = true;
+      });
+      const failure = new Error('teardown failed');
+      const assertion = rejects
+        ? expect(destroying).rejects.toBe(failure)
+        : expect(destroying).resolves.toBeUndefined();
+
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(completed).toBe(false);
+      if (rejects) {
+        gate.reject(failure);
+      } else {
+        gate.resolve();
+      }
+      await assertion;
+      expect(completed).toBe(true);
+      expect(sandboxTeardownById.has(name)).toBe(false);
+    },
+  );
 
   test('destroy interrupts a start whose HTML request is still pending', async () => {
     const htmlGate = deferred<Response>();
@@ -221,24 +277,30 @@ describe('public operation races', () => {
     vi.useRealTimers();
   });
 
-  test('destroy issued before idle time prevents a queued preload from reviving the app', async () => {
-    vi.useFakeTimers();
-    const fetch = vi.fn(() => Promise.resolve(response('<html></html>')));
+  test.each([false, true])(
+    'destroy cancels queued preload even with only the injected slot (injectedOnly=%s)',
+    async (injectedOnly) => {
+      vi.useFakeTimers();
+      const fetch = vi.fn(() => Promise.resolve(response('<html></html>')));
 
-    preloadApp({
-      name: 'cancelled-preload',
-      url: 'https://example.test/cancelled-preload/',
-      fetch,
-      fiber: false,
-    });
-    await destroyApp('cancelled-preload');
-    vi.advanceTimersByTime(1);
-    await Promise.resolve();
+      preloadApp({
+        name: 'cancelled-preload',
+        url: 'https://example.test/cancelled-preload/',
+        fetch,
+        fiber: false,
+      });
+      if (injectedOnly) {
+        window.__JIESHU_CORE_INTENTS = undefined;
+      }
+      await destroyApp('cancelled-preload');
+      vi.advanceTimersByTime(1);
+      await Promise.resolve();
 
-    expect(getJieshuById('cancelled-preload')).toBeNull();
-    expect(fetch).not.toHaveBeenCalled();
-    vi.useRealTimers();
-  });
+      expect(getJieshuById('cancelled-preload')).toBeNull();
+      expect(fetch).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    },
+  );
 
   test('a start adopts an in-flight preload instead of being discarded with its stale idle intent', async () => {
     vi.useFakeTimers();

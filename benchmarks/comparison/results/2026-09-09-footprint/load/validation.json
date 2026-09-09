@@ -1,0 +1,15 @@
+{
+  "command": "node benchmarks/comparison/measure-core-load.mjs",
+  "exitCode": 0,
+  "regularObservations": 120,
+  "regularPassed": 120,
+  "traceObservations": 12,
+  "tracePassed": 12,
+  "checks": [
+    "node --check benchmarks/comparison/measure-core-load.mjs",
+    "node node_modules/eslint/bin/eslint.js benchmarks/comparison/measure-core-load.mjs --max-warnings=0",
+    "node node_modules/prettier/bin/prettier.cjs --check benchmarks/comparison/measure-core-load.mjs",
+    "git diff --check"
+  ],
+  "postRunAnalysis": "Added URL-attributed background parsing/streaming events to trace summary using saved unmodified raw traces; regular timing samples unchanged."
+}

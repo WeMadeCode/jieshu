@@ -1,0 +1,52 @@
+{
+  "startedAt": "2026-09-09T08:31:43.209Z",
+  "rounds": 3,
+  "checkpoints": [0, 250, 500, 1000],
+  "modes": ["same-name", "distinct-names"],
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "totalMemoryBytes": 17179869184,
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "sourceTree": "ec55f619fddf7c2c9f3b660fc84262d31abec3c3",
+      "sourceStatus": "",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    },
+    "jieshu": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "sourceTree": "7dffb5c244f0c2fa81ca5bf53ba488a28b0e29d1",
+      "sourceStatus": "",
+      "bundleBytes": 108681,
+      "gzipBytes": 32759,
+      "sha256": "2d98842d46df3c3dbd89041f927fd1b16e9ebc827fafc7c98d1c2069b42f034e"
+    }
+  },
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production",
+    "charset": "utf-8"
+  },
+  "method": [
+    "No-op destroy stress: every id is absent; no child application is ever mounted. This is not a real application lifecycle workload.",
+    "Fresh browser context for each framework/mode/round. Framework and mode orders alternate; all observations are serial.",
+    "Await the public ComparisonCore.destroyApp(id) API 1000 times, using either one repeated id or 1000 different ids.",
+    "Capture after core load and after250/500/1000 operations; force GC outside operation timing and record Performance.JSHeapUsedSize plus Memory.getDOMCounters.",
+    "After the last checkpoint, diagnostically delete both host references to Jieshu coreOperationSlots and force GC. No live app exists. Wujie receives the same absent-property deletion control.",
+    "Deleting protocol state is a diagnostic intervention, not a proposed fix or a production-safe API. The same-name concurrency protocol must be preserved in any implementation.",
+    "Heap values are JavaScript heap bytes, not process RSS. Timing is per-batch wall time in milliseconds, excluding CDP/GC sampling.",
+    "Compilation and engine cache growth can remain after deleting slots. Do not attribute all before/after heap differences to the slot objects or claim complete leak remediation."
+  ],
+  "finishedAt": "2026-09-09T08:31:44.207Z"
+}

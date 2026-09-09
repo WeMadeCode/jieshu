@@ -409,15 +409,47 @@ export function patchWindowEffect(iframeWindow: Window): void {
   patchInstanceofAcrossRealms(iframeWindow);
 }
 
-type DomConstructor = CallableFunction & { prototype?: object };
+// Let ordinary constructors collect their state without retaining an empty global WeakMap table.
+const instanceofPatchStateKey = Symbol('jieshu.instanceof-state');
+
+type DomConstructor = CallableFunction & {
+  prototype?: object;
+  [instanceofPatchStateKey]?: InstanceofPatchState;
+};
 
 interface InstanceofPatchState {
   readonly constructor: DomConstructor;
   readonly peers: Map<DomConstructor, number>;
 }
 
-const instanceofPatchStates = new WeakMap<DomConstructor, InstanceofPatchState>();
+let fallbackInstanceofPatchStates: WeakMap<DomConstructor, InstanceofPatchState> | undefined;
 const nativeHasInstance = Function.prototype[Symbol.hasInstance];
+
+const getInstanceofPatchState = (targetConstructor: DomConstructor) => {
+  const fallback = fallbackInstanceofPatchStates?.get(targetConstructor);
+  if (fallback) {
+    return fallback;
+  }
+  try {
+    // Only this module writes this private Symbol; PropertyDescriptor erases its value type.
+    const state = Object.getOwnPropertyDescriptor(targetConstructor, instanceofPatchStateKey)?.value as
+      InstanceofPatchState | undefined;
+    if (state?.constructor === targetConstructor) {
+      return state;
+    }
+  } catch {
+    // A facade or user Proxy may expose the state only through its get trap.
+  }
+  try {
+    const state = targetConstructor[instanceofPatchStateKey];
+    if (state?.constructor === targetConstructor) {
+      return state;
+    }
+  } catch {
+    // Metadata access must not prevent the existing hasInstance installation path.
+  }
+  return undefined;
+};
 
 function matchesPatchedInstance(state: InstanceofPatchState, receiver: unknown, element: unknown): boolean {
   if (nativeHasInstance.call(receiver, element)) return true;
@@ -431,7 +463,8 @@ function matchesPatchedInstance(state: InstanceofPatchState, receiver: unknown, 
   return false;
 }
 
-function createSharedConstructorFacade(original: DomConstructor): DomConstructor {
+const createSharedConstructorFacade = (original: DomConstructor) => {
+  // The facade and state refer to each other; traps run after both are initialized.
   let facade!: DomConstructor;
   let state!: InstanceofPatchState;
   const peers = new Map<DomConstructor, number>();
@@ -440,6 +473,9 @@ function createSharedConstructorFacade(original: DomConstructor): DomConstructor
   };
   facade = new Proxy(original, {
     get(target, property, receiver) {
+      if (property === instanceofPatchStateKey) {
+        return state;
+      }
       return property === Symbol.hasInstance ? hasInstance : Reflect.get(target, property, receiver);
     },
     construct(target, argumentsList, newTarget) {
@@ -447,9 +483,8 @@ function createSharedConstructorFacade(original: DomConstructor): DomConstructor
     },
   });
   state = { constructor: facade, peers };
-  instanceofPatchStates.set(facade, state);
   return facade;
-}
+};
 
 function isolateSharedConstructor(
   targetWindow: Window,
@@ -481,8 +516,8 @@ function isolateSharedConstructor(
   }
 }
 
-function registerInstanceofPeer(targetConstructor: DomConstructor, peerConstructor: DomConstructor): () => void {
-  let state = instanceofPatchStates.get(targetConstructor);
+const registerInstanceofPeer = (targetConstructor: DomConstructor, peerConstructor: DomConstructor) => {
+  let state = getInstanceofPatchState(targetConstructor);
   if (!state) {
     const createdState: InstanceofPatchState = { constructor: targetConstructor, peers: new Map() };
     try {
@@ -492,26 +527,46 @@ function registerInstanceofPeer(targetConstructor: DomConstructor, peerConstruct
           return matchesPatchedInstance(createdState, this, element);
         },
       });
-      instanceofPatchStates.set(targetConstructor, createdState);
-      state = createdState;
     } catch (cause: unknown) {
       console.warn(cause);
       return () => undefined;
     }
+    let attached = false;
+    try {
+      Object.defineProperty(targetConstructor, instanceofPatchStateKey, {
+        configurable: true,
+        value: createdState,
+      });
+      attached = getInstanceofPatchState(targetConstructor) === createdState;
+    } catch {
+      // Non-extensible constructors and rejecting Proxies can still accept hasInstance.
+    }
+    if (!attached) {
+      fallbackInstanceofPatchStates ??= new WeakMap();
+      fallbackInstanceofPatchStates.set(targetConstructor, createdState);
+    }
+    state = createdState;
   }
 
   state.peers.set(peerConstructor, (state.peers.get(peerConstructor) ?? 0) + 1);
   const registeredState = state;
   let registered = true;
   return () => {
-    if (!registered) return;
+    if (!registered) {
+      return;
+    }
     registered = false;
     const registrations = registeredState.peers.get(peerConstructor);
-    if (registrations === undefined) return;
-    if (registrations === 1) registeredState.peers.delete(peerConstructor);
-    else registeredState.peers.set(peerConstructor, registrations - 1);
+    if (registrations === undefined) {
+      return;
+    }
+    if (registrations === 1) {
+      registeredState.peers.delete(peerConstructor);
+    } else {
+      registeredState.peers.set(peerConstructor, registrations - 1);
+    }
   };
-}
+};
 
 function isDomConstructor(name: string, ctor: DomConstructor, peerWindow: Window): boolean {
   const prototype = ctor.prototype;

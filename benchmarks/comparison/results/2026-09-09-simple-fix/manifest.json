@@ -1,0 +1,89 @@
+{
+  "date": "2026-09-09",
+  "scope": "Final minimal no-op destroy fast path and constant simplification; baseline bc688b2. Full traces/bundles remain ignored.",
+  "files": [
+    {
+      "file": "bundle/fast-path.json",
+      "source": "test-results/footprint-simple-bundle.json",
+      "sourceSha256": "4ad547ffb4e8a6f57b775c6cce4e6025c715b6a2147ddeb3323f79f5f87582a1",
+      "bytes": 1322,
+      "sha256": "d88ab951bf1a42fe8df9f1bbf18f769fe491a480431460ac682fdc0fe9ff09c9"
+    },
+    {
+      "file": "bundle/query-wrapper.json",
+      "source": "test-results/footprint-simple-final-bundle.json",
+      "sourceSha256": "e1f4494525322dac206979d0bd8d93825b279525775d6cab9d7c8e382d18037e",
+      "bytes": 1884,
+      "sha256": "e1f4494525322dac206979d0bd8d93825b279525775d6cab9d7c8e382d18037e"
+    },
+    {
+      "file": "idle/environment.json",
+      "source": "test-results/footprint-simple-final-retention/environment.json",
+      "sourceSha256": "80142aa3a6aede4adab15bc42a7c3276c5d2b3d79e93c4122226aa2ce0ad0b37",
+      "bytes": 11750,
+      "sha256": "e162346234b7f9936e85bbc1dda5c33c1a488f7ca82a29938c32cf0b94733545"
+    },
+    {
+      "file": "idle/observations.jsonl",
+      "source": "test-results/footprint-simple-final-retention/observations.jsonl",
+      "sourceSha256": "d9e3adc58bcd0720c331fbc9fb4f6c74ccba64032a84a9359b6b654044c04817",
+      "bytes": 24506,
+      "sha256": "d9e3adc58bcd0720c331fbc9fb4f6c74ccba64032a84a9359b6b654044c04817"
+    },
+    {
+      "file": "idle/summary.json",
+      "source": "test-results/footprint-simple-final-retention/summary.json",
+      "sourceSha256": "37563fa9e7250cc178e8b77eb917ccefb1fe286e837ef5357b2b6f2f6405c10c",
+      "bytes": 6107,
+      "sha256": "847aac5e4aa6d73a9dd3ed843eff6796486bca2ea6b21a631973cc22c0fee2e0"
+    },
+    {
+      "file": "load/environment.json",
+      "source": "test-results/footprint-simple-final-load/environment.json",
+      "sourceSha256": "b4a31dd8cbe41c1d45dcd359d32814bb49c03a6cba5ffd044e1a00b817e02c94",
+      "bytes": 2574,
+      "sha256": "71b0f35099e7f14cdd872d5edac14c18102ee4ded702b09ee45144f7821d16d8"
+    },
+    {
+      "file": "load/observations.jsonl",
+      "source": "test-results/footprint-simple-final-load/observations.jsonl",
+      "sourceSha256": "cd83de5dad278863107c5a8c17d4e24c6228c9eb580c2d37d552b8828f2698e8",
+      "bytes": 554992,
+      "sha256": "cd83de5dad278863107c5a8c17d4e24c6228c9eb580c2d37d552b8828f2698e8"
+    },
+    {
+      "file": "load/summary.json",
+      "source": "test-results/footprint-simple-final-load/summary.json",
+      "sourceSha256": "2c24eb386bdc9e398ef406f6a8d987293cd80a139e06f0ebd12229e012907137",
+      "bytes": 6181,
+      "sha256": "9518bd02c14fdc632d523344af3c6947f36bdda7a05f93a4958fba2a390775ce"
+    },
+    {
+      "file": "bundle/final.json",
+      "source": "test-results/footprint-simple-final-load/environment.json",
+      "sourceSha256": "b4a31dd8cbe41c1d45dcd359d32814bb49c03a6cba5ffd044e1a00b817e02c94",
+      "bytes": 2062,
+      "sha256": "5a5a29015a333343dd49f394d88effc4077b0a3333a35043ae54734ced02586a"
+    },
+    {
+      "file": "load/trace-summary.json",
+      "source": "test-results/footprint-simple-final-load/trace-summary.json",
+      "sourceSha256": "b0126aac1b79fc872da2d69bf4af56b496b01fb9c4b545720edfb59f2a41ec42",
+      "bytes": 68779,
+      "sha256": "9bc837b4193e647d38dbadaa93cbe29997d910049a5b49ab4f8cb440de411ed3"
+    },
+    {
+      "file": "load/variants.json",
+      "source": "test-results/footprint-simple-final-load/summary.json",
+      "sourceSha256": "2c24eb386bdc9e398ef406f6a8d987293cd80a139e06f0ebd12229e012907137",
+      "bytes": 15091,
+      "sha256": "8200190cba100443c80065c23bb5cf22df25eeeec8bf80777ca1aaec325411ef"
+    },
+    {
+      "file": "validation.json",
+      "source": "Final command results, diagnostic rows, runtime hash verification and current source hashes",
+      "bytes": 3270,
+      "sha256": "57acb773b85d604f428833351e660ea70f73e348cfc71a52017ba1e58a33cccc"
+    }
+  ]
+}

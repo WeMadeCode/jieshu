@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-09-09T08:59:18.380Z",
+  "node": "v26.7.0",
+  "vite": "8.2.2",
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production",
+    "entry": "all public runtime exports from current local source"
+  },
+  "results": [
+    {
+      "framework": "jieshu",
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "changedCoreFiles": ["packages/jieshu-core/src/index.ts", "packages/jieshu-core/src/operation-intent.ts"],
+      "baselineBytes": 108681,
+      "baselineGzipBytes": 32759,
+      "baselineSha256": "2d98842d46df3c3dbd89041f927fd1b16e9ebc827fafc7c98d1c2069b42f034e",
+      "bundleBytes": 108808,
+      "gzipBytes": 32793,
+      "sha256": "fd3b84d4b955f072c4f2ede560de1d029e4d00835ca20f9102ad1c56be1de2dd",
+      "deltaBytes": 127,
+      "deltaGzipBytes": 34
+    },
+    {
+      "framework": "wujie",
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "changedCoreFiles": [],
+      "baselineBytes": 65660,
+      "baselineGzipBytes": 19802,
+      "baselineSha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+      "deltaBytes": 0,
+      "deltaGzipBytes": 0
+    }
+  ]
+}

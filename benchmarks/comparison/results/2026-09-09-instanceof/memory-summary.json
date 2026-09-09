@@ -1,0 +1,2609 @@
+{
+  "generatedAt": "2026-09-09T14:08:34.837Z",
+  "kind": "derived-memory-summary",
+  "derivedFrom": [
+    {
+      "path": "before-30/environment.json",
+      "source": "test-results/instanceof-before-30/environment.json",
+      "sha256": "f9716ac2bc791d953026624d5ae39483b06f2a5e8b58015b6aad382485e9977b",
+      "bytes": 2281
+    },
+    {
+      "path": "before-30/observations.jsonl",
+      "source": "test-results/instanceof-before-30/observations.jsonl",
+      "sha256": "d344c17fdc0c6f1047c1884ca55c57cc4eaaa4d5d5ab7f94eed23a5fbc6d67c7",
+      "bytes": 9182
+    },
+    {
+      "path": "before-30/instanceof-audit.json",
+      "source": "test-results/instanceof-before-30/instanceof-audit.json",
+      "sha256": "b997ce02737801a27dfac36174873ad83d55993f7facd3a475ec6ddb672f1841",
+      "bytes": 30803
+    },
+    {
+      "path": "before-100/environment.json",
+      "source": "test-results/instanceof-before-100/environment.json",
+      "sha256": "943dfe41d8364117c7df5160bfb726296fab1e06763a6778f5e8c258940da89d",
+      "bytes": 2278
+    },
+    {
+      "path": "before-100/observations.jsonl",
+      "source": "test-results/instanceof-before-100/observations.jsonl",
+      "sha256": "915b538f78b22bab69a1988a27b35b29654bd2f9ad0223d4936b4743a4031a40",
+      "bytes": 19941
+    },
+    {
+      "path": "before-100/instanceof-audit.json",
+      "source": "test-results/instanceof-before-100/instanceof-audit.json",
+      "sha256": "7344e84308c5ea66fe74f3e2c8c1a7b0bae12e1a54fc21254ea7ac71e8a782fb",
+      "bytes": 30850
+    },
+    {
+      "path": "candidate-30/environment.json",
+      "source": "test-results/instanceof-candidate-30/environment.json",
+      "sha256": "aec91bba4c39f302689b962e2cee1569db2055f7b7882b7476fcd39d3bac2265",
+      "bytes": 2430
+    },
+    {
+      "path": "candidate-30/observations.jsonl",
+      "source": "test-results/instanceof-candidate-30/observations.jsonl",
+      "sha256": "215e542adb46d4238b633f4242eb784e2c796b437af1085b3220016be90f7fcd",
+      "bytes": 9182
+    },
+    {
+      "path": "candidate-30/instanceof-audit.json",
+      "source": "test-results/instanceof-candidate-30/instanceof-audit.json",
+      "sha256": "1e2ef199b70b0cb69c2906473c0b035b13002b1a65cd49c23770a06c01e1c71b",
+      "bytes": 24473
+    },
+    {
+      "path": "candidate-100/environment.json",
+      "source": "test-results/instanceof-candidate-100/environment.json",
+      "sha256": "fea0ebd5de617d894ecdd47bf2d1cd6e47c43eebad6ecfc0c7982fe5bd6cd973",
+      "bytes": 2437
+    },
+    {
+      "path": "candidate-100/observations.jsonl",
+      "source": "test-results/instanceof-candidate-100/observations.jsonl",
+      "sha256": "52a0d98f4347112801609e43a76a361179d66cbf8f69d14a93a148aa981b7640",
+      "bytes": 19923
+    },
+    {
+      "path": "candidate-100/instanceof-audit.json",
+      "source": "test-results/instanceof-candidate-100/instanceof-audit.json",
+      "sha256": "d385aaf888d61b75a8ba86f3eaa27e080c25ca5de4fa3c1a4ddbbf11925e8fd4",
+      "bytes": 24470
+    }
+  ],
+  "method": {
+    "selectedStages": [
+      "blank",
+      "core",
+      "mounted-1",
+      "mounted-5-alive",
+      "final-settled-5.5s"
+    ],
+    "units": "bytes for JS heap; counts for DOM metrics",
+    "gc": "Each observation waits 30 ms, forces HeapProfiler.collectGarbage, then reads Performance metrics and Memory.getDOMCounters.",
+    "final": "After five alive apps are destroyed and asset cache cleared, waits 5.5 s before final GC measurement and full heap snapshot.",
+    "core": "Memory run core stage includes the common benchmark harness; this differs from the separate core-load fixture.",
+    "limitations": [
+      "One complete memory round per framework at each cycle count; these are paired diagnostic observations, not estimated population means or significance tests.",
+      "Each sequence contains both N same-assets and N unique-assets cycles plus initial and alive app work; N is not the total mount count.",
+      "GC heap is not browser RSS; V8 table self_size is not retained size.",
+      "The final five-app stage may set the same backing-table high-water mark for N=30 and N=100.",
+      "Before/candidate differences also contain ordinary JIT and measurement variation; the explicit heap binding audit separately verifies the target allocation change.",
+      "load-initial preserves the first candidate-vs-Wujie load run; it is not the later before/candidate A/B run."
+    ]
+  },
+  "runs": [
+    {
+      "label": "before-30",
+      "phase": "before",
+      "cycles": 30,
+      "memoryRounds": 1,
+      "actualMountsFormula": "1 initial + N same-assets + N unique-assets + 5 alive = 2N + 6 per framework",
+      "observationCount": 2,
+      "passedCount": 2,
+      "failedCount": 0,
+      "records": [
+        {
+          "framework": "jieshu",
+          "round": 0,
+          "passed": true,
+          "pageErrors": [],
+          "diagnostics": [],
+          "actualMounts": 66,
+          "actualDestroys": 66,
+          "gcCheckpoints": {
+            "expected": 24,
+            "observed": 24,
+            "points": [
+              {
+                "stage": "blank"
+              },
+              {
+                "stage": "core"
+              },
+              {
+                "stage": "mounted-1"
+              },
+              {
+                "stage": "destroyed-first"
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "cache-cleared"
+              },
+              {
+                "stage": "cache-cleared-settled-5.5s"
+              },
+              {
+                "stage": "mounted-5-alive"
+              },
+              {
+                "stage": "deactivated-5-alive"
+              },
+              {
+                "stage": "final-cleanup"
+              },
+              {
+                "stage": "final-settled-5.5s"
+              }
+            ]
+          },
+          "selected": {
+            "blank": {
+              "stage": "blank",
+              "Documents": 1,
+              "JSEventListeners": 0,
+              "Nodes": 9,
+              "JSHeapUsedSize": 553976,
+              "JSHeapTotalSize": 1048576,
+              "dom": {
+                "documents": 1,
+                "nodes": 9,
+                "jsEventListeners": 0
+              }
+            },
+            "core": {
+              "stage": "core",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 10,
+              "JSHeapUsedSize": 748080,
+              "JSHeapTotalSize": 1310720,
+              "dom": {
+                "documents": 1,
+                "nodes": 10,
+                "jsEventListeners": 3
+              }
+            },
+            "mounted-1": {
+              "stage": "mounted-1",
+              "Documents": 2,
+              "JSEventListeners": 9,
+              "Nodes": 953,
+              "JSHeapUsedSize": 3945272,
+              "JSHeapTotalSize": 4456448,
+              "dom": {
+                "documents": 2,
+                "nodes": 953,
+                "jsEventListeners": 9
+              }
+            },
+            "mounted-5-alive": {
+              "stage": "mounted-5-alive",
+              "Documents": 6,
+              "JSEventListeners": 33,
+              "Nodes": 4726,
+              "JSHeapUsedSize": 8839816,
+              "JSHeapTotalSize": 9699328,
+              "dom": {
+                "documents": 6,
+                "nodes": 4726,
+                "jsEventListeners": 33
+              }
+            },
+            "final-settled-5.5s": {
+              "stage": "final-settled-5.5s",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 11,
+              "JSHeapUsedSize": 3394936,
+              "JSHeapTotalSize": 4194304,
+              "dom": {
+                "documents": 1,
+                "nodes": 11,
+                "jsEventListeners": 3
+              }
+            }
+          },
+          "coreMinusBlankHeapBytes": 194104,
+          "finalMinusCoreHeapBytes": 2646856
+        },
+        {
+          "framework": "wujie",
+          "round": 0,
+          "passed": true,
+          "pageErrors": [],
+          "diagnostics": [],
+          "actualMounts": 66,
+          "actualDestroys": 66,
+          "gcCheckpoints": {
+            "expected": 24,
+            "observed": 24,
+            "points": [
+              {
+                "stage": "blank"
+              },
+              {
+                "stage": "core"
+              },
+              {
+                "stage": "mounted-1"
+              },
+              {
+                "stage": "destroyed-first"
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "cache-cleared"
+              },
+              {
+                "stage": "cache-cleared-settled-5.5s"
+              },
+              {
+                "stage": "mounted-5-alive"
+              },
+              {
+                "stage": "deactivated-5-alive"
+              },
+              {
+                "stage": "final-cleanup"
+              },
+              {
+                "stage": "final-settled-5.5s"
+              }
+            ]
+          },
+          "selected": {
+            "blank": {
+              "stage": "blank",
+              "Documents": 1,
+              "JSEventListeners": 0,
+              "Nodes": 9,
+              "JSHeapUsedSize": 553976,
+              "JSHeapTotalSize": 1048576,
+              "dom": {
+                "documents": 1,
+                "nodes": 9,
+                "jsEventListeners": 0
+              }
+            },
+            "core": {
+              "stage": "core",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 10,
+              "JSHeapUsedSize": 691912,
+              "JSHeapTotalSize": 1310720,
+              "dom": {
+                "documents": 1,
+                "nodes": 10,
+                "jsEventListeners": 3
+              }
+            },
+            "mounted-1": {
+              "stage": "mounted-1",
+              "Documents": 2,
+              "JSEventListeners": 9,
+              "Nodes": 950,
+              "JSHeapUsedSize": 4204520,
+              "JSHeapTotalSize": 4718592,
+              "dom": {
+                "documents": 2,
+                "nodes": 950,
+                "jsEventListeners": 9
+              }
+            },
+            "mounted-5-alive": {
+              "stage": "mounted-5-alive",
+              "Documents": 6,
+              "JSEventListeners": 33,
+              "Nodes": 4711,
+              "JSHeapUsedSize": 10374440,
+              "JSHeapTotalSize": 11010048,
+              "dom": {
+                "documents": 6,
+                "nodes": 4711,
+                "jsEventListeners": 33
+              }
+            },
+            "final-settled-5.5s": {
+              "stage": "final-settled-5.5s",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 11,
+              "JSHeapUsedSize": 3065540,
+              "JSHeapTotalSize": 4194304,
+              "dom": {
+                "documents": 1,
+                "nodes": 11,
+                "jsEventListeners": 3
+              }
+            }
+          },
+          "coreMinusBlankHeapBytes": 137936,
+          "finalMinusCoreHeapBytes": 2373628
+        }
+      ],
+      "externalArtifacts": [
+        {
+          "framework": "jieshu",
+          "heap": "test-results/instanceof-before-30/jieshu-final.heapsnapshot",
+          "bundle": "test-results/footprint-simple-final-load/jieshu.js"
+        },
+        {
+          "framework": "wujie",
+          "heap": "test-results/instanceof-before-30/wujie-final.heapsnapshot",
+          "bundle": "test-results/footprint-simple-final-load/wujie.js"
+        }
+      ],
+      "instanceofAudit": {
+        "source": "before-30/instanceof-audit.json",
+        "identification": "unique-structural-match",
+        "allocationState": "eager-WeakMap-allocated",
+        "registryBindings": [
+          {
+            "owner": {
+              "index": 24017,
+              "id": 48037,
+              "type": "object",
+              "name": "system / Context / scope @48035",
+              "selfBytes": 1664
+            },
+            "binding": "Oa",
+            "value": {
+              "index": 24148,
+              "id": 48299,
+              "type": "object",
+              "name": "WeakMap",
+              "selfBytes": 16
+            }
+          }
+        ],
+        "backingTables": [
+          {
+            "weakMap": {
+              "index": 24148,
+              "id": 48299,
+              "type": "object",
+              "name": "WeakMap",
+              "selfBytes": 16
+            },
+            "table": {
+              "index": 25889,
+              "id": 51779,
+              "type": "array",
+              "name": "",
+              "selfBytes": 32788
+            },
+            "holePairRecords": 2145,
+            "nonHolePairRecords": 0,
+            "weakEdges": 0,
+            "otherPayloadEdges": 0,
+            "emptyUnderRecognizedSchema": true
+          }
+        ],
+        "privateSymbols": []
+      }
+    },
+    {
+      "label": "before-100",
+      "phase": "before",
+      "cycles": 100,
+      "memoryRounds": 1,
+      "actualMountsFormula": "1 initial + N same-assets + N unique-assets + 5 alive = 2N + 6 per framework",
+      "observationCount": 2,
+      "passedCount": 2,
+      "failedCount": 0,
+      "records": [
+        {
+          "framework": "jieshu",
+          "round": 0,
+          "passed": true,
+          "pageErrors": [],
+          "diagnostics": [],
+          "actualMounts": 206,
+          "actualDestroys": 206,
+          "gcCheckpoints": {
+            "expected": 52,
+            "observed": 52,
+            "points": [
+              {
+                "stage": "blank"
+              },
+              {
+                "stage": "core"
+              },
+              {
+                "stage": "mounted-1"
+              },
+              {
+                "stage": "destroyed-first"
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 35
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 40
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 45
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 50
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 55
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 60
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 65
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 70
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 75
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 80
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 85
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 90
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 95
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 100
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 35
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 40
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 45
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 50
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 55
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 60
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 65
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 70
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 75
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 80
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 85
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 90
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 95
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 100
+              },
+              {
+                "stage": "cache-cleared"
+              },
+              {
+                "stage": "cache-cleared-settled-5.5s"
+              },
+              {
+                "stage": "mounted-5-alive"
+              },
+              {
+                "stage": "deactivated-5-alive"
+              },
+              {
+                "stage": "final-cleanup"
+              },
+              {
+                "stage": "final-settled-5.5s"
+              }
+            ]
+          },
+          "selected": {
+            "blank": {
+              "stage": "blank",
+              "Documents": 1,
+              "JSEventListeners": 0,
+              "Nodes": 9,
+              "JSHeapUsedSize": 553976,
+              "JSHeapTotalSize": 1048576,
+              "dom": {
+                "documents": 1,
+                "nodes": 9,
+                "jsEventListeners": 0
+              }
+            },
+            "core": {
+              "stage": "core",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 10,
+              "JSHeapUsedSize": 748080,
+              "JSHeapTotalSize": 1310720,
+              "dom": {
+                "documents": 1,
+                "nodes": 10,
+                "jsEventListeners": 3
+              }
+            },
+            "mounted-1": {
+              "stage": "mounted-1",
+              "Documents": 2,
+              "JSEventListeners": 9,
+              "Nodes": 953,
+              "JSHeapUsedSize": 3945272,
+              "JSHeapTotalSize": 4718592,
+              "dom": {
+                "documents": 2,
+                "nodes": 953,
+                "jsEventListeners": 9
+              }
+            },
+            "mounted-5-alive": {
+              "stage": "mounted-5-alive",
+              "Documents": 6,
+              "JSEventListeners": 33,
+              "Nodes": 4726,
+              "JSHeapUsedSize": 8939172,
+              "JSHeapTotalSize": 9175040,
+              "dom": {
+                "documents": 6,
+                "nodes": 4726,
+                "jsEventListeners": 33
+              }
+            },
+            "final-settled-5.5s": {
+              "stage": "final-settled-5.5s",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 11,
+              "JSHeapUsedSize": 3486256,
+              "JSHeapTotalSize": 3670016,
+              "dom": {
+                "documents": 1,
+                "nodes": 11,
+                "jsEventListeners": 3
+              }
+            }
+          },
+          "coreMinusBlankHeapBytes": 194104,
+          "finalMinusCoreHeapBytes": 2738176
+        },
+        {
+          "framework": "wujie",
+          "round": 0,
+          "passed": true,
+          "pageErrors": [],
+          "diagnostics": [],
+          "actualMounts": 206,
+          "actualDestroys": 206,
+          "gcCheckpoints": {
+            "expected": 52,
+            "observed": 52,
+            "points": [
+              {
+                "stage": "blank"
+              },
+              {
+                "stage": "core"
+              },
+              {
+                "stage": "mounted-1"
+              },
+              {
+                "stage": "destroyed-first"
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 35
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 40
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 45
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 50
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 55
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 60
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 65
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 70
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 75
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 80
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 85
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 90
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 95
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 100
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 35
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 40
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 45
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 50
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 55
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 60
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 65
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 70
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 75
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 80
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 85
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 90
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 95
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 100
+              },
+              {
+                "stage": "cache-cleared"
+              },
+              {
+                "stage": "cache-cleared-settled-5.5s"
+              },
+              {
+                "stage": "mounted-5-alive"
+              },
+              {
+                "stage": "deactivated-5-alive"
+              },
+              {
+                "stage": "final-cleanup"
+              },
+              {
+                "stage": "final-settled-5.5s"
+              }
+            ]
+          },
+          "selected": {
+            "blank": {
+              "stage": "blank",
+              "Documents": 1,
+              "JSEventListeners": 0,
+              "Nodes": 9,
+              "JSHeapUsedSize": 553976,
+              "JSHeapTotalSize": 1048576,
+              "dom": {
+                "documents": 1,
+                "nodes": 9,
+                "jsEventListeners": 0
+              }
+            },
+            "core": {
+              "stage": "core",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 10,
+              "JSHeapUsedSize": 691912,
+              "JSHeapTotalSize": 1310720,
+              "dom": {
+                "documents": 1,
+                "nodes": 10,
+                "jsEventListeners": 3
+              }
+            },
+            "mounted-1": {
+              "stage": "mounted-1",
+              "Documents": 2,
+              "JSEventListeners": 9,
+              "Nodes": 950,
+              "JSHeapUsedSize": 4204532,
+              "JSHeapTotalSize": 5242880,
+              "dom": {
+                "documents": 2,
+                "nodes": 950,
+                "jsEventListeners": 9
+              }
+            },
+            "mounted-5-alive": {
+              "stage": "mounted-5-alive",
+              "Documents": 6,
+              "JSEventListeners": 33,
+              "Nodes": 4711,
+              "JSHeapUsedSize": 10420880,
+              "JSHeapTotalSize": 11534336,
+              "dom": {
+                "documents": 6,
+                "nodes": 4711,
+                "jsEventListeners": 33
+              }
+            },
+            "final-settled-5.5s": {
+              "stage": "final-settled-5.5s",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 11,
+              "JSHeapUsedSize": 3111480,
+              "JSHeapTotalSize": 4194304,
+              "dom": {
+                "documents": 1,
+                "nodes": 11,
+                "jsEventListeners": 3
+              }
+            }
+          },
+          "coreMinusBlankHeapBytes": 137936,
+          "finalMinusCoreHeapBytes": 2419568
+        }
+      ],
+      "externalArtifacts": [
+        {
+          "framework": "jieshu",
+          "heap": "test-results/instanceof-before-100/jieshu-final.heapsnapshot",
+          "bundle": "test-results/footprint-simple-final-load/jieshu.js"
+        },
+        {
+          "framework": "wujie",
+          "heap": "test-results/instanceof-before-100/wujie-final.heapsnapshot",
+          "bundle": "test-results/footprint-simple-final-load/wujie.js"
+        }
+      ],
+      "instanceofAudit": {
+        "source": "before-100/instanceof-audit.json",
+        "identification": "unique-structural-match",
+        "allocationState": "eager-WeakMap-allocated",
+        "registryBindings": [
+          {
+            "owner": {
+              "index": 51624,
+              "id": 103249,
+              "type": "object",
+              "name": "system / Context / scope @51943",
+              "selfBytes": 1664
+            },
+            "binding": "Oa",
+            "value": {
+              "index": 51745,
+              "id": 103491,
+              "type": "object",
+              "name": "WeakMap",
+              "selfBytes": 16
+            }
+          }
+        ],
+        "backingTables": [
+          {
+            "weakMap": {
+              "index": 51745,
+              "id": 103491,
+              "type": "object",
+              "name": "WeakMap",
+              "selfBytes": 16
+            },
+            "table": {
+              "index": 53306,
+              "id": 106613,
+              "type": "array",
+              "name": "",
+              "selfBytes": 32788
+            },
+            "holePairRecords": 2145,
+            "nonHolePairRecords": 0,
+            "weakEdges": 0,
+            "otherPayloadEdges": 0,
+            "emptyUnderRecognizedSchema": true
+          }
+        ],
+        "privateSymbols": []
+      }
+    },
+    {
+      "label": "candidate-30",
+      "phase": "candidate",
+      "cycles": 30,
+      "memoryRounds": 1,
+      "actualMountsFormula": "1 initial + N same-assets + N unique-assets + 5 alive = 2N + 6 per framework",
+      "observationCount": 2,
+      "passedCount": 2,
+      "failedCount": 0,
+      "records": [
+        {
+          "framework": "jieshu",
+          "round": 0,
+          "passed": true,
+          "pageErrors": [],
+          "diagnostics": [],
+          "actualMounts": 66,
+          "actualDestroys": 66,
+          "gcCheckpoints": {
+            "expected": 24,
+            "observed": 24,
+            "points": [
+              {
+                "stage": "blank"
+              },
+              {
+                "stage": "core"
+              },
+              {
+                "stage": "mounted-1"
+              },
+              {
+                "stage": "destroyed-first"
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "cache-cleared"
+              },
+              {
+                "stage": "cache-cleared-settled-5.5s"
+              },
+              {
+                "stage": "mounted-5-alive"
+              },
+              {
+                "stage": "deactivated-5-alive"
+              },
+              {
+                "stage": "final-cleanup"
+              },
+              {
+                "stage": "final-settled-5.5s"
+              }
+            ]
+          },
+          "selected": {
+            "blank": {
+              "stage": "blank",
+              "Documents": 1,
+              "JSEventListeners": 0,
+              "Nodes": 9,
+              "JSHeapUsedSize": 553976,
+              "JSHeapTotalSize": 1048576,
+              "dom": {
+                "documents": 1,
+                "nodes": 9,
+                "jsEventListeners": 0
+              }
+            },
+            "core": {
+              "stage": "core",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 10,
+              "JSHeapUsedSize": 748136,
+              "JSHeapTotalSize": 1310720,
+              "dom": {
+                "documents": 1,
+                "nodes": 10,
+                "jsEventListeners": 3
+              }
+            },
+            "mounted-1": {
+              "stage": "mounted-1",
+              "Documents": 2,
+              "JSEventListeners": 9,
+              "Nodes": 953,
+              "JSHeapUsedSize": 3945836,
+              "JSHeapTotalSize": 4718592,
+              "dom": {
+                "documents": 2,
+                "nodes": 953,
+                "jsEventListeners": 9
+              }
+            },
+            "mounted-5-alive": {
+              "stage": "mounted-5-alive",
+              "Documents": 6,
+              "JSEventListeners": 33,
+              "Nodes": 4726,
+              "JSHeapUsedSize": 8841000,
+              "JSHeapTotalSize": 9175040,
+              "dom": {
+                "documents": 6,
+                "nodes": 4726,
+                "jsEventListeners": 33
+              }
+            },
+            "final-settled-5.5s": {
+              "stage": "final-settled-5.5s",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 11,
+              "JSHeapUsedSize": 3368604,
+              "JSHeapTotalSize": 3670016,
+              "dom": {
+                "documents": 1,
+                "nodes": 11,
+                "jsEventListeners": 3
+              }
+            }
+          },
+          "coreMinusBlankHeapBytes": 194160,
+          "finalMinusCoreHeapBytes": 2620468
+        },
+        {
+          "framework": "wujie",
+          "round": 0,
+          "passed": true,
+          "pageErrors": [],
+          "diagnostics": [],
+          "actualMounts": 66,
+          "actualDestroys": 66,
+          "gcCheckpoints": {
+            "expected": 24,
+            "observed": 24,
+            "points": [
+              {
+                "stage": "blank"
+              },
+              {
+                "stage": "core"
+              },
+              {
+                "stage": "mounted-1"
+              },
+              {
+                "stage": "destroyed-first"
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "cache-cleared"
+              },
+              {
+                "stage": "cache-cleared-settled-5.5s"
+              },
+              {
+                "stage": "mounted-5-alive"
+              },
+              {
+                "stage": "deactivated-5-alive"
+              },
+              {
+                "stage": "final-cleanup"
+              },
+              {
+                "stage": "final-settled-5.5s"
+              }
+            ]
+          },
+          "selected": {
+            "blank": {
+              "stage": "blank",
+              "Documents": 1,
+              "JSEventListeners": 0,
+              "Nodes": 9,
+              "JSHeapUsedSize": 553976,
+              "JSHeapTotalSize": 1048576,
+              "dom": {
+                "documents": 1,
+                "nodes": 9,
+                "jsEventListeners": 0
+              }
+            },
+            "core": {
+              "stage": "core",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 10,
+              "JSHeapUsedSize": 691912,
+              "JSHeapTotalSize": 1310720,
+              "dom": {
+                "documents": 1,
+                "nodes": 10,
+                "jsEventListeners": 3
+              }
+            },
+            "mounted-1": {
+              "stage": "mounted-1",
+              "Documents": 2,
+              "JSEventListeners": 9,
+              "Nodes": 950,
+              "JSHeapUsedSize": 4204412,
+              "JSHeapTotalSize": 4980736,
+              "dom": {
+                "documents": 2,
+                "nodes": 950,
+                "jsEventListeners": 9
+              }
+            },
+            "mounted-5-alive": {
+              "stage": "mounted-5-alive",
+              "Documents": 6,
+              "JSEventListeners": 33,
+              "Nodes": 4711,
+              "JSHeapUsedSize": 10374736,
+              "JSHeapTotalSize": 11010048,
+              "dom": {
+                "documents": 6,
+                "nodes": 4711,
+                "jsEventListeners": 33
+              }
+            },
+            "final-settled-5.5s": {
+              "stage": "final-settled-5.5s",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 11,
+              "JSHeapUsedSize": 3065692,
+              "JSHeapTotalSize": 4194304,
+              "dom": {
+                "documents": 1,
+                "nodes": 11,
+                "jsEventListeners": 3
+              }
+            }
+          },
+          "coreMinusBlankHeapBytes": 137936,
+          "finalMinusCoreHeapBytes": 2373780
+        }
+      ],
+      "externalArtifacts": [
+        {
+          "framework": "jieshu",
+          "heap": "test-results/instanceof-candidate-30/jieshu-final.heapsnapshot",
+          "bundle": "test-results/instanceof-candidate-load/jieshu.js"
+        },
+        {
+          "framework": "wujie",
+          "heap": "test-results/instanceof-candidate-30/wujie-final.heapsnapshot",
+          "bundle": "test-results/instanceof-candidate-load/wujie.js"
+        }
+      ],
+      "instanceofAudit": {
+        "source": "candidate-30/instanceof-audit.json",
+        "identification": "unique-fallback-undefined-binding",
+        "allocationState": "fallback-is-undefined",
+        "registryBindings": [
+          {
+            "owner": {
+              "index": 24020,
+              "id": 48043,
+              "type": "object",
+              "name": "system / Context / scope @48041",
+              "selfBytes": 1672
+            },
+            "binding": "ka",
+            "value": {
+              "index": 30,
+              "id": 61,
+              "type": "native",
+              "name": "undefined",
+              "selfBytes": 0
+            }
+          }
+        ],
+        "backingTables": [],
+        "privateSymbols": [
+          {
+            "binding": "Oa",
+            "value": {
+              "index": 24148,
+              "id": 48299,
+              "type": "symbol",
+              "name": "symbol",
+              "selfBytes": 16
+            },
+            "description": "jieshu.instanceof-state"
+          }
+        ]
+      }
+    },
+    {
+      "label": "candidate-100",
+      "phase": "candidate",
+      "cycles": 100,
+      "memoryRounds": 1,
+      "actualMountsFormula": "1 initial + N same-assets + N unique-assets + 5 alive = 2N + 6 per framework",
+      "observationCount": 2,
+      "passedCount": 2,
+      "failedCount": 0,
+      "records": [
+        {
+          "framework": "jieshu",
+          "round": 0,
+          "passed": true,
+          "pageErrors": [],
+          "diagnostics": [],
+          "actualMounts": 206,
+          "actualDestroys": 206,
+          "gcCheckpoints": {
+            "expected": 52,
+            "observed": 52,
+            "points": [
+              {
+                "stage": "blank"
+              },
+              {
+                "stage": "core"
+              },
+              {
+                "stage": "mounted-1"
+              },
+              {
+                "stage": "destroyed-first"
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 35
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 40
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 45
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 50
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 55
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 60
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 65
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 70
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 75
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 80
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 85
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 90
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 95
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 100
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 35
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 40
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 45
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 50
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 55
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 60
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 65
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 70
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 75
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 80
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 85
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 90
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 95
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 100
+              },
+              {
+                "stage": "cache-cleared"
+              },
+              {
+                "stage": "cache-cleared-settled-5.5s"
+              },
+              {
+                "stage": "mounted-5-alive"
+              },
+              {
+                "stage": "deactivated-5-alive"
+              },
+              {
+                "stage": "final-cleanup"
+              },
+              {
+                "stage": "final-settled-5.5s"
+              }
+            ]
+          },
+          "selected": {
+            "blank": {
+              "stage": "blank",
+              "Documents": 1,
+              "JSEventListeners": 0,
+              "Nodes": 9,
+              "JSHeapUsedSize": 553976,
+              "JSHeapTotalSize": 1048576,
+              "dom": {
+                "documents": 1,
+                "nodes": 9,
+                "jsEventListeners": 0
+              }
+            },
+            "core": {
+              "stage": "core",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 10,
+              "JSHeapUsedSize": 748136,
+              "JSHeapTotalSize": 1310720,
+              "dom": {
+                "documents": 1,
+                "nodes": 10,
+                "jsEventListeners": 3
+              }
+            },
+            "mounted-1": {
+              "stage": "mounted-1",
+              "Documents": 2,
+              "JSEventListeners": 9,
+              "Nodes": 953,
+              "JSHeapUsedSize": 3945836,
+              "JSHeapTotalSize": 4718592,
+              "dom": {
+                "documents": 2,
+                "nodes": 953,
+                "jsEventListeners": 9
+              }
+            },
+            "mounted-5-alive": {
+              "stage": "mounted-5-alive",
+              "Documents": 6,
+              "JSEventListeners": 33,
+              "Nodes": 4726,
+              "JSHeapUsedSize": 8933964,
+              "JSHeapTotalSize": 9699328,
+              "dom": {
+                "documents": 6,
+                "nodes": 4726,
+                "jsEventListeners": 33
+              }
+            },
+            "final-settled-5.5s": {
+              "stage": "final-settled-5.5s",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 11,
+              "JSHeapUsedSize": 3460840,
+              "JSHeapTotalSize": 3932160,
+              "dom": {
+                "documents": 1,
+                "nodes": 11,
+                "jsEventListeners": 3
+              }
+            }
+          },
+          "coreMinusBlankHeapBytes": 194160,
+          "finalMinusCoreHeapBytes": 2712704
+        },
+        {
+          "framework": "wujie",
+          "round": 0,
+          "passed": true,
+          "pageErrors": [],
+          "diagnostics": [],
+          "actualMounts": 206,
+          "actualDestroys": 206,
+          "gcCheckpoints": {
+            "expected": 52,
+            "observed": 52,
+            "points": [
+              {
+                "stage": "blank"
+              },
+              {
+                "stage": "core"
+              },
+              {
+                "stage": "mounted-1"
+              },
+              {
+                "stage": "destroyed-first"
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 35
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 40
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 45
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 50
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 55
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 60
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 65
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 70
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 75
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 80
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 85
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 90
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 95
+              },
+              {
+                "stage": "same-assets",
+                "cycle": 100
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 1
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 5
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 10
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 15
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 20
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 25
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 30
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 35
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 40
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 45
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 50
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 55
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 60
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 65
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 70
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 75
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 80
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 85
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 90
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 95
+              },
+              {
+                "stage": "unique-assets",
+                "cycle": 100
+              },
+              {
+                "stage": "cache-cleared"
+              },
+              {
+                "stage": "cache-cleared-settled-5.5s"
+              },
+              {
+                "stage": "mounted-5-alive"
+              },
+              {
+                "stage": "deactivated-5-alive"
+              },
+              {
+                "stage": "final-cleanup"
+              },
+              {
+                "stage": "final-settled-5.5s"
+              }
+            ]
+          },
+          "selected": {
+            "blank": {
+              "stage": "blank",
+              "Documents": 1,
+              "JSEventListeners": 0,
+              "Nodes": 9,
+              "JSHeapUsedSize": 553976,
+              "JSHeapTotalSize": 1048576,
+              "dom": {
+                "documents": 1,
+                "nodes": 9,
+                "jsEventListeners": 0
+              }
+            },
+            "core": {
+              "stage": "core",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 10,
+              "JSHeapUsedSize": 691912,
+              "JSHeapTotalSize": 1310720,
+              "dom": {
+                "documents": 1,
+                "nodes": 10,
+                "jsEventListeners": 3
+              }
+            },
+            "mounted-1": {
+              "stage": "mounted-1",
+              "Documents": 2,
+              "JSEventListeners": 9,
+              "Nodes": 950,
+              "JSHeapUsedSize": 4204424,
+              "JSHeapTotalSize": 5242880,
+              "dom": {
+                "documents": 2,
+                "nodes": 950,
+                "jsEventListeners": 9
+              }
+            },
+            "mounted-5-alive": {
+              "stage": "mounted-5-alive",
+              "Documents": 6,
+              "JSEventListeners": 33,
+              "Nodes": 4711,
+              "JSHeapUsedSize": 10416832,
+              "JSHeapTotalSize": 11272192,
+              "dom": {
+                "documents": 6,
+                "nodes": 4711,
+                "jsEventListeners": 33
+              }
+            },
+            "final-settled-5.5s": {
+              "stage": "final-settled-5.5s",
+              "Documents": 1,
+              "JSEventListeners": 3,
+              "Nodes": 11,
+              "JSHeapUsedSize": 3112712,
+              "JSHeapTotalSize": 4194304,
+              "dom": {
+                "documents": 1,
+                "nodes": 11,
+                "jsEventListeners": 3
+              }
+            }
+          },
+          "coreMinusBlankHeapBytes": 137936,
+          "finalMinusCoreHeapBytes": 2420800
+        }
+      ],
+      "externalArtifacts": [
+        {
+          "framework": "jieshu",
+          "heap": "test-results/instanceof-candidate-100/jieshu-final.heapsnapshot",
+          "bundle": "test-results/instanceof-candidate-load/jieshu.js"
+        },
+        {
+          "framework": "wujie",
+          "heap": "test-results/instanceof-candidate-100/wujie-final.heapsnapshot",
+          "bundle": "test-results/instanceof-candidate-load/wujie.js"
+        }
+      ],
+      "instanceofAudit": {
+        "source": "candidate-100/instanceof-audit.json",
+        "identification": "unique-fallback-undefined-binding",
+        "allocationState": "fallback-is-undefined",
+        "registryBindings": [
+          {
+            "owner": {
+              "index": 45975,
+              "id": 91951,
+              "type": "object",
+              "name": "system / Context / scope @53077",
+              "selfBytes": 1672
+            },
+            "binding": "ka",
+            "value": {
+              "index": 30,
+              "id": 61,
+              "type": "native",
+              "name": "undefined",
+              "selfBytes": 0
+            }
+          }
+        ],
+        "backingTables": [],
+        "privateSymbols": [
+          {
+            "binding": "Oa",
+            "value": {
+              "index": 46096,
+              "id": 92193,
+              "type": "symbol",
+              "name": "symbol",
+              "selfBytes": 16
+            },
+            "description": "jieshu.instanceof-state"
+          }
+        ]
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "cycles": 30,
+      "framework": "jieshu",
+      "before": {
+        "run": "before-30",
+        "round": 0
+      },
+      "candidate": {
+        "run": "candidate-30",
+        "round": 0
+      },
+      "bothPassed": true,
+      "deltaDirection": "candidate minus before",
+      "stageDeltas": {
+        "blank": {
+          "JSHeapUsedSize": 0,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "core": {
+          "JSHeapUsedSize": 56,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0.007485830392471394,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "mounted-1": {
+          "JSHeapUsedSize": 564,
+          "JSHeapTotalSize": 262144,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0.014295592293763268,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "mounted-5-alive": {
+          "JSHeapUsedSize": 1184,
+          "JSHeapTotalSize": -524288,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0.013393943946344584,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "final-settled-5.5s": {
+          "JSHeapUsedSize": -26332,
+          "JSHeapTotalSize": -524288,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": -0.7756258144483431,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        }
+      },
+      "coreMinusBlankHeapBytesDelta": 56,
+      "finalMinusCoreHeapBytesDelta": -26388
+    },
+    {
+      "cycles": 30,
+      "framework": "wujie",
+      "before": {
+        "run": "before-30",
+        "round": 0
+      },
+      "candidate": {
+        "run": "candidate-30",
+        "round": 0
+      },
+      "bothPassed": true,
+      "deltaDirection": "candidate minus before",
+      "stageDeltas": {
+        "blank": {
+          "JSHeapUsedSize": 0,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "core": {
+          "JSHeapUsedSize": 0,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "mounted-1": {
+          "JSHeapUsedSize": -108,
+          "JSHeapTotalSize": 262144,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": -0.0025686641994805593,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "mounted-5-alive": {
+          "JSHeapUsedSize": 296,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0.002853166050408504,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "final-settled-5.5s": {
+          "JSHeapUsedSize": 152,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0.004958343391376397,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        }
+      },
+      "coreMinusBlankHeapBytesDelta": 0,
+      "finalMinusCoreHeapBytesDelta": 152
+    },
+    {
+      "cycles": 100,
+      "framework": "jieshu",
+      "before": {
+        "run": "before-100",
+        "round": 0
+      },
+      "candidate": {
+        "run": "candidate-100",
+        "round": 0
+      },
+      "bothPassed": true,
+      "deltaDirection": "candidate minus before",
+      "stageDeltas": {
+        "blank": {
+          "JSHeapUsedSize": 0,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "core": {
+          "JSHeapUsedSize": 56,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0.007485830392471394,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "mounted-1": {
+          "JSHeapUsedSize": 564,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0.014295592293763268,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "mounted-5-alive": {
+          "JSHeapUsedSize": -5208,
+          "JSHeapTotalSize": 524288,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": -0.05826042948944265,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "final-settled-5.5s": {
+          "JSHeapUsedSize": -25416,
+          "JSHeapTotalSize": 262144,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": -0.729034241891588,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        }
+      },
+      "coreMinusBlankHeapBytesDelta": 56,
+      "finalMinusCoreHeapBytesDelta": -25472
+    },
+    {
+      "cycles": 100,
+      "framework": "wujie",
+      "before": {
+        "run": "before-100",
+        "round": 0
+      },
+      "candidate": {
+        "run": "candidate-100",
+        "round": 0
+      },
+      "bothPassed": true,
+      "deltaDirection": "candidate minus before",
+      "stageDeltas": {
+        "blank": {
+          "JSHeapUsedSize": 0,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "core": {
+          "JSHeapUsedSize": 0,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "mounted-1": {
+          "JSHeapUsedSize": -108,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": -0.0025686568683506274,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "mounted-5-alive": {
+          "JSHeapUsedSize": -4048,
+          "JSHeapTotalSize": -262144,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": -0.0388450879388305,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        },
+        "final-settled-5.5s": {
+          "JSHeapUsedSize": 1232,
+          "JSHeapTotalSize": 0,
+          "Documents": 0,
+          "Nodes": 0,
+          "JSEventListeners": 0,
+          "JSHeapUsedSizeChangePercent": 0.03959530512810624,
+          "dom": {
+            "documents": 0,
+            "nodes": 0,
+            "jsEventListeners": 0
+          }
+        }
+      },
+      "coreMinusBlankHeapBytesDelta": 0,
+      "finalMinusCoreHeapBytesDelta": 1232
+    }
+  ],
+  "externalArtifacts": [
+    {
+      "source": "test-results/instanceof-before-30/jieshu-final.heapsnapshot",
+      "role": "full-final-heap-snapshot",
+      "framework": "jieshu",
+      "storedInDurableDirectory": false,
+      "sha256": "e85618e74e212796d45fd2a6e2d2eb672f45b141c35ea8152a181c4f6983abcb",
+      "bytes": 8771631
+    },
+    {
+      "source": "test-results/footprint-simple-final-load/jieshu.js",
+      "role": "measured-production-core-bundle",
+      "framework": "jieshu",
+      "storedInDurableDirectory": false,
+      "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433",
+      "bytes": 108183
+    },
+    {
+      "source": "test-results/instanceof-before-30/wujie-final.heapsnapshot",
+      "role": "full-final-heap-snapshot",
+      "framework": "wujie",
+      "storedInDurableDirectory": false,
+      "sha256": "f1d1414e6098072e28daeeb647eb249432b6bec75b47868feb52de41af88ba2d",
+      "bytes": 7985238
+    },
+    {
+      "source": "test-results/footprint-simple-final-load/wujie.js",
+      "role": "measured-production-core-bundle",
+      "framework": "wujie",
+      "storedInDurableDirectory": false,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+      "bytes": 65660
+    },
+    {
+      "source": "test-results/instanceof-before-100/jieshu-final.heapsnapshot",
+      "role": "full-final-heap-snapshot",
+      "framework": "jieshu",
+      "storedInDurableDirectory": false,
+      "sha256": "bf0ab373dc0415a15ce4a14ff9dce8208f8d58dcfe25f0cdc1800327c0278888",
+      "bytes": 8825451
+    },
+    {
+      "source": "test-results/instanceof-before-100/wujie-final.heapsnapshot",
+      "role": "full-final-heap-snapshot",
+      "framework": "wujie",
+      "storedInDurableDirectory": false,
+      "sha256": "5df426d33463fb409a73bd58a862ecad42d9c8bb280b93aaa1099ef8c719e1c6",
+      "bytes": 8014328
+    },
+    {
+      "source": "test-results/instanceof-candidate-30/jieshu-final.heapsnapshot",
+      "role": "full-final-heap-snapshot",
+      "framework": "jieshu",
+      "storedInDurableDirectory": false,
+      "sha256": "519a72787e7c1285a741339631be58f44a08ef69632d07538cb2a495c6a36e2e",
+      "bytes": 8499504
+    },
+    {
+      "source": "test-results/instanceof-candidate-load/jieshu.js",
+      "role": "measured-production-core-bundle",
+      "framework": "jieshu",
+      "storedInDurableDirectory": false,
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+      "bytes": 108581
+    },
+    {
+      "source": "test-results/instanceof-candidate-30/wujie-final.heapsnapshot",
+      "role": "full-final-heap-snapshot",
+      "framework": "wujie",
+      "storedInDurableDirectory": false,
+      "sha256": "a0dc6252610c0268bf560e885de828f8511d2f16accde929556388a9b5e9b912",
+      "bytes": 7981090
+    },
+    {
+      "source": "test-results/instanceof-candidate-load/wujie.js",
+      "role": "measured-production-core-bundle",
+      "framework": "wujie",
+      "storedInDurableDirectory": false,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+      "bytes": 65660
+    },
+    {
+      "source": "test-results/instanceof-candidate-100/jieshu-final.heapsnapshot",
+      "role": "full-final-heap-snapshot",
+      "framework": "jieshu",
+      "storedInDurableDirectory": false,
+      "sha256": "249e3f5fd4e34abccf65fb50d7af39e68d76a9ba47cfe90e816a5b43b0acc680",
+      "bytes": 8550654
+    },
+    {
+      "source": "test-results/instanceof-candidate-100/wujie-final.heapsnapshot",
+      "role": "full-final-heap-snapshot",
+      "framework": "wujie",
+      "storedInDurableDirectory": false,
+      "sha256": "20e6ba350d3e0c99f18756ece57a4e1ad0bd82e84fcc0d94ec47608a8851d66c",
+      "bytes": 8016246
+    }
+  ]
+}

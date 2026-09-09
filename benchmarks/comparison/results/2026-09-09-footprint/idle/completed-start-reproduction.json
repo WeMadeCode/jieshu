@@ -1,0 +1,6 @@
+{
+  "source": "bc688b2 operation-intent.ts and original settleWhenCancelled function extracted from index.ts AST",
+  "method": "100 resolved start results modeled as destroy closures capturing object markers; release all caller references and GC, then delete global intent slots and GC. Confirms cancellation race can retain fulfilled work result, not a measurement of actual sandbox retained bytes.",
+  "retainedBefore": 0,
+  "retainedAfter": 0
+}

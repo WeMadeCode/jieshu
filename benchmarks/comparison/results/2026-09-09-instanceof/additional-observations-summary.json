@@ -1,0 +1,1185 @@
+{
+  "generatedAt": "2026-09-09T14:11:20.125Z",
+  "kind": "derived-additional-observations-summary",
+  "derivedFrom": [
+    {
+      "path": "load-ab/environment.json",
+      "source": "test-results/instanceof-load-ab/environment.json",
+      "sha256": "a868e84061f4760fa8bb1f0d563d20339110f1c1d504105d11e2561753483a63",
+      "bytes": 4538
+    },
+    {
+      "path": "load-ab/jieshu-before.environment.json",
+      "source": "test-results/instanceof-load-ab/jieshu-before.environment.json",
+      "sha256": "b4a31dd8cbe41c1d45dcd359d32814bb49c03a6cba5ffd044e1a00b817e02c94",
+      "bytes": 2590
+    },
+    {
+      "path": "load-ab/observations.jsonl",
+      "source": "test-results/instanceof-load-ab/observations.jsonl",
+      "sha256": "35b1faa5dbc7f1f3afbfb8d9160f6eccb2dc219a5a668d56de0d87234d395923",
+      "bytes": 840436
+    },
+    {
+      "path": "load-ab/summary.json",
+      "source": "test-results/instanceof-load-ab/summary.json",
+      "sha256": "84fb06f6dd86a5b68c2ede1a1d8f3d379c75a1d5a215c6f0b8eea27f1cba50f1",
+      "bytes": 9363
+    },
+    {
+      "path": "load-ab/trace-summary.json",
+      "source": "test-results/instanceof-load-ab/trace-summary.json",
+      "sha256": "41a150628b162923c3bf2405509ebb3848d5b4e59a64125745fa111fef80e804",
+      "bytes": 691217
+    },
+    {
+      "path": "startup-focused/environment.json",
+      "source": "test-results/instanceof-startup-focused/environment.json",
+      "sha256": "42112a7a99bd9ae70366433e63d0a5c38a2eae09dbee8460fc91b00cc9fc0e09",
+      "bytes": 2485
+    },
+    {
+      "path": "startup-focused/observations.jsonl",
+      "source": "test-results/instanceof-startup-focused/observations.jsonl",
+      "sha256": "40bc263923dbb7a5cfe790e290bd6edbb1c7d42044e8a680981ea11c165bacb1",
+      "bytes": 53936
+    },
+    {
+      "path": "startup-focused/summary.json",
+      "source": "test-results/instanceof-startup-focused/summary.json",
+      "sha256": "2e8325f20fc2f9ed3d7394cb3afeaa8788065f2cd8bbd53f2d5cf8f69638255e",
+      "bytes": 13554
+    },
+    {
+      "path": "startup-focused/SUMMARY.md",
+      "source": "test-results/instanceof-startup-focused/SUMMARY.md",
+      "sha256": "fc668e5787cf3558c2af6e515f902f75184bd32afee5ba6800731d69126448ee",
+      "bytes": 4980
+    },
+    {
+      "path": "stability/environment.json",
+      "source": "test-results/instanceof-stability/environment.json",
+      "sha256": "b22873c348e4d7d237506a9ddb4a730ad5ba7fe0be4e4e2f1f56d7b07795a46c",
+      "bytes": 2485
+    },
+    {
+      "path": "stability/observations.jsonl",
+      "source": "test-results/instanceof-stability/observations.jsonl",
+      "sha256": "580facf8d2f566ad6d5f68d63986077c158217b67a36aa4ca573fb2b19018a54",
+      "bytes": 69289
+    },
+    {
+      "path": "stability/summary.json",
+      "source": "test-results/instanceof-stability/summary.json",
+      "sha256": "dd5f34f3f1dd505d7f311ed8a7bbb118a67f15ed70a65ffd120036500bbe9845",
+      "bytes": 33897
+    },
+    {
+      "path": "stability/SUMMARY.md",
+      "source": "test-results/instanceof-stability/SUMMARY.md",
+      "sha256": "264dedd28413f1154b46cc2be8526128fb860fe655bbf038bcff0bda6d885666",
+      "bytes": 5917
+    }
+  ],
+  "loadAb": {
+    "untraced": {
+      "observations": 180,
+      "passed": 180,
+      "groups": [
+        {
+          "framework": "wujie",
+          "encoding": "legacy",
+          "observations": 30,
+          "passed": 30,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "jieshu",
+          "encoding": "legacy",
+          "observations": 30,
+          "passed": 30,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "jieshu-before",
+          "encoding": "legacy",
+          "observations": 30,
+          "passed": 30,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "wujie",
+          "encoding": "utf8",
+          "observations": 30,
+          "passed": 30,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "jieshu",
+          "encoding": "utf8",
+          "observations": 30,
+          "passed": 30,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "jieshu-before",
+          "encoding": "utf8",
+          "observations": 30,
+          "passed": 30,
+          "failed": 0,
+          "pageErrors": []
+        }
+      ]
+    },
+    "traced": {
+      "observations": 18,
+      "passed": 18,
+      "groups": [
+        {
+          "framework": "wujie",
+          "encoding": "legacy",
+          "observations": 3,
+          "passed": 3,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "jieshu",
+          "encoding": "legacy",
+          "observations": 3,
+          "passed": 3,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "jieshu-before",
+          "encoding": "legacy",
+          "observations": 3,
+          "passed": 3,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "wujie",
+          "encoding": "utf8",
+          "observations": 3,
+          "passed": 3,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "jieshu",
+          "encoding": "utf8",
+          "observations": 3,
+          "passed": 3,
+          "failed": 0,
+          "pageErrors": []
+        },
+        {
+          "framework": "jieshu-before",
+          "encoding": "utf8",
+          "observations": 3,
+          "passed": 3,
+          "failed": 0,
+          "pageErrors": []
+        }
+      ]
+    },
+    "beforeCandidateDifferences": [
+      {
+        "encoding": "legacy",
+        "method": "candidate group median minus before group median; no statistical significance inference",
+        "medianDeltas": {
+          "totalLoadMs": 0.2999999998137355,
+          "requestAndResponseMs": 0.19999999995343387,
+          "responseEndToOnloadMs": 1.1641532182693481e-10,
+          "scriptDurationMs": 0.010000000000000009,
+          "v8CompileDurationMs": 0,
+          "heapDeltaBytes": 56
+        }
+      },
+      {
+        "encoding": "utf8",
+        "method": "candidate group median minus before group median; no statistical significance inference",
+        "medianDeltas": {
+          "totalLoadMs": 0.09999999997671694,
+          "requestAndResponseMs": 0.10000000009313226,
+          "responseEndToOnloadMs": -0.09999999986030161,
+          "scriptDurationMs": -0.0044999999999999485,
+          "v8CompileDurationMs": 0.0005000000000000004,
+          "heapDeltaBytes": 56
+        }
+      }
+    ]
+  },
+  "startupFocused": {
+    "observations": 240,
+    "passed": 240,
+    "groups": [
+      {
+        "framework": "jieshu",
+        "scenario": "cold",
+        "observations": 30,
+        "passed": 30,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "cold",
+        "observations": 30,
+        "passed": 30,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "cold-fiber",
+        "observations": 30,
+        "passed": 30,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "cold-fiber",
+        "observations": 30,
+        "passed": 30,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "concurrent-5",
+        "observations": 30,
+        "passed": 30,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "concurrent-5",
+        "observations": 30,
+        "passed": 30,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "cpu4x",
+        "observations": 30,
+        "passed": 30,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "cpu4x",
+        "observations": 30,
+        "passed": 30,
+        "failed": 0,
+        "pageErrors": []
+      }
+    ]
+  },
+  "stability": {
+    "classification": "robustness observations in the controlled fixture; not a general public API contract assertion",
+    "observations": 96,
+    "frameworks": [
+      {
+        "framework": "wujie",
+        "observations": 48,
+        "passed": 42,
+        "failed": 6,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "observations": 48,
+        "passed": 48,
+        "failed": 0,
+        "pageErrors": []
+      }
+    ],
+    "groups": [
+      {
+        "framework": "wujie",
+        "scenario": "mount-interaction-lifecycle",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "mount-interaction-lifecycle",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "props-and-event-bus",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "props-and-event-bus",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "javascript-global-isolation",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "javascript-global-isolation",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "stylesheet-isolation",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "stylesheet-isolation",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "two-apps-independent-state",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "two-apps-independent-state",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "destroy-and-recreate",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "destroy-and-recreate",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "keep-alive-switch",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "keep-alive-switch",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "route-sync-disabled",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "route-sync-disabled",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "route-sync-enabled",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "route-sync-enabled",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "async-unmount-completion",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "async-unmount-completion",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "start-destroy-race",
+        "observations": 3,
+        "passed": 0,
+        "failed": 3,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "start-destroy-race",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "same-name-concurrent-containers",
+        "observations": 3,
+        "passed": 0,
+        "failed": 3,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "same-name-concurrent-containers",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "preload-execute-then-activate",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "preload-execute-then-activate",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "dynamic-script-and-stylesheet",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "dynamic-script-and-stylesheet",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "missing-script-error-and-recovery",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "missing-script-error-and-recovery",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "fiber-enabled-interaction",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      },
+      {
+        "framework": "jieshu",
+        "scenario": "fiber-enabled-interaction",
+        "observations": 3,
+        "passed": 3,
+        "failed": 0,
+        "pageErrors": []
+      }
+    ],
+    "failures": [
+      {
+        "framework": "wujie",
+        "scenario": "start-destroy-race",
+        "round": 0,
+        "details": {
+          "contract": "robustness-observation",
+          "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+          "observations": {
+            "failureObservations": {
+              "destruction": [
+                {
+                  "status": "fulfilled",
+                  "reason": ""
+                }
+              ],
+              "starting": [
+                {
+                  "status": "rejected",
+                  "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                  "errorName": "TypeError"
+                }
+              ],
+              "readyCount": 0,
+              "loadingCount": 1,
+              "observationWindowMs": 250
+            },
+            "browserState": {
+              "hostUrl": "http://127.0.0.1:56431/",
+              "events": [
+                {
+                  "name": "cancelled-start",
+                  "type": "beforeLoad"
+                }
+              ],
+              "states": [
+                {
+                  "name": "cancelled-start"
+                }
+              ],
+              "iframes": 0,
+              "containers": [
+                {
+                  "id": "stability-primary",
+                  "children": [
+                    {
+                      "tag": "DIV",
+                      "attributes": [
+                        [
+                          "data-loading-flag",
+                          ""
+                        ],
+                        [
+                          "style",
+                          "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                        ]
+                      ],
+                      "readyElements": 0
+                    }
+                  ]
+                },
+                {
+                  "id": "stability-secondary",
+                  "children": []
+                }
+              ]
+            }
+          }
+        },
+        "pageErrors": [],
+        "diagnostics": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "same-name-concurrent-containers",
+        "round": 0,
+        "details": {
+          "contract": "robustness-observation",
+          "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+          "observations": {
+            "failureObservations": {
+              "outcomes": [
+                {
+                  "status": "rejected",
+                  "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                  "errorName": "TypeError"
+                },
+                {
+                  "status": "fulfilled",
+                  "reason": ""
+                }
+              ],
+              "firstReady": 0,
+              "secondReady": 1,
+              "loadingCount": 1
+            },
+            "browserState": {
+              "hostUrl": "http://127.0.0.1:56431/",
+              "events": [
+                {
+                  "name": "same-name",
+                  "type": "beforeLoad"
+                },
+                {
+                  "name": "same-name",
+                  "type": "beforeLoad"
+                },
+                {
+                  "name": "same-name",
+                  "type": "beforeMount"
+                },
+                {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": false,
+                  "name": "same-name",
+                  "type": "mount"
+                },
+                {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                },
+                {
+                  "name": "same-name",
+                  "type": "afterMount"
+                }
+              ],
+              "states": [
+                {
+                  "name": "same-name",
+                  "state": {
+                    "mounts": 1,
+                    "unmounts": 0,
+                    "count": 0,
+                    "route": "/child/?variant=normal",
+                    "pongCount": 0,
+                    "dynamicLoaded": false,
+                    "dynamicStyleLoaded": false,
+                    "ready": true,
+                    "name": "same-name",
+                    "type": "ready"
+                  }
+                }
+              ],
+              "iframes": 1,
+              "containers": [
+                {
+                  "id": "stability-primary",
+                  "children": [
+                    {
+                      "tag": "DIV",
+                      "attributes": [
+                        [
+                          "data-loading-flag",
+                          ""
+                        ],
+                        [
+                          "style",
+                          "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                        ]
+                      ],
+                      "readyElements": 0
+                    }
+                  ]
+                },
+                {
+                  "id": "stability-secondary",
+                  "children": [
+                    {
+                      "tag": "WUJIE-APP",
+                      "attributes": [
+                        [
+                          "data-wujie-id",
+                          "same-name"
+                        ],
+                        [
+                          "class",
+                          "wujie_iframe"
+                        ]
+                      ],
+                      "readyElements": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "pageErrors": [],
+        "diagnostics": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "start-destroy-race",
+        "round": 1,
+        "details": {
+          "contract": "robustness-observation",
+          "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+          "observations": {
+            "failureObservations": {
+              "destruction": [
+                {
+                  "status": "fulfilled",
+                  "reason": ""
+                }
+              ],
+              "starting": [
+                {
+                  "status": "rejected",
+                  "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                  "errorName": "TypeError"
+                }
+              ],
+              "readyCount": 0,
+              "loadingCount": 1,
+              "observationWindowMs": 250
+            },
+            "browserState": {
+              "hostUrl": "http://127.0.0.1:56431/",
+              "events": [
+                {
+                  "name": "cancelled-start",
+                  "type": "beforeLoad"
+                }
+              ],
+              "states": [
+                {
+                  "name": "cancelled-start"
+                }
+              ],
+              "iframes": 0,
+              "containers": [
+                {
+                  "id": "stability-primary",
+                  "children": [
+                    {
+                      "tag": "DIV",
+                      "attributes": [
+                        [
+                          "data-loading-flag",
+                          ""
+                        ],
+                        [
+                          "style",
+                          "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                        ]
+                      ],
+                      "readyElements": 0
+                    }
+                  ]
+                },
+                {
+                  "id": "stability-secondary",
+                  "children": []
+                }
+              ]
+            }
+          }
+        },
+        "pageErrors": [],
+        "diagnostics": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "same-name-concurrent-containers",
+        "round": 1,
+        "details": {
+          "contract": "robustness-observation",
+          "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+          "observations": {
+            "failureObservations": {
+              "outcomes": [
+                {
+                  "status": "rejected",
+                  "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                  "errorName": "TypeError"
+                },
+                {
+                  "status": "fulfilled",
+                  "reason": ""
+                }
+              ],
+              "firstReady": 0,
+              "secondReady": 1,
+              "loadingCount": 1
+            },
+            "browserState": {
+              "hostUrl": "http://127.0.0.1:56431/",
+              "events": [
+                {
+                  "name": "same-name",
+                  "type": "beforeLoad"
+                },
+                {
+                  "name": "same-name",
+                  "type": "beforeLoad"
+                },
+                {
+                  "name": "same-name",
+                  "type": "beforeMount"
+                },
+                {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": false,
+                  "name": "same-name",
+                  "type": "mount"
+                },
+                {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                },
+                {
+                  "name": "same-name",
+                  "type": "afterMount"
+                }
+              ],
+              "states": [
+                {
+                  "name": "same-name",
+                  "state": {
+                    "mounts": 1,
+                    "unmounts": 0,
+                    "count": 0,
+                    "route": "/child/?variant=normal",
+                    "pongCount": 0,
+                    "dynamicLoaded": false,
+                    "dynamicStyleLoaded": false,
+                    "ready": true,
+                    "name": "same-name",
+                    "type": "ready"
+                  }
+                }
+              ],
+              "iframes": 1,
+              "containers": [
+                {
+                  "id": "stability-primary",
+                  "children": [
+                    {
+                      "tag": "DIV",
+                      "attributes": [
+                        [
+                          "data-loading-flag",
+                          ""
+                        ],
+                        [
+                          "style",
+                          "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                        ]
+                      ],
+                      "readyElements": 0
+                    }
+                  ]
+                },
+                {
+                  "id": "stability-secondary",
+                  "children": [
+                    {
+                      "tag": "WUJIE-APP",
+                      "attributes": [
+                        [
+                          "data-wujie-id",
+                          "same-name"
+                        ],
+                        [
+                          "class",
+                          "wujie_iframe"
+                        ]
+                      ],
+                      "readyElements": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "pageErrors": [],
+        "diagnostics": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "start-destroy-race",
+        "round": 2,
+        "details": {
+          "contract": "robustness-observation",
+          "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+          "observations": {
+            "failureObservations": {
+              "destruction": [
+                {
+                  "status": "fulfilled",
+                  "reason": ""
+                }
+              ],
+              "starting": [
+                {
+                  "status": "rejected",
+                  "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                  "errorName": "TypeError"
+                }
+              ],
+              "readyCount": 0,
+              "loadingCount": 1,
+              "observationWindowMs": 250
+            },
+            "browserState": {
+              "hostUrl": "http://127.0.0.1:56431/",
+              "events": [
+                {
+                  "name": "cancelled-start",
+                  "type": "beforeLoad"
+                }
+              ],
+              "states": [
+                {
+                  "name": "cancelled-start"
+                }
+              ],
+              "iframes": 0,
+              "containers": [
+                {
+                  "id": "stability-primary",
+                  "children": [
+                    {
+                      "tag": "DIV",
+                      "attributes": [
+                        [
+                          "data-loading-flag",
+                          ""
+                        ],
+                        [
+                          "style",
+                          "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                        ]
+                      ],
+                      "readyElements": 0
+                    }
+                  ]
+                },
+                {
+                  "id": "stability-secondary",
+                  "children": []
+                }
+              ]
+            }
+          }
+        },
+        "pageErrors": [],
+        "diagnostics": []
+      },
+      {
+        "framework": "wujie",
+        "scenario": "same-name-concurrent-containers",
+        "round": 2,
+        "details": {
+          "contract": "robustness-observation",
+          "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+          "observations": {
+            "failureObservations": {
+              "outcomes": [
+                {
+                  "status": "rejected",
+                  "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                  "errorName": "TypeError"
+                },
+                {
+                  "status": "fulfilled",
+                  "reason": ""
+                }
+              ],
+              "firstReady": 0,
+              "secondReady": 1,
+              "loadingCount": 1
+            },
+            "browserState": {
+              "hostUrl": "http://127.0.0.1:56431/",
+              "events": [
+                {
+                  "name": "same-name",
+                  "type": "beforeLoad"
+                },
+                {
+                  "name": "same-name",
+                  "type": "beforeLoad"
+                },
+                {
+                  "name": "same-name",
+                  "type": "beforeMount"
+                },
+                {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": false,
+                  "name": "same-name",
+                  "type": "mount"
+                },
+                {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                },
+                {
+                  "name": "same-name",
+                  "type": "afterMount"
+                }
+              ],
+              "states": [
+                {
+                  "name": "same-name",
+                  "state": {
+                    "mounts": 1,
+                    "unmounts": 0,
+                    "count": 0,
+                    "route": "/child/?variant=normal",
+                    "pongCount": 0,
+                    "dynamicLoaded": false,
+                    "dynamicStyleLoaded": false,
+                    "ready": true,
+                    "name": "same-name",
+                    "type": "ready"
+                  }
+                }
+              ],
+              "iframes": 1,
+              "containers": [
+                {
+                  "id": "stability-primary",
+                  "children": [
+                    {
+                      "tag": "DIV",
+                      "attributes": [
+                        [
+                          "data-loading-flag",
+                          ""
+                        ],
+                        [
+                          "style",
+                          "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                        ]
+                      ],
+                      "readyElements": 0
+                    }
+                  ]
+                },
+                {
+                  "id": "stability-secondary",
+                  "children": [
+                    {
+                      "tag": "WUJIE-APP",
+                      "attributes": [
+                        [
+                          "data-wujie-id",
+                          "same-name"
+                        ],
+                        [
+                          "class",
+                          "wujie_iframe"
+                        ]
+                      ],
+                      "readyElements": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "pageErrors": [],
+        "diagnostics": []
+      }
+    ]
+  },
+  "limitations": [
+    "Load traces are grouped separately from untraced timing observations.",
+    "Differences of measured group medians describe this run and do not establish statistical significance.",
+    "Startup-focused covers the four recorded scenarios, not all possible applications or browser environments.",
+    "Observed concurrent-operation failures are robustness findings; acceptable rejection behavior depends on each public contract."
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "date": "2026-09-09",
+  "packageManager": "pnpm@10.28.2",
+  "pnpmPath": "/tmp/jieshu-pnpm-10.28.2/bin/pnpm",
+  "sourceFiles": [
+    {
+      "file": "packages/jieshu-core/src/iframe.ts",
+      "sha256": "836ceb3df2959219fdc36e496c0dcae724c7486f4b266efd70a09b47cfe066c6"
+    },
+    {
+      "file": "packages/jieshu-core/__test__/unit/instanceof-state.test.ts",
+      "sha256": "6091547e9f6e7dd7d09b274fec21f1979241e1b7f3a1abf1baa9b2fd0a842946"
+    },
+    {
+      "file": "packages/jieshu-core/src/index.ts",
+      "sha256": "92d25ee3f41375d22644d3dde7d8a6db42520e33859a47293f85d6be1d4a2bef"
+    },
+    {
+      "file": "packages/jieshu-core/src/operation-intent.ts",
+      "sha256": "9b2a529ff5e032934fb6e4333265ad7b4447ecfd04a574c6ab4bfa9e795cbf26"
+    },
+    {
+      "file": "packages/jieshu-core/src/constant.ts",
+      "sha256": "25c41f9f80ab7fbf80a0e65b87afef201789c8d496cd00ee60fb2b8dfc9a8209"
+    },
+    {
+      "file": "packages/jieshu-core/__test__/unit/public-operation-race.test.ts",
+      "sha256": "a0e87f0f12070501ba9916270a7915d4a9281fb146bc57e0647892c44ce1ebcd"
+    }
+  ],
+  "logs": [
+    {
+      "file": "test-results/instanceof-final-unit.log",
+      "command": "pnpm --filter @cloud/jieshu-core test:unit",
+      "result": "54 files, 529 passed; statements 79%, branches 71.82%, functions 83.99%, lines 80.92%",
+      "exitCode": 0,
+      "sha256": "23b985fa74f20f6d595feaef1114ed07be2d63603a0c81250de2727769391550"
+    },
+    {
+      "file": "test-results/instanceof-candidate-browser.log",
+      "command": "pnpm --filter @cloud/jieshu-core exec playwright test --config __test__/browser/playwright.config.mts",
+      "result": "137 passed",
+      "exitCode": 0,
+      "sha256": "6bce0d1299777d549dc01606b5fd72fcb2536eecfc563aa86fbf22cd50dff5f8"
+    },
+    {
+      "file": "test-results/instanceof-candidate-integration.log",
+      "command": "NODE_OPTIONS=--openssl-legacy-provider pnpm --filter @cloud/jieshu-core exec playwright test --config __test__/integration/playwright.config.mts",
+      "result": "77 passed, default Webpack React and Vue hosts",
+      "exitCode": 0,
+      "sha256": "191c1fa09e0030f446ea9679ba27f9d91e924aa25daa4bcba1a8674633432efa"
+    },
+    {
+      "file": "test-results/instanceof-final-typecheck.log",
+      "command": "pnpm --filter @cloud/jieshu-core typecheck",
+      "result": "passed",
+      "exitCode": 0,
+      "sha256": "6ec2b736a096580a80940cb4397bc33af615ff65b80c8c9a27a305e2667bff8d"
+    },
+    {
+      "file": "test-results/instanceof-candidate-build.log",
+      "command": "pnpm --filter @cloud/jieshu-core build",
+      "result": "ESM, UMD, types passed; later source change is comment only",
+      "exitCode": 0,
+      "sha256": "bebe9366716fc9618095f56c9abd146726da333b3c08acad34f201d045a5b583"
+    },
+    {
+      "file": "test-results/instanceof-final-lint.log",
+      "command": "node node_modules/eslint/bin/eslint.js [four changed source/test/diagnostic files]",
+      "result": "passed",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "test-results/instanceof-final-format.log",
+      "command": "node node_modules/prettier/bin/prettier.cjs --check [six changed files]",
+      "result": "passed",
+      "exitCode": 0,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    }
+  ],
+  "runtime": {
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "status": "",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    },
+    "jieshu": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/inspect-instanceof-heap.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md\n?? docs/notes/instanceof-memory-optimization.md\n?? packages/jieshu-core/__test__/unit/instanceof-state.test.ts",
+      "bundleBytes": 108581,
+      "gzipBytes": 32708,
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e"
+    },
+    "jieshu-before": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md",
+      "bundleBytes": 108183,
+      "gzipBytes": 32603,
+      "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433",
+      "source": {
+        "kind": "saved-bundle",
+        "bundlePath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/footprint-simple-final-load/jieshu.js",
+        "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433",
+        "environmentPath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/footprint-simple-final-load/environment.json",
+        "environmentSha256": "b4a31dd8cbe41c1d45dcd359d32814bb49c03a6cba5ffd044e1a00b817e02c94",
+        "copiedEnvironment": "jieshu-before.environment.json"
+      }
+    }
+  },
+  "checks": {
+    "load": {
+      "total": 180,
+      "passed": 180
+    },
+    "trace": {
+      "total": 18,
+      "passed": 18,
+      "dataLoss": 0
+    },
+    "startup": {
+      "total": 240,
+      "passed": 240
+    },
+    "stability": [
+      {
+        "framework": "jieshu",
+        "total": 48,
+        "passed": 48
+      },
+      {
+        "framework": "wujie",
+        "total": 48,
+        "passed": 42
+      }
+    ],
+    "gitDiffCheck": "passed",
+    "diagnosticSyntax": "passed"
+  },
+  "scope": "No adapter changes, no new commit. Performance sampling runs serialized; heavy build/test/heap analysis runs excluded from sampling. Historical no-op fast path and constant changes retained.",
+  "limitations": [
+    "Single memory round per before/after cycle parameter; heap attribution supports capacity removal, not statistical whole-process memory claims.",
+    "The new metadata uses a private Symbol, observable through reflection. Rejecting constructors still use lazy WeakMap.",
+    "No arbitrary mixed-version guarantee. Core load and footprint still worse than local Wujie."
+  ]
+}

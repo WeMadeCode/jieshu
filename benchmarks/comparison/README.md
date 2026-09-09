@@ -4,6 +4,12 @@
 
 后续优化按独立的[优化计划](./OPTIMIZATION.md)执行，结论与剩余差距见[优化报告](../../docs/notes/jieshu-performance-optimization.md)。原始基线不会被优化后的结果覆盖。
 
+核心体积、加载和空闲内存的进一步[原因与方案](../../docs/notes/core-footprint-analysis.md)见独立诊断，证据保存在 [results/2026-09-09-footprint](./results/2026-09-09-footprint/)。
+
+后续第一步[最小修复](../../docs/notes/core-footprint-simple-fix.md)处理未知名称空销毁及常量冗余，原分析基线保持不变。
+
+第二步处理真实销毁后的 instanceof WeakMap 空表容量，[实现、收益与代价](../../docs/notes/instanceof-memory-optimization.md)及[原始记录](./results/2026-09-09-instanceof/)单独保存。
+
 ## 运行
 
 在 Jieshu 仓库根目录执行，使用已安装的 Vite 和 Playwright，以及 Playwright 对应的 Chromium。Wujie 仓库默认位于相邻的 `../wujie`，可以通过 `WUJIE_ROOT` 指定。脚本只从源码构建内存中的 bundle，不依赖已有 dist，不改两个 core。
@@ -35,6 +41,28 @@ node benchmarks/comparison/inspect-heap.mjs test-results/comparison-heaps-new/wu
 ```
 
 `profile` 输出 `.cpuprofile` 和按采样耗时聚合的函数列表，不包含正式启动观测，不能拿未压缩 profile 的耗时与生产启动数据混算。`inspect-heap.mjs` 按 V8 快照元数据解码，并聚合节点 `self_size`；分组差异只能定位成本候选，不能代替引用链分析，也不是浏览器总内存。
+
+核心成本诊断可独立复跑，下面各目录每次都换成新名称：
+
+```bash
+# 相同构建的模块生成字节、普通ESM消费者tree shaking及目标降级成本。
+BENCH_OUTPUT=test-results/footprint-bundle-new node benchmarks/comparison/analyze-bundle.mjs
+# 从上一步source map冻结源码，只在构建内存中应用候选；输出独立candidates-*目录。
+node benchmarks/comparison/probe-bundle-candidates.mjs test-results/footprint-bundle-new
+# 不安装子应用：legacy/UTF-8，各框架30次加载；trace另各3次。
+CORE_LOAD_OUTPUT=test-results/footprint-load-new node benchmarks/comparison/measure-core-load.mjs
+# 可选：加入此前本脚本保存的Jieshu产物，与当前Jieshu及Wujie同轮交错。
+# 必须保留旧产物同目录environment.json；脚本核对SHA，并复制原metadata。
+CORE_LOAD_BEFORE_BUNDLE=test-results/previous-load/jieshu.js CORE_LOAD_OUTPUT=test-results/footprint-load-ab-new node benchmarks/comparison/measure-core-load.mjs
+# 从同哈希产物与heap Context审计instanceof状态表，支持旧全局表和新懒分配兜底。
+node benchmarks/comparison/inspect-instanceof-heap.mjs test-results/comparison-heaps-new/jieshu-final.heapsnapshot test-results/footprint-load-new/jieshu.js
+# 对分析基线bc688b2的干净core复现空destroy的槽数增长。
+IDLE_RETENTION_COMMIT=bc688b2 IDLE_RETENTION_OUTPUT=test-results/footprint-retention-new node benchmarks/comparison/measure-idle-retention.mjs
+# 验收后续空destroy修复：允许未提交core，记录并核对构建前后源码指纹，要求全过程0槽。
+IDLE_RETENTION_ALLOW_DIRTY=1 IDLE_RETENTION_EXPECT_SLOTS=none IDLE_RETENTION_OUTPUT=test-results/footprint-retention-fixed-new node benchmarks/comparison/measure-idle-retention.mjs
+```
+
+核心加载脚本区分请求/响应、响应结束到 onload、脚本执行和带 URL 的后台解析事件；它们可能重叠，不能相加为互斥阶段。空 destroy 诊断只操作不存在的应用，在无活跃操作的测试页删除槽引用作归因干预，不将该操作当作生产修复。ES2022 构建只是反事实诊断，不修改框架的 ES2018 兼容目标。候选构建只证明包体变化，不能代替后续行为验证。
 
 `smoke` 每场景包含两轮预热和一轮记录样本，仅用来确认夹具工作，不能代替正式统计。测试顺序在两框架之间交错，每个启动/稳定性样本使用独立 browser context；内存每轮使用一个 context 跟踪完整序列。运行时不要同时执行构建、其他浏览器测试或高负载任务。
 

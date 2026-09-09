@@ -1,0 +1,2318 @@
+[
+  {
+    "framework": "wujie",
+    "encoding": "legacy",
+    "round": 0,
+    "file": "wujie-legacy-0.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1254,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45577,
+        "tdur": 1103,
+        "tid": 601030,
+        "ts": 29940921814,
+        "tts": 566
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45577.2",
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1238,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45577,
+        "tdur": 1096,
+        "tid": 601030,
+        "ts": 29940921825,
+        "tts": 569
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "C94B88A2B2FED3A4807406C144F392E9",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 315,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45577,
+        "tdur": 289,
+        "tid": 601021,
+        "ts": 29940923257,
+        "tts": 35915
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          },
+          "fileName": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 19,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45577,
+        "tdur": 14,
+        "tid": 601021,
+        "ts": 29940923264,
+        "tts": 35922
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 25,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.254,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.238,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.315,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.019,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "fa33c1ba689c478a93a88f48de42ec9530bb0a198ad1014174cb8ca1122e278b",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "jieshu",
+    "encoding": "legacy",
+    "round": 0,
+    "file": "jieshu-legacy-0.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2179,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45579,
+        "tdur": 1845,
+        "tid": 601061,
+        "ts": 29940987104,
+        "tts": 507
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45579.2",
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2157,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45579,
+        "tdur": 1832,
+        "tid": 601061,
+        "ts": 29940987115,
+        "tts": 510
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "920F6CC34A0FF7632B80E54B664E6A1A",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 631,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45579,
+        "tdur": 562,
+        "tid": 601052,
+        "ts": 29940989496,
+        "tts": 35556
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          },
+          "fileName": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 30,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45579,
+        "tdur": 26,
+        "tid": 601052,
+        "ts": 29940989502,
+        "tts": 35562
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 37,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.179,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.157,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.631,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.03,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "eb3890b60c461e7c351e681142f889ba6a650f2ee8d2da7702be902a16cbc498",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "wujie",
+    "encoding": "utf8",
+    "round": 0,
+    "file": "wujie-utf8-0.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1294,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45580,
+        "tdur": 1144,
+        "tid": 601082,
+        "ts": 29941055176,
+        "tts": 587
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45580.2",
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1286,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45580,
+        "tdur": 1139,
+        "tid": 601082,
+        "ts": 29941055180,
+        "tts": 588
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "E9E4112A5BBB34BEB29B4887CB2C7A69",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 315,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45580,
+        "tdur": 291,
+        "tid": 601073,
+        "ts": 29941056665,
+        "tts": 35557
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          },
+          "fileName": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 17,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45580,
+        "tdur": 11,
+        "tid": 601073,
+        "ts": 29941056671,
+        "tts": 35563
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 25,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.294,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.286,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.315,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.017,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "ba8aa22c84dbb95f39e45ff8a46d68f87bf41e9a7cee2895eccc11660bcb5cc9",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "jieshu",
+    "encoding": "utf8",
+    "round": 0,
+    "file": "jieshu-utf8-0.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2174,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45581,
+        "tdur": 1842,
+        "tid": 601103,
+        "ts": 29941119046,
+        "tts": 628
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45581.2",
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2139,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45581,
+        "tdur": 1829,
+        "tid": 601103,
+        "ts": 29941119071,
+        "tts": 631
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "3DA8E276CF2D4811886E341E8FB312CB",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 556,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45581,
+        "tdur": 483,
+        "tid": 601094,
+        "ts": 29941121435,
+        "tts": 35523
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          },
+          "fileName": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 18,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45581,
+        "tdur": 14,
+        "tid": 601094,
+        "ts": 29941121442,
+        "tts": 35530
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 37,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.174,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.139,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.556,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.018,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "c8e1b8828e48ee74ea7c2df64426ed70fbafdfe087fa2e87652211a111451288",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "jieshu",
+    "encoding": "utf8",
+    "round": 1,
+    "file": "jieshu-utf8-1.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2139,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45582,
+        "tdur": 1825,
+        "tid": 601124,
+        "ts": 29941185710,
+        "tts": 556
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45582.2",
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2127,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45582,
+        "tdur": 1818,
+        "tid": 601124,
+        "ts": 29941185716,
+        "tts": 558
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "7A3D06FB66529E2C8CD8C37837EA36AF",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 555,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45582,
+        "tdur": 482,
+        "tid": 601115,
+        "ts": 29941188045,
+        "tts": 35586
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          },
+          "fileName": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 17,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45582,
+        "tdur": 13,
+        "tid": 601115,
+        "ts": 29941188052,
+        "tts": 35593
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 37,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.139,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.127,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.555,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.017,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "447cac4f0bd30754718d72da64578ab1e139c0835cceedaaff05a7531cb6436d",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "wujie",
+    "encoding": "utf8",
+    "round": 1,
+    "file": "wujie-utf8-1.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1257,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45583,
+        "tdur": 1095,
+        "tid": 601145,
+        "ts": 29941252099,
+        "tts": 638
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45583.2",
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1248,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45583,
+        "tdur": 1091,
+        "tid": 601145,
+        "ts": 29941252105,
+        "tts": 640
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "90D6FAEB8DAC3DA5A0930E8BB64C6D07",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 306,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45583,
+        "tdur": 284,
+        "tid": 601136,
+        "ts": 29941253536,
+        "tts": 35602
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          },
+          "fileName": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 16,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45583,
+        "tdur": 13,
+        "tid": 601136,
+        "ts": 29941253542,
+        "tts": 35608
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 25,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.257,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.248,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.306,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.016,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "7855e9b1b47972c0c921d9f84417d9d1374df278a9cc8b3c3caf8071428fd7c1",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "jieshu",
+    "encoding": "legacy",
+    "round": 1,
+    "file": "jieshu-legacy-1.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2146,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45584,
+        "tdur": 1807,
+        "tid": 601167,
+        "ts": 29941316180,
+        "tts": 566
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45584.2",
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2121,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45584,
+        "tdur": 1798,
+        "tid": 601167,
+        "ts": 29941316200,
+        "tts": 571
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "159635772524B2462D241D3825335562",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 637,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45584,
+        "tdur": 563,
+        "tid": 601157,
+        "ts": 29941318511,
+        "tts": 36012
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          },
+          "fileName": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 23,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45584,
+        "tdur": 20,
+        "tid": 601157,
+        "ts": 29941318518,
+        "tts": 36018
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 37,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.146,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.121,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.637,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.023,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "e664d4ea68eba9929ac7a152dc638d5fd678dac610d6262125e971f6258fcb01",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "wujie",
+    "encoding": "legacy",
+    "round": 1,
+    "file": "wujie-legacy-1.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1262,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45585,
+        "tdur": 1098,
+        "tid": 601188,
+        "ts": 29941387798,
+        "tts": 533
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45585.2",
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1256,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45585,
+        "tdur": 1095,
+        "tid": 601188,
+        "ts": 29941387802,
+        "tts": 534
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "33E8F2C626AEA7876A05E40DF7B6A5BD",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 311,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45585,
+        "tdur": 285,
+        "tid": 601179,
+        "ts": 29941389238,
+        "tts": 37813
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          },
+          "fileName": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 16,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45585,
+        "tdur": 12,
+        "tid": 601179,
+        "ts": 29941389245,
+        "tts": 37819
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 25,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.262,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.256,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.311,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.016,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "315e45b03c9e90c9138c986e010f4d00e5e5a5a10de543095149a45d8d635235",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "wujie",
+    "encoding": "legacy",
+    "round": 2,
+    "file": "wujie-legacy-2.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1250,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45586,
+        "tdur": 1109,
+        "tid": 601209,
+        "ts": 29941452091,
+        "tts": 586
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45586.2",
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1239,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45586,
+        "tdur": 1103,
+        "tid": 601209,
+        "ts": 29941452097,
+        "tts": 588
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "F0A1918FACFED966D0DA7EAA6DA11B4B",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 316,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45586,
+        "tdur": 293,
+        "tid": 601200,
+        "ts": 29941453532,
+        "tts": 35355
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+          },
+          "fileName": "http://127.0.0.1:55448/wujie.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 17,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45586,
+        "tdur": 14,
+        "tid": 601200,
+        "ts": 29941453538,
+        "tts": 35361
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 25,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.25,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.239,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.316,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.017,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "29bfe1ca88fc74a0af067be4b5354c85a689aa3721184018403ca0471e6ba35e",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "jieshu",
+    "encoding": "legacy",
+    "round": 2,
+    "file": "jieshu-legacy-2.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2178,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45587,
+        "tdur": 1848,
+        "tid": 601234,
+        "ts": 29941516289,
+        "tts": 463
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45587.2",
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2166,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45587,
+        "tdur": 1840,
+        "tid": 601234,
+        "ts": 29941516295,
+        "tts": 465
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "045689FAA326CDD051A7BF0BE6C0E0E7",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 543,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45587,
+        "tdur": 471,
+        "tid": 601221,
+        "ts": 29941518670,
+        "tts": 35659
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+          },
+          "fileName": "http://127.0.0.1:55448/jieshu.js?encoding=legacy"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 17,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45587,
+        "tdur": 13,
+        "tid": 601221,
+        "ts": 29941518676,
+        "tts": 35665
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 37,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.178,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.166,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.543,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.017,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "6015d29d438d4d069b9512fa9d38a21e0d614ee6edbbfcd5d3aad0f83caa1270",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "wujie",
+    "encoding": "utf8",
+    "round": 2,
+    "file": "wujie-utf8-2.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1231,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45588,
+        "tdur": 1070,
+        "tid": 601256,
+        "ts": 29941584946,
+        "tts": 669
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45588.2",
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 1207,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45588,
+        "tdur": 1065,
+        "tid": 601256,
+        "ts": 29941584966,
+        "tts": 670
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "3851F74A890EB893F73D2E09BE7498BE",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 335,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45588,
+        "tdur": 310,
+        "tid": 601247,
+        "ts": 29941586373,
+        "tts": 35979
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+          },
+          "fileName": "http://127.0.0.1:55448/wujie.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 23,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45588,
+        "tdur": 18,
+        "tid": 601247,
+        "ts": 29941586379,
+        "tts": 35985
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 25,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 36,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.231,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 1.207,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.335,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.023,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "144a9bbed4edeeb6613615a6a5569f83da988a1a2bb6fc2fded1fbc16e1f3f65",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  },
+  {
+    "framework": "jieshu",
+    "encoding": "utf8",
+    "round": 2,
+    "file": "jieshu-utf8-2.trace.json",
+    "dataLossOccurred": false,
+    "categories": [
+      "disabled-by-default-v8.compile",
+      "v8,devtools.timeline,disabled-by-default-v8.compile",
+      "devtools.timeline",
+      "v8,devtools.timeline"
+    ],
+    "events": [
+      {
+        "args": {
+          "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2099,
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "ph": "X",
+        "pid": 45589,
+        "tdur": 1773,
+        "tid": 601277,
+        "ts": 29941648599,
+        "tts": 638
+      },
+      {
+        "args": {
+          "data": {
+            "requestId": "45589.2",
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          }
+        },
+        "cat": "v8,devtools.timeline,disabled-by-default-v8.compile",
+        "dur": 2084,
+        "name": "v8.parseOnBackground",
+        "ph": "X",
+        "pid": 45589,
+        "tdur": 1769,
+        "tid": 601277,
+        "ts": 29941648611,
+        "tts": 640
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "frame": "703AC812CA46492B9D20640AFF89FAE0",
+            "lineNumber": 1,
+            "scriptId": 0,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          }
+        },
+        "cat": "devtools.timeline",
+        "dur": 537,
+        "name": "EvaluateScript",
+        "ph": "X",
+        "pid": 45589,
+        "tdur": 461,
+        "tid": 601268,
+        "ts": 29941650897,
+        "tts": 35551
+      },
+      {
+        "args": {
+          "data": {
+            "columnNumber": 1,
+            "lineNumber": 1,
+            "scriptId": 17,
+            "streamed": true,
+            "url": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+          },
+          "fileName": "http://127.0.0.1:55448/jieshu.js?encoding=utf8"
+        },
+        "cat": "v8,devtools.timeline",
+        "dur": 18,
+        "name": "v8.compile",
+        "ph": "X",
+        "pid": 45589,
+        "tdur": 13,
+        "tid": 601268,
+        "ts": 29941650905,
+        "tts": 35558
+      }
+    ],
+    "durations": [
+      {
+        "name": "V8.CompileCode",
+        "eventCount": 37,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.Compile",
+        "eventCount": 5,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnition",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileIgnitionFinalization",
+        "eventCount": 47,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileEval",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.099,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.parseOnBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 2.084,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileCodeBackground",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "EvaluateScript",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.537,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "v8.compile",
+        "eventCount": 1,
+        "coreAttributedCount": 1,
+        "coreCompleteDurationCount": 1,
+        "coreTotalMs": 0.018,
+        "missingDurationCount": 0
+      },
+      {
+        "name": "V8.CompileStreamedScript",
+        "eventCount": 1,
+        "coreAttributedCount": 0,
+        "coreCompleteDurationCount": 0,
+        "coreTotalMs": null,
+        "missingDurationCount": 0
+      }
+    ],
+    "limitations": [
+      "Only complete X events with numeric dur are quantified; duration uses Chrome trace microseconds / 1000.",
+      "Only events carrying the exact core URL in args are attributed to the core; unlabelled events remain unquantified.",
+      "Parse, compile, streaming and EvaluateScript events may be nested or overlap; do not add them as disjoint phases.",
+      "Tracing changes execution overhead; these diagnostics are excluded from the 30-sample load comparison."
+    ],
+    "rawTraceSha256": "1b1ece3c72bb74b84d388a1e0d45a652c5a56700f8f1f42c4ba5b9bd851bc19a",
+    "eventSelection": "Only events carrying the exact core script URL are retained here; durations/counts were computed from the full trace. Raw trace is in ignored test-results and identified by SHA256."
+  }
+]

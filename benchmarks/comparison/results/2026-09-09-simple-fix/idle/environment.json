@@ -1,0 +1,291 @@
+{
+  "startedAt": "2026-09-09T09:12:35.412Z",
+  "rounds": 3,
+  "allowDirtySource": true,
+  "expectedSlotsMode": "none",
+  "checkpoints": [0, 250, 500, 1000],
+  "modes": ["same-name", "distinct-names"],
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "totalMemoryBytes": 17179869184,
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "sourceTree": "ec55f619fddf7c2c9f3b660fc84262d31abec3c3",
+      "sourceStatus": "",
+      "sourceDirty": false,
+      "sourceMode": "worktree",
+      "sourceFingerprintSha256": "a7617bf020197f1011612710e74951572a6e650eacbba1612f84607fcb70f734",
+      "sourceFiles": [
+        {
+          "path": "packages/wujie-core/src/common.ts",
+          "bytes": 6801,
+          "sha256": "c3e3a4b3ea40814aed429133c4f79b1a078e4a1a1955ac67e6e0e8077ec61781"
+        },
+        {
+          "path": "packages/wujie-core/src/constant.ts",
+          "bytes": 3294,
+          "sha256": "a17338528b93d1da77a30accbf63041bdd9fa5b2de736ba821f8ae4378e150d4"
+        },
+        {
+          "path": "packages/wujie-core/src/effect.ts",
+          "bytes": 24889,
+          "sha256": "093710f8cb5dfb1423cbbe1669f42afb2cef479c92865b19be99ca45070c744d"
+        },
+        {
+          "path": "packages/wujie-core/src/entry.ts",
+          "bytes": 13473,
+          "sha256": "fc94ef09a8501531eeb83807e9f37d546de6e40b72b01c7f0d9f659de18c4c44"
+        },
+        {
+          "path": "packages/wujie-core/src/event.ts",
+          "bytes": 3431,
+          "sha256": "5e06c9aa79f807fefb163ca2c8678ead51b81f58c6ee0e79b2194f9fe6380163"
+        },
+        {
+          "path": "packages/wujie-core/src/iframe.ts",
+          "bytes": 47662,
+          "sha256": "3e8591aa5e9d14db28508c1deb5f9877ef723642f6dc3c585e08a2ecf9e688eb"
+        },
+        {
+          "path": "packages/wujie-core/src/index.ts",
+          "bytes": 12099,
+          "sha256": "ab8340aee38735a15ab80dd5bad54218a21f98895898c6331cf15340d5eafe2a"
+        },
+        {
+          "path": "packages/wujie-core/src/plugin.ts",
+          "bytes": 3565,
+          "sha256": "d0600428b7086c74beb74252e34418eb6585835945a48f8678994d713287825f"
+        },
+        {
+          "path": "packages/wujie-core/src/proxy.ts",
+          "bytes": 14495,
+          "sha256": "16325868b3e80331cbd3004e740b008ddbb7f0fc36d8ea47ee1ec0501a988640"
+        },
+        {
+          "path": "packages/wujie-core/src/sandbox.ts",
+          "bytes": 27517,
+          "sha256": "f96a98e7ffa11ded1489e26bfaa49301c78018d2bc59d71d5b9b3092f1a49c9f"
+        },
+        {
+          "path": "packages/wujie-core/src/shadow.ts",
+          "bytes": 15462,
+          "sha256": "13184e89db86fa1d0d7fbb527bd27ffb3b1d9363fa6707159075aba95ef3c39f"
+        },
+        {
+          "path": "packages/wujie-core/src/sync.ts",
+          "bytes": 6151,
+          "sha256": "8e38386e9326e349199ab905db289827aecbdd88824687bef5cf82c1b8e8ea54"
+        },
+        {
+          "path": "packages/wujie-core/src/template.ts",
+          "bytes": 11320,
+          "sha256": "c7736235d48421ec2105a9ee346cc22c39c57da92b82377c32f68bf2b8b54b83"
+        },
+        {
+          "path": "packages/wujie-core/src/tracker.ts",
+          "bytes": 4055,
+          "sha256": "db9e4fc0dcffe9d58b9b877e35e31433aa6177f9184f5e591063e60c9fe555b1"
+        },
+        {
+          "path": "packages/wujie-core/src/utils.ts",
+          "bytes": 12856,
+          "sha256": "04c883d01faa5da203ed9c40a3b3f5283f41ae5fb3f35b795052c7feac408c99"
+        }
+      ],
+      "sourceFingerprintVerifiedAfterBuild": true,
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    },
+    "jieshu": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "sourceTree": "7dffb5c244f0c2fa81ca5bf53ba488a28b0e29d1",
+      "sourceStatus": "M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts",
+      "sourceDirty": true,
+      "sourceMode": "worktree",
+      "sourceFingerprintSha256": "fe0381e4293899442fc8651f000eccee6b699b51b47290a0bdbafb8f6785a760",
+      "sourceFiles": [
+        {
+          "path": "packages/jieshu-core/src/common.ts",
+          "bytes": 1176,
+          "sha256": "cd78749ffdf60079847ab080177953b033a871ec39deba491c2abf48a2bf4d37"
+        },
+        {
+          "path": "packages/jieshu-core/src/constant.ts",
+          "bytes": 3445,
+          "sha256": "25c41f9f80ab7fbf80a0e65b87afef201789c8d496cd00ee60fb2b8dfc9a8209"
+        },
+        {
+          "path": "packages/jieshu-core/src/contracts.ts",
+          "bytes": 5900,
+          "sha256": "7b60e4ea99f48bb56f72ce2bad73f75e0c2dd5e6965da6a46e45ab33ae0f320e"
+        },
+        {
+          "path": "packages/jieshu-core/src/controller.ts",
+          "bytes": 7285,
+          "sha256": "a4d45a0d1d016ac47b62bceb02ff09ea1730d15d94fd9635e3daa1f9e74bbc96"
+        },
+        {
+          "path": "packages/jieshu-core/src/effect-pipeline.ts",
+          "bytes": 1118,
+          "sha256": "86339d701046842c341de4d66c136717cf6c88e64f4bab513d5dccb879be76aa"
+        },
+        {
+          "path": "packages/jieshu-core/src/effect.ts",
+          "bytes": 41061,
+          "sha256": "57989ac98da0eb3dd8ea056ea74184f5f8e5f06f650b2b5d6b31286fdcd18cdf"
+        },
+        {
+          "path": "packages/jieshu-core/src/entry.ts",
+          "bytes": 26850,
+          "sha256": "97bc3cacb88afaa4faf98561cdfe472f043bf3d726f87bf16fca39b49cf7ff5d"
+        },
+        {
+          "path": "packages/jieshu-core/src/event.ts",
+          "bytes": 6830,
+          "sha256": "beb4994f870d2ed8110fc8e7810fc4403e331a53db8f22d83d6be378e2b4b3b7"
+        },
+        {
+          "path": "packages/jieshu-core/src/function-binding.ts",
+          "bytes": 3201,
+          "sha256": "b2d98b9558838f56a1e5062d90bd9bba153f7fb66e32613dc0c9205b08c6c71b"
+        },
+        {
+          "path": "packages/jieshu-core/src/iframe-inline-events.ts",
+          "bytes": 5563,
+          "sha256": "229dfb2874156f4928a4410fc1ec7a92d27ddfbac50e7880bde924a423f6b13e"
+        },
+        {
+          "path": "packages/jieshu-core/src/iframe-script.ts",
+          "bytes": 12988,
+          "sha256": "be6e755573c5388a224f70090954e8d283f3e8372fd6d77c5a7973e2b51e7b32"
+        },
+        {
+          "path": "packages/jieshu-core/src/iframe.ts",
+          "bytes": 46949,
+          "sha256": "bf0638f9ee98a59bb7d318872b9b2ca6faba58507f0cbd7ddbe6d330a575ec40"
+        },
+        {
+          "path": "packages/jieshu-core/src/index.ts",
+          "bytes": 20941,
+          "sha256": "92d25ee3f41375d22644d3dde7d8a6db42520e33859a47293f85d6be1d4a2bef"
+        },
+        {
+          "path": "packages/jieshu-core/src/native-dom.ts",
+          "bytes": 2728,
+          "sha256": "36e18b8d4131f386e4a819e3fc3e555d57ab254bbab263e86c131a7c2bf42669"
+        },
+        {
+          "path": "packages/jieshu-core/src/operation-intent.ts",
+          "bytes": 2807,
+          "sha256": "400dbfae01f130dce9e3e50f26c488740c4e4b64dc4ee5f2fc0c14d30d90ec5a"
+        },
+        {
+          "path": "packages/jieshu-core/src/options.ts",
+          "bytes": 3166,
+          "sha256": "f000c1bbb3b10a0aeb4ce7dea04dc313515f44839bc46edda266122974250d7f"
+        },
+        {
+          "path": "packages/jieshu-core/src/plugin.ts",
+          "bytes": 4555,
+          "sha256": "888eb308cc0461a15bf80483b00bef9b195646344b551ebb4a3383114f2bb95c"
+        },
+        {
+          "path": "packages/jieshu-core/src/proxy-resolver.ts",
+          "bytes": 1953,
+          "sha256": "fb18091bc4146797642242d82350129a275c00e0528476ae22775029cde7bd55"
+        },
+        {
+          "path": "packages/jieshu-core/src/proxy.ts",
+          "bytes": 14338,
+          "sha256": "fbcb42d9e4ac37a819212c58c7bc4083da84efa52ccde56ade058ca686efe5b2"
+        },
+        {
+          "path": "packages/jieshu-core/src/route-state.ts",
+          "bytes": 2931,
+          "sha256": "a49db9e7ea72900c70ed1ae54a32ffd9bbe131c69f91f5161e9862fe6aad7edd"
+        },
+        {
+          "path": "packages/jieshu-core/src/sandbox-policy.ts",
+          "bytes": 4625,
+          "sha256": "d35f598e46756bed5ae75643f5967e6e242705fa2536c671820198b118db5105"
+        },
+        {
+          "path": "packages/jieshu-core/src/sandbox-registry.ts",
+          "bytes": 5072,
+          "sha256": "85d78f3d12f51fb2599ea213d45f594c0c876c13ded2edc78eeb73c30ce40887"
+        },
+        {
+          "path": "packages/jieshu-core/src/sandbox-runtime.ts",
+          "bytes": 13436,
+          "sha256": "4cab9548d3e998561614a344b46c4eb1ae98dd162269ab911878cca5f4b94fff"
+        },
+        {
+          "path": "packages/jieshu-core/src/sandbox.ts",
+          "bytes": 35721,
+          "sha256": "34df43dfef90418cc933b5a2579652bd60e30298d02595fba3e5ad70ba63a4b6"
+        },
+        {
+          "path": "packages/jieshu-core/src/shadow.ts",
+          "bytes": 19132,
+          "sha256": "22816201e9ea70301bec61dac6927660c88d6bec8bf5c0e2cd15a6528bf6edb0"
+        },
+        {
+          "path": "packages/jieshu-core/src/sync.ts",
+          "bytes": 4755,
+          "sha256": "1a7a51eeb1873f5cda630120f8cd92583effb5c25d7d88d5f2c128af59c0734e"
+        },
+        {
+          "path": "packages/jieshu-core/src/template.ts",
+          "bytes": 27926,
+          "sha256": "3048e3ce196b1fac7922d4a85b3590fb82021724caa5c4024a49e1e0367129a9"
+        },
+        {
+          "path": "packages/jieshu-core/src/tracker.ts",
+          "bytes": 7573,
+          "sha256": "8a31cc951e76cd3fdb218dd1e8ff98673f5e33e8c02ba083d9c0a99d90fd94f7"
+        },
+        {
+          "path": "packages/jieshu-core/src/url-utils.ts",
+          "bytes": 1568,
+          "sha256": "a98a64f25c79d18c3aa0ad9d5c7119e33cbb4f373cfb34f2c2ba5038f8bb082d"
+        },
+        {
+          "path": "packages/jieshu-core/src/utils.ts",
+          "bytes": 7015,
+          "sha256": "76f301873355a336e75c975618136ffa392343b82fa2215f1cf618cf41c076bd"
+        }
+      ],
+      "sourceFingerprintVerifiedAfterBuild": true,
+      "bundleBytes": 108183,
+      "gzipBytes": 32603,
+      "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433"
+    }
+  },
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production",
+    "charset": "utf-8"
+  },
+  "method": [
+    "No-op destroy stress: every id is absent; no child application is ever mounted. This is not a real application lifecycle workload.",
+    "Fresh browser context for each framework/mode/round. Framework and mode orders alternate; all observations are serial.",
+    "Await the public ComparisonCore.destroyApp(id) API 1000 times, using either one repeated id or 1000 different ids.",
+    "Capture after core load and after250/500/1000 operations; force GC outside operation timing and record Performance.JSHeapUsedSize plus Memory.getDOMCounters.",
+    "After the last checkpoint, diagnostically delete both host references to Jieshu coreOperationSlots and force GC. No live app exists. Wujie receives the same absent-property deletion control.",
+    "Deleting protocol state is a diagnostic intervention, not a proposed fix or a production-safe API. The same-name concurrency protocol must be preserved in any implementation.",
+    "Heap values are JavaScript heap bytes, not process RSS. Timing is per-batch wall time in milliseconds, excluding CDP/GC sampling.",
+    "Compilation and engine cache growth can remain after deleting slots. Do not attribute all before/after heap differences to the slot objects or claim complete leak remediation."
+  ],
+  "finishedAt": "2026-09-09T09:12:36.331Z"
+}

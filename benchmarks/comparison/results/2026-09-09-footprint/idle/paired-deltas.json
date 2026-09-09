@@ -1,0 +1,134 @@
+[
+  {
+    "framework": "wujie",
+    "mode": "same-name",
+    "round": 0,
+    "growthAfter1000Bytes": 19620,
+    "interventionReleasedBytes": 5360,
+    "postInterventionVersusCoreBytes": 14260,
+    "totalMs": 0.29999999701976776,
+    "slots": 0,
+    "postSlots": 0
+  },
+  {
+    "framework": "wujie",
+    "mode": "same-name",
+    "round": 1,
+    "growthAfter1000Bytes": 14884,
+    "interventionReleasedBytes": -212,
+    "postInterventionVersusCoreBytes": 15096,
+    "totalMs": 0.4000000022351742,
+    "slots": 0,
+    "postSlots": 0
+  },
+  {
+    "framework": "wujie",
+    "mode": "same-name",
+    "round": 2,
+    "growthAfter1000Bytes": 14884,
+    "interventionReleasedBytes": -212,
+    "postInterventionVersusCoreBytes": 15096,
+    "totalMs": 0.20000000298023224,
+    "slots": 0,
+    "postSlots": 0
+  },
+  {
+    "framework": "wujie",
+    "mode": "distinct-names",
+    "round": 0,
+    "growthAfter1000Bytes": 79396,
+    "interventionReleasedBytes": -212,
+    "postInterventionVersusCoreBytes": 79608,
+    "totalMs": 0.19999999925494194,
+    "slots": 0,
+    "postSlots": 0
+  },
+  {
+    "framework": "wujie",
+    "mode": "distinct-names",
+    "round": 1,
+    "growthAfter1000Bytes": 79396,
+    "interventionReleasedBytes": -212,
+    "postInterventionVersusCoreBytes": 79608,
+    "totalMs": 0.5,
+    "slots": 0,
+    "postSlots": 0
+  },
+  {
+    "framework": "wujie",
+    "mode": "distinct-names",
+    "round": 2,
+    "growthAfter1000Bytes": 79396,
+    "interventionReleasedBytes": -212,
+    "postInterventionVersusCoreBytes": 79608,
+    "totalMs": 0.4000000022351742,
+    "slots": 0,
+    "postSlots": 0
+  },
+  {
+    "framework": "jieshu",
+    "mode": "same-name",
+    "round": 0,
+    "growthAfter1000Bytes": 49548,
+    "interventionReleasedBytes": -1176,
+    "postInterventionVersusCoreBytes": 50724,
+    "totalMs": 1,
+    "slots": 1,
+    "postSlots": 0
+  },
+  {
+    "framework": "jieshu",
+    "mode": "same-name",
+    "round": 1,
+    "growthAfter1000Bytes": 48984,
+    "interventionReleasedBytes": -1176,
+    "postInterventionVersusCoreBytes": 50160,
+    "totalMs": 1.1000000014901161,
+    "slots": 1,
+    "postSlots": 0
+  },
+  {
+    "framework": "jieshu",
+    "mode": "same-name",
+    "round": 2,
+    "growthAfter1000Bytes": 49548,
+    "interventionReleasedBytes": -1176,
+    "postInterventionVersusCoreBytes": 50724,
+    "totalMs": 1.1000000014901161,
+    "slots": 1,
+    "postSlots": 0
+  },
+  {
+    "framework": "jieshu",
+    "mode": "distinct-names",
+    "round": 0,
+    "growthAfter1000Bytes": 259656,
+    "interventionReleasedBytes": 147216,
+    "postInterventionVersusCoreBytes": 112440,
+    "totalMs": 1,
+    "slots": 1000,
+    "postSlots": 0
+  },
+  {
+    "framework": "jieshu",
+    "mode": "distinct-names",
+    "round": 1,
+    "growthAfter1000Bytes": 259656,
+    "interventionReleasedBytes": 147216,
+    "postInterventionVersusCoreBytes": 112440,
+    "totalMs": 1.199999999254942,
+    "slots": 1000,
+    "postSlots": 0
+  },
+  {
+    "framework": "jieshu",
+    "mode": "distinct-names",
+    "round": 2,
+    "growthAfter1000Bytes": 260268,
+    "interventionReleasedBytes": 147216,
+    "postInterventionVersusCoreBytes": 113052,
+    "totalMs": 1.1000000014901161,
+    "slots": 1000,
+    "postSlots": 0
+  }
+]

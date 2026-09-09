@@ -1,0 +1,1049 @@
+{
+  "generatedAt": "2026-09-09T14:09:07.205Z",
+  "inputs": [
+    {
+      "directory": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-stability",
+      "environment": {
+        "startedAt": "2026-09-09T14:08:29.868Z",
+        "mode": "stability",
+        "samples": 30,
+        "memoryRounds": 5,
+        "stabilityRounds": 3,
+        "cycles": 30,
+        "platform": "darwin",
+        "release": "25.6.0",
+        "arch": "arm64",
+        "totalMemoryBytes": 17179869184,
+        "cpu": "Apple M1 Pro",
+        "cpuCount": 8,
+        "loadAverage": [
+          5.61328125,
+          5.16845703125,
+          6.4287109375
+        ],
+        "node": "v26.7.0",
+        "browser": "151.0.7922.34",
+        "playwright": "1.62.1",
+        "vite": "8.2.2",
+        "revisions": {
+          "jieshu": {
+            "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+            "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/inspect-instanceof-heap.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md\n?? docs/notes/instanceof-memory-optimization.md\n?? packages/jieshu-core/__test__/unit/instanceof-state.test.ts",
+            "package": "0.0.5",
+            "packageManager": "pnpm@10.28.2",
+            "bundleBytes": 108581,
+            "gzipBytes": 32708,
+            "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e"
+          },
+          "wujie": {
+            "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+            "status": "",
+            "package": "2.1.0",
+            "packageManager": "pnpm@10.33.0",
+            "bundleBytes": 65660,
+            "gzipBytes": 19802,
+            "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+          }
+        },
+        "build": {
+          "target": "es2018",
+          "minify": true,
+          "format": "iife",
+          "mode": "production"
+        },
+        "fixture": {
+          "jsBytes": 3634,
+          "cssBytes": 65,
+          "domItems": 300,
+          "heapItems": 4000
+        },
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "limitations": [
+          "Headless Chromium only",
+          "Local HTTP, cross-origin ports",
+          "No browser total RSS measurement",
+          "Background desktop activity uncontrolled"
+        ],
+        "finishedAt": "2026-09-09T14:08:51.521Z",
+        "counts": {
+          "observations": 96,
+          "failures": 6
+        }
+      }
+    }
+  ],
+  "methodology": {
+    "percentile": "Linear interpolation at (N - 1) * p",
+    "startup": "Successful non-warmup observations only; separate fresh browser contexts with alternating framework order",
+    "readyMedianChangePercent": "(median(jieshu.readyMs) / median(wujie.readyMs) - 1) * 100",
+    "bootstrapIterations": 5000,
+    "bootstrapSeed": 20260909,
+    "bootstrapPrimary": "Independent sample percentile bootstrap for median(J) - median(W), in ms",
+    "bootstrapSensitivity": "Complete same-source, same-round pairs resampled together; statistic remains median(J) - median(W)",
+    "memory": "Successful rounds only; medians across rounds per stage/cycle; CDP after forced GC; MiB = 1048576 bytes",
+    "memoryDelta": "Median of per-round stage heap minus that same round core heap"
+  },
+  "counts": {
+    "total": 96,
+    "passed": 90,
+    "failed": 6
+  },
+  "warmupRecords": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "failures": []
+  },
+  "startup": [],
+  "memory": {
+    "rounds": {
+      "wujie": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0
+      },
+      "jieshu": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0
+      }
+    },
+    "stages": []
+  },
+  "stability": [
+    {
+      "scenario": "mount-interaction-lifecycle",
+      "contract": "shared-public-behavior",
+      "expected": "A visible child handles a click and invokes mount/unmount lifecycle hooks in order.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "props-and-event-bus",
+      "contract": "shared-public-behavior",
+      "expected": "Props reach the child and a targeted host ping receives exactly one child pong.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "javascript-global-isolation",
+      "contract": "shared-public-behavior",
+      "expected": "Child global writes do not mutate the host global with the same name.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "stylesheet-isolation",
+      "contract": "shared-public-behavior",
+      "expected": "Child CSS applies inside the child and cannot recolor a matching host element.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "two-apps-independent-state",
+      "contract": "shared-public-behavior",
+      "expected": "Two concurrent apps render and keep click state and targeted bus messages independent.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "destroy-and-recreate",
+      "contract": "shared-public-behavior",
+      "expected": "Explicit destroy removes the child; a new instance resets state and has one bus subscription.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "keep-alive-switch",
+      "contract": "shared-public-behavior",
+      "expected": "Switching away from a kept-alive app and back preserves its DOM state without remount.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "route-sync-disabled",
+      "contract": "shared-public-behavior",
+      "expected": "Child pushState updates its own route while the host URL stays unchanged.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "route-sync-enabled",
+      "contract": "shared-public-behavior",
+      "expected": "Child pushState updates its route and the named host query parameter without changing host pathname.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "async-unmount-completion",
+      "contract": "shared-public-behavior",
+      "expected": "The destroy Promise completes only after the 80 ms async unmount hook and afterUnmount event.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "start-destroy-race",
+      "contract": "robustness-observation",
+      "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 0,
+          "failed": 3
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "same-name-concurrent-containers",
+      "contract": "robustness-observation",
+      "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 0,
+          "failed": 3
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "preload-execute-then-activate",
+      "contract": "shared-public-behavior",
+      "expected": "An executed preload can be activated, rendered in the requested container and interacted with.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "dynamic-script-and-stylesheet",
+      "contract": "shared-public-behavior",
+      "expected": "Dynamically appended script and stylesheet finish loading and survive a kept-alive switch.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "missing-script-error-and-recovery",
+      "contract": "shared-public-behavior",
+      "expected": "A script HTTP 404 is observable; after explicit cleanup, the same name starts successfully with a valid URL.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    },
+    {
+      "scenario": "fiber-enabled-interaction",
+      "contract": "shared-public-behavior",
+      "expected": "With fiber scheduling enabled, rendering, interaction and destroy still complete correctly.",
+      "frameworks": {
+        "wujie": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        },
+        "jieshu": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0
+        }
+      }
+    }
+  ],
+  "failures": [
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "start-destroy-race",
+      "round": 0,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+        "observations": {
+          "failureObservations": {
+            "destruction": [
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "starting": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              }
+            ],
+            "readyCount": 0,
+            "loadingCount": 1,
+            "observationWindowMs": 250
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:56431/",
+            "events": [
+              {
+                "name": "cancelled-start",
+                "type": "beforeLoad"
+              }
+            ],
+            "states": [
+              {
+                "name": "cancelled-start"
+              }
+            ],
+            "iframes": 0,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      [
+                        "data-loading-flag",
+                        ""
+                      ],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection during cancellation.",
+        "stack": "Error: Unexpected startup rejection during cancellation.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:329:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 21
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "same-name-concurrent-containers",
+      "round": 0,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+        "observations": {
+          "failureObservations": {
+            "outcomes": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              },
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "firstReady": 0,
+            "secondReady": 1,
+            "loadingCount": 1
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:56431/",
+            "events": [
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeMount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": false,
+                "name": "same-name",
+                "type": "mount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": true,
+                "name": "same-name",
+                "type": "ready"
+              },
+              {
+                "name": "same-name",
+                "type": "afterMount"
+              }
+            ],
+            "states": [
+              {
+                "name": "same-name",
+                "state": {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                }
+              }
+            ],
+            "iframes": 1,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      [
+                        "data-loading-flag",
+                        ""
+                      ],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": [
+                  {
+                    "tag": "WUJIE-APP",
+                    "attributes": [
+                      [
+                        "data-wujie-id",
+                        "same-name"
+                      ],
+                      [
+                        "class",
+                        "wujie_iframe"
+                      ]
+                    ],
+                    "readyElements": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection in the superseded request.",
+        "stack": "Error: Unexpected startup rejection in the superseded request.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:367:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 23
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "start-destroy-race",
+      "round": 1,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+        "observations": {
+          "failureObservations": {
+            "destruction": [
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "starting": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              }
+            ],
+            "readyCount": 0,
+            "loadingCount": 1,
+            "observationWindowMs": 250
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:56431/",
+            "events": [
+              {
+                "name": "cancelled-start",
+                "type": "beforeLoad"
+              }
+            ],
+            "states": [
+              {
+                "name": "cancelled-start"
+              }
+            ],
+            "iframes": 0,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      [
+                        "data-loading-flag",
+                        ""
+                      ],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection during cancellation.",
+        "stack": "Error: Unexpected startup rejection during cancellation.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:329:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 54
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "same-name-concurrent-containers",
+      "round": 1,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+        "observations": {
+          "failureObservations": {
+            "outcomes": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              },
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "firstReady": 0,
+            "secondReady": 1,
+            "loadingCount": 1
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:56431/",
+            "events": [
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeMount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": false,
+                "name": "same-name",
+                "type": "mount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": true,
+                "name": "same-name",
+                "type": "ready"
+              },
+              {
+                "name": "same-name",
+                "type": "afterMount"
+              }
+            ],
+            "states": [
+              {
+                "name": "same-name",
+                "state": {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                }
+              }
+            ],
+            "iframes": 1,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      [
+                        "data-loading-flag",
+                        ""
+                      ],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": [
+                  {
+                    "tag": "WUJIE-APP",
+                    "attributes": [
+                      [
+                        "data-wujie-id",
+                        "same-name"
+                      ],
+                      [
+                        "class",
+                        "wujie_iframe"
+                      ]
+                    ],
+                    "readyElements": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection in the superseded request.",
+        "stack": "Error: Unexpected startup rejection in the superseded request.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:367:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 56
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "start-destroy-race",
+      "round": 2,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Destroy during resource loading leaves no late mounted child or uncaught error after work settles.",
+        "observations": {
+          "failureObservations": {
+            "destruction": [
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "starting": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              }
+            ],
+            "readyCount": 0,
+            "loadingCount": 1,
+            "observationWindowMs": 250
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:56431/",
+            "events": [
+              {
+                "name": "cancelled-start",
+                "type": "beforeLoad"
+              }
+            ],
+            "states": [
+              {
+                "name": "cancelled-start"
+              }
+            ],
+            "iframes": 0,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      [
+                        "data-loading-flag",
+                        ""
+                      ],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": []
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection during cancellation.",
+        "stack": "Error: Unexpected startup rejection during cancellation.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:329:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 85
+    },
+    {
+      "kind": "stability",
+      "framework": "wujie",
+      "scenario": "same-name-concurrent-containers",
+      "round": 2,
+      "passed": false,
+      "details": {
+        "contract": "robustness-observation",
+        "expected": "Two overlapping starts for one name leave at most one live DOM; the latest request owns its container.",
+        "observations": {
+          "failureObservations": {
+            "outcomes": [
+              {
+                "status": "rejected",
+                "reason": "TypeError: Cannot read properties of null (reading 'protocol')",
+                "errorName": "TypeError"
+              },
+              {
+                "status": "fulfilled",
+                "reason": ""
+              }
+            ],
+            "firstReady": 0,
+            "secondReady": 1,
+            "loadingCount": 1
+          },
+          "browserState": {
+            "hostUrl": "http://127.0.0.1:56431/",
+            "events": [
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeLoad"
+              },
+              {
+                "name": "same-name",
+                "type": "beforeMount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": false,
+                "name": "same-name",
+                "type": "mount"
+              },
+              {
+                "mounts": 1,
+                "unmounts": 0,
+                "count": 0,
+                "route": "/child/?variant=normal",
+                "pongCount": 0,
+                "dynamicLoaded": false,
+                "dynamicStyleLoaded": false,
+                "ready": true,
+                "name": "same-name",
+                "type": "ready"
+              },
+              {
+                "name": "same-name",
+                "type": "afterMount"
+              }
+            ],
+            "states": [
+              {
+                "name": "same-name",
+                "state": {
+                  "mounts": 1,
+                  "unmounts": 0,
+                  "count": 0,
+                  "route": "/child/?variant=normal",
+                  "pongCount": 0,
+                  "dynamicLoaded": false,
+                  "dynamicStyleLoaded": false,
+                  "ready": true,
+                  "name": "same-name",
+                  "type": "ready"
+                }
+              }
+            ],
+            "iframes": 1,
+            "containers": [
+              {
+                "id": "stability-primary",
+                "children": [
+                  {
+                    "tag": "DIV",
+                    "attributes": [
+                      [
+                        "data-loading-flag",
+                        ""
+                      ],
+                      [
+                        "style",
+                        "position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index:1;"
+                      ]
+                    ],
+                    "readyElements": 0
+                  }
+                ]
+              },
+              {
+                "id": "stability-secondary",
+                "children": [
+                  {
+                    "tag": "WUJIE-APP",
+                    "attributes": [
+                      [
+                        "data-wujie-id",
+                        "same-name"
+                      ],
+                      [
+                        "class",
+                        "wujie_iframe"
+                      ]
+                    ],
+                    "readyElements": 1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "error": {
+        "message": "Unexpected startup rejection in the superseded request.",
+        "stack": "Error: Unexpected startup rejection in the superseded request.\n    at check (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:9:19)\n    at Object.run (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:367:7)\n    at async runStability (file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/stability.mjs:512:26)\n    at async file:///Users/zhouxiang/Documents/Github/jieshu/benchmarks/comparison/run.mjs:457:5"
+      },
+      "pageErrors": [],
+      "diagnostics": [],
+      "sourceIndex": 0,
+      "sourceLine": 87
+    }
+  ]
+}

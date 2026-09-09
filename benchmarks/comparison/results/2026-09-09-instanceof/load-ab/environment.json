@@ -1,0 +1,68 @@
+{
+  "startedAt": "2026-09-09T14:06:36.273Z",
+  "samples": 30,
+  "traceSamplesPerEncoding": 3,
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "totalMemoryBytes": 17179869184,
+  "loadAverage": [
+    4.47021484375,
+    5.17333984375,
+    6.62939453125
+  ],
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "status": "",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    },
+    "jieshu": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/inspect-instanceof-heap.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md\n?? docs/notes/instanceof-memory-optimization.md\n?? packages/jieshu-core/__test__/unit/instanceof-state.test.ts",
+      "bundleBytes": 108581,
+      "gzipBytes": 32708,
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e"
+    },
+    "jieshu-before": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md",
+      "bundleBytes": 108183,
+      "gzipBytes": 32603,
+      "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433",
+      "source": {
+        "kind": "saved-bundle",
+        "bundlePath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/footprint-simple-final-load/jieshu.js",
+        "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433",
+        "environmentPath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/footprint-simple-final-load/environment.json",
+        "environmentSha256": "b4a31dd8cbe41c1d45dcd359d32814bb49c03a6cba5ffd044e1a00b817e02c94",
+        "copiedEnvironment": "jieshu-before.environment.json"
+      }
+    }
+  },
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production"
+  },
+  "method": [
+    "Fresh browser context for every observation; three-framework order rotates each round and reverses every three rounds to balance all positions; serial sampling, CPU 1x. jieshu-before uses the hash-verified saved bundle and original metadata. Its request route is /before.js, equal in length to /jieshu.js to avoid URL-length differences in GC heap measurements; the recorded framework and output file remain jieshu-before.",
+    "No sub-application or benchmark fixture installed. Measurement function installed before baseline GC.",
+    "Legacy HTML/JS omits charset; UTF-8 HTML/JS declares charset. Both transfer identical UTF-8 source bytes.",
+    "Before/after heap uses forced GC outside load timing. After core load, no mounts or lifecycle operations occur.",
+    "Resource responseEnd-startTime includes request scheduling, localhost network and response transfer.",
+    "onload-responseEnd is response end to onload, not pure parsing or execution; work can overlap transfer.",
+    "Performance duration deltas include identical measurement instrumentation. Missing metrics are null.",
+    "GC JS heap and DOM counts are not process RSS or total browser memory.",
+    "Each context has an empty HTTP cache; Chromium process-level compilation caches are not explicitly cleared."
+  ]
+}

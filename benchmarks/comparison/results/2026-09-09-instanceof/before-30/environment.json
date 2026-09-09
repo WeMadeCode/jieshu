@@ -1,0 +1,70 @@
+{
+  "startedAt": "2026-09-09T13:44:59.884Z",
+  "mode": "memory",
+  "samples": 30,
+  "memoryRounds": 1,
+  "stabilityRounds": 3,
+  "cycles": 30,
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "totalMemoryBytes": 17179869184,
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "loadAverage": [
+    4.19384765625,
+    10.78857421875,
+    12.72119140625
+  ],
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "jieshu": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md",
+      "package": "0.0.5",
+      "packageManager": "pnpm@10.28.2",
+      "bundleBytes": 108183,
+      "gzipBytes": 32603,
+      "sha256": "f67ade90e3b0bac404996ea38ec6d3f39a12abea261191bc92ccf7d62494e433"
+    },
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "status": "",
+      "package": "2.1.0",
+      "packageManager": "pnpm@10.33.0",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    }
+  },
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production"
+  },
+  "fixture": {
+    "jsBytes": 3634,
+    "cssBytes": 65,
+    "domItems": 300,
+    "heapItems": 4000
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "limitations": [
+    "Headless Chromium only",
+    "Local HTTP, cross-origin ports",
+    "No browser total RSS measurement",
+    "Background desktop activity uncontrolled"
+  ],
+  "finishedAt": "2026-09-09T13:45:29.645Z",
+  "counts": {
+    "observations": 2,
+    "failures": 0
+  }
+}

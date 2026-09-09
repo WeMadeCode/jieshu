@@ -26,13 +26,22 @@ declare global {
   }
 }
 
-function sharedSlots(): OperationSlots {
-  const runtimeWindow = window as unknown as IntentRuntimeWindow;
-  const slots =
+// Overloads distinguish read-only lookup from access that creates the shared table.
+export function getOperationSlots(): OperationSlots;
+// eslint-disable-next-line no-redeclare -- TypeScript overloads describe one runtime implementation.
+export function getOperationSlots(create: false): OperationSlots | undefined;
+// eslint-disable-next-line no-redeclare -- This implements the two TypeScript signatures above.
+export function getOperationSlots(create = true) {
+  const runtimeWindow: IntentRuntimeWindow = window;
+  const existing =
     runtimeWindow.__JIESHU_INJECT?.coreOperationSlots ??
     (runtimeWindow.__POWERED_BY_JIESHU__ ? runtimeWindow.__JIESHU?.inject?.coreOperationSlots : undefined) ??
-    runtimeWindow.__JIESHU_CORE_INTENTS ??
-    (Object.create(null) as OperationSlots);
+    runtimeWindow.__JIESHU_CORE_INTENTS;
+  if (!create) {
+    return existing;
+  }
+  // A fresh null-prototype dictionary has no entries until an operation writes one.
+  const slots = existing ?? (Object.create(null) as OperationSlots);
   runtimeWindow.__JIESHU_CORE_INTENTS = slots;
   runtimeWindow.__JIESHU_INJECT = { ...runtimeWindow.__JIESHU_INJECT, coreOperationSlots: slots };
   return slots;
@@ -52,7 +61,7 @@ function asIntent(id: string, slot: OperationSlot): OperationIntent {
 
 /** Mark a public operation as the newest intent for one application id. */
 export function beginOperation(id: string): OperationIntent {
-  const slots = sharedSlots();
+  const slots = getOperationSlots();
   const previous = slots[id];
   previous?.cancel();
   const slot = createSlot((previous?.revision ?? 0) + 1);
@@ -62,13 +71,13 @@ export function beginOperation(id: string): OperationIntent {
 
 /** Observe the current intent without superseding it (used by idle preload). */
 export function observeOperation(id: string): OperationIntent {
-  const slots = sharedSlots();
+  const slots = getOperationSlots();
   slots[id] ||= createSlot(0);
   const slot = slots[id];
   return asIntent(id, slot);
 }
 
 export function isOperationCurrent(intent: OperationIntent): boolean {
-  const slot = sharedSlots()[intent.id];
+  const slot = getOperationSlots()[intent.id];
   return Boolean(slot && slot.revision === intent.revision && slot.cancelled === intent.cancelled);
 }

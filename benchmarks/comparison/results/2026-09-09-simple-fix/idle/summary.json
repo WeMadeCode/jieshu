@@ -1,0 +1,254 @@
+[
+  {
+    "framework": "wujie",
+    "mode": "same-name",
+    "passed": 15,
+    "observations": 15,
+    "checkpoints": [
+      {
+        "stage": "core-loaded",
+        "operations": 0,
+        "n": 3,
+        "medianHeapUsedBytes": 1189076,
+        "medianTotalMs": 0,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 250,
+        "n": 3,
+        "medianHeapUsedBytes": 1199000,
+        "medianTotalMs": 0.10000000149011612,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 500,
+        "n": 3,
+        "medianHeapUsedBytes": 1203616,
+        "medianTotalMs": 0.19999999925494194,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 1000,
+        "n": 3,
+        "medianHeapUsedBytes": 1203960,
+        "medianTotalMs": 0.19999999925494194,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "cleared-slots",
+        "operations": 1000,
+        "n": 3,
+        "medianHeapUsedBytes": 1204172,
+        "medianTotalMs": 0.19999999925494194,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      }
+    ]
+  },
+  {
+    "framework": "wujie",
+    "mode": "distinct-names",
+    "passed": 15,
+    "observations": 15,
+    "checkpoints": [
+      {
+        "stage": "core-loaded",
+        "operations": 0,
+        "n": 3,
+        "medianHeapUsedBytes": 1189076,
+        "medianTotalMs": 0,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 250,
+        "n": 3,
+        "medianHeapUsedBytes": 1263512,
+        "medianTotalMs": 0.09999999776482582,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 500,
+        "n": 3,
+        "medianHeapUsedBytes": 1268128,
+        "medianTotalMs": 0.29999999701976776,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 1000,
+        "n": 3,
+        "medianHeapUsedBytes": 1268472,
+        "medianTotalMs": 0.3999999985098839,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "cleared-slots",
+        "operations": 1000,
+        "n": 3,
+        "medianHeapUsedBytes": 1268684,
+        "medianTotalMs": 0.3999999985098839,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      }
+    ]
+  },
+  {
+    "framework": "jieshu",
+    "mode": "same-name",
+    "passed": 15,
+    "observations": 15,
+    "checkpoints": [
+      {
+        "stage": "core-loaded",
+        "operations": 0,
+        "n": 3,
+        "medianHeapUsedBytes": 1245036,
+        "medianTotalMs": 0,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 250,
+        "n": 3,
+        "medianHeapUsedBytes": 1256136,
+        "medianTotalMs": 0.20000000298023224,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 500,
+        "n": 3,
+        "medianHeapUsedBytes": 1260408,
+        "medianTotalMs": 0.30000000074505806,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 1000,
+        "n": 3,
+        "medianHeapUsedBytes": 1265044,
+        "medianTotalMs": 0.5,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "cleared-slots",
+        "operations": 1000,
+        "n": 3,
+        "medianHeapUsedBytes": 1268028,
+        "medianTotalMs": 0.5,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      }
+    ]
+  },
+  {
+    "framework": "jieshu",
+    "mode": "distinct-names",
+    "passed": 15,
+    "observations": 15,
+    "checkpoints": [
+      {
+        "stage": "core-loaded",
+        "operations": 0,
+        "n": 3,
+        "medianHeapUsedBytes": 1245036,
+        "medianTotalMs": 0,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 250,
+        "n": 3,
+        "medianHeapUsedBytes": 1320648,
+        "medianTotalMs": 0.19999999925494194,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 500,
+        "n": 3,
+        "medianHeapUsedBytes": 1324920,
+        "medianTotalMs": 0.30000000074505806,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "after-operations",
+        "operations": 1000,
+        "n": 3,
+        "medianHeapUsedBytes": 1329556,
+        "medianTotalMs": 0.6000000014901161,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      },
+      {
+        "stage": "cleared-slots",
+        "operations": 1000,
+        "n": 3,
+        "medianHeapUsedBytes": 1332540,
+        "medianTotalMs": 0.6000000014901161,
+        "slots": [0],
+        "documents": [1],
+        "nodes": [9],
+        "jsEventListeners": [16]
+      }
+    ]
+  }
+]

@@ -1,0 +1,118 @@
+{
+  "date": "2026-09-09",
+  "scope": "Core footprint cause analysis; source unchanged from bc688b2. Raw bundles, source maps and full traces remain in ignored test-results.",
+  "files": [
+    {
+      "file": "bundle/analysis.json",
+      "source": "test-results/footprint-bundle/analysis.json",
+      "bytes": 36519,
+      "sha256": "abb9298bf316fa1b01a3bb05b30773e3b04c6e755074176505fc300046836b16",
+      "sourceSha256": "bd1ca237ff3dd01c88ddd72242ba136b63331e55214f361131607a2767a40f38"
+    },
+    {
+      "file": "bundle/module-differences.json",
+      "source": "test-results/footprint-bundle/module-differences.json",
+      "bytes": 2837,
+      "sha256": "915a4f66df22da2d3d0819645aa0dff1bbe4f5613225d31be2be22962a102c5e",
+      "sourceSha256": "915a4f66df22da2d3d0819645aa0dff1bbe4f5613225d31be2be22962a102c5e"
+    },
+    {
+      "file": "bundle/what-if.json",
+      "source": "test-results/footprint-bundle/what-if.json",
+      "bytes": 375,
+      "sha256": "f698457d73fdaee82b623eb2bac869cdd3e95663e4fda8566cd900e74fb46cc3",
+      "sourceSha256": "f698457d73fdaee82b623eb2bac869cdd3e95663e4fda8566cd900e74fb46cc3"
+    },
+    {
+      "file": "bundle/candidate-analysis.json",
+      "source": "test-results/footprint-bundle/candidates-t0LnWf/candidate-analysis.json",
+      "bytes": 1924,
+      "sha256": "3089a29d0c180ad32a0aef9eb000c1817673a07b87cde58f8bc82acfdd03087c",
+      "sourceSha256": "3089a29d0c180ad32a0aef9eb000c1817673a07b87cde58f8bc82acfdd03087c"
+    },
+    {
+      "file": "load/environment.json",
+      "source": "test-results/footprint-load/environment.json",
+      "bytes": 2093,
+      "sha256": "4e248cd6aed9a453e160a8b58a1ebd97beef5ff935852986cf551b93d90c606f",
+      "sourceSha256": "774b0a63f7c9cb7bf8a3cd99ed5b35bc7b66405a8a805c269ec42c173a627481"
+    },
+    {
+      "file": "load/observations.jsonl",
+      "source": "test-results/footprint-load/observations.jsonl",
+      "bytes": 554772,
+      "sha256": "744a81f52384792c879026b1e6236870b9582c828b57e1dfbcb4ed1b29380da4",
+      "sourceSha256": "744a81f52384792c879026b1e6236870b9582c828b57e1dfbcb4ed1b29380da4"
+    },
+    {
+      "file": "load/summary.json",
+      "source": "test-results/footprint-load/summary.json",
+      "bytes": 6161,
+      "sha256": "0f2d0d18eccb29b046d077b165e017ab8957ee1d780a0f335fdd6917928a2de2",
+      "sourceSha256": "881e9bb6f9e01e88efa621a6573acebce695017cd9f1247e9fe13707e9284643"
+    },
+    {
+      "file": "load/validation.json",
+      "source": "test-results/footprint-load/validation.json",
+      "bytes": 670,
+      "sha256": "4be496323bd9ebe23cab3b1bf4df1500fde31ba0ec960a0aa8238b4a5c7a278e",
+      "sourceSha256": "4be496323bd9ebe23cab3b1bf4df1500fde31ba0ec960a0aa8238b4a5c7a278e"
+    },
+    {
+      "file": "idle/environment.json",
+      "source": "test-results/footprint-retention/environment.json",
+      "bytes": 2469,
+      "sha256": "41c4663ec51ad7492158c0fc93d38956d194c7900a93ea2c1e4e4af7de0bb72b",
+      "sourceSha256": "9ed6a158778d854d30df40570f34d1a24203d16b83cad8e68262a1580262342f"
+    },
+    {
+      "file": "idle/observations.jsonl",
+      "source": "test-results/footprint-retention/observations.jsonl",
+      "bytes": 24367,
+      "sha256": "edd4fe300eca4513e3c0289c8fa0f7fa6e8365c9bfedfcd34b1ec77cf2ca9620",
+      "sourceSha256": "edd4fe300eca4513e3c0289c8fa0f7fa6e8365c9bfedfcd34b1ec77cf2ca9620"
+    },
+    {
+      "file": "idle/summary.json",
+      "source": "test-results/footprint-retention/summary.json",
+      "bytes": 6110,
+      "sha256": "0affa835d9a8e01dac8ccd16526c142b8ea9e1104b21b86dfc96bedc57f10cb0",
+      "sourceSha256": "8a30a490ecbe1dda33c1e1beb937cd51b5f85cde52a7772bf49ab3c9307b52dd"
+    },
+    {
+      "file": "idle/paired-deltas.json",
+      "source": "test-results/footprint-retention/paired-deltas.json",
+      "bytes": 3208,
+      "sha256": "e8ea4e1ba48bfdb4c40f91cd8122e08576d87c3b7e21518ec745042ba180434a",
+      "sourceSha256": "e8ea4e1ba48bfdb4c40f91cd8122e08576d87c3b7e21518ec745042ba180434a"
+    },
+    {
+      "file": "idle/AUDIT.json",
+      "source": "test-results/footprint-memory-audit/AUDIT.json",
+      "bytes": 9167,
+      "sha256": "6ac75d48f0d3aac6afbda07428cd0871ff262a3cb12b39f3f60d44c361727d19",
+      "sourceSha256": "6ac75d48f0d3aac6afbda07428cd0871ff262a3cb12b39f3f60d44c361727d19"
+    },
+    {
+      "file": "idle/table-details.json",
+      "source": "test-results/footprint-memory-audit/table-details.json",
+      "bytes": 2954,
+      "sha256": "f89982b7bd9e79e183a9f804f1010b38c7fec643edcee28be898563618c9972b",
+      "sourceSha256": "f89982b7bd9e79e183a9f804f1010b38c7fec643edcee28be898563618c9972b"
+    },
+    {
+      "file": "idle/completed-start-reproduction.json",
+      "source": "test-results/footprint-memory-audit/completed-start-reproduction.json",
+      "bytes": 448,
+      "sha256": "0548e1f148457fa8101621edf252a4797b7f70582f7f84323451e97c938d80d4",
+      "sourceSha256": "0548e1f148457fa8101621edf252a4797b7f70582f7f84323451e97c938d80d4"
+    },
+    {
+      "file": "load/trace-summary.json",
+      "source": "test-results/footprint-load/trace-summary.json (URL event subset)",
+      "bytes": 69030,
+      "sha256": "b8bb016d12f4838b951c41ab6e2f38b51568d1ac8e626c04b4d01bf15692f005",
+      "sourceSha256": "1e8e6ecc20c8a46a992163f1d54c8c0d63089cab6c42d6c779d770c91cf5d9d1"
+    }
+  ]
+}

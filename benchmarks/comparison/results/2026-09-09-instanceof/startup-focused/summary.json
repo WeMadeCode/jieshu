@@ -1,0 +1,463 @@
+{
+  "generatedAt": "2026-09-09T14:08:30.598Z",
+  "inputs": [
+    {
+      "directory": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-startup-focused",
+      "environment": {
+        "startedAt": "2026-09-09T14:07:14.272Z",
+        "mode": "startup",
+        "samples": 30,
+        "memoryRounds": 5,
+        "stabilityRounds": 3,
+        "cycles": 30,
+        "platform": "darwin",
+        "release": "25.6.0",
+        "arch": "arm64",
+        "totalMemoryBytes": 17179869184,
+        "cpu": "Apple M1 Pro",
+        "cpuCount": 8,
+        "loadAverage": [
+          4.8115234375,
+          5.1416015625,
+          6.5478515625
+        ],
+        "node": "v26.7.0",
+        "browser": "151.0.7922.34",
+        "playwright": "1.62.1",
+        "vite": "8.2.2",
+        "revisions": {
+          "jieshu": {
+            "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+            "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/inspect-instanceof-heap.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md\n?? docs/notes/instanceof-memory-optimization.md\n?? packages/jieshu-core/__test__/unit/instanceof-state.test.ts",
+            "package": "0.0.5",
+            "packageManager": "pnpm@10.28.2",
+            "bundleBytes": 108581,
+            "gzipBytes": 32708,
+            "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e"
+          },
+          "wujie": {
+            "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+            "status": "",
+            "package": "2.1.0",
+            "packageManager": "pnpm@10.33.0",
+            "bundleBytes": 65660,
+            "gzipBytes": 19802,
+            "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+          }
+        },
+        "build": {
+          "target": "es2018",
+          "minify": true,
+          "format": "iife",
+          "mode": "production"
+        },
+        "fixture": {
+          "jsBytes": 3634,
+          "cssBytes": 65,
+          "domItems": 300,
+          "heapItems": 4000
+        },
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "limitations": [
+          "Headless Chromium only",
+          "Local HTTP, cross-origin ports",
+          "No browser total RSS measurement",
+          "Background desktop activity uncontrolled"
+        ],
+        "finishedAt": "2026-09-09T14:07:54.616Z",
+        "counts": {
+          "observations": 240,
+          "failures": 0
+        }
+      }
+    }
+  ],
+  "methodology": {
+    "percentile": "Linear interpolation at (N - 1) * p",
+    "startup": "Successful non-warmup observations only; separate fresh browser contexts with alternating framework order",
+    "readyMedianChangePercent": "(median(jieshu.readyMs) / median(wujie.readyMs) - 1) * 100",
+    "bootstrapIterations": 5000,
+    "bootstrapSeed": 20260909,
+    "bootstrapPrimary": "Independent sample percentile bootstrap for median(J) - median(W), in ms",
+    "bootstrapSensitivity": "Complete same-source, same-round pairs resampled together; statistic remains median(J) - median(W)",
+    "memory": "Successful rounds only; medians across rounds per stage/cycle; CDP after forced GC; MiB = 1048576 bytes",
+    "memoryDelta": "Median of per-round stage heap minus that same round core heap"
+  },
+  "counts": {
+    "total": 240,
+    "passed": 240,
+    "failed": 0
+  },
+  "warmupRecords": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "failures": []
+  },
+  "startup": [
+    {
+      "scenario": "cold",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 29.050000000046566,
+              "p95": 30.35499999986496
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 36.8499999998603,
+              "p95": 42.87999999995808
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.350000000093132,
+              "p95": 6.175000000116414
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 28,
+              "p95": 29.110000000102445
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 35.5,
+              "p95": 41.79500000013503
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 6.600000000093132,
+              "p95": 7.320000000041908
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -3.663500678060838,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -1.3499999998603016,
+        "interval95Ms": [
+          -2.0000000002328306,
+          -0.8500000003259629
+        ]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -1.3499999998603016,
+        "interval95Ms": [
+          -2.0000000002328306,
+          -0.8999999996740371
+        ]
+      }
+    },
+    {
+      "scenario": "cold-fiber",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 39.60000000009313,
+              "p95": 47.22999999986495
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 51.449999999953434,
+              "p95": 56.85499999986496
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5,
+              "p95": 5.754999999771826
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 38.6500000001397,
+              "p95": 51.49999999999997
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 48.199999999953434,
+              "p95": 62.685000000125726
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 6.25,
+              "p95": 6.854999999864958
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -6.316812439267139,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -3.25,
+        "interval95Ms": [
+          -5.900000000139698,
+          0
+        ]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -3.25,
+        "interval95Ms": [
+          -5.500000000232831,
+          0.09999999962747097
+        ]
+      }
+    },
+    {
+      "scenario": "concurrent-5",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 57.10000000009313,
+              "p95": 59.71000000019558
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 72.5999999998603,
+              "p95": 74.56500000006054
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.7999999998137355,
+              "p95": 4.900000000162981
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 57.949999999953434,
+              "p95": 59.16500000015367
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 70.85000000009313,
+              "p95": 75.01000000000931
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.9500000001862645,
+              "p95": 6.155000000144355
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -2.410468319243164,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -1.7499999997671694,
+        "interval95Ms": [
+          -2.900000000372529,
+          -0.39874999945752276
+        ]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -1.7499999997671694,
+        "interval95Ms": [
+          -2.9000000001396984,
+          -0.34999999962747097
+        ]
+      }
+    },
+    {
+      "scenario": "cpu4x",
+      "frameworks": {
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 107.5,
+              "p95": 112.27999999998136
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 126.90000000037253,
+              "p95": 132.92499999990685
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 8.149999999906868,
+              "p95": 9.200000000186265
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "apiMs": {
+              "n": 30,
+              "median": 102.94999999995343,
+              "p95": 107.85499999986496
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 121.94999999995343,
+              "p95": 126.66499999989756
+            },
+            "coreLoadMs": {
+              "n": 30,
+              "median": 10.099999999627471,
+              "p95": 10.754999999771826
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "readyMedianChangePercent": -3.9007092201769566,
+      "readyDifferenceBootstrap": {
+        "method": "independent-samples-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -4.950000000419095,
+        "interval95Ms": [
+          -5.7000000001862645,
+          -3.900000000372529
+        ]
+      },
+      "pairedRoundBootstrap": {
+        "method": "paired-round-percentile",
+        "estimand": "median(jieshu.readyMs) - median(wujie.readyMs)",
+        "iterations": 5000,
+        "seed": 20260909,
+        "wujieN": 30,
+        "jieshuN": 30,
+        "observedDifferenceMs": -4.950000000419095,
+        "interval95Ms": [
+          -5.7000000001862645,
+          -4.000000000465661
+        ]
+      }
+    }
+  ],
+  "memory": {
+    "rounds": {
+      "wujie": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0
+      },
+      "jieshu": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0
+      }
+    },
+    "stages": []
+  },
+  "stability": [],
+  "failures": []
+}

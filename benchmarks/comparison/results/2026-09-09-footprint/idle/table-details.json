@@ -1,0 +1,168 @@
+[
+  {
+    "id": 107125,
+    "bytes": 1044,
+    "edgeCount": 46,
+    "holes": 45,
+    "nonHoleEdges": [
+      {
+        "type": "internal",
+        "name": "map",
+        "to": {
+          "id": 281,
+          "type": "native",
+          "name": "system / Map",
+          "bytes": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": 107445,
+    "bytes": 76,
+    "edgeCount": 1,
+    "holes": 0,
+    "nonHoleEdges": [
+      {
+        "type": "internal",
+        "name": "map",
+        "to": {
+          "id": 213,
+          "type": "native",
+          "name": "system / Map",
+          "bytes": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": 107477,
+    "bytes": 76,
+    "edgeCount": 1,
+    "holes": 0,
+    "nonHoleEdges": [
+      {
+        "type": "internal",
+        "name": "map",
+        "to": {
+          "id": 213,
+          "type": "native",
+          "name": "system / Map",
+          "bytes": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": 107489,
+    "bytes": 76,
+    "edgeCount": 1,
+    "holes": 0,
+    "nonHoleEdges": [
+      {
+        "type": "internal",
+        "name": "map",
+        "to": {
+          "id": 213,
+          "type": "native",
+          "name": "system / Map",
+          "bytes": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": 108593,
+    "bytes": 32788,
+    "edgeCount": 2146,
+    "holes": 2145,
+    "nonHoleEdges": [
+      {
+        "type": "internal",
+        "name": "map",
+        "to": {
+          "id": 281,
+          "type": "native",
+          "name": "system / Map",
+          "bytes": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": 108811,
+    "bytes": 76,
+    "edgeCount": 3,
+    "holes": 0,
+    "nonHoleEdges": [
+      {
+        "type": "internal",
+        "name": "5",
+        "to": {
+          "id": 28219,
+          "type": "string",
+          "name": "1788939986250",
+          "bytes": 28
+        }
+      },
+      {
+        "type": "internal",
+        "name": "6",
+        "to": {
+          "id": 109291,
+          "type": "object",
+          "name": "Object",
+          "bytes": 28
+        }
+      },
+      {
+        "type": "internal",
+        "name": "map",
+        "to": {
+          "id": 213,
+          "type": "native",
+          "name": "system / Map",
+          "bytes": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": 127413,
+    "bytes": 24,
+    "edgeCount": 3,
+    "holes": 0,
+    "nonHoleEdges": [
+      {
+        "type": "internal",
+        "name": "scope_info",
+        "to": {
+          "id": 111,
+          "type": "code",
+          "name": "system / ScopeInfo",
+          "bytes": 0
+        }
+      },
+      {
+        "type": "internal",
+        "name": "map",
+        "to": {
+          "id": 64119,
+          "type": "object shape",
+          "name": "system / Map",
+          "bytes": 40
+        }
+      },
+      {
+        "type": "hidden",
+        "name": 1,
+        "to": {
+          "id": 127409,
+          "type": "object",
+          "name": "Promise",
+          "bytes": 20
+        }
+      }
+    ]
+  }
+]

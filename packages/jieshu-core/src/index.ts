@@ -24,7 +24,7 @@ import {
 } from './common';
 import { EventBus } from './event';
 import { RuntimeAppController } from './controller';
-import { beginOperation, isOperationCurrent, observeOperation } from './operation-intent';
+import { beginOperation, getOperationSlots, isOperationCurrent, observeOperation } from './operation-intent';
 import type { OperationIntent } from './operation-intent';
 import type { CacheOptions, PreOptions, StartOptions } from './contracts';
 import type { AppController } from './controller';
@@ -558,6 +558,10 @@ async function destroyAppNow(id: string, canContinue: ContinuationGuard): Promis
 }
 
 const destroyAppWithCompletion = (id: string) => {
+  // An idle preload already owns an operation slot even before its sandbox exists.
+  if (!getJieshuById(id) && !waitForSandboxTeardown(id) && !getOperationSlots(false)?.[id]) {
+    return Promise.resolve();
+  }
   const reentrantUnmount = isReentrantUnmountOperation(id);
   const intent = beginOperation(id);
   const destroying = destroyAppNow(id, () => isOperationCurrent(intent));

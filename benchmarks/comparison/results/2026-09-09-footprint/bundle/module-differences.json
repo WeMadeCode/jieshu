@@ -1,0 +1,182 @@
+[
+  {
+    "module": "template.ts",
+    "jieshu": 9773,
+    "wujie": 3092,
+    "delta": 6681
+  },
+  {
+    "module": "effect.ts",
+    "jieshu": 13206,
+    "wujie": 6643,
+    "delta": 6563
+  },
+  {
+    "module": "iframe-script.ts",
+    "jieshu": 4399,
+    "wujie": 0,
+    "delta": 4399
+  },
+  {
+    "module": "entry.ts",
+    "jieshu": 7944,
+    "wujie": 3582,
+    "delta": 4362
+  },
+  {
+    "module": "sandbox-runtime.ts",
+    "jieshu": 4049,
+    "wujie": 0,
+    "delta": 4049
+  },
+  {
+    "module": "controller.ts",
+    "jieshu": 3055,
+    "wujie": 0,
+    "delta": 3055
+  },
+  {
+    "module": "sandbox-policy.ts",
+    "jieshu": 2904,
+    "wujie": 0,
+    "delta": 2904
+  },
+  {
+    "module": "index.ts",
+    "jieshu": 5566,
+    "wujie": 2987,
+    "delta": 2579
+  },
+  {
+    "module": "sandbox.ts",
+    "jieshu": 10804,
+    "wujie": 8317,
+    "delta": 2487
+  },
+  {
+    "module": "iframe-inline-events.ts",
+    "jieshu": 2219,
+    "wujie": 0,
+    "delta": 2219
+  },
+  {
+    "module": "sandbox-registry.ts",
+    "jieshu": 1704,
+    "wujie": 0,
+    "delta": 1704
+  },
+  {
+    "module": "options.ts",
+    "jieshu": 1554,
+    "wujie": 0,
+    "delta": 1554
+  },
+  {
+    "module": "tracker.ts",
+    "jieshu": 2355,
+    "wujie": 996,
+    "delta": 1359
+  },
+  {
+    "module": "shadow.ts",
+    "jieshu": 6539,
+    "wujie": 5261,
+    "delta": 1278
+  },
+  {
+    "module": "function-binding.ts",
+    "jieshu": 1190,
+    "wujie": 0,
+    "delta": 1190
+  },
+  {
+    "module": "native-dom.ts",
+    "jieshu": 1040,
+    "wujie": 0,
+    "delta": 1040
+  },
+  {
+    "module": "operation-intent.ts",
+    "jieshu": 831,
+    "wujie": 0,
+    "delta": 831
+  },
+  {
+    "module": "route-state.ts",
+    "jieshu": 761,
+    "wujie": 0,
+    "delta": 761
+  },
+  {
+    "module": "constant.ts",
+    "jieshu": 1947,
+    "wujie": 1272,
+    "delta": 675
+  },
+  {
+    "module": "url-utils.ts",
+    "jieshu": 359,
+    "wujie": 0,
+    "delta": 359
+  },
+  {
+    "module": "event.ts",
+    "jieshu": 1542,
+    "wujie": 1231,
+    "delta": 311
+  },
+  {
+    "module": "effect-pipeline.ts",
+    "jieshu": 238,
+    "wujie": 0,
+    "delta": 238
+  },
+  {
+    "module": "proxy-resolver.ts",
+    "jieshu": 178,
+    "wujie": 0,
+    "delta": 178
+  },
+  {
+    "module": "plugin.ts",
+    "jieshu": 971,
+    "wujie": 815,
+    "delta": 156
+  },
+  {
+    "module": "[unmapped]",
+    "jieshu": 1225,
+    "wujie": 1218,
+    "delta": 7
+  },
+  {
+    "module": "proxy.ts",
+    "jieshu": 5251,
+    "wujie": 5474,
+    "delta": -223
+  },
+  {
+    "module": "iframe.ts",
+    "jieshu": 13850,
+    "wujie": 14109,
+    "delta": -259
+  },
+  {
+    "module": "sync.ts",
+    "jieshu": 1383,
+    "wujie": 1991,
+    "delta": -608
+  },
+  {
+    "module": "common.ts",
+    "jieshu": 0,
+    "wujie": 3212,
+    "delta": -3212
+  },
+  {
+    "module": "utils.ts",
+    "jieshu": 1844,
+    "wujie": 5460,
+    "delta": -3616
+  }
+]

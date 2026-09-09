@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-09-09T08:36:46.790Z",
+  "input": "/Users/zhouxiang/Documents/Github/jieshu/test-results/footprint-bundle",
+  "node": "v26.7.0",
+  "vite": "8.2.2",
+  "baselineRevision": {
+    "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+    "status": "?? benchmarks/comparison/analyze-bundle.mjs"
+  },
+  "baselineSha256": "2d98842d46df3c3dbd89041f927fd1b16e9ebc827fafc7c98d1c2069b42f034e",
+  "baselineVerified": true,
+  "supplementalSources": [
+    {
+      "module": "packages/jieshu-core/src/common.ts",
+      "sha256": "cd78749ffdf60079847ab080177953b033a871ec39deba491c2abf48a2bf4d37"
+    }
+  ],
+  "method": "Four in-memory transformations of frozen source-map originals; identical production ES2018 IIFE build.",
+  "limitations": [
+    "These candidates match the captured source structure and deliberately fail when that structure differs.",
+    "Successful byte comparison is not behavioral validation of a future source change.",
+    "No browser load-time or heap measurement is performed."
+  ],
+  "results": [
+    {
+      "candidate": "frozen-baseline",
+      "bundleBytes": 108681,
+      "gzipBytes": 32759,
+      "sha256": "2d98842d46df3c3dbd89041f927fd1b16e9ebc827fafc7c98d1c2069b42f034e",
+      "file": "frozen-baseline.js"
+    },
+    {
+      "candidate": "flatten-constants",
+      "bundleBytes": 108087,
+      "gzipBytes": 32571,
+      "sha256": "cfe6fe050cf0bef64d32c87c95392f7b5d3e1446aad7719a3c292a5e9fd50e5b",
+      "file": "flatten-constants.js"
+    },
+    {
+      "candidate": "share-attributes",
+      "bundleBytes": 108477,
+      "gzipBytes": 32749,
+      "sha256": "18a1c88a3c5ffc23dc957c6737ee9a321daf38d0a685619819c0686100127e5a",
+      "file": "share-attributes.js"
+    },
+    {
+      "candidate": "both",
+      "bundleBytes": 107883,
+      "gzipBytes": 32550,
+      "sha256": "5a17e54eca6057399360a3df9f1b5ee0a62216079cd06feb1a14faae2c823cc6",
+      "file": "both.js"
+    }
+  ]
+}

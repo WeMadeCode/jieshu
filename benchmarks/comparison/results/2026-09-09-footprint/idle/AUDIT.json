@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "bc688b2",
+  "scope": "Read-only source/heap audit; no browser run or source change. Historical snapshots are from comparison-opt-heaps, preceding final first-round commit.",
+  "inputs": [
+    "test-results/comparison-opt-heaps/jieshu-final.heapsnapshot",
+    "test-results/comparison-opt-heaps/wujie-final.heapsnapshot",
+    "benchmarks/comparison/results/2026-09-09-optimized/heap-attribution.json"
+  ],
+  "findings": [
+    {
+      "id": "MEM-INTENT-SLOTS",
+      "kind": "confirmed unbounded name-indexed state retention",
+      "sources": [
+        "packages/jieshu-core/src/operation-intent.ts:29",
+        "packages/jieshu-core/src/operation-intent.ts:56",
+        "packages/jieshu-core/src/index.ts:560"
+      ],
+      "retainingPath": "Host Window -> __JIESHU_CORE_INTENTS (or __JIESHU_INJECT.coreOperationSlots) -> application name -> slot -> cancelled Promise and cancel resolver -> resolver Context -> Promise",
+      "snapshot": {
+        "dictionaryId": 69691,
+        "dictionaryBytes": 12,
+        "propertyTableId": 117415,
+        "propertyTableBytes": 224,
+        "slots": [
+          {
+            "name": "memory-1",
+            "id": 117403,
+            "slotBytes": 24
+          },
+          {
+            "name": "memory-0",
+            "id": 117405,
+            "slotBytes": 24
+          },
+          {
+            "name": "memory-2",
+            "id": 117407,
+            "slotBytes": 24
+          },
+          {
+            "name": "memory-4",
+            "id": 117409,
+            "slotBytes": 24
+          },
+          {
+            "name": "memory-3",
+            "id": 117411,
+            "slotBytes": 24
+          },
+          {
+            "name": "memory",
+            "id": 117413,
+            "slotBytes": 24
+          }
+        ],
+        "perSlotObservedBytes": {
+          "slot": 24,
+          "promise": 20,
+          "resolver": 28,
+          "resolverContext": 24
+        },
+        "lowerBoundSixSlotBytesIncludingDictionaryAndPropertyTable": 812
+      },
+      "reproduction": "distinct-name-reproduction.json: actual committed beginOperation creates 1000,2000,...,10000 strongly held keys; destroyApp performs this allocation even for an absent sandbox.",
+      "fix": "Track uses in the shared slot, acquire for begin/observe, release exactly once on operation completion, and delete only current slot with no remaining users. Preload observing a destroy slot must keep it alive until idle preload completion. Promise identity prevents ABA after revision reset.",
+      "risks": [
+        "A completed superseded work release must not delete a replacement slot.",
+        "The cancellation-facing completion and actual destroy teardown completion are different for reentrant destroy; release after actual work.",
+        "Older separately bundled core copies do not understand lease increments; mixed protocol versions require explicit compatibility handling or scope statement.",
+        "A speculative fulfilled Promise.race -> returned destroy callback retention chain was NOT reproduced: actual helper experiment collected all100 markers while intent slots remained. Do not claim sandbox leak on that basis."
+      ]
+    },
+    {
+      "id": "MEM-INSTANCEOF-TABLE",
+      "kind": "confirmed empty weak-table backing capacity after realm GC",
+      "sources": [
+        "packages/jieshu-core/src/iframe.ts:409",
+        "packages/jieshu-core/src/iframe.ts:419",
+        "packages/jieshu-core/src/iframe.ts:484"
+      ],
+      "retainingPath": "Core module lexical Context @105221 -> ka (instanceofPatchStates) WeakMap @105825 -> internal table @108593",
+      "snapshot": {
+        "id": 108593,
+        "bytes": 32788,
+        "edgeCount": 2146,
+        "holes": 2145,
+        "nonHoleEdges": [
+          {
+            "type": "internal",
+            "name": "map",
+            "to": {
+              "id": 281,
+              "type": "native",
+              "name": "system / Map",
+              "bytes": 0
+            }
+          }
+        ]
+      },
+      "attribution": "Current standardized build test-results/footprint-bundle/jieshu-whole-core-es2018.js maps ka.get/set usage to registerInstanceofPeer and constructor/peers state. Historical minified Context has same variable ka. Table has only holes and map edge, no live constructor/state entry.",
+      "fixOptions": [
+        "Bind state metadata to the existing patched Symbol.hasInstance function, which already closes over the state, eliminating a module-wide WeakMap table; preserve original-constructor/subclass checks, reference counts and release ownership.",
+        "Partition by realm using WeakMap<Window,...> so a collected realm also releases its inner table; audit aliased/shared constructor identity across realms before adopting.",
+        "If lifecycle cleanup is chosen, wire the currently ignored release callback into real destroy and verify table capacity actually shrinks; deleting peers alone is insufficient evidence of backing-store release."
+      ],
+      "expectedCeiling": "This historical table itself costs32788 bytes, about8% of407159-byte total self-size delta; not the dominant code/source delta."
+    },
+    {
+      "id": "MEM-REGISTRIES-CLEAN",
+      "kind": "verified empty after final destroy",
+      "evidence": [
+        {
+          "id": 107445,
+          "bytes": 76,
+          "edgeCount": 1,
+          "holes": 0,
+          "nonHoleEdges": [
+            {
+              "type": "internal",
+              "name": "map",
+              "to": {
+                "id": 213,
+                "type": "native",
+                "name": "system / Map",
+                "bytes": 0
+              }
+            }
+          ]
+        },
+        {
+          "id": 107477,
+          "bytes": 76,
+          "edgeCount": 1,
+          "holes": 0,
+          "nonHoleEdges": [
+            {
+              "type": "internal",
+              "name": "map",
+              "to": {
+                "id": 213,
+                "type": "native",
+                "name": "system / Map",
+                "bytes": 0
+              }
+            }
+          ]
+        },
+        {
+          "id": 107489,
+          "bytes": 76,
+          "edgeCount": 1,
+          "holes": 0,
+          "nonHoleEdges": [
+            {
+              "type": "internal",
+              "name": "map",
+              "to": {
+                "id": 213,
+                "type": "native",
+                "name": "system / Map",
+                "bytes": 0
+              }
+            }
+          ]
+        },
+        {
+          "id": 108811,
+          "bytes": 76,
+          "edgeCount": 3,
+          "holes": 0,
+          "nonHoleEdges": [
+            {
+              "type": "internal",
+              "name": "5",
+              "to": {
+                "id": 28219,
+                "type": "string",
+                "name": "1788939986250",
+                "bytes": 28
+              }
+            },
+            {
+              "type": "internal",
+              "name": "6",
+              "to": {
+                "id": 109291,
+                "type": "object",
+                "name": "Object",
+                "bytes": 28
+              }
+            },
+            {
+              "type": "internal",
+              "name": "map",
+              "to": {
+                "id": 213,
+                "type": "native",
+                "name": "system / Map",
+                "bytes": 0
+              }
+            }
+          ]
+        }
+      ],
+      "interpretation": "idToSandboxMap, teardownById and unmountHookDepthById tables are empty; event map contains only host public bus. Core destroy removes sandbox cache and settles/removes tombstones. setupApp options intentionally persist, as Wujie does."
+    },
+    {
+      "id": "MEM-FIXED-INITIALIZATION",
+      "kind": "normal fixed module allocations; low priority",
+      "sources": [
+        "packages/jieshu-core/src/entry.ts:96",
+        "packages/jieshu-core/src/entry.ts:249",
+        "packages/jieshu-core/src/proxy.ts:31",
+        "packages/jieshu-core/src/effect.ts:61",
+        "packages/jieshu-core/src/effect.ts:828",
+        "packages/jieshu-core/src/iframe-script.ts:344"
+      ],
+      "interpretation": "Three AssetCache objects eagerly create18 Map/WeakMap/WeakSet containers, which are empty after clear except weak-table holes; five document/location membership Sets duplicate information also retained in policy arrays; single-instance forwarding/pipeline classes add fixed objects and closures. Lazy creation can improve never-started baseline but cannot reduce used-then-destroyed idle footprint without discarding state. Pure-function simplification/deduplication is safer than adding lazy/reset machinery for a few KiB."
+    }
+  ],
+  "limitations": [
+    "Self sizes are not retained sizes or browser RSS.",
+    "No new browser memory sampling in this audit.",
+    "The previously established258216 code-byte and86015 external-string-byte deltas still dominate; fixing the concrete small state issues cannot guarantee Wujie parity.",
+    "Existing V8 weak-table capacity is a collectible-key/capacity issue, not evidence of retained child realms."
+  ]
+}

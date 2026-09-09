@@ -13,3 +13,5 @@ examples/vue2/public/tinymce/
 pnpm-lock.yaml
 **/CHANGELOG.md
 packages/*/types/
+# Preserve recorded benchmark bytes and manifest checksums.
+benchmarks/comparison/results/

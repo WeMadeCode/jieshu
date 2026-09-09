@@ -1,0 +1,22 @@
+[
+  {
+    "candidate": "frozen-baseline",
+    "bundleBytes": 108681,
+    "gzipBytes": 32759
+  },
+  {
+    "candidate": "flatten-constants",
+    "bundleBytes": 108087,
+    "gzipBytes": 32571
+  },
+  {
+    "candidate": "share-attributes",
+    "bundleBytes": 108477,
+    "gzipBytes": 32749
+  },
+  {
+    "candidate": "both",
+    "bundleBytes": 107883,
+    "gzipBytes": 32550
+  }
+]
