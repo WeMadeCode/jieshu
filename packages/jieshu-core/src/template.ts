@@ -80,7 +80,7 @@ const JAVASCRIPT_TYPES = new Set([
 ]);
 const RCDATA_TAGS = new Set(['textarea', 'title']);
 const RAW_TEXT_TAGS = new Set(['iframe', 'noembed', 'noframes', 'noscript', 'xmp']);
-const STYLE_ATTRIBUTE_NAMES = ['media', 'nonce', 'title', 'type', 'blocking', 'disabled'] as const;
+export const STYLE_ATTRIBUTE_NAMES = ['media', 'nonce', 'title', 'type', 'blocking', 'disabled'] as const;
 
 type ForeignNamespace = 'svg' | 'math';
 
@@ -615,18 +615,24 @@ function isSerializableAttributeName(name: string): boolean {
   return true;
 }
 
-function escapeAttributeValue(value: string): string {
+export const escapeAttributeValue = (value: string) => {
   let escaped = '';
   for (let index = 0; index < value.length; index += 1) {
     const character = value[index];
-    if (character === '&') escaped += '&amp;';
-    else if (character === '"') escaped += '&quot;';
-    else if (character === '<') escaped += '&lt;';
-    else if (character === '>') escaped += '&gt;';
-    else escaped += character;
+    if (character === '&') {
+      escaped += '&amp;';
+    } else if (character === '"') {
+      escaped += '&quot;';
+    } else if (character === '<') {
+      escaped += '&lt;';
+    } else if (character === '>') {
+      escaped += '&gt;';
+    } else {
+      escaped += character;
+    }
   }
   return escaped;
-}
+};
 
 function serializeResolvedLink(attributes: ScriptAttributes, resolvedHref: string): string {
   let serializedAttributes = '';

@@ -1,0 +1,2196 @@
+{
+  "generatedAt": "2026-09-09T14:56:31.554Z",
+  "method": "Isolated original and candidate source helpers transpiled to native ES2018 async functions. Compare exact event order, microtask sentinels, error object identity, log keys, response.text receiver and thrown callback/logger behavior. No framework/browser integration is claimed.",
+  "limitations": [
+    "Internal function names and new Error stack locations differ after refactoring; stack text is deliberately not compared.",
+    "These are isolated helper checks, not the required core behavior and integration tests for a landed change."
+  ],
+  "scenarios": 312,
+  "failures": 0,
+  "results": [
+    {
+      "kind": "html",
+      "scenario": "success",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "success",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "success",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "success",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "success",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "success",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "success",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "success",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-thenable",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-thenable",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "response-undefined",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "response-undefined",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "response-undefined",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "response-undefined",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-thenable",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-thenable",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "html",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "success",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "success",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "success",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "success",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "success",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "success",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "success",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "success",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-thenable",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-thenable",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "response-undefined",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "response-undefined",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "response-undefined",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "response-undefined",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-thenable",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-thenable",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "style",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "success",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "success",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "success",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "success",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "success",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "success",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "success",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "success",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-thenable",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-thenable",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "fetch-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "response-undefined",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "response-undefined",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "response-undefined",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "response-undefined",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "response-undefined",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "status-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-getter-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-getter-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-getter-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-sync-throw",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-sync-throw",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-sync-throw",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-error",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-error",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-error",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-string",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-string",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-reject-string",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-thenable",
+      "handlerMode": "none",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-thenable",
+      "handlerMode": "none",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-thenable",
+      "handlerMode": "normal",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-error",
+      "loggerThrows": true,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": false,
+      "equal": true
+    },
+    {
+      "kind": "script",
+      "scenario": "text-thenable",
+      "handlerMode": "throw-string",
+      "loggerThrows": true,
+      "equal": true
+    }
+  ]
+}

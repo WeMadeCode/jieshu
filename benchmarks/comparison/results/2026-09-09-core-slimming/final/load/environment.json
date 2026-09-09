@@ -1,0 +1,69 @@
+{
+  "startedAt": "2026-09-09T15:12:04.419Z",
+  "samples": 60,
+  "traceSamplesPerEncoding": 7,
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "totalMemoryBytes": 17179869184,
+  "loadAverage": [
+    1.8017578125,
+    3.15673828125,
+    4.1064453125
+  ],
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "status": "",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    },
+    "jieshu": {
+      "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+      "status": "M benchmarks/comparison/README.md\n M benchmarks/comparison/measure-core-load.mjs\n M benchmarks/comparison/run.mjs\n M packages/jieshu-core/__test__/unit/cache-fetch-context.test.ts\n M packages/jieshu-core/__test__/unit/controller.test.ts\n M packages/jieshu-core/__test__/unit/entry-pipeline.test.ts\n M packages/jieshu-core/src/controller.ts\n M packages/jieshu-core/src/entry.ts\n M packages/jieshu-core/src/template.ts\n?? benchmarks/comparison/before-bundle.mjs\n?? benchmarks/comparison/before-bundle.test.mjs\n?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs\n?? benchmarks/comparison/results/2026-09-09-core-load/\n?? benchmarks/comparison/summarize-before-after.mjs\n?? benchmarks/comparison/summarize-before-after.test.mjs\n?? benchmarks/comparison/summarize-core-load-causes.mjs\n?? benchmarks/comparison/verify-core-load-variants.mjs\n?? docs/notes/core-load-causes.md\n?? docs/notes/core-load-slimming.md\n?? packages/jieshu-core/__test__/unit/entry-request-errors.test.ts",
+      "bundleBytes": 107474,
+      "gzipBytes": 32578,
+      "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5"
+    },
+    "jieshu-before": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/inspect-instanceof-heap.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md\n?? docs/notes/instanceof-memory-optimization.md\n?? packages/jieshu-core/__test__/unit/instanceof-state.test.ts",
+      "bundleBytes": 108581,
+      "gzipBytes": 32708,
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+      "source": {
+        "kind": "saved-bundle",
+        "bundlePath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-load-ab/jieshu.js",
+        "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "environmentPath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-load-ab/environment.json",
+        "environmentSha256": "a868e84061f4760fa8bb1f0d563d20339110f1c1d504105d11e2561753483a63",
+        "copiedEnvironment": "jieshu-before.environment.json"
+      }
+    }
+  },
+  "bundleTransport": "All core bundles are UTF-8 buffers prepared before sampling; no per-request string encoding.",
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production"
+  },
+  "method": [
+    "Fresh browser context for every observation; three-framework order rotates each round and reverses every three rounds to balance all positions; serial sampling, CPU 1x. jieshu-before uses the hash-verified saved bundle and original metadata. Its request route is /before.js, equal in length to /jieshu.js to avoid URL-length differences in GC heap measurements; the recorded framework and output file remain jieshu-before.",
+    "No sub-application or benchmark fixture installed. Measurement function installed before baseline GC.",
+    "Legacy HTML/JS omits charset; UTF-8 HTML/JS declares charset. Both transfer identical UTF-8 source bytes.",
+    "Before/after heap uses forced GC outside load timing. After core load, no mounts or lifecycle operations occur.",
+    "Resource responseEnd-startTime includes request scheduling, localhost network and response transfer.",
+    "onload-responseEnd is response end to onload, not pure parsing or execution; work can overlap transfer.",
+    "Performance duration deltas include identical measurement instrumentation. Missing metrics are null.",
+    "GC JS heap and DOM counts are not process RSS or total browser memory.",
+    "Each context has an empty HTTP cache; Chromium process-level compilation caches are not explicitly cleared."
+  ]
+}

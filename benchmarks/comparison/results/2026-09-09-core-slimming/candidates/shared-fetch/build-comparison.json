@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-09-09T14:55:05.826Z",
+  "sourceSnapshotSha256": "50f8aaa714c54c9e1d03f1ace28d03847120c8f9aa8a510042e1b56c665c38d6",
+  "originalEntrySha256": "b149484c29c972099d18c85199e8c3b559c62083604872b3c9a1c43eb8dee509",
+  "candidateEntrySha256": "94224ab273b3a59daab7777fa3761d82836cf9f9482fb1559b0ac41478249981",
+  "method": "Both variants built against the same in-memory snapshot of all core src files; only entry.ts differs. Production ES2018 minified whole-core IIFE.",
+  "results": [
+    {
+      "variant": "original",
+      "bytes": 108349,
+      "gzipBytes": 32692,
+      "sha256": "40241cbbe8bde2b41aea55158418eda4cded68a29a23b326367fbb5760c2b384"
+    },
+    {
+      "variant": "candidate",
+      "bytes": 108131,
+      "gzipBytes": 32643,
+      "sha256": "6236d0c40f6f563dcd8c16f946d90b8ff1030017d7eb1b25ae061cddd0f20978"
+    }
+  ],
+  "delta": {
+    "bytes": -218,
+    "gzipBytes": -49
+  }
+}

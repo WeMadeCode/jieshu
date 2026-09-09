@@ -1,0 +1,196 @@
+{
+  "generatedAt": "2026-09-09T15:23:42.733597+00:00",
+  "baselineCommit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+  "currentCoreBundle": {
+    "bytes": 107474,
+    "gzipBytes": 32578,
+    "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5"
+  },
+  "coreSourcesSha256": {
+    "packages/jieshu-core/src/common.ts": "cd78749ffdf60079847ab080177953b033a871ec39deba491c2abf48a2bf4d37",
+    "packages/jieshu-core/src/constant.ts": "25c41f9f80ab7fbf80a0e65b87afef201789c8d496cd00ee60fb2b8dfc9a8209",
+    "packages/jieshu-core/src/contracts.ts": "7b60e4ea99f48bb56f72ce2bad73f75e0c2dd5e6965da6a46e45ab33ae0f320e",
+    "packages/jieshu-core/src/controller.ts": "28080edac9b24973c23754467d4e4ccf11a536108bce9ae2db000f40f784d58f",
+    "packages/jieshu-core/src/effect-pipeline.ts": "86339d701046842c341de4d66c136717cf6c88e64f4bab513d5dccb879be76aa",
+    "packages/jieshu-core/src/effect.ts": "57989ac98da0eb3dd8ea056ea74184f5f8e5f06f650b2b5d6b31286fdcd18cdf",
+    "packages/jieshu-core/src/entry.ts": "64556478c014744521257861cb759aa04942ad59402b17480ef4dcc44fa10093",
+    "packages/jieshu-core/src/event.ts": "beb4994f870d2ed8110fc8e7810fc4403e331a53db8f22d83d6be378e2b4b3b7",
+    "packages/jieshu-core/src/function-binding.ts": "b2d98b9558838f56a1e5062d90bd9bba153f7fb66e32613dc0c9205b08c6c71b",
+    "packages/jieshu-core/src/iframe-inline-events.ts": "229dfb2874156f4928a4410fc1ec7a92d27ddfbac50e7880bde924a423f6b13e",
+    "packages/jieshu-core/src/iframe-script.ts": "be6e755573c5388a224f70090954e8d283f3e8372fd6d77c5a7973e2b51e7b32",
+    "packages/jieshu-core/src/iframe.ts": "836ceb3df2959219fdc36e496c0dcae724c7486f4b266efd70a09b47cfe066c6",
+    "packages/jieshu-core/src/index.ts": "92d25ee3f41375d22644d3dde7d8a6db42520e33859a47293f85d6be1d4a2bef",
+    "packages/jieshu-core/src/native-dom.ts": "36e18b8d4131f386e4a819e3fc3e555d57ab254bbab263e86c131a7c2bf42669",
+    "packages/jieshu-core/src/operation-intent.ts": "9b2a529ff5e032934fb6e4333265ad7b4447ecfd04a574c6ab4bfa9e795cbf26",
+    "packages/jieshu-core/src/options.ts": "f000c1bbb3b10a0aeb4ce7dea04dc313515f44839bc46edda266122974250d7f",
+    "packages/jieshu-core/src/plugin.ts": "888eb308cc0461a15bf80483b00bef9b195646344b551ebb4a3383114f2bb95c",
+    "packages/jieshu-core/src/proxy-resolver.ts": "fb18091bc4146797642242d82350129a275c00e0528476ae22775029cde7bd55",
+    "packages/jieshu-core/src/proxy.ts": "fbcb42d9e4ac37a819212c58c7bc4083da84efa52ccde56ade058ca686efe5b2",
+    "packages/jieshu-core/src/route-state.ts": "a49db9e7ea72900c70ed1ae54a32ffd9bbe131c69f91f5161e9862fe6aad7edd",
+    "packages/jieshu-core/src/sandbox-policy.ts": "d35f598e46756bed5ae75643f5967e6e242705fa2536c671820198b118db5105",
+    "packages/jieshu-core/src/sandbox-registry.ts": "85d78f3d12f51fb2599ea213d45f594c0c876c13ded2edc78eeb73c30ce40887",
+    "packages/jieshu-core/src/sandbox-runtime.ts": "4cab9548d3e998561614a344b46c4eb1ae98dd162269ab911878cca5f4b94fff",
+    "packages/jieshu-core/src/sandbox.ts": "34df43dfef90418cc933b5a2579652bd60e30298d02595fba3e5ad70ba63a4b6",
+    "packages/jieshu-core/src/shadow.ts": "22816201e9ea70301bec61dac6927660c88d6bec8bf5c0e2cd15a6528bf6edb0",
+    "packages/jieshu-core/src/sync.ts": "1a7a51eeb1873f5cda630120f8cd92583effb5c25d7d88d5f2c128af59c0734e",
+    "packages/jieshu-core/src/template.ts": "2def888d9ac7402b8272f7ce51271c4be6e180a8160a0d34c4ad09f39ba3c0f2",
+    "packages/jieshu-core/src/tracker.ts": "8a31cc951e76cd3fdb218dd1e8ff98673f5e33e8c02ba083d9c0a99d90fd94f7",
+    "packages/jieshu-core/src/url-utils.ts": "a98a64f25c79d18c3aa0ad9d5c7119e33cbb4f373cfb34f2c2ba5038f8bb082d",
+    "packages/jieshu-core/src/utils.ts": "76f301873355a336e75c975618136ffa392343b82fa2215f1cf618cf41c076bd"
+  },
+  "coverage": {
+    "statements": 79.14,
+    "branches": 72.25,
+    "functions": 83.91,
+    "lines": 80.96
+  },
+  "validation": {
+    "unit": {
+      "command": "PATH=/tmp/jieshu-pnpm-10.28.2/bin:$PATH pnpm --filter @cloud/jieshu-core test:unit",
+      "log": "test-results/core-slimming-unit.log",
+      "logSha256": "7611f73628184b52e68433081994af3770e113e45649ee86a058c0f89d79248d",
+      "files": 55,
+      "passed": 564,
+      "failed": 0
+    },
+    "browser": {
+      "command": "PATH=/tmp/jieshu-pnpm-10.28.2/bin:$PATH pnpm --filter @cloud/jieshu-core exec playwright test --config __test__/browser/playwright.config.mts",
+      "log": "test-results/core-slimming-browser.log",
+      "logSha256": "9ea9a2bf4e4fac11d31c38517770a7dafdfede8952796060411c3262e24e8cdf",
+      "passed": 137,
+      "failed": 0
+    },
+    "integration": {
+      "command": "PATH=/tmp/jieshu-pnpm-10.28.2/bin:$PATH NODE_OPTIONS=--openssl-legacy-provider pnpm --filter @cloud/jieshu-core exec playwright test --config __test__/integration/playwright.config.mts",
+      "log": "test-results/core-slimming-integration.log",
+      "logSha256": "9b11b4b8e14480587eb8119ae4f71ed8f1b2991d6bd25543fb584a7cdb53f47f",
+      "passed": 77,
+      "failed": 0
+    },
+    "build": {
+      "command": "PATH=/tmp/jieshu-pnpm-10.28.2/bin:$PATH pnpm --filter @cloud/jieshu-core build",
+      "log": "test-results/core-slimming-build.log",
+      "logSha256": "ceaedfb56e1111a06623056a033b0fdba421533df6b5be9c10e2131528313620",
+      "exitCode": 0
+    },
+    "typecheck": {
+      "command": "PATH=/tmp/jieshu-pnpm-10.28.2/bin:$PATH pnpm --filter @cloud/jieshu-core typecheck",
+      "log": "test-results/core-slimming-typecheck.log",
+      "logSha256": "6ec2b736a096580a80940cb4397bc33af615ff65b80c8c9a27a305e2667bff8d",
+      "exitCode": 0
+    },
+    "core-lint": {
+      "command": "pnpm exec eslint packages/jieshu-core/src/controller.ts packages/jieshu-core/src/entry.ts packages/jieshu-core/src/template.ts packages/jieshu-core/__test__/unit/controller.test.ts packages/jieshu-core/__test__/unit/cache-fetch-context.test.ts packages/jieshu-core/__test__/unit/entry-pipeline.test.ts packages/jieshu-core/__test__/unit/entry-request-errors.test.ts benchmarks/comparison/run.mjs benchmarks/comparison/before-bundle.mjs benchmarks/comparison/before-bundle.test.mjs --max-warnings=0",
+      "log": "test-results/core-slimming-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    "benchmark-tests": {
+      "command": "node --test benchmarks/comparison/before-bundle.test.mjs benchmarks/comparison/summarize-before-after.test.mjs",
+      "log": "test-results/core-slimming-benchmark-tests.log",
+      "logSha256": "a678e76c15640c4c28fb323587f9964ffaabc6553ce0664d4745d5869efa56ed",
+      "passed": 14,
+      "failed": 0
+    },
+    "benchmark-lint": {
+      "command": "pnpm exec eslint benchmarks/comparison/measure-core-load.mjs benchmarks/comparison/run.mjs benchmarks/comparison/before-bundle.mjs benchmarks/comparison/before-bundle.test.mjs benchmarks/comparison/summarize-before-after.mjs benchmarks/comparison/summarize-before-after.test.mjs --max-warnings=0",
+      "log": "test-results/core-slimming-benchmark-lint.log",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    "format": {
+      "command": "pnpm exec prettier --check packages/jieshu-core/src/controller.ts packages/jieshu-core/src/entry.ts packages/jieshu-core/src/template.ts packages/jieshu-core/__test__/unit/controller.test.ts packages/jieshu-core/__test__/unit/cache-fetch-context.test.ts packages/jieshu-core/__test__/unit/entry-pipeline.test.ts packages/jieshu-core/__test__/unit/entry-request-errors.test.ts benchmarks/comparison/measure-core-load.mjs benchmarks/comparison/run.mjs benchmarks/comparison/before-bundle.mjs benchmarks/comparison/before-bundle.test.mjs benchmarks/comparison/summarize-before-after.mjs benchmarks/comparison/summarize-before-after.test.mjs docs/notes/core-load-slimming.md benchmarks/comparison/README.md",
+      "exitCode": 0,
+      "log": "test-results/core-slimming-format.log",
+      "logSha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    "diff-check": {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  },
+  "measurements": {
+    "core-slimming-load-ab": {
+      "records": 402,
+      "passed": 402,
+      "failed": 0,
+      "traceRecords": 42,
+      "environmentSha256": "6b0cb39161c411335f2bd0e0df03383c001620dcc4382f40323cf56f7e05d1f1",
+      "observationsSha256": "c3065c864060c9167d705dd69afbe9ce1d723438bd9be7f0c747d84870267364"
+    },
+    "core-slimming-startup-ab": {
+      "records": 360,
+      "passed": 360,
+      "failed": 0,
+      "traceRecords": 0,
+      "environmentSha256": "45eeed2d51457cfee4f40a41cd7b5831adf60ed745b97c406d343aa139f89e44",
+      "observationsSha256": "aa26952507c3029aa7335787981a479ca2eb002129a3a46f94f6f14de7cb98be"
+    },
+    "core-slimming-load-buffer-ab": {
+      "records": 402,
+      "passed": 402,
+      "failed": 0,
+      "traceRecords": 42,
+      "environmentSha256": "0c09c76bdefd4788fe1fe4cbeb15af5235f80b18c3aa94d79b2d2f182b4d1ed8",
+      "observationsSha256": "b8d74a6867175d5a22b728fb8b3ef12305288957246218222035cf9aee7acec1"
+    },
+    "core-slimming-startup-buffer-ab": {
+      "records": 360,
+      "passed": 360,
+      "failed": 0,
+      "traceRecords": 0,
+      "environmentSha256": "5488c140868f574a2db3bd9c3bf27aea759cc07f3dfdf4f2f4c88ae7d0f3a9e6",
+      "observationsSha256": "37908553bb26becd2cf53eb6b87e894cc062f58737516a8c6f2885fa01495a4d"
+    },
+    "core-slimming-memory-ab": {
+      "records": 3,
+      "passed": 3,
+      "failed": 0,
+      "traceRecords": 0,
+      "environmentSha256": "d0d5ac1211903f6ff050a206d56ca552c48c61754a10cabd4bfb7fb1e921e542",
+      "observationsSha256": "f1dee1def39b564766076e4fe9f1c3e3b5c27468052e3c1f581ac1c9c3891d69"
+    },
+    "core-slimming-stability": {
+      "records": 96,
+      "passed": 90,
+      "failed": 6,
+      "traceRecords": 0,
+      "environmentSha256": "f7c7080685a25f22ef2c3f6192369384f1a3033288b5f52f65e511bc299366fa",
+      "observationsSha256": "7dbdd1b4fc3e638e44ad7335bc12368114e815be1da5917f0049175b7583c7bb"
+    },
+    "core-slimming-components-load": {
+      "records": 402,
+      "passed": 402,
+      "failed": 0,
+      "traceRecords": 42,
+      "environmentSha256": "393105bc4629ffca83e7f34e24afd1436d40d2f16aa10245183f61910c2841b7",
+      "observationsSha256": "e6bb2bc61614413ef5689ebc5d5ce111432d80eea59ab17633ab636292173411"
+    },
+    "core-slimming-cpu4x-tail-ab": {
+      "records": 270,
+      "passed": 270,
+      "failed": 0,
+      "traceRecords": 0,
+      "environmentSha256": "57cbf95b5fcd67327ec57e5f60fe95934ddb5c5b8484e6488207e41673edb407",
+      "observationsSha256": "039cbecaa4cf6a07d964efd5c77ac3f31b57f49974157b9f5a7af8c8903faae7"
+    }
+  },
+  "toolSources": {
+    "benchmarks/comparison/measure-core-load.mjs": "c957243eab4da8f39ae969a24ae631e13e1562acbdb586975221166010b4e942",
+    "benchmarks/comparison/run.mjs": "32e9d8c083e039aa7cff10e27fe027061b842dcdbc583bfcd0debe7a81df750e",
+    "benchmarks/comparison/before-bundle.mjs": "090f6ce1683bae82561704e6b27d976464493daa590d4ce27b86bcaa6dd949f7",
+    "benchmarks/comparison/summarize-before-after.mjs": "afb9be2bb7f8dc09d6a8f4479bdc04b24885382e7963c35d06466a1511b2ee7e",
+    "test-results/prepare-core-load-factor-variants.mjs": "24d120020d0da921ab849e74d520ac7d8b787b38db0b370221bce94bf51c28d4",
+    "test-results/measure-core-slimming-components.mjs": "ce85697af6b97fcc598d62a60860e1173b4bffc6e84e177dae96b0bb61c35fb3"
+  },
+  "coreUnchangedThroughAllRuns": true,
+  "notes": [
+    "Initial string-versus-buffer transport observations are retained for audit only, not for final load-time conclusions.",
+    "Stability failures are six pre-existing Wujie concurrency checks; Jieshu passed all 48.",
+    "No production core changes occurred after the full behavior tests and captured build.",
+    "GC heap is not browser RSS; single lifecycle memory round has no confidence interval.",
+    "Temporary component build and measure scripts remain under ignored test-results; exact SHA and prepared manifest are recorded.",
+    "The initial CPU4x P95 difference of +13.25 ms did not persist in the separate 90-round followup (+0.60 ms, paired 95% CI [-0.685,2.555]); runs are not pooled.",
+    "Corrected core total-load median decreases by 0.10 ms but its paired interval [-0.25,0.05] includes zero; stable total-load improvement is not established."
+  ]
+}

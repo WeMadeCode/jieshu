@@ -1,0 +1,71 @@
+{
+  "startedAt": "2026-09-09T15:16:37.170Z",
+  "mode": "stability",
+  "samples": 30,
+  "memoryRounds": 5,
+  "stabilityRounds": 3,
+  "cycles": 30,
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "totalMemoryBytes": 17179869184,
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "loadAverage": [
+    3.33984375,
+    3.86181640625,
+    4.2060546875
+  ],
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "jieshu": {
+      "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+      "status": "M benchmarks/comparison/README.md\n M benchmarks/comparison/measure-core-load.mjs\n M benchmarks/comparison/run.mjs\n M packages/jieshu-core/__test__/unit/cache-fetch-context.test.ts\n M packages/jieshu-core/__test__/unit/controller.test.ts\n M packages/jieshu-core/__test__/unit/entry-pipeline.test.ts\n M packages/jieshu-core/src/controller.ts\n M packages/jieshu-core/src/entry.ts\n M packages/jieshu-core/src/template.ts\n?? benchmarks/comparison/before-bundle.mjs\n?? benchmarks/comparison/before-bundle.test.mjs\n?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs\n?? benchmarks/comparison/results/2026-09-09-core-load/\n?? benchmarks/comparison/summarize-before-after.mjs\n?? benchmarks/comparison/summarize-before-after.test.mjs\n?? benchmarks/comparison/summarize-core-load-causes.mjs\n?? benchmarks/comparison/verify-core-load-variants.mjs\n?? docs/notes/core-load-causes.md\n?? docs/notes/core-load-slimming.md\n?? packages/jieshu-core/__test__/unit/entry-request-errors.test.ts",
+      "package": "0.0.5",
+      "packageManager": "pnpm@10.28.2",
+      "bundleBytes": 107474,
+      "gzipBytes": 32578,
+      "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5"
+    },
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "status": "",
+      "package": "2.1.0",
+      "packageManager": "pnpm@10.33.0",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    }
+  },
+  "bundleTransport": "All core bundles are UTF-8 buffers prepared before sampling; no per-request string encoding.",
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production"
+  },
+  "fixture": {
+    "jsBytes": 3634,
+    "cssBytes": 65,
+    "domItems": 300,
+    "heapItems": 4000
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "limitations": [
+    "Headless Chromium only",
+    "Local HTTP, cross-origin ports",
+    "No browser total RSS measurement",
+    "Background desktop activity uncontrolled"
+  ],
+  "finishedAt": "2026-09-09T15:16:59.053Z",
+  "counts": {
+    "observations": 96,
+    "failures": 6
+  }
+}

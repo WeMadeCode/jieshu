@@ -10,6 +10,10 @@
 
 第二步处理真实销毁后的 instanceof WeakMap 空表容量，[实现、收益与代价](../../docs/notes/instanceof-memory-optimization.md)及[原始记录](./results/2026-09-09-instanceof/)单独保存。
 
+后续[核心加载原因分析](../../docs/notes/core-load-causes.md)用等体积注释、跳过初始化、gzip 和 CPU 对照定位成本，结果见 [2026-09-09-core-load](./results/2026-09-09-core-load/)。跳过行为的构建只用于诊断。
+
+后续[核心加载等价精简](../../docs/notes/core-load-slimming.md)记录实际修改、优化前后 A/B 和回归结果。
+
 ## 运行
 
 在 Jieshu 仓库根目录执行，使用已安装的 Vite 和 Playwright，以及 Playwright 对应的 Chromium。Wujie 仓库默认位于相邻的 `../wujie`，可以通过 `WUJIE_ROOT` 指定。脚本只从源码构建内存中的 bundle，不依赖已有 dist，不改两个 core。
@@ -28,6 +32,18 @@ BENCH_MODE=startup BENCH_SAMPLES=30 BENCH_OUTPUT=test-results/comparison-startup
 BENCH_MODE=memory BENCH_MEMORY_ROUNDS=5 BENCH_CYCLES=30 BENCH_OUTPUT=test-results/comparison-memory-new node benchmarks/comparison/run.mjs
 BENCH_MODE=stability BENCH_STABILITY_ROUNDS=3 BENCH_OUTPUT=test-results/comparison-stability-new node benchmarks/comparison/run.mjs
 ```
+
+对比优化前后的首次启动与生命周期内存，可加入此前 `measure-core-load.mjs` 保存的 Jieshu 产物：
+
+```bash
+BENCH_BEFORE_BUNDLE=test-results/previous-load/jieshu.js BENCH_MODE=startup BENCH_SCENARIOS=cold,cold-fiber,concurrent-5,cpu4x BENCH_SAMPLES=30 BENCH_OUTPUT=test-results/startup-ab-new node benchmarks/comparison/run.mjs
+BENCH_BEFORE_BUNDLE=test-results/previous-load/jieshu.js BENCH_MODE=memory BENCH_MEMORY_ROUNDS=1 BENCH_CYCLES=30 BENCH_OUTPUT=test-results/memory-ab-new node benchmarks/comparison/run.mjs
+node benchmarks/comparison/summarize-before-after.mjs --output test-results/ab-summary-new test-results/footprint-load-ab-new test-results/startup-ab-new test-results/memory-ab-new
+```
+
+`BENCH_BEFORE_BUNDLE` 仅支持 startup/memory/smoke；校验旁边 `environment.json` 的 SHA 和 production/minified/ES2018/IIFE 元数据。所有核心包在采样前统一编码为 UTF-8 Buffer，避免当前字符串和冻结字节采用不同服务器发送路径。冻结版本标记为 `jieshu-before`，夹具按 Jieshu 运行，与当前 Jieshu/Wujie 每六轮覆盖全部顺序。默认不设置时仍是原两组行为。
+
+三组数据需使用 `summarize-before-after.mjs`；既有 `summarize.mjs` 会拒绝该格式。前后统计按同 encoding 或 scenario、同 round 配对，排除 trace/预热及失败/缺失配对，报告 `median(current) − median(before)` 和固定种子 bootstrap 区间。多个输入目录必须使用相同产物和运行环境，同一组重复 round 会被拒绝。内存列出各阶段及相对 blank/core 的增量，单轮不估计区间。
 
 定位热点时可缩小场景或采集诊断数据：
 
@@ -68,6 +84,17 @@ IDLE_RETENTION_ALLOW_DIRTY=1 IDLE_RETENTION_EXPECT_SLOTS=none IDLE_RETENTION_OUT
 
 ## 指标含义
 
+核心加载原因实验分为固定产物准备、浏览器测量、离线配对统计三个阶段。每次使用新目录，源码不作生产修改：
+
+```bash
+CORE_CAUSE_OUTPUT=test-results/core-load-causes-new node benchmarks/comparison/prepare-core-load-variants.mjs
+CORE_CAUSE_INPUT=test-results/core-load-causes-new CORE_CAUSE_RUN=test-results/core-load-causes-new/formal node benchmarks/comparison/measure-core-load-causes.mjs
+node benchmarks/comparison/summarize-core-load-causes.mjs test-results/core-load-causes-new/formal
+CORE_VERIFY_INPUT=test-results/core-load-causes-new CORE_VERIFY_OUTPUT=test-results/core-load-causes-new/runtime-verification.json node benchmarks/comparison/verify-core-load-variants.mjs
+```
+
+默认七变体、35 轮、identity/gzip、CPU 1x/4x，共 980 个普通观测；另有 98 个 CPU 1x trace。可先设置 `CORE_CAUSE_SAMPLES=1 CORE_CAUSE_TRACE_SAMPLES=1` 并使用独立 `preflight` 输出目录验证 42 个样本。所有 guard 在已压缩产物中插入，原函数文本保留，但 V8 编译策略仍可能变化；不能把差值叫作纯初始化耗时。
+
 - `coreLoadMs`：独立加载核心 bundle 的耗时，包括本地 HTTP 获取、解析和执行；不含在 `readyMs` 中。没有把两个不同时间区间的中位数相加伪装为端到端冷启动。
 - `apiMs`：调用 `startApp` 到 Promise 返回；多个应用时为各应用 API 耗时的最大值。
 - `readyMs`：调用 `startApp` 到子应用报告 ready、目标容器内 ready DOM 可见，再经过两个主页面 rAF；是固定夹具的就绪指标，不是浏览器 FCP/LCP。多个应用时从批次发起到全部就绪。
@@ -80,9 +107,9 @@ fixture 含 300 个列表节点、4,000 个 JS 对象、两个按钮及动态资
 ## 文件
 
 - `fixture.mjs`：两边完全相同的子应用，以及只记录 JSON 快照的观测代码。
-- `run.mjs`：相同参数的源码构建、HTTP 服务、启动/内存采样与环境记录。
+- `run.mjs`：相同参数的源码构建、HTTP 服务、启动/内存采样与环境记录；`before-bundle.mjs` 校验可选冻结基线及轮换顺序。
 - `stability.mjs`：常规行为和并发健壮性检查，失败仍保存现场并继续。
-- `summarize.mjs`：从原始数据生成分布、置信区间和稳定性汇总。
+- `summarize.mjs`：两框架原始数据的分布、置信区间和稳定性汇总；`summarize-before-after.mjs` 处理含冻结 Jieshu 的前后对照。
 - `results/`：可纳入版本控制的小体积原始数据和报告；浏览器下载、trace、coverage、临时输出放在忽略目录中。
 
 并发取消可使用明确的 `AbortError`；内部空指针、残留 loading 或错误 DOM 归属仍计作健壮性失败。框架测试失败会进入原始数据；采样器完整执行后可以以退出码 0 结束，因此必须检查汇总中的失败数，不能仅以进程退出码判断两框架全部通过。

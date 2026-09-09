@@ -1,0 +1,270 @@
+{
+  "generatedAt": "2026-09-09T14:39:18.588Z",
+  "input": "/Users/zhouxiang/Documents/Github/jieshu/test-results/core-load-causes-7",
+  "manifestSha256": "a87e74978f794c7f7f069cb965e96ae7a478e7ceb26b92ca73127cc728e967ef",
+  "scriptSha256": "bc3497d182e482f91fcb4d795507d86f0c362e88dbadc86fd91bdaa8c120975c",
+  "browser": "151.0.7922.34",
+  "node": "v26.7.0",
+  "method": [
+    "Separate, instrumented runtime diagnostic; no observations from this script belong to the formal performance sample.",
+    "One fresh Chromium context and one page.evaluate per empty control or prepared variant.",
+    "Proxy construct traps count invocations of global Map/WeakMap/Set/WeakSet; each delegates with Reflect.construct(target, args, newTarget).",
+    "A receiver-preserving window.addEventListener wrapper records registration types. The diagnostic error listener is installed before wrapping.",
+    "Collection and listener counters are copied after script onload; the empty script uses the same instrumentation and load path.",
+    "All prepared source bytes are verified against the manifest SHA-256 before loading."
+  ],
+  "limitations": [
+    "Instrumentation changes constructor identities and execution. These observations establish executed allocations and registrations, not timing or heap size.",
+    "Counts exclude browser-engine internal collections and ordinary object/array/function allocations; they count constructions rather than unique retained objects.",
+    "Matching exports confirms names and startApp type only. Guarded variants intentionally lack functionality and are not functionally equivalent framework builds."
+  ],
+  "records": [
+    {
+      "id": "empty-control",
+      "sha256": "4a16cab41a8f641d77f5c3cb94e7ab34b15c97db8f816c124bca9ebad53340c0",
+      "counts": {
+        "Map": 0,
+        "WeakMap": 0,
+        "Set": 0,
+        "WeakSet": 0
+      },
+      "windowListenerRegistrations": [],
+      "coreValueType": "undefined",
+      "coreIsFalse": false,
+      "coreExportAvailable": false,
+      "coreExportNames": [],
+      "customElements": [],
+      "errors": [],
+      "pageErrors": []
+    },
+    {
+      "id": "wujie",
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+      "counts": {
+        "Map": 2,
+        "WeakMap": 4,
+        "Set": 1,
+        "WeakSet": 0
+      },
+      "windowListenerRegistrations": [
+        "popstate"
+      ],
+      "coreValueType": "object",
+      "coreIsFalse": false,
+      "coreExportAvailable": true,
+      "coreExportNames": [
+        "bus",
+        "clearAssetsCache",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "setupApp",
+        "startApp"
+      ],
+      "customElements": [
+        "wujie-app"
+      ],
+      "errors": [],
+      "pageErrors": []
+    },
+    {
+      "id": "jieshu",
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+      "counts": {
+        "Map": 14,
+        "WeakMap": 17,
+        "Set": 10,
+        "WeakSet": 4
+      },
+      "windowListenerRegistrations": [
+        "popstate"
+      ],
+      "coreValueType": "object",
+      "coreIsFalse": false,
+      "coreExportAvailable": true,
+      "coreExportNames": [
+        "bus",
+        "clearAssetsCache",
+        "createAppController",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "runAsUnmountReentry",
+        "setupApp",
+        "startApp"
+      ],
+      "customElements": [
+        "jieshu-app"
+      ],
+      "errors": [],
+      "pageErrors": []
+    },
+    {
+      "id": "wujie-padded",
+      "sha256": "dff9e9c679b5064bdea1a3043fd63fb42e5dbed109b80f5972c7abde4c200eb8",
+      "counts": {
+        "Map": 2,
+        "WeakMap": 4,
+        "Set": 1,
+        "WeakSet": 0
+      },
+      "windowListenerRegistrations": [
+        "popstate"
+      ],
+      "coreValueType": "object",
+      "coreIsFalse": false,
+      "coreExportAvailable": true,
+      "coreExportNames": [
+        "bus",
+        "clearAssetsCache",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "setupApp",
+        "startApp"
+      ],
+      "customElements": [
+        "wujie-app"
+      ],
+      "errors": [],
+      "pageErrors": []
+    },
+    {
+      "id": "jieshu-entry-skipped",
+      "sha256": "2f9df6eef7481d96c1f8deb0b89cc45114d4ca44508eeb4a3e2a4cb06d171040",
+      "counts": {
+        "Map": 14,
+        "WeakMap": 17,
+        "Set": 10,
+        "WeakSet": 4
+      },
+      "windowListenerRegistrations": [],
+      "coreValueType": "object",
+      "coreIsFalse": false,
+      "coreExportAvailable": true,
+      "coreExportNames": [
+        "bus",
+        "clearAssetsCache",
+        "createAppController",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "runAsUnmountReentry",
+        "setupApp",
+        "startApp"
+      ],
+      "customElements": [],
+      "errors": [],
+      "pageErrors": []
+    },
+    {
+      "id": "jieshu-caches-skipped",
+      "sha256": "09a068029bda2d0974b5d48886227aab8b57668a056e58144b14fed955b5d9b8",
+      "counts": {
+        "Map": 5,
+        "WeakMap": 11,
+        "Set": 10,
+        "WeakSet": 1
+      },
+      "windowListenerRegistrations": [
+        "popstate"
+      ],
+      "coreValueType": "object",
+      "coreIsFalse": false,
+      "coreExportAvailable": true,
+      "coreExportNames": [
+        "bus",
+        "clearAssetsCache",
+        "createAppController",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "runAsUnmountReentry",
+        "setupApp",
+        "startApp"
+      ],
+      "customElements": [
+        "jieshu-app"
+      ],
+      "errors": [],
+      "pageErrors": []
+    },
+    {
+      "id": "wujie-init-skipped",
+      "sha256": "e5d495d95e9ff35e725f94dbebdea95a881d361cfffe682a4f26c13087909fd9",
+      "counts": {
+        "Map": 0,
+        "WeakMap": 0,
+        "Set": 0,
+        "WeakSet": 0
+      },
+      "windowListenerRegistrations": [],
+      "coreValueType": "boolean",
+      "coreIsFalse": true,
+      "coreExportAvailable": false,
+      "coreExportNames": [],
+      "customElements": [],
+      "errors": [],
+      "pageErrors": []
+    },
+    {
+      "id": "jieshu-init-skipped",
+      "sha256": "37a5b1b47e98ff404e8fac43e52271ee90b9e11592e522e9d98e328a51acda28",
+      "counts": {
+        "Map": 0,
+        "WeakMap": 0,
+        "Set": 0,
+        "WeakSet": 0
+      },
+      "windowListenerRegistrations": [],
+      "coreValueType": "boolean",
+      "coreIsFalse": true,
+      "coreExportAvailable": false,
+      "coreExportNames": [],
+      "customElements": [],
+      "errors": [],
+      "pageErrors": []
+    }
+  ],
+  "cacheSuppressionDelta": {
+    "Map": 9,
+    "WeakMap": 6,
+    "Set": 0,
+    "WeakSet": 3
+  },
+  "validations": [
+    {
+      "name": "No uncaught import errors",
+      "valid": true
+    },
+    {
+      "name": "Empty control introduces no measured collections, listeners, exports or custom elements",
+      "valid": true
+    },
+    {
+      "name": "Skipping three AssetCache instances removes exactly 9 Map, 6 WeakMap and 3 WeakSet constructions",
+      "valid": true
+    },
+    {
+      "name": "Entry guard removes exactly one popstate registration and the custom element registration",
+      "valid": true
+    },
+    {
+      "name": "Wujie padding preserves complete export names and collection counts",
+      "valid": true
+    },
+    {
+      "name": "Jieshu partial guards preserve complete export names",
+      "valid": true
+    },
+    {
+      "name": "IIFE guards remove all observed core constructors, listeners and exports",
+      "valid": true
+    },
+    {
+      "name": "Each variant has the prepared expected startApp export presence",
+      "valid": true
+    }
+  ],
+  "allDiagnosticsValid": true
+}

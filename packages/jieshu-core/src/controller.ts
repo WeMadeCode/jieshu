@@ -40,13 +40,13 @@ export class RuntimeAppController implements AppController {
   public start(options: StartOptions): Promise<DestroyHandler | void> {
     const snapshot = { ...options };
     const { revision, previousAppsReleased } = this.begin(snapshot.name);
-    return this.startAtRevision(snapshot, revision, previousAppsReleased);
+    return this.runAtRevision('start', snapshot, revision, previousAppsReleased);
   }
 
   public refresh(options: StartOptions): Promise<DestroyHandler | void> {
     const snapshot = { ...options };
     const { revision, previousAppsReleased } = this.begin(snapshot.name);
-    return this.refreshAtRevision(snapshot, revision, previousAppsReleased);
+    return this.runAtRevision('refresh', snapshot, revision, previousAppsReleased);
   }
 
   public destroy(name: string): Promise<void> {
@@ -129,12 +129,15 @@ export class RuntimeAppController implements AppController {
     return !this.disposed && revision === this.revision;
   }
 
-  private async startAtRevision(
+  private async runAtRevision(
+    operation: 'start' | 'refresh',
     options: StartOptions,
     revision: number,
     previousAppsReleased?: Promise<void>,
-  ): Promise<DestroyHandler | void> {
-    if (previousAppsReleased) await previousAppsReleased;
+  ) {
+    if (previousAppsReleased) {
+      await previousAppsReleased;
+    }
     if (!this.isCurrent(revision)) {
       return undefined;
     }
@@ -148,58 +151,37 @@ export class RuntimeAppController implements AppController {
     this.pendingNames.set(revision, options.name);
     let destroy: DestroyHandler | void;
     try {
-      destroy = await this.runtime.start(options);
+      destroy = await this.runtime[operation](options);
       if (this.ownedApplication?.revision === revision) {
         this.ownedApplication.runtimeCompleted = true;
         this.ownedApplication.preserveOnDisconnect ||= this.runtime.shouldPreserveOnDisconnect?.(options.name) === true;
       }
+      // Refresh retains its pending name until stale cleanup finishes, including rejection.
+      if (operation === 'refresh') {
+        if (!this.isCurrent(revision)) {
+          if (destroy) {
+            await destroy();
+          }
+          return undefined;
+        }
+        return destroy;
+      }
     } catch (cause: unknown) {
-      if (this.ownedApplication?.revision === revision) this.ownedApplication.runtimeStarted = false;
+      if (this.ownedApplication?.revision === revision) {
+        this.ownedApplication.runtimeStarted = false;
+      }
       throw cause;
     } finally {
       this.pendingNames.delete(revision);
     }
 
+    // Start removes its pending name before stale cleanup and does not catch cleanup failures.
     if (!this.isCurrent(revision)) {
-      if (destroy) await destroy();
+      if (destroy) {
+        await destroy();
+      }
       return undefined;
     }
     return destroy;
-  }
-
-  private async refreshAtRevision(
-    options: StartOptions,
-    revision: number,
-    previousAppsReleased?: Promise<void>,
-  ): Promise<DestroyHandler | void> {
-    if (previousAppsReleased) await previousAppsReleased;
-    if (!this.isCurrent(revision)) {
-      return undefined;
-    }
-
-    const owner = this.ownedApplication;
-    if (!owner || owner.revision !== revision) {
-      return undefined;
-    }
-    owner.runtimeStarted = true;
-    owner.preserveOnDisconnect = options.alive === true;
-    this.pendingNames.set(revision, options.name);
-    try {
-      const destroy = await this.runtime.refresh(options);
-      if (this.ownedApplication?.revision === revision) {
-        this.ownedApplication.runtimeCompleted = true;
-        this.ownedApplication.preserveOnDisconnect ||= this.runtime.shouldPreserveOnDisconnect?.(options.name) === true;
-      }
-      if (!this.isCurrent(revision)) {
-        if (destroy) await destroy();
-        return undefined;
-      }
-      return destroy;
-    } catch (cause: unknown) {
-      if (this.ownedApplication?.revision === revision) this.ownedApplication.runtimeStarted = false;
-      throw cause;
-    } finally {
-      this.pendingNames.delete(revision);
-    }
   }
 }

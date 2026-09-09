@@ -1,0 +1,88 @@
+{
+  "generatedAt": "2026-09-09T15:10:23.083Z",
+  "baselineCommit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+  "baselineSha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+  "currentSha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5",
+  "sourceMapFile": "test-results/core-load-current-modules/jieshu-whole-core-es2018.js.map",
+  "sourceMapSha256": "9a4415f442e59e65a82816c5c5ee6051e78f49551e9b26f65e2a0825912a1b77",
+  "currentSnapshotFile": "test-results/core-load-factor-inputs/snapshot.json",
+  "currentSnapshotSha256": "063dba576be48de03bcd6e9ec048d39007c952a82b97288bd56589a53df62061",
+  "currentSourceFiles": [
+    {
+      "name": "controller.ts",
+      "sha256": "28080edac9b24973c23754467d4e4ccf11a536108bce9ae2db000f40f784d58f"
+    },
+    {
+      "name": "entry.ts",
+      "sha256": "64556478c014744521257861cb759aa04942ad59402b17480ef4dcc44fa10093"
+    },
+    {
+      "name": "template.ts",
+      "sha256": "2def888d9ac7402b8272f7ce51271c4be6e180a8160a0d34c4ad09f39ba3c0f2"
+    }
+  ],
+  "sourceTokensMatchCurrent": true,
+  "supplementalSources": [
+    {
+      "module": "packages/jieshu-core/src/common.ts",
+      "sha256": "cd78749ffdf60079847ab080177953b033a871ec39deba491c2abf48a2bf4d37"
+    }
+  ],
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "sourcemap": false,
+    "format": "iife",
+    "mode": "production",
+    "exports": "all public runtime exports"
+  },
+  "method": "Original source-map contents plus 557c51d supplemental sources; per-feature replacements from captured current sources. No runtime guards and no live core reads while building.",
+  "limitations": [
+    "Byte comparison does not establish functional equivalence or load-time improvement.",
+    "Feature sizes are measured on the common baseline; combination effects need not be additive."
+  ],
+  "variants": [
+    {
+      "id": "baseline",
+      "file": "baseline.js",
+      "bundleBytes": 108581,
+      "gzipBytes": 32708,
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e"
+    },
+    {
+      "id": "cache-methods-only",
+      "file": "cache-methods-only.js",
+      "bundleBytes": 108558,
+      "gzipBytes": 32697,
+      "sha256": "65b6e18a9ead6396f616d74be83e2f655fb79380eb64b8f1d2cce9059c9805f3"
+    },
+    {
+      "id": "shared-attributes-only",
+      "file": "shared-attributes-only.js",
+      "bundleBytes": 108372,
+      "gzipBytes": 32703,
+      "sha256": "d56046482cc29e50ebff2a24fde06287f5c0ecab056d0127bda36b39603fb831"
+    },
+    {
+      "id": "controller-only",
+      "file": "controller-only.js",
+      "bundleBytes": 107924,
+      "gzipBytes": 32639,
+      "sha256": "37cbfaf6ccdc9f729572be1d6ce37743b3dfad2a6703d9817c47bbb179a3584e"
+    },
+    {
+      "id": "shared-fetch-only",
+      "file": "shared-fetch-only.js",
+      "bundleBytes": 108361,
+      "gzipBytes": 32666,
+      "sha256": "c9c18b4522e836e8d2169433774c40f090125dd75abcc69c0cbb32eee9f60741"
+    },
+    {
+      "id": "all-current",
+      "file": "all-current.js",
+      "bundleBytes": 107474,
+      "gzipBytes": 32578,
+      "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5"
+    }
+  ]
+}

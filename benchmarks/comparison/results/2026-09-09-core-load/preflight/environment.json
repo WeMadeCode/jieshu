@@ -1,0 +1,359 @@
+{
+  "startedAt": "2026-09-09T14:28:40.060Z",
+  "input": "/Users/zhouxiang/Documents/Github/jieshu/test-results/core-load-causes-7",
+  "manifestSha256": "a87e74978f794c7f7f069cb965e96ae7a478e7ceb26b92ca73127cc728e967ef",
+  "manifest": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-09T14:27:30.838Z",
+    "build": {
+      "target": "es2018",
+      "minify": true,
+      "sourcemap": "hidden",
+      "format": "iife",
+      "mode": "production",
+      "exports": "all public runtime exports",
+      "vite": "8.2.2",
+      "node": "v26.7.0"
+    },
+    "revisions": {
+      "wujie": {
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "status": "",
+        "sourceSha256": "639f2792aa62997e112e32b334301689c7ed39419c4a6e06c8b296aeb23891f7",
+        "package": "2.1.0",
+        "packageManager": "pnpm@10.33.0",
+        "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+        "bundleBytes": 65660,
+        "gzipBytes": 19802,
+        "priorMeasuredSha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+        "matchesPriorMeasuredBundle": true
+      },
+      "jieshu": {
+        "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "status": "?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs",
+        "sourceSha256": "6b4b5d422b3f74dc515a22a16105d4b95ad4a02cca55d7c7f66c8dfd5d0b5624",
+        "package": "0.0.5",
+        "packageManager": "pnpm@10.28.2",
+        "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "bundleBytes": 108581,
+        "gzipBytes": 32708,
+        "priorMeasuredSha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "matchesPriorMeasuredBundle": true
+      }
+    },
+    "variants": [
+      {
+        "id": "wujie",
+        "framework": "wujie",
+        "file": "bundles/wujie.js",
+        "gzipFile": "bundles/wujie.js.gz",
+        "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+        "rawBytes": 65660,
+        "gzipBytes": 19802,
+        "gzipSha256": "0b9d18137960920cc7d6699e7cf8f114cc871b5a88fb41dbfe9a32d50ae51298",
+        "exportExpected": true,
+        "kind": "baseline",
+        "explanation": "Production ES2018 minified IIFE with all public runtime exports; hidden source map adds no footer.",
+        "baselineSha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+        "revision": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "instrumentationOffsets": [],
+        "sourceMapFile": "bundles/wujie.js.map",
+        "sourceMapSha256": "2b29898379eff1f037da7f78e1b862685847a8cb3581c0893b1cb4d134a708eb"
+      },
+      {
+        "id": "jieshu",
+        "framework": "jieshu",
+        "file": "bundles/jieshu.js",
+        "gzipFile": "bundles/jieshu.js.gz",
+        "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "rawBytes": 108581,
+        "gzipBytes": 32708,
+        "gzipSha256": "fd1a79e5aa84761b32b608e3fb7f4cd130f5f9ed7cca082939a31c39d1bc92ff",
+        "exportExpected": true,
+        "kind": "baseline",
+        "explanation": "Production ES2018 minified IIFE with all public runtime exports; hidden source map adds no footer.",
+        "baselineSha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "revision": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "instrumentationOffsets": [],
+        "sourceMapFile": "bundles/jieshu.js.map",
+        "sourceMapSha256": "9a4415f442e59e65a82816c5c5ee6051e78f49551e9b26f65e2a0825912a1b77"
+      },
+      {
+        "id": "wujie-padded",
+        "framework": "wujie",
+        "file": "bundles/wujie-padded.js",
+        "gzipFile": "bundles/wujie-padded.js.gz",
+        "sha256": "dff9e9c679b5064bdea1a3043fd63fb42e5dbed109b80f5972c7abde4c200eb8",
+        "rawBytes": 108581,
+        "gzipBytes": 20112,
+        "gzipSha256": "725229abb01424f18f8e297ddcf11a3b722fb0bc2e191a8e3a13b492ae4b5019",
+        "exportExpected": true,
+        "kind": "raw-byte-padding-control",
+        "explanation": "Wujie plus an ASCII block comment matching Jieshu raw size. Syntax work and compressed size are not matched.",
+        "baselineSha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+        "revision": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "instrumentationOffsets": [
+          {
+            "baselineUtf16Offset": 65190,
+            "baselineUtf8Offset": 65660,
+            "insertedAsciiBytes": 42921,
+            "reason": "Append one ASCII block comment to match Jieshu raw UTF-8 size."
+          }
+        ],
+        "paddingBytes": 42921
+      },
+      {
+        "id": "jieshu-entry-skipped",
+        "framework": "jieshu",
+        "file": "bundles/jieshu-entry-skipped.js",
+        "gzipFile": "bundles/jieshu-entry-skipped.js.gz",
+        "sha256": "2f9df6eef7481d96c1f8deb0b89cc45114d4ca44508eeb4a3e2a4cb06d171040",
+        "rawBytes": 108599,
+        "gzipBytes": 32715,
+        "gzipSha256": "3ac7b5faa6db451b7a3c48f94e01697ff0859dc15a79d3971e8d98d522120ce8",
+        "exportExpected": true,
+        "kind": "entry-side-effects-control",
+        "explanation": "Diagnostic only: suppress the two mapped entry calls for href routing and custom element registration; preserve all minified function bodies and exports.",
+        "baselineSha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "revision": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "instrumentationOffsets": [
+          {
+            "baselineUtf16Offset": 103636,
+            "baselineUtf8Offset": 103944,
+            "variantUtf16Offset": 103636,
+            "insertedText": "(false&&",
+            "reason": "Skip only entry call processAppForHrefJump()."
+          },
+          {
+            "baselineUtf16Offset": 103640,
+            "baselineUtf8Offset": 103948,
+            "variantUtf16Offset": 103648,
+            "insertedText": ")",
+            "reason": "End guard for entry call processAppForHrefJump()."
+          },
+          {
+            "baselineUtf16Offset": 103641,
+            "baselineUtf8Offset": 103949,
+            "variantUtf16Offset": 103650,
+            "insertedText": "(false&&",
+            "reason": "Skip only entry call defineJieshuWebComponent()."
+          },
+          {
+            "baselineUtf16Offset": 103645,
+            "baselineUtf8Offset": 103953,
+            "variantUtf16Offset": 103662,
+            "insertedText": ")",
+            "reason": "End guard for entry call defineJieshuWebComponent()."
+          }
+        ],
+        "guardedCalls": [
+          {
+            "name": "processAppForHrefJump",
+            "start": 103636,
+            "end": 103640,
+            "originalCall": "Xi()",
+            "originalSource": "../packages/jieshu-core/src/index.ts",
+            "originalLine": 178,
+            "originalColumn": 1,
+            "generatedLine": 22,
+            "generatedColumn": 42094
+          },
+          {
+            "name": "defineJieshuWebComponent",
+            "start": 103641,
+            "end": 103645,
+            "originalCall": "pi()",
+            "originalSource": "../packages/jieshu-core/src/index.ts",
+            "originalLine": 181,
+            "originalColumn": 1,
+            "generatedLine": 22,
+            "generatedColumn": 42099
+          }
+        ]
+      },
+      {
+        "id": "jieshu-caches-skipped",
+        "framework": "jieshu",
+        "file": "bundles/jieshu-caches-skipped.js",
+        "gzipFile": "bundles/jieshu-caches-skipped.js.gz",
+        "sha256": "09a068029bda2d0974b5d48886227aab8b57668a056e58144b14fed955b5d9b8",
+        "rawBytes": 108602,
+        "gzipBytes": 32716,
+        "gzipSha256": "91545947a84d3d6f1072201d4a30b152fe482fc01eb73708a9f60b4f5bbac886",
+        "exportExpected": true,
+        "kind": "asset-cache-initialization-control",
+        "explanation": "Diagnostic only: do not construct styleAssets, scriptAssets or htmlDocuments; preserve the AssetCache class and other initialization. Exports retain their shape, but asset loading and clearAssetsCache are unusable.",
+        "baselineSha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "revision": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "instrumentationOffsets": [
+          {
+            "baselineUtf16Offset": 20788,
+            "baselineUtf8Offset": 21096,
+            "variantUtf16Offset": 20788,
+            "insertedText": "false&&",
+            "reason": "Do not construct the top-level styleAssets AssetCache."
+          },
+          {
+            "baselineUtf16Offset": 20802,
+            "baselineUtf8Offset": 21110,
+            "variantUtf16Offset": 20809,
+            "insertedText": "false&&",
+            "reason": "Do not construct the top-level scriptAssets AssetCache."
+          },
+          {
+            "baselineUtf16Offset": 20816,
+            "baselineUtf8Offset": 21124,
+            "variantUtf16Offset": 20830,
+            "insertedText": "false&&",
+            "reason": "Do not construct the top-level htmlDocuments AssetCache."
+          }
+        ],
+        "guardedInitializers": [
+          {
+            "name": "styleAssets",
+            "start": 20788,
+            "end": 20798,
+            "originalInitializer": "new Xt(Zt)",
+            "originalSource": "../packages/jieshu-core/src/entry.ts",
+            "originalLine": 249,
+            "originalColumn": 21,
+            "generatedLine": 15,
+            "generatedColumn": 9386
+          },
+          {
+            "name": "scriptAssets",
+            "start": 20802,
+            "end": 20812,
+            "originalInitializer": "new Xt(Qt)",
+            "originalSource": "../packages/jieshu-core/src/entry.ts",
+            "originalLine": 250,
+            "originalColumn": 22,
+            "generatedLine": 15,
+            "generatedColumn": 9400
+          },
+          {
+            "name": "htmlDocuments",
+            "start": 20816,
+            "end": 20826,
+            "originalInitializer": "new Xt($t)",
+            "originalSource": "../packages/jieshu-core/src/entry.ts",
+            "originalLine": 251,
+            "originalColumn": 23,
+            "generatedLine": 15,
+            "generatedColumn": 9414
+          }
+        ]
+      },
+      {
+        "id": "wujie-init-skipped",
+        "framework": "wujie",
+        "file": "bundles/wujie-init-skipped.js",
+        "gzipFile": "bundles/wujie-init-skipped.js.gz",
+        "sha256": "e5d495d95e9ff35e725f94dbebdea95a881d361cfffe682a4f26c13087909fd9",
+        "rawBytes": 65667,
+        "gzipBytes": 19807,
+        "gzipSha256": "5bcbc2f05da199423314ac91a090865cae98227cc92355762294c3de2a0552da",
+        "exportExpected": false,
+        "kind": "initialization-skipped-control",
+        "explanation": "Diagnostic only: ComparisonCore becomes false. Original code text is retained, but the JavaScript engine may skip parsing or compilation through constant folding and lazy parsing.",
+        "baselineSha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+        "revision": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "instrumentationOffsets": [
+          {
+            "baselineUtf16Offset": 19,
+            "baselineUtf8Offset": 19,
+            "variantUtf16Offset": 19,
+            "insertedText": "false&&",
+            "reason": "Do not execute the unique ComparisonCore IIFE initializer."
+          }
+        ]
+      },
+      {
+        "id": "jieshu-init-skipped",
+        "framework": "jieshu",
+        "file": "bundles/jieshu-init-skipped.js",
+        "gzipFile": "bundles/jieshu-init-skipped.js.gz",
+        "sha256": "37a5b1b47e98ff404e8fac43e52271ee90b9e11592e522e9d98e328a51acda28",
+        "rawBytes": 108588,
+        "gzipBytes": 32713,
+        "gzipSha256": "03e6824133e2d1c0061afa25eaf2a38d299b2dcc4e34575b99dee59a145aef5c",
+        "exportExpected": false,
+        "kind": "initialization-skipped-control",
+        "explanation": "Diagnostic only: ComparisonCore becomes false. Original code text is retained, but the JavaScript engine may skip parsing or compilation through constant folding and lazy parsing.",
+        "baselineSha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "revision": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "instrumentationOffsets": [
+          {
+            "baselineUtf16Offset": 19,
+            "baselineUtf8Offset": 19,
+            "variantUtf16Offset": 19,
+            "insertedText": "false&&",
+            "reason": "Do not execute the unique ComparisonCore IIFE initializer."
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Variants are causal diagnostic controls, not production implementations or equivalent functional products.",
+      "Padded Wujie matches raw bytes only; its comment is cheap to parse and compresses more than executable source.",
+      "Skipping an IIFE changes engine optimization and lazy compilation decisions, so its timing is not a pure parse-time measurement.",
+      "Entry-skipped retains API exports but intentionally omits routing listeners and custom-element registration; it must not run application correctness benchmarks.",
+      "Caches-skipped retains API exports but asset loading and clearAssetsCache are unusable. It isolates eager construction costs, not the cost of including the AssetCache class in the bundle.",
+      "Source maps describe the two unmodified baselines only. Instrumentation offsets are provided separately for modified variants.",
+      "Output files are UTF-8 and gzip files compress those exact bytes. Relative file paths resolve against this manifest directory."
+    ]
+  },
+  "assets": [
+    {
+      "id": "wujie",
+      "gzipSha256": "0b9d18137960920cc7d6699e7cf8f114cc871b5a88fb41dbfe9a32d50ae51298"
+    },
+    {
+      "id": "jieshu",
+      "gzipSha256": "fd1a79e5aa84761b32b608e3fb7f4cd130f5f9ed7cca082939a31c39d1bc92ff"
+    },
+    {
+      "id": "wujie-padded",
+      "gzipSha256": "725229abb01424f18f8e297ddcf11a3b722fb0bc2e191a8e3a13b492ae4b5019"
+    },
+    {
+      "id": "jieshu-entry-skipped",
+      "gzipSha256": "3ac7b5faa6db451b7a3c48f94e01697ff0859dc15a79d3971e8d98d522120ce8"
+    },
+    {
+      "id": "jieshu-caches-skipped",
+      "gzipSha256": "91545947a84d3d6f1072201d4a30b152fe482fc01eb73708a9f60b4f5bbac886"
+    },
+    {
+      "id": "wujie-init-skipped",
+      "gzipSha256": "5bcbc2f05da199423314ac91a090865cae98227cc92355762294c3de2a0552da"
+    },
+    {
+      "id": "jieshu-init-skipped",
+      "gzipSha256": "03e6824133e2d1c0061afa25eaf2a38d299b2dcc4e34575b99dee59a145aef5c"
+    }
+  ],
+  "samples": 1,
+  "traceSamples": 1,
+  "browser": "151.0.7922.34",
+  "node": "v26.7.0",
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "loadAverage": [
+    3.61328125,
+    3.5185546875,
+    4.4033203125
+  ],
+  "playwright": "1.62.1",
+  "method": [
+    "All prepared assets are verified before sampling. No build or core source mutation during sampling.",
+    "UTF-8, independent browser context for each observation, no-store and CDP network cache disabled; browser process reused, internal compilation cache not explicitly purged.",
+    "Serial cyclic variant ordering with block reversal; CPU and transport order alternate by round.",
+    "Normal observations: seven variants × two transports × CPU rates 1/4 × samples. Trace observations: seven variants × two transports × CPU rate 1 × traceSamples, excluded from normal timings.",
+    "Timing begins before script append and ends at onload. GC occurs outside timing. CDP ScriptDuration includes identical measurement instrumentation.",
+    "Localhost only, no artificial network throttling. Gzip is precomputed, not compressed inside request timing. CPU 4x is CDP emulation, not a specific device.",
+    "Skipped initializer/cache/entry variants are causal diagnostics, not functional core builds or production optimization candidates. Export checks validate shape only."
+  ]
+}

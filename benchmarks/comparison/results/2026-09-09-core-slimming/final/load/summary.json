@@ -1,0 +1,470 @@
+[
+  {
+    "encoding": "legacy",
+    "framework": "wujie",
+    "passed": 60,
+    "characterSets": [
+      "windows-1252"
+    ],
+    "totalLoadMs": {
+      "n": 60,
+      "median": 3.300000000745058,
+      "p95": 4,
+      "min": 3,
+      "max": 10.900000000372529
+    },
+    "requestAndResponseMs": {
+      "n": 60,
+      "median": 0.900000000372529,
+      "p95": 1.210000000195577,
+      "min": 0.7999999998137355,
+      "max": 1.7999999998137355
+    },
+    "responseEndToOnloadMs": {
+      "n": 60,
+      "median": 1.7999999998137355,
+      "p95": 2.2049999992828813,
+      "min": 1.599999999627471,
+      "max": 6.2999999998137355
+    },
+    "scriptDurationMs": {
+      "n": 60,
+      "median": 0.27849999999999997,
+      "p95": 0.34814999999999996,
+      "min": 0.245,
+      "max": 3.199
+    },
+    "v8CompileDurationMs": {
+      "n": 60,
+      "median": 0.013,
+      "p95": 0.017099999999999997,
+      "min": 0.01,
+      "max": 0.019
+    },
+    "heapDeltaBytes": {
+      "n": 60,
+      "median": 161808,
+      "p95": 161808,
+      "min": 161808,
+      "max": 161808
+    },
+    "beforeHeapBytes": {
+      "n": 60,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 60,
+      "median": 717144,
+      "p95": 717144,
+      "min": 717144,
+      "max": 717144
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 6,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 3
+      }
+    ]
+  },
+  {
+    "encoding": "legacy",
+    "framework": "jieshu",
+    "passed": 60,
+    "characterSets": [
+      "windows-1252"
+    ],
+    "totalLoadMs": {
+      "n": 60,
+      "median": 4.400000000372529,
+      "p95": 5.009999999962747,
+      "min": 4,
+      "max": 6.099999999627471
+    },
+    "requestAndResponseMs": {
+      "n": 60,
+      "median": 0.900000000372529,
+      "p95": 1.2999999998603016,
+      "min": 0.7999999998137355,
+      "max": 1.400000000372529
+    },
+    "responseEndToOnloadMs": {
+      "n": 60,
+      "median": 2.8999999994412065,
+      "p95": 3.3999999994412065,
+      "min": 2.5,
+      "max": 4.599999999627471
+    },
+    "scriptDurationMs": {
+      "n": 60,
+      "median": 0.457,
+      "p95": 0.53855,
+      "min": 0.406,
+      "max": 1.792
+    },
+    "v8CompileDurationMs": {
+      "n": 60,
+      "median": 0.014,
+      "p95": 0.02005,
+      "min": 0.011,
+      "max": 0.038
+    },
+    "heapDeltaBytes": {
+      "n": 60,
+      "median": 216672,
+      "p95": 216672,
+      "min": 216672,
+      "max": 216672
+    },
+    "beforeHeapBytes": {
+      "n": 60,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 60,
+      "median": 772008,
+      "p95": 772008,
+      "min": 772008,
+      "max": 772008
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 6,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 3
+      }
+    ]
+  },
+  {
+    "encoding": "legacy",
+    "framework": "jieshu-before",
+    "passed": 60,
+    "characterSets": [
+      "windows-1252"
+    ],
+    "totalLoadMs": {
+      "n": 60,
+      "median": 4.5,
+      "p95": 5.099999999627471,
+      "min": 4,
+      "max": 5.7000000001862645
+    },
+    "requestAndResponseMs": {
+      "n": 60,
+      "median": 0.900000000372529,
+      "p95": 1.1050000005401668,
+      "min": 0.7000000001862645,
+      "max": 1.2000000001862645
+    },
+    "responseEndToOnloadMs": {
+      "n": 60,
+      "median": 3,
+      "p95": 3.4050000003539025,
+      "min": 2.6000000005587935,
+      "max": 4
+    },
+    "scriptDurationMs": {
+      "n": 60,
+      "median": 0.5055000000000001,
+      "p95": 0.6149999999999999,
+      "min": 0.462,
+      "max": 0.795
+    },
+    "v8CompileDurationMs": {
+      "n": 60,
+      "median": 0.014,
+      "p95": 0.018000000000000002,
+      "min": 0.011,
+      "max": 0.02
+    },
+    "heapDeltaBytes": {
+      "n": 60,
+      "median": 217956,
+      "p95": 217956,
+      "min": 217956,
+      "max": 217956
+    },
+    "beforeHeapBytes": {
+      "n": 60,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 60,
+      "median": 773292,
+      "p95": 773292,
+      "min": 773292,
+      "max": 773292
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 6,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 3
+      }
+    ]
+  },
+  {
+    "encoding": "utf8",
+    "framework": "wujie",
+    "passed": 60,
+    "characterSets": [
+      "UTF-8"
+    ],
+    "totalLoadMs": {
+      "n": 60,
+      "median": 3.2000000001862645,
+      "p95": 3.7999999998137355,
+      "min": 2.900000000372529,
+      "max": 4
+    },
+    "requestAndResponseMs": {
+      "n": 60,
+      "median": 0.900000000372529,
+      "p95": 1.1000000005587935,
+      "min": 0.7000000001862645,
+      "max": 1.400000000372529
+    },
+    "responseEndToOnloadMs": {
+      "n": 60,
+      "median": 1.7999999998137355,
+      "p95": 2,
+      "min": 1.599999999627471,
+      "max": 2.2000000001862645
+    },
+    "scriptDurationMs": {
+      "n": 60,
+      "median": 0.28300000000000003,
+      "p95": 0.37079999999999996,
+      "min": 0.242,
+      "max": 0.40099999999999997
+    },
+    "v8CompileDurationMs": {
+      "n": 60,
+      "median": 0.014,
+      "p95": 0.018000000000000002,
+      "min": 0.01,
+      "max": 0.019
+    },
+    "heapDeltaBytes": {
+      "n": 60,
+      "median": 161244,
+      "p95": 161244,
+      "min": 161244,
+      "max": 161244
+    },
+    "beforeHeapBytes": {
+      "n": 60,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 60,
+      "median": 716580,
+      "p95": 716580,
+      "min": 716580,
+      "max": 716580
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 8,
+        "jsEventListeners": 3
+      }
+    ]
+  },
+  {
+    "encoding": "utf8",
+    "framework": "jieshu",
+    "passed": 60,
+    "characterSets": [
+      "UTF-8"
+    ],
+    "totalLoadMs": {
+      "n": 60,
+      "median": 4.2999999998137355,
+      "p95": 4.904999999469146,
+      "min": 3.900000000372529,
+      "max": 5.900000000372529
+    },
+    "requestAndResponseMs": {
+      "n": 60,
+      "median": 0.900000000372529,
+      "p95": 1.1049999996088442,
+      "min": 0.6999999992549419,
+      "max": 1.400000000372529
+    },
+    "responseEndToOnloadMs": {
+      "n": 60,
+      "median": 2.7999999998137355,
+      "p95": 3.3999999994412065,
+      "min": 2.599999999627471,
+      "max": 3.900000000372529
+    },
+    "scriptDurationMs": {
+      "n": 60,
+      "median": 0.4625,
+      "p95": 0.5926,
+      "min": 0.415,
+      "max": 0.632
+    },
+    "v8CompileDurationMs": {
+      "n": 60,
+      "median": 0.014,
+      "p95": 0.022,
+      "min": 0.011,
+      "max": 0.028
+    },
+    "heapDeltaBytes": {
+      "n": 60,
+      "median": 216100,
+      "p95": 216100,
+      "min": 216100,
+      "max": 216100
+    },
+    "beforeHeapBytes": {
+      "n": 60,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 60,
+      "median": 771436,
+      "p95": 771436,
+      "min": 771436,
+      "max": 771436
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 8,
+        "jsEventListeners": 3
+      }
+    ]
+  },
+  {
+    "encoding": "utf8",
+    "framework": "jieshu-before",
+    "passed": 60,
+    "characterSets": [
+      "UTF-8"
+    ],
+    "totalLoadMs": {
+      "n": 60,
+      "median": 4.400000000372529,
+      "p95": 5.10499999965541,
+      "min": 4.099999999627471,
+      "max": 5.2999999998137355
+    },
+    "requestAndResponseMs": {
+      "n": 60,
+      "median": 0.900000000372529,
+      "p95": 1.2999999998137355,
+      "min": 0.7999999998137355,
+      "max": 1.400000000372529
+    },
+    "responseEndToOnloadMs": {
+      "n": 60,
+      "median": 2.900000000372529,
+      "p95": 3.4050000003539025,
+      "min": 2.5,
+      "max": 3.5
+    },
+    "scriptDurationMs": {
+      "n": 60,
+      "median": 0.5,
+      "p95": 0.62515,
+      "min": 0.45399999999999996,
+      "max": 0.647
+    },
+    "v8CompileDurationMs": {
+      "n": 60,
+      "median": 0.014,
+      "p95": 0.022,
+      "min": 0.011,
+      "max": 0.036000000000000004
+    },
+    "heapDeltaBytes": {
+      "n": 60,
+      "median": 217384,
+      "p95": 217384,
+      "min": 217384,
+      "max": 217384
+    },
+    "beforeHeapBytes": {
+      "n": 60,
+      "median": 555336,
+      "p95": 555336,
+      "min": 555336,
+      "max": 555336
+    },
+    "afterHeapBytes": {
+      "n": 60,
+      "median": 772720,
+      "p95": 772720,
+      "min": 772720,
+      "max": 772720
+    },
+    "beforeDom": [
+      {
+        "documents": 1,
+        "nodes": 7,
+        "jsEventListeners": 0
+      }
+    ],
+    "afterDom": [
+      {
+        "documents": 1,
+        "nodes": 8,
+        "jsEventListeners": 3
+      }
+    ]
+  }
+]

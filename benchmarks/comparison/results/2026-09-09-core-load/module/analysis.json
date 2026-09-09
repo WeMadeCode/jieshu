@@ -1,0 +1,1270 @@
+{
+  "generatedAt": "2026-09-09T14:33:45.964Z",
+  "node": "v26.7.0",
+  "vite": "8.2.2",
+  "method": {
+    "entry": "Local checkout core source; identical production minifier, IIFE format, and target for both frameworks.",
+    "wholeCore": "All public runtime exports retained, matching run.mjs.",
+    "startOnlyConsumer": "ESM consumer imports only startApp and stores it on window; ordinary tree shaking, same IIFE output.",
+    "es2022": "Diagnostic counterfactual only; supported ES2018 build target is unchanged.",
+    "generatedBytes": "UTF-8 generated spans assigned by preceding source-map segment on each line; totals reconcile exactly.",
+    "preMinifyRenderedBytes": "Bundler module code after tree shaking and target lowering but before whole-chunk minification.",
+    "gzipBytes": "Whole output gzip only. Module gzip cannot be added because compression shares a dictionary.",
+    "limitations": [
+      "Source-map attribution is approximate near generated helpers and cross-module rewrites.",
+      "Module generated spans are not the bytes saved by removing that module.",
+      "Source consumers do not measure published package metadata or downstream prebuilt ESM behavior.",
+      "This script does not measure browser startup or heap memory."
+    ]
+  },
+  "results": [
+    {
+      "framework": "jieshu",
+      "usage": "whole-core",
+      "target": "es2018",
+      "revision": {
+        "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "status": "?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs\n?? benchmarks/comparison/summarize-core-load-causes.mjs"
+      },
+      "bundleBytes": 108581,
+      "gzipBytes": 32708,
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+      "exports": [
+        "bus",
+        "clearAssetsCache",
+        "createAppController",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "runAsUnmountReentry",
+        "setupApp",
+        "startApp"
+      ],
+      "modules": [
+        {
+          "module": "iframe.ts",
+          "generatedBytes": 14248,
+          "originalSourceBytes": 48664,
+          "preMinifyRenderedBytes": 34084
+        },
+        {
+          "module": "effect.ts",
+          "generatedBytes": 13222,
+          "originalSourceBytes": 41061,
+          "preMinifyRenderedBytes": 32483
+        },
+        {
+          "module": "sandbox.ts",
+          "generatedBytes": 10851,
+          "originalSourceBytes": 35721,
+          "preMinifyRenderedBytes": 21169
+        },
+        {
+          "module": "template.ts",
+          "generatedBytes": 9776,
+          "originalSourceBytes": 27926,
+          "preMinifyRenderedBytes": 23875
+        },
+        {
+          "module": "entry.ts",
+          "generatedBytes": 7960,
+          "originalSourceBytes": 26850,
+          "preMinifyRenderedBytes": 19712
+        },
+        {
+          "module": "shadow.ts",
+          "generatedBytes": 6539,
+          "originalSourceBytes": 19132,
+          "preMinifyRenderedBytes": 15766
+        },
+        {
+          "module": "index.ts",
+          "generatedBytes": 5641,
+          "originalSourceBytes": 20941,
+          "preMinifyRenderedBytes": 13935
+        },
+        {
+          "module": "proxy.ts",
+          "generatedBytes": 5257,
+          "originalSourceBytes": 14338,
+          "preMinifyRenderedBytes": 11134
+        },
+        {
+          "module": "iframe-script.ts",
+          "generatedBytes": 4399,
+          "originalSourceBytes": 12988,
+          "preMinifyRenderedBytes": 10961
+        },
+        {
+          "module": "sandbox-runtime.ts",
+          "generatedBytes": 4049,
+          "originalSourceBytes": 13436,
+          "preMinifyRenderedBytes": 8220
+        },
+        {
+          "module": "controller.ts",
+          "generatedBytes": 3055,
+          "originalSourceBytes": 7285,
+          "preMinifyRenderedBytes": 5891
+        },
+        {
+          "module": "sandbox-policy.ts",
+          "generatedBytes": 2904,
+          "originalSourceBytes": 4625,
+          "preMinifyRenderedBytes": 4153
+        },
+        {
+          "module": "tracker.ts",
+          "generatedBytes": 2355,
+          "originalSourceBytes": 7573,
+          "preMinifyRenderedBytes": 5481
+        },
+        {
+          "module": "iframe-inline-events.ts",
+          "generatedBytes": 2219,
+          "originalSourceBytes": 5563,
+          "preMinifyRenderedBytes": 5195
+        },
+        {
+          "module": "utils.ts",
+          "generatedBytes": 1844,
+          "originalSourceBytes": 7015,
+          "preMinifyRenderedBytes": 4061
+        },
+        {
+          "module": "sandbox-registry.ts",
+          "generatedBytes": 1703,
+          "originalSourceBytes": 5072,
+          "preMinifyRenderedBytes": 4887
+        },
+        {
+          "module": "options.ts",
+          "generatedBytes": 1554,
+          "originalSourceBytes": 3166,
+          "preMinifyRenderedBytes": 3316
+        },
+        {
+          "module": "event.ts",
+          "generatedBytes": 1542,
+          "originalSourceBytes": 6830,
+          "preMinifyRenderedBytes": 3946
+        },
+        {
+          "module": "sync.ts",
+          "generatedBytes": 1383,
+          "originalSourceBytes": 4755,
+          "preMinifyRenderedBytes": 3041
+        },
+        {
+          "module": "constant.ts",
+          "generatedBytes": 1265,
+          "originalSourceBytes": 3445,
+          "preMinifyRenderedBytes": 3102
+        },
+        {
+          "module": "[unmapped]",
+          "generatedBytes": 1225,
+          "originalSourceBytes": null,
+          "preMinifyRenderedBytes": null
+        },
+        {
+          "module": "function-binding.ts",
+          "generatedBytes": 1190,
+          "originalSourceBytes": 3201,
+          "preMinifyRenderedBytes": 2639
+        },
+        {
+          "module": "native-dom.ts",
+          "generatedBytes": 1040,
+          "originalSourceBytes": 2728,
+          "preMinifyRenderedBytes": 1823
+        },
+        {
+          "module": "plugin.ts",
+          "generatedBytes": 971,
+          "originalSourceBytes": 4555,
+          "preMinifyRenderedBytes": 2408
+        },
+        {
+          "module": "operation-intent.ts",
+          "generatedBytes": 852,
+          "originalSourceBytes": 3006,
+          "preMinifyRenderedBytes": 2250
+        },
+        {
+          "module": "route-state.ts",
+          "generatedBytes": 761,
+          "originalSourceBytes": 2931,
+          "preMinifyRenderedBytes": 1756
+        },
+        {
+          "module": "url-utils.ts",
+          "generatedBytes": 359,
+          "originalSourceBytes": 1568,
+          "preMinifyRenderedBytes": 818
+        },
+        {
+          "module": "effect-pipeline.ts",
+          "generatedBytes": 238,
+          "originalSourceBytes": 1118,
+          "preMinifyRenderedBytes": 515
+        },
+        {
+          "module": "proxy-resolver.ts",
+          "generatedBytes": 179,
+          "originalSourceBytes": 1953,
+          "preMinifyRenderedBytes": 505
+        }
+      ]
+    },
+    {
+      "framework": "jieshu",
+      "usage": "start-only-consumer",
+      "target": "es2018",
+      "revision": {
+        "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "status": "?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs\n?? benchmarks/comparison/summarize-core-load-causes.mjs"
+      },
+      "bundleBytes": 102936,
+      "gzipBytes": 31305,
+      "sha256": "6ea3f9077b95793aea927e2fd72c0587a86f69d268be2c54306189c5c49927ab",
+      "exports": [],
+      "modules": [
+        {
+          "module": "iframe.ts",
+          "generatedBytes": 14242,
+          "originalSourceBytes": 48664,
+          "preMinifyRenderedBytes": 34084
+        },
+        {
+          "module": "effect.ts",
+          "generatedBytes": 13222,
+          "originalSourceBytes": 41061,
+          "preMinifyRenderedBytes": 32483
+        },
+        {
+          "module": "sandbox.ts",
+          "generatedBytes": 10858,
+          "originalSourceBytes": 35721,
+          "preMinifyRenderedBytes": 21169
+        },
+        {
+          "module": "template.ts",
+          "generatedBytes": 9780,
+          "originalSourceBytes": 27926,
+          "preMinifyRenderedBytes": 23875
+        },
+        {
+          "module": "entry.ts",
+          "generatedBytes": 7867,
+          "originalSourceBytes": 26850,
+          "preMinifyRenderedBytes": 19474
+        },
+        {
+          "module": "shadow.ts",
+          "generatedBytes": 6539,
+          "originalSourceBytes": 19132,
+          "preMinifyRenderedBytes": 15766
+        },
+        {
+          "module": "proxy.ts",
+          "generatedBytes": 5244,
+          "originalSourceBytes": 14338,
+          "preMinifyRenderedBytes": 11134
+        },
+        {
+          "module": "iframe-script.ts",
+          "generatedBytes": 4399,
+          "originalSourceBytes": 12988,
+          "preMinifyRenderedBytes": 10961
+        },
+        {
+          "module": "sandbox-runtime.ts",
+          "generatedBytes": 4049,
+          "originalSourceBytes": 13436,
+          "preMinifyRenderedBytes": 8220
+        },
+        {
+          "module": "index.ts",
+          "generatedBytes": 3312,
+          "originalSourceBytes": 20941,
+          "preMinifyRenderedBytes": 8308
+        },
+        {
+          "module": "sandbox-policy.ts",
+          "generatedBytes": 2904,
+          "originalSourceBytes": 4625,
+          "preMinifyRenderedBytes": 4153
+        },
+        {
+          "module": "tracker.ts",
+          "generatedBytes": 2355,
+          "originalSourceBytes": 7573,
+          "preMinifyRenderedBytes": 5481
+        },
+        {
+          "module": "iframe-inline-events.ts",
+          "generatedBytes": 2219,
+          "originalSourceBytes": 5563,
+          "preMinifyRenderedBytes": 5195
+        },
+        {
+          "module": "utils.ts",
+          "generatedBytes": 1843,
+          "originalSourceBytes": 7015,
+          "preMinifyRenderedBytes": 4061
+        },
+        {
+          "module": "sandbox-registry.ts",
+          "generatedBytes": 1669,
+          "originalSourceBytes": 5072,
+          "preMinifyRenderedBytes": 4793
+        },
+        {
+          "module": "options.ts",
+          "generatedBytes": 1554,
+          "originalSourceBytes": 3166,
+          "preMinifyRenderedBytes": 3316
+        },
+        {
+          "module": "event.ts",
+          "generatedBytes": 1542,
+          "originalSourceBytes": 6830,
+          "preMinifyRenderedBytes": 3946
+        },
+        {
+          "module": "sync.ts",
+          "generatedBytes": 1383,
+          "originalSourceBytes": 4755,
+          "preMinifyRenderedBytes": 3041
+        },
+        {
+          "module": "constant.ts",
+          "generatedBytes": 1265,
+          "originalSourceBytes": 3445,
+          "preMinifyRenderedBytes": 3102
+        },
+        {
+          "module": "function-binding.ts",
+          "generatedBytes": 1190,
+          "originalSourceBytes": 3201,
+          "preMinifyRenderedBytes": 2639
+        },
+        {
+          "module": "[unmapped]",
+          "generatedBytes": 1144,
+          "originalSourceBytes": null,
+          "preMinifyRenderedBytes": null
+        },
+        {
+          "module": "native-dom.ts",
+          "generatedBytes": 1040,
+          "originalSourceBytes": 2728,
+          "preMinifyRenderedBytes": 1823
+        },
+        {
+          "module": "plugin.ts",
+          "generatedBytes": 971,
+          "originalSourceBytes": 4555,
+          "preMinifyRenderedBytes": 2408
+        },
+        {
+          "module": "operation-intent.ts",
+          "generatedBytes": 781,
+          "originalSourceBytes": 3006,
+          "preMinifyRenderedBytes": 2078
+        },
+        {
+          "module": "route-state.ts",
+          "generatedBytes": 761,
+          "originalSourceBytes": 2931,
+          "preMinifyRenderedBytes": 1756
+        },
+        {
+          "module": "url-utils.ts",
+          "generatedBytes": 359,
+          "originalSourceBytes": 1568,
+          "preMinifyRenderedBytes": 818
+        },
+        {
+          "module": "effect-pipeline.ts",
+          "generatedBytes": 238,
+          "originalSourceBytes": 1118,
+          "preMinifyRenderedBytes": 515
+        },
+        {
+          "module": "proxy-resolver.ts",
+          "generatedBytes": 178,
+          "originalSourceBytes": 1953,
+          "preMinifyRenderedBytes": 505
+        },
+        {
+          "module": "../test-results/core-load-current-modules/jieshu-consumer.mjs",
+          "generatedBytes": 28,
+          "originalSourceBytes": 143,
+          "preMinifyRenderedBytes": null
+        }
+      ]
+    },
+    {
+      "framework": "jieshu",
+      "usage": "whole-core",
+      "target": "es2022",
+      "revision": {
+        "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "status": "?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs\n?? benchmarks/comparison/summarize-core-load-causes.mjs"
+      },
+      "bundleBytes": 103554,
+      "gzipBytes": 31285,
+      "sha256": "d708636c15a5eb7d62dbe88d85e39b87b62844d7bd45b5226e716da86e1599da",
+      "exports": [
+        "bus",
+        "clearAssetsCache",
+        "createAppController",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "runAsUnmountReentry",
+        "setupApp",
+        "startApp"
+      ],
+      "modules": [
+        {
+          "module": "iframe.ts",
+          "generatedBytes": 13592,
+          "originalSourceBytes": 48664,
+          "preMinifyRenderedBytes": 30288
+        },
+        {
+          "module": "effect.ts",
+          "generatedBytes": 12547,
+          "originalSourceBytes": 41061,
+          "preMinifyRenderedBytes": 28503
+        },
+        {
+          "module": "sandbox.ts",
+          "generatedBytes": 10197,
+          "originalSourceBytes": 35721,
+          "preMinifyRenderedBytes": 17508
+        },
+        {
+          "module": "template.ts",
+          "generatedBytes": 9491,
+          "originalSourceBytes": 27926,
+          "preMinifyRenderedBytes": 22270
+        },
+        {
+          "module": "entry.ts",
+          "generatedBytes": 7690,
+          "originalSourceBytes": 26850,
+          "preMinifyRenderedBytes": 18159
+        },
+        {
+          "module": "shadow.ts",
+          "generatedBytes": 6288,
+          "originalSourceBytes": 19132,
+          "preMinifyRenderedBytes": 14417
+        },
+        {
+          "module": "index.ts",
+          "generatedBytes": 5394,
+          "originalSourceBytes": 20941,
+          "preMinifyRenderedBytes": 12501
+        },
+        {
+          "module": "proxy.ts",
+          "generatedBytes": 5141,
+          "originalSourceBytes": 14338,
+          "preMinifyRenderedBytes": 10708
+        },
+        {
+          "module": "iframe-script.ts",
+          "generatedBytes": 4104,
+          "originalSourceBytes": 12988,
+          "preMinifyRenderedBytes": 9077
+        },
+        {
+          "module": "sandbox-runtime.ts",
+          "generatedBytes": 3977,
+          "originalSourceBytes": 13436,
+          "preMinifyRenderedBytes": 7802
+        },
+        {
+          "module": "sandbox-policy.ts",
+          "generatedBytes": 2904,
+          "originalSourceBytes": 4625,
+          "preMinifyRenderedBytes": 4153
+        },
+        {
+          "module": "controller.ts",
+          "generatedBytes": 2788,
+          "originalSourceBytes": 7285,
+          "preMinifyRenderedBytes": 4615
+        },
+        {
+          "module": "tracker.ts",
+          "generatedBytes": 2281,
+          "originalSourceBytes": 7573,
+          "preMinifyRenderedBytes": 5162
+        },
+        {
+          "module": "iframe-inline-events.ts",
+          "generatedBytes": 2147,
+          "originalSourceBytes": 5563,
+          "preMinifyRenderedBytes": 4794
+        },
+        {
+          "module": "utils.ts",
+          "generatedBytes": 1733,
+          "originalSourceBytes": 7015,
+          "preMinifyRenderedBytes": 3529
+        },
+        {
+          "module": "event.ts",
+          "generatedBytes": 1483,
+          "originalSourceBytes": 6830,
+          "preMinifyRenderedBytes": 3627
+        },
+        {
+          "module": "sandbox-registry.ts",
+          "generatedBytes": 1439,
+          "originalSourceBytes": 5072,
+          "preMinifyRenderedBytes": 3261
+        },
+        {
+          "module": "sync.ts",
+          "generatedBytes": 1313,
+          "originalSourceBytes": 4755,
+          "preMinifyRenderedBytes": 2621
+        },
+        {
+          "module": "constant.ts",
+          "generatedBytes": 1265,
+          "originalSourceBytes": 3445,
+          "preMinifyRenderedBytes": 3102
+        },
+        {
+          "module": "[unmapped]",
+          "generatedBytes": 1225,
+          "originalSourceBytes": null,
+          "preMinifyRenderedBytes": null
+        },
+        {
+          "module": "function-binding.ts",
+          "generatedBytes": 1166,
+          "originalSourceBytes": 3201,
+          "preMinifyRenderedBytes": 2507
+        },
+        {
+          "module": "options.ts",
+          "generatedBytes": 1164,
+          "originalSourceBytes": 3166,
+          "preMinifyRenderedBytes": 2098
+        },
+        {
+          "module": "native-dom.ts",
+          "generatedBytes": 1040,
+          "originalSourceBytes": 2728,
+          "preMinifyRenderedBytes": 1823
+        },
+        {
+          "module": "plugin.ts",
+          "generatedBytes": 955,
+          "originalSourceBytes": 4555,
+          "preMinifyRenderedBytes": 2268
+        },
+        {
+          "module": "route-state.ts",
+          "generatedBytes": 738,
+          "originalSourceBytes": 2931,
+          "preMinifyRenderedBytes": 1645
+        },
+        {
+          "module": "operation-intent.ts",
+          "generatedBytes": 720,
+          "originalSourceBytes": 3006,
+          "preMinifyRenderedBytes": 1462
+        },
+        {
+          "module": "url-utils.ts",
+          "generatedBytes": 356,
+          "originalSourceBytes": 1568,
+          "preMinifyRenderedBytes": 818
+        },
+        {
+          "module": "effect-pipeline.ts",
+          "generatedBytes": 238,
+          "originalSourceBytes": 1118,
+          "preMinifyRenderedBytes": 515
+        },
+        {
+          "module": "proxy-resolver.ts",
+          "generatedBytes": 178,
+          "originalSourceBytes": 1953,
+          "preMinifyRenderedBytes": 505
+        }
+      ]
+    },
+    {
+      "framework": "jieshu",
+      "usage": "start-only-consumer",
+      "target": "es2022",
+      "revision": {
+        "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+        "status": "?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs\n?? benchmarks/comparison/summarize-core-load-causes.mjs"
+      },
+      "bundleBytes": 98267,
+      "gzipBytes": 30024,
+      "sha256": "0178ca53b815d92395b1f7dfc90296b7da8202e313b6f1bd3cef2aefadf39d85",
+      "exports": [],
+      "modules": [
+        {
+          "module": "iframe.ts",
+          "generatedBytes": 13592,
+          "originalSourceBytes": 48664,
+          "preMinifyRenderedBytes": 30288
+        },
+        {
+          "module": "effect.ts",
+          "generatedBytes": 12547,
+          "originalSourceBytes": 41061,
+          "preMinifyRenderedBytes": 28503
+        },
+        {
+          "module": "sandbox.ts",
+          "generatedBytes": 10190,
+          "originalSourceBytes": 35721,
+          "preMinifyRenderedBytes": 17508
+        },
+        {
+          "module": "template.ts",
+          "generatedBytes": 9488,
+          "originalSourceBytes": 27926,
+          "preMinifyRenderedBytes": 22270
+        },
+        {
+          "module": "entry.ts",
+          "generatedBytes": 7597,
+          "originalSourceBytes": 26850,
+          "preMinifyRenderedBytes": 17921
+        },
+        {
+          "module": "shadow.ts",
+          "generatedBytes": 6288,
+          "originalSourceBytes": 19132,
+          "preMinifyRenderedBytes": 14417
+        },
+        {
+          "module": "proxy.ts",
+          "generatedBytes": 5134,
+          "originalSourceBytes": 14338,
+          "preMinifyRenderedBytes": 10708
+        },
+        {
+          "module": "iframe-script.ts",
+          "generatedBytes": 4104,
+          "originalSourceBytes": 12988,
+          "preMinifyRenderedBytes": 9077
+        },
+        {
+          "module": "sandbox-runtime.ts",
+          "generatedBytes": 3977,
+          "originalSourceBytes": 13436,
+          "preMinifyRenderedBytes": 7802
+        },
+        {
+          "module": "index.ts",
+          "generatedBytes": 3157,
+          "originalSourceBytes": 20941,
+          "preMinifyRenderedBytes": 7369
+        },
+        {
+          "module": "sandbox-policy.ts",
+          "generatedBytes": 2904,
+          "originalSourceBytes": 4625,
+          "preMinifyRenderedBytes": 4153
+        },
+        {
+          "module": "tracker.ts",
+          "generatedBytes": 2281,
+          "originalSourceBytes": 7573,
+          "preMinifyRenderedBytes": 5162
+        },
+        {
+          "module": "iframe-inline-events.ts",
+          "generatedBytes": 2147,
+          "originalSourceBytes": 5563,
+          "preMinifyRenderedBytes": 4794
+        },
+        {
+          "module": "utils.ts",
+          "generatedBytes": 1733,
+          "originalSourceBytes": 7015,
+          "preMinifyRenderedBytes": 3529
+        },
+        {
+          "module": "event.ts",
+          "generatedBytes": 1483,
+          "originalSourceBytes": 6830,
+          "preMinifyRenderedBytes": 3627
+        },
+        {
+          "module": "sandbox-registry.ts",
+          "generatedBytes": 1405,
+          "originalSourceBytes": 5072,
+          "preMinifyRenderedBytes": 3167
+        },
+        {
+          "module": "sync.ts",
+          "generatedBytes": 1313,
+          "originalSourceBytes": 4755,
+          "preMinifyRenderedBytes": 2621
+        },
+        {
+          "module": "constant.ts",
+          "generatedBytes": 1265,
+          "originalSourceBytes": 3445,
+          "preMinifyRenderedBytes": 3102
+        },
+        {
+          "module": "function-binding.ts",
+          "generatedBytes": 1166,
+          "originalSourceBytes": 3201,
+          "preMinifyRenderedBytes": 2507
+        },
+        {
+          "module": "options.ts",
+          "generatedBytes": 1164,
+          "originalSourceBytes": 3166,
+          "preMinifyRenderedBytes": 2098
+        },
+        {
+          "module": "[unmapped]",
+          "generatedBytes": 1144,
+          "originalSourceBytes": null,
+          "preMinifyRenderedBytes": null
+        },
+        {
+          "module": "native-dom.ts",
+          "generatedBytes": 1040,
+          "originalSourceBytes": 2728,
+          "preMinifyRenderedBytes": 1823
+        },
+        {
+          "module": "plugin.ts",
+          "generatedBytes": 955,
+          "originalSourceBytes": 4555,
+          "preMinifyRenderedBytes": 2268
+        },
+        {
+          "module": "route-state.ts",
+          "generatedBytes": 738,
+          "originalSourceBytes": 2931,
+          "preMinifyRenderedBytes": 1645
+        },
+        {
+          "module": "operation-intent.ts",
+          "generatedBytes": 655,
+          "originalSourceBytes": 3006,
+          "preMinifyRenderedBytes": 1303
+        },
+        {
+          "module": "url-utils.ts",
+          "generatedBytes": 356,
+          "originalSourceBytes": 1568,
+          "preMinifyRenderedBytes": 818
+        },
+        {
+          "module": "effect-pipeline.ts",
+          "generatedBytes": 238,
+          "originalSourceBytes": 1118,
+          "preMinifyRenderedBytes": 515
+        },
+        {
+          "module": "proxy-resolver.ts",
+          "generatedBytes": 178,
+          "originalSourceBytes": 1953,
+          "preMinifyRenderedBytes": 505
+        },
+        {
+          "module": "../test-results/core-load-current-modules/jieshu-consumer.mjs",
+          "generatedBytes": 28,
+          "originalSourceBytes": 143,
+          "preMinifyRenderedBytes": null
+        }
+      ]
+    },
+    {
+      "framework": "wujie",
+      "usage": "whole-core",
+      "target": "es2018",
+      "revision": {
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "status": ""
+      },
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+      "exports": [
+        "bus",
+        "clearAssetsCache",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "setupApp",
+        "startApp"
+      ],
+      "modules": [
+        {
+          "module": "iframe.ts",
+          "generatedBytes": 14109,
+          "originalSourceBytes": 47662,
+          "preMinifyRenderedBytes": 31517
+        },
+        {
+          "module": "sandbox.ts",
+          "generatedBytes": 8317,
+          "originalSourceBytes": 27517,
+          "preMinifyRenderedBytes": 16285
+        },
+        {
+          "module": "effect.ts",
+          "generatedBytes": 6643,
+          "originalSourceBytes": 24889,
+          "preMinifyRenderedBytes": 16596
+        },
+        {
+          "module": "proxy.ts",
+          "generatedBytes": 5474,
+          "originalSourceBytes": 14495,
+          "preMinifyRenderedBytes": 10997
+        },
+        {
+          "module": "utils.ts",
+          "generatedBytes": 5460,
+          "originalSourceBytes": 12856,
+          "preMinifyRenderedBytes": 11970
+        },
+        {
+          "module": "shadow.ts",
+          "generatedBytes": 5261,
+          "originalSourceBytes": 15462,
+          "preMinifyRenderedBytes": 11447
+        },
+        {
+          "module": "entry.ts",
+          "generatedBytes": 3582,
+          "originalSourceBytes": 13473,
+          "preMinifyRenderedBytes": 8316
+        },
+        {
+          "module": "common.ts",
+          "generatedBytes": 3212,
+          "originalSourceBytes": 6801,
+          "preMinifyRenderedBytes": 5442
+        },
+        {
+          "module": "template.ts",
+          "generatedBytes": 3092,
+          "originalSourceBytes": 11320,
+          "preMinifyRenderedBytes": 7503
+        },
+        {
+          "module": "index.ts",
+          "generatedBytes": 2987,
+          "originalSourceBytes": 12099,
+          "preMinifyRenderedBytes": 6224
+        },
+        {
+          "module": "sync.ts",
+          "generatedBytes": 1991,
+          "originalSourceBytes": 6151,
+          "preMinifyRenderedBytes": 4231
+        },
+        {
+          "module": "constant.ts",
+          "generatedBytes": 1272,
+          "originalSourceBytes": 3294,
+          "preMinifyRenderedBytes": 3126
+        },
+        {
+          "module": "event.ts",
+          "generatedBytes": 1231,
+          "originalSourceBytes": 3431,
+          "preMinifyRenderedBytes": 2488
+        },
+        {
+          "module": "[unmapped]",
+          "generatedBytes": 1218,
+          "originalSourceBytes": null,
+          "preMinifyRenderedBytes": null
+        },
+        {
+          "module": "tracker.ts",
+          "generatedBytes": 996,
+          "originalSourceBytes": 4055,
+          "preMinifyRenderedBytes": 1592
+        },
+        {
+          "module": "plugin.ts",
+          "generatedBytes": 815,
+          "originalSourceBytes": 3565,
+          "preMinifyRenderedBytes": 1757
+        }
+      ]
+    },
+    {
+      "framework": "wujie",
+      "usage": "start-only-consumer",
+      "target": "es2018",
+      "revision": {
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "status": ""
+      },
+      "bundleBytes": 64115,
+      "gzipBytes": 19461,
+      "sha256": "d90dbdd6381ecd45febe11d693a1490919cb135696abad836833508cea610d96",
+      "exports": [],
+      "modules": [
+        {
+          "module": "iframe.ts",
+          "generatedBytes": 14143,
+          "originalSourceBytes": 47662,
+          "preMinifyRenderedBytes": 31517
+        },
+        {
+          "module": "sandbox.ts",
+          "generatedBytes": 8313,
+          "originalSourceBytes": 27517,
+          "preMinifyRenderedBytes": 16285
+        },
+        {
+          "module": "effect.ts",
+          "generatedBytes": 6690,
+          "originalSourceBytes": 24889,
+          "preMinifyRenderedBytes": 16596
+        },
+        {
+          "module": "utils.ts",
+          "generatedBytes": 5670,
+          "originalSourceBytes": 12856,
+          "preMinifyRenderedBytes": 11970
+        },
+        {
+          "module": "shadow.ts",
+          "generatedBytes": 5572,
+          "originalSourceBytes": 15462,
+          "preMinifyRenderedBytes": 11447
+        },
+        {
+          "module": "proxy.ts",
+          "generatedBytes": 5566,
+          "originalSourceBytes": 14495,
+          "preMinifyRenderedBytes": 10997
+        },
+        {
+          "module": "entry.ts",
+          "generatedBytes": 3395,
+          "originalSourceBytes": 13473,
+          "preMinifyRenderedBytes": 7839
+        },
+        {
+          "module": "common.ts",
+          "generatedBytes": 3131,
+          "originalSourceBytes": 6801,
+          "preMinifyRenderedBytes": 5205
+        },
+        {
+          "module": "template.ts",
+          "generatedBytes": 3087,
+          "originalSourceBytes": 11320,
+          "preMinifyRenderedBytes": 7503
+        },
+        {
+          "module": "sync.ts",
+          "generatedBytes": 1990,
+          "originalSourceBytes": 6151,
+          "preMinifyRenderedBytes": 4231
+        },
+        {
+          "module": "index.ts",
+          "generatedBytes": 1864,
+          "originalSourceBytes": 12099,
+          "preMinifyRenderedBytes": 4219
+        },
+        {
+          "module": "event.ts",
+          "generatedBytes": 1231,
+          "originalSourceBytes": 3431,
+          "preMinifyRenderedBytes": 2488
+        },
+        {
+          "module": "[unmapped]",
+          "generatedBytes": 1137,
+          "originalSourceBytes": null,
+          "preMinifyRenderedBytes": null
+        },
+        {
+          "module": "tracker.ts",
+          "generatedBytes": 996,
+          "originalSourceBytes": 4055,
+          "preMinifyRenderedBytes": 1592
+        },
+        {
+          "module": "plugin.ts",
+          "generatedBytes": 816,
+          "originalSourceBytes": 3565,
+          "preMinifyRenderedBytes": 1757
+        },
+        {
+          "module": "constant.ts",
+          "generatedBytes": 479,
+          "originalSourceBytes": 3294,
+          "preMinifyRenderedBytes": 3126
+        },
+        {
+          "module": "../../jieshu/test-results/core-load-current-modules/wujie-consumer.mjs",
+          "generatedBytes": 35,
+          "originalSourceBytes": 141,
+          "preMinifyRenderedBytes": null
+        }
+      ]
+    },
+    {
+      "framework": "wujie",
+      "usage": "whole-core",
+      "target": "es2022",
+      "revision": {
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "status": ""
+      },
+      "bundleBytes": 62967,
+      "gzipBytes": 19165,
+      "sha256": "4544a7629c7e0913411d39a6c1892fa34b2c1eb03b23724c2f41744edc2f48c3",
+      "exports": [
+        "bus",
+        "clearAssetsCache",
+        "destroyApp",
+        "preloadApp",
+        "refreshApp",
+        "setupApp",
+        "startApp"
+      ],
+      "modules": [
+        {
+          "module": "iframe.ts",
+          "generatedBytes": 13666,
+          "originalSourceBytes": 47662,
+          "preMinifyRenderedBytes": 29049
+        },
+        {
+          "module": "sandbox.ts",
+          "generatedBytes": 7809,
+          "originalSourceBytes": 27517,
+          "preMinifyRenderedBytes": 13234
+        },
+        {
+          "module": "effect.ts",
+          "generatedBytes": 6445,
+          "originalSourceBytes": 24889,
+          "preMinifyRenderedBytes": 15433
+        },
+        {
+          "module": "proxy.ts",
+          "generatedBytes": 5185,
+          "originalSourceBytes": 14495,
+          "preMinifyRenderedBytes": 9720
+        },
+        {
+          "module": "shadow.ts",
+          "generatedBytes": 5155,
+          "originalSourceBytes": 15462,
+          "preMinifyRenderedBytes": 10869
+        },
+        {
+          "module": "utils.ts",
+          "generatedBytes": 4893,
+          "originalSourceBytes": 12856,
+          "preMinifyRenderedBytes": 9754
+        },
+        {
+          "module": "entry.ts",
+          "generatedBytes": 3416,
+          "originalSourceBytes": 13473,
+          "preMinifyRenderedBytes": 7489
+        },
+        {
+          "module": "common.ts",
+          "generatedBytes": 3136,
+          "originalSourceBytes": 6801,
+          "preMinifyRenderedBytes": 4983
+        },
+        {
+          "module": "template.ts",
+          "generatedBytes": 3071,
+          "originalSourceBytes": 11320,
+          "preMinifyRenderedBytes": 7429
+        },
+        {
+          "module": "index.ts",
+          "generatedBytes": 2741,
+          "originalSourceBytes": 12099,
+          "preMinifyRenderedBytes": 4633
+        },
+        {
+          "module": "sync.ts",
+          "generatedBytes": 1991,
+          "originalSourceBytes": 6151,
+          "preMinifyRenderedBytes": 4231
+        },
+        {
+          "module": "constant.ts",
+          "generatedBytes": 1272,
+          "originalSourceBytes": 3294,
+          "preMinifyRenderedBytes": 3126
+        },
+        {
+          "module": "[unmapped]",
+          "generatedBytes": 1218,
+          "originalSourceBytes": null,
+          "preMinifyRenderedBytes": null
+        },
+        {
+          "module": "event.ts",
+          "generatedBytes": 1196,
+          "originalSourceBytes": 3431,
+          "preMinifyRenderedBytes": 2240
+        },
+        {
+          "module": "tracker.ts",
+          "generatedBytes": 987,
+          "originalSourceBytes": 4055,
+          "preMinifyRenderedBytes": 1592
+        },
+        {
+          "module": "plugin.ts",
+          "generatedBytes": 786,
+          "originalSourceBytes": 3565,
+          "preMinifyRenderedBytes": 1659
+        }
+      ]
+    },
+    {
+      "framework": "wujie",
+      "usage": "start-only-consumer",
+      "target": "es2022",
+      "revision": {
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+        "status": ""
+      },
+      "bundleBytes": 61481,
+      "gzipBytes": 18823,
+      "sha256": "817b26284da6ce0f468c817188af73004744e8c88a9e574ab803f73560b69e63",
+      "exports": [],
+      "modules": [
+        {
+          "module": "iframe.ts",
+          "generatedBytes": 13698,
+          "originalSourceBytes": 47662,
+          "preMinifyRenderedBytes": 29049
+        },
+        {
+          "module": "sandbox.ts",
+          "generatedBytes": 7810,
+          "originalSourceBytes": 27517,
+          "preMinifyRenderedBytes": 13234
+        },
+        {
+          "module": "effect.ts",
+          "generatedBytes": 6488,
+          "originalSourceBytes": 24889,
+          "preMinifyRenderedBytes": 15433
+        },
+        {
+          "module": "shadow.ts",
+          "generatedBytes": 5470,
+          "originalSourceBytes": 15462,
+          "preMinifyRenderedBytes": 10869
+        },
+        {
+          "module": "proxy.ts",
+          "generatedBytes": 5277,
+          "originalSourceBytes": 14495,
+          "preMinifyRenderedBytes": 9720
+        },
+        {
+          "module": "utils.ts",
+          "generatedBytes": 5094,
+          "originalSourceBytes": 12856,
+          "preMinifyRenderedBytes": 9754
+        },
+        {
+          "module": "entry.ts",
+          "generatedBytes": 3206,
+          "originalSourceBytes": 13473,
+          "preMinifyRenderedBytes": 7012
+        },
+        {
+          "module": "template.ts",
+          "generatedBytes": 3076,
+          "originalSourceBytes": 11320,
+          "preMinifyRenderedBytes": 7429
+        },
+        {
+          "module": "common.ts",
+          "generatedBytes": 3054,
+          "originalSourceBytes": 6801,
+          "preMinifyRenderedBytes": 4746
+        },
+        {
+          "module": "sync.ts",
+          "generatedBytes": 1991,
+          "originalSourceBytes": 6151,
+          "preMinifyRenderedBytes": 4231
+        },
+        {
+          "module": "index.ts",
+          "generatedBytes": 1667,
+          "originalSourceBytes": 12099,
+          "preMinifyRenderedBytes": 2894
+        },
+        {
+          "module": "event.ts",
+          "generatedBytes": 1196,
+          "originalSourceBytes": 3431,
+          "preMinifyRenderedBytes": 2240
+        },
+        {
+          "module": "[unmapped]",
+          "generatedBytes": 1137,
+          "originalSourceBytes": null,
+          "preMinifyRenderedBytes": null
+        },
+        {
+          "module": "tracker.ts",
+          "generatedBytes": 987,
+          "originalSourceBytes": 4055,
+          "preMinifyRenderedBytes": 1592
+        },
+        {
+          "module": "plugin.ts",
+          "generatedBytes": 789,
+          "originalSourceBytes": 3565,
+          "preMinifyRenderedBytes": 1659
+        },
+        {
+          "module": "constant.ts",
+          "generatedBytes": 506,
+          "originalSourceBytes": 3294,
+          "preMinifyRenderedBytes": 3126
+        },
+        {
+          "module": "../../jieshu/test-results/core-load-current-modules/wujie-consumer.mjs",
+          "generatedBytes": 35,
+          "originalSourceBytes": 141,
+          "preMinifyRenderedBytes": null
+        }
+      ]
+    }
+  ]
+}

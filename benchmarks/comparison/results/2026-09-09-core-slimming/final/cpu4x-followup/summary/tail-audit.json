@@ -1,0 +1,325 @@
+{
+  "generatedAt": "2026-09-09T15:24:01.034Z",
+  "scenario": "cpu4x",
+  "independentRunsNotPooled": true,
+  "sources": [
+    {
+      "file": "test-results/core-slimming-startup-buffer-ab/environment.json",
+      "sha256": "5488c140868f574a2db3bd9c3bf27aea759cc07f3dfdf4f2f4c88ae7d0f3a9e6"
+    },
+    {
+      "file": "test-results/core-slimming-startup-buffer-ab/observations.jsonl",
+      "sha256": "37908553bb26becd2cf53eb6b87e894cc062f58737516a8c6f2885fa01495a4d"
+    },
+    {
+      "file": "test-results/core-slimming-cpu4x-tail-ab/environment.json",
+      "sha256": "57cbf95b5fcd67327ec57e5f60fe95934ddb5c5b8484e6488207e41673edb407"
+    },
+    {
+      "file": "test-results/core-slimming-cpu4x-tail-ab/observations.jsonl",
+      "sha256": "039cbecaa4cf6a07d964efd5c77ac3f31b57f49974157b9f5a7af8c8903faae7"
+    }
+  ],
+  "runs": [
+    {
+      "label": "initial-30",
+      "directory": "test-results/core-slimming-startup-buffer-ab",
+      "startedAt": "2026-09-09T15:12:57.399Z",
+      "expectedRoundsPerFramework": 30,
+      "counts": {
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0
+        },
+        "jieshu-before": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0
+        },
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0
+        }
+      },
+      "bundles": {
+        "jieshu": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5",
+        "jieshu-before": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "wujie": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+      },
+      "bundleTransport": "All core bundles are UTF-8 buffers prepared before sampling; no per-request string encoding.",
+      "initialEnvironmentLoadAverage": [
+        2.8642578125,
+        3.232421875,
+        4.0732421875
+      ],
+      "metrics": {
+        "readyMs": {
+          "frameworks": {
+            "jieshu": {
+              "n": 30,
+              "median": 138,
+              "p95": 183.395,
+              "min": 118.3,
+              "max": 186.9
+            },
+            "jieshu-before": {
+              "n": 30,
+              "median": 144.9,
+              "p95": 170.145,
+              "min": 114.8,
+              "max": 182.6
+            },
+            "wujie": {
+              "n": 30,
+              "median": 143.35,
+              "p95": 177.8,
+              "min": 125.6,
+              "max": 179.8
+            }
+          },
+          "currentMinusBefore": {
+            "median": {
+              "n": 30,
+              "exclusions": [],
+              "statistic": "median(current) - median(before)",
+              "current": 138,
+              "before": 144.9,
+              "differenceMs": -6.9,
+              "confidenceInterval95Ms": [
+                -16.6,
+                7.00125
+              ],
+              "bootstrapIterations": 5000,
+              "seed": 4288596336
+            },
+            "p95": {
+              "n": 30,
+              "exclusions": [],
+              "statistic": "p95(current) - p95(before)",
+              "current": 183.395,
+              "before": 170.145,
+              "differenceMs": 13.25,
+              "confidenceInterval95Ms": [
+                -6.57,
+                25.7
+              ],
+              "bootstrapIterations": 5000,
+              "seed": 2740176026
+            }
+          }
+        },
+        "apiMs": {
+          "frameworks": {
+            "jieshu": {
+              "n": 30,
+              "median": 116.25,
+              "p95": 155.15,
+              "min": 99,
+              "max": 163
+            },
+            "jieshu-before": {
+              "n": 30,
+              "median": 122.3,
+              "p95": 146.43,
+              "min": 89.8,
+              "max": 158.8
+            },
+            "wujie": {
+              "n": 30,
+              "median": 119.5,
+              "p95": 152.175,
+              "min": 95.8,
+              "max": 155.3
+            }
+          },
+          "currentMinusBefore": {
+            "median": {
+              "n": 30,
+              "exclusions": [],
+              "statistic": "median(current) - median(before)",
+              "current": 116.25,
+              "before": 122.3,
+              "differenceMs": -6.05,
+              "confidenceInterval95Ms": [
+                -15.25125,
+                6
+              ],
+              "bootstrapIterations": 5000,
+              "seed": 418757589
+            },
+            "p95": {
+              "n": 30,
+              "exclusions": [],
+              "statistic": "p95(current) - p95(before)",
+              "current": 155.15,
+              "before": 146.43,
+              "differenceMs": 8.72,
+              "confidenceInterval95Ms": [
+                -7.2,
+                23.735
+              ],
+              "bootstrapIterations": 5000,
+              "seed": 4205982599
+            }
+          }
+        }
+      }
+    },
+    {
+      "label": "followup-90",
+      "directory": "test-results/core-slimming-cpu4x-tail-ab",
+      "startedAt": "2026-09-09T15:20:30.674Z",
+      "expectedRoundsPerFramework": 90,
+      "counts": {
+        "jieshu": {
+          "total": 90,
+          "passed": 90,
+          "failed": 0
+        },
+        "jieshu-before": {
+          "total": 90,
+          "passed": 90,
+          "failed": 0
+        },
+        "wujie": {
+          "total": 90,
+          "passed": 90,
+          "failed": 0
+        }
+      },
+      "bundles": {
+        "jieshu": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5",
+        "jieshu-before": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "wujie": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+      },
+      "bundleTransport": "All core bundles are UTF-8 buffers prepared before sampling; no per-request string encoding.",
+      "initialEnvironmentLoadAverage": [
+        1.99462890625,
+        2.99365234375,
+        3.75146484375
+      ],
+      "metrics": {
+        "readyMs": {
+          "frameworks": {
+            "jieshu": {
+              "n": 90,
+              "median": 162.75,
+              "p95": 166.755,
+              "min": 151.8,
+              "max": 168.9
+            },
+            "jieshu-before": {
+              "n": 90,
+              "median": 162.55,
+              "p95": 166.155,
+              "min": 157.8,
+              "max": 169
+            },
+            "wujie": {
+              "n": 90,
+              "median": 166.25,
+              "p95": 170.6,
+              "min": 160.3,
+              "max": 175.6
+            }
+          },
+          "currentMinusBefore": {
+            "median": {
+              "n": 90,
+              "exclusions": [],
+              "statistic": "median(current) - median(before)",
+              "current": 162.75,
+              "before": 162.55,
+              "differenceMs": 0.2,
+              "confidenceInterval95Ms": [
+                -1,
+                1.25
+              ],
+              "bootstrapIterations": 5000,
+              "seed": 1601831117
+            },
+            "p95": {
+              "n": 90,
+              "exclusions": [],
+              "statistic": "p95(current) - p95(before)",
+              "current": 166.755,
+              "before": 166.155,
+              "differenceMs": 0.6,
+              "confidenceInterval95Ms": [
+                -0.685,
+                2.555
+              ],
+              "bootstrapIterations": 5000,
+              "seed": 772172773
+            }
+          }
+        },
+        "apiMs": {
+          "frameworks": {
+            "jieshu": {
+              "n": 90,
+              "median": 138.1,
+              "p95": 142.5,
+              "min": 126.6,
+              "max": 143.9
+            },
+            "jieshu-before": {
+              "n": 90,
+              "median": 138.5,
+              "p95": 142.21,
+              "min": 133.3,
+              "max": 150.8
+            },
+            "wujie": {
+              "n": 90,
+              "median": 142.05,
+              "p95": 146.575,
+              "min": 121.9,
+              "max": 149.8
+            }
+          },
+          "currentMinusBefore": {
+            "median": {
+              "n": 90,
+              "exclusions": [],
+              "statistic": "median(current) - median(before)",
+              "current": 138.1,
+              "before": 138.5,
+              "differenceMs": -0.4,
+              "confidenceInterval95Ms": [
+                -1,
+                0.25
+              ],
+              "bootstrapIterations": 5000,
+              "seed": 1960666091
+            },
+            "p95": {
+              "n": 90,
+              "exclusions": [],
+              "statistic": "p95(current) - p95(before)",
+              "current": 142.5,
+              "before": 142.21,
+              "differenceMs": 0.29,
+              "confidenceInterval95Ms": [
+                -1.2,
+                1.195
+              ],
+              "bootstrapIterations": 5000,
+              "seed": 1946029900
+            }
+          }
+        }
+      }
+    }
+  ],
+  "method": [
+    "Same-run, same-round complete current/before pairs are resampled together, 5000 times with fixed per-run/metric/statistic seed; linear-interpolated quantiles.",
+    "Each interval is computed for its stated statistic. Median confidence intervals are not used as evidence about P95.",
+    "The 30-round and 90-round samples were collected at different times and remain separate; no pooled estimate or cross-run latency delta is calculated.",
+    "Percentile bootstrap intervals describe within-run sampling uncertainty. They do not prove equivalence or the absence of rare regressions. A 30-sample P95 depends on roughly the highest two or three observations; even 90 samples give limited extreme-tail coverage.",
+    "CPU 4x is browser emulation, not a device guarantee. Readiness timing begins after core loading and harness installation."
+  ],
+  "conclusion": "Follow-up 90-round readiness P95 current-minus-before is 0.6 ms, 95% paired bootstrap CI [-0.685, 2.555]. API P95 difference is 0.29 ms, CI [-1.2, 1.195]. Interpret alongside the separate initial run, not as a pooled result."
+}

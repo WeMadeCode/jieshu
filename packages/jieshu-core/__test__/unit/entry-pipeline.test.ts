@@ -183,8 +183,8 @@ describe('entry asset pipeline', () => {
     const parsed = await importHTML({
       url: entryUrl,
       html: [
-        '<link rel=stylesheet href=./theme.css media=print nonce="external-nonce" title="external-title">',
-        '<style media=screen nonce="inline-nonce" title="inline-title">.inline { color: blue; }</style>',
+        '<link rel=stylesheet href=./theme.css media=print nonce="external-nonce&amp;&quot;&lt;&gt;" title="external-title">',
+        '<style media=screen nonce="inline-nonce&amp;&quot;&lt;&gt;" title="inline-title">.inline { color: blue; }</style>',
       ].join(''),
       opts: { fetch },
     });
@@ -195,10 +195,10 @@ describe('entry asset pipeline', () => {
 
     const output = await processCssLoader(sandbox, parsed.template, parsed.getExternalStyleSheets);
     expect(output).toContain(
-      '<style media="print" nonce="external-nonce" title="external-title">/* https://child.example/css-attributes/theme.css */.external { color: green; }</style>',
+      '<style media="print" nonce="external-nonce&amp;&quot;&lt;&gt;" title="external-title">/* https://child.example/css-attributes/theme.css */.external { color: green; }</style>',
     );
     expect(output).toContain(
-      '<style media="screen" nonce="inline-nonce" title="inline-title">/* inline-style-1 */.inline { color: blue; }</style>',
+      '<style media="screen" nonce="inline-nonce&amp;&quot;&lt;&gt;" title="inline-title">/* inline-style-1 */.inline { color: blue; }</style>',
     );
   });
 

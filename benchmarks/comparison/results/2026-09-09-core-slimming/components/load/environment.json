@@ -1,0 +1,85 @@
+{
+  "startedAt": "2026-09-09T15:14:32.617Z",
+  "samples": 60,
+  "traceSamplesPerEncoding": 7,
+  "platform": "darwin",
+  "release": "25.6.0",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "cpuCount": 8,
+  "totalMemoryBytes": 17179869184,
+  "loadAverage": [
+    4.5703125,
+    3.9423828125,
+    4.2724609375
+  ],
+  "node": "v26.7.0",
+  "browser": "151.0.7922.34",
+  "playwright": "1.62.1",
+  "vite": "8.2.2",
+  "revisions": {
+    "baseline": {
+      "id": "baseline",
+      "file": "baseline.js",
+      "bundleBytes": 108581,
+      "gzipBytes": 32708,
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e"
+    },
+    "cache-methods-only": {
+      "id": "cache-methods-only",
+      "file": "cache-methods-only.js",
+      "bundleBytes": 108558,
+      "gzipBytes": 32697,
+      "sha256": "65b6e18a9ead6396f616d74be83e2f655fb79380eb64b8f1d2cce9059c9805f3"
+    },
+    "shared-attributes-only": {
+      "id": "shared-attributes-only",
+      "file": "shared-attributes-only.js",
+      "bundleBytes": 108372,
+      "gzipBytes": 32703,
+      "sha256": "d56046482cc29e50ebff2a24fde06287f5c0ecab056d0127bda36b39603fb831"
+    },
+    "controller-only": {
+      "id": "controller-only",
+      "file": "controller-only.js",
+      "bundleBytes": 107924,
+      "gzipBytes": 32639,
+      "sha256": "37cbfaf6ccdc9f729572be1d6ce37743b3dfad2a6703d9817c47bbb179a3584e"
+    },
+    "shared-fetch-only": {
+      "id": "shared-fetch-only",
+      "file": "shared-fetch-only.js",
+      "bundleBytes": 108361,
+      "gzipBytes": 32666,
+      "sha256": "c9c18b4522e836e8d2169433774c40f090125dd75abcc69c0cbb32eee9f60741"
+    },
+    "all-current": {
+      "id": "all-current",
+      "file": "all-current.js",
+      "bundleBytes": 107474,
+      "gzipBytes": 32578,
+      "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5"
+    }
+  },
+  "inputManifest": {
+    "input": "/Users/zhouxiang/Documents/Github/jieshu/test-results/core-load-factor-variants",
+    "sha256": "6f1c84781cb2025b63c2fc7a329795f1200d76d92d57f4ddc138b6c8bc38feca"
+  },
+  "build": {
+    "target": "es2018",
+    "minify": true,
+    "format": "iife",
+    "mode": "production"
+  },
+  "method": [
+    "Frozen component variants from manifest; fresh context per observation, serial CPU 1x UTF-8. Cyclic order each round with alternate reversed blocks; all routes v0..v5 have equal length. No sub-application installed.",
+    "No sub-application or benchmark fixture installed. Measurement function installed before baseline GC.",
+    "Legacy HTML/JS omits charset; UTF-8 HTML/JS declares charset. Both transfer identical UTF-8 source bytes.",
+    "Before/after heap uses forced GC outside load timing. After core load, no mounts or lifecycle operations occur.",
+    "Resource responseEnd-startTime includes request scheduling, localhost network and response transfer.",
+    "onload-responseEnd is response end to onload, not pure parsing or execution; work can overlap transfer.",
+    "Performance duration deltas include identical measurement instrumentation. Missing metrics are null.",
+    "GC JS heap and DOM counts are not process RSS or total browser memory.",
+    "Each context has an empty HTTP cache; Chromium process-level compilation caches are not explicitly cleared."
+  ]
+}

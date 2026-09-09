@@ -10,11 +10,13 @@ import { gzipSync } from 'node:zlib';
 import { chromium } from '@playwright/test';
 import { build } from 'vite';
 
+import { comparisonOrder, coreRoute, fixtureFramework, readBeforeBundle } from './before-bundle.mjs';
 import { childProgram, installHarness } from './fixture.mjs';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const wujieRoot = path.resolve(process.env.WUJIE_ROOT || path.join(root, '../wujie'));
 const mode = process.env.BENCH_MODE || 'all';
+const beforeBundle = await readBeforeBundle(process.env.BENCH_BEFORE_BUNDLE, mode);
 const samples = Number(process.env.BENCH_SAMPLES || 30);
 const memoryRounds = Number(process.env.BENCH_MEMORY_ROUNDS || 5);
 const stabilityRounds = Number(process.env.BENCH_STABILITY_ROUNDS || 3);
@@ -57,7 +59,8 @@ for (const [framework, repository] of [
   if (chunks.length !== 1) {
     throw new Error(`Expected a single bundled core for ${framework}`);
   }
-  bundles[framework] = chunks[0].code;
+  // Encode all variants before sampling; frozen bundles are also byte buffers.
+  bundles[framework] = Buffer.from(chunks[0].code);
   revisions[framework] = {
     commit: git(repository, ['rev-parse', 'HEAD']),
     status: git(repository, ['status', '--short']),
@@ -68,6 +71,12 @@ for (const [framework, repository] of [
     gzipBytes: gzipSync(chunks[0].code).length,
     sha256: createHash('sha256').update(chunks[0].code).digest('hex'),
   };
+}
+if (beforeBundle) {
+  bundles['jieshu-before'] = beforeBundle.bundle;
+  revisions['jieshu-before'] = beforeBundle.revision;
+  await writeFile(path.join(output, 'jieshu-before.js'), beforeBundle.bundle);
+  await writeFile(path.join(output, 'jieshu-before.environment.json'), beforeBundle.sourceEnvironment);
 }
 
 const childCode = `(${childProgram.toString()})();`;
@@ -123,7 +132,8 @@ const childOrigin = await listen((request, response) => {
 const hostOrigin = await listen((request, response) => {
   const url = new URL(request.url, 'http://localhost');
   if (url.pathname.endsWith('.js')) {
-    const framework = url.pathname.slice(1, -3);
+    const route = url.pathname.slice(1, -3);
+    const framework = beforeBundle && route === 'before' ? 'jieshu-before' : route;
     if (bundles[framework]) {
       response.setHeader('Content-Type', 'text/javascript');
       response.setHeader('Cache-Control', 'public, max-age=3600');
@@ -160,6 +170,19 @@ try {
       .version,
     vite: JSON.parse(await readFile(path.join(root, 'node_modules/vite/package.json'), 'utf8')).version,
     revisions,
+    ...(beforeBundle
+      ? {
+          comparison: {
+            frameworks: ['jieshu', 'wujie', 'jieshu-before'],
+            order:
+              'Cyclic order by round, reversing each three-round block; six measured rounds cover all permutations.',
+            savedBundle:
+              'Hash-verified frozen Jieshu; fixture framework remains jieshu, recorded label is jieshu-before.',
+            routes: 'Current /jieshu.js and frozen /before.js have equal URL length.',
+          },
+        }
+      : {}),
+    bundleTransport: 'All core bundles are UTF-8 buffers prepared before sampling; no per-request string encoding.',
     build: { target: 'es2018', minify: mode !== 'profile', format: 'iife', mode: 'production' },
     fixture: {
       jsBytes: Buffer.byteLength(childCode),
@@ -208,8 +231,8 @@ try {
           document.head.appendChild(script);
         });
         return performance.now() - started;
-      }, framework);
-      await page.evaluate(installHarness, { framework, childOrigin });
+      }, coreRoute(framework));
+      await page.evaluate(installHarness, { framework: fixtureFramework(framework), childOrigin });
       return coreLoadMs;
     };
     const coreLoadMs = loadCore ? await load() : undefined;
@@ -247,7 +270,7 @@ try {
       }
       const count = mode === 'smoke' ? 1 : samples;
       for (let round = -2; round < count; round += 1) {
-        for (const framework of round % 2 === 0 ? ['jieshu', 'wujie'] : ['wujie', 'jieshu']) {
+        for (const framework of comparisonOrder(round, Boolean(beforeBundle))) {
           const opened = await openPage(framework, { cpuRate: scenario === 'cpu4x' ? 4 : 1 });
           const { page, context, errors, diagnostics, coreLoadMs } = opened;
           let result;
@@ -353,7 +376,7 @@ try {
       return { ...selected, dom };
     };
     for (let round = 0; round < memoryRounds; round += 1) {
-      for (const framework of round % 2 === 0 ? ['jieshu', 'wujie'] : ['wujie', 'jieshu']) {
+      for (const framework of comparisonOrder(round, Boolean(beforeBundle))) {
         const opened = await openPage(framework, { loadCore: false });
         const { page, context, errors, diagnostics } = opened;
         try {

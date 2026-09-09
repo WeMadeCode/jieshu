@@ -1,0 +1,1272 @@
+{
+  "kind": "Retrospective audit of existing 2026-09-09 results; no new browser sampling or production changes",
+  "sources": [
+    {
+      "path": "benchmarks/comparison/results/2026-09-09-instanceof/load-ab/observations.jsonl",
+      "sha256": "35b1faa5dbc7f1f3afbfb8d9160f6eccb2dc219a5a668d56de0d87234d395923"
+    },
+    {
+      "path": "benchmarks/comparison/results/2026-09-09-instanceof/load-ab/trace-summary.json",
+      "sha256": "41a150628b162923c3bf2405509ebb3848d5b4e59a64125745fa111fef80e804"
+    },
+    {
+      "path": "benchmarks/comparison/results/2026-09-09-instanceof/load-ab/environment.json",
+      "sha256": "a868e84061f4760fa8bb1f0d563d20339110f1c1d504105d11e2561753483a63"
+    }
+  ],
+  "environment": {
+    "startedAt": "2026-09-09T14:06:36.273Z",
+    "cpu": "Apple M1 Pro",
+    "browser": "151.0.7922.34",
+    "cpuCount": 8,
+    "loadAverage": [
+      4.47021484375,
+      5.17333984375,
+      6.62939453125
+    ],
+    "build": {
+      "target": "es2018",
+      "minify": true,
+      "format": "iife",
+      "mode": "production"
+    }
+  },
+  "bundles": {
+    "wujie": {
+      "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+      "status": "clean",
+      "bundleBytes": 65660,
+      "gzipBytes": 19802,
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+      "savedBundleHashVerified": true
+    },
+    "jieshu": {
+      "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+      "status": "dirty at original measurement; bundle SHA is the content identity",
+      "bundleBytes": 108581,
+      "gzipBytes": 32708,
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+      "savedBundleHashVerified": true
+    }
+  },
+  "untraced": {
+    "wujie": {
+      "passed": 30,
+      "totalLoadMs": {
+        "n": 30,
+        "median": 3.2,
+        "min": 3,
+        "max": 4,
+        "p95": 3.81
+      },
+      "requestAndResponseMs": {
+        "n": 30,
+        "median": 0.9,
+        "min": 0.8,
+        "max": 1.3,
+        "p95": 1.3
+      },
+      "responseEndToOnloadMs": {
+        "n": 30,
+        "median": 1.8,
+        "min": 1.6,
+        "max": 2.1,
+        "p95": 2
+      },
+      "scriptDurationMs": {
+        "n": 30,
+        "median": 0.272,
+        "min": 0.255,
+        "max": 0.357,
+        "p95": 0.3361
+      },
+      "v8CompileDurationMs": {
+        "n": 30,
+        "median": 0.012,
+        "min": 0.011,
+        "max": 0.02,
+        "p95": 0.017
+      },
+      "beforeResourceStartMs": {
+        "n": 30,
+        "median": 0.5,
+        "min": 0.4,
+        "max": 0.7,
+        "p95": 0.6
+      },
+      "bodyTransferMs": {
+        "n": 30,
+        "median": 0.2,
+        "min": 0.1,
+        "max": 0.3,
+        "p95": 0.3
+      },
+      "heapDeltaBytes": {
+        "n": 30,
+        "median": 161244,
+        "min": 161244,
+        "max": 161244,
+        "p95": 161244
+      },
+      "bodyBytes": [
+        65660
+      ],
+      "contentEncodings": [
+        ""
+      ],
+      "legacyTotalLoadMs": {
+        "n": 30,
+        "median": 3.2,
+        "min": 3,
+        "max": 4.1,
+        "p95": 3.81
+      }
+    },
+    "jieshu": {
+      "passed": 30,
+      "totalLoadMs": {
+        "n": 30,
+        "median": 4.4,
+        "min": 4.2,
+        "max": 4.9,
+        "p95": 4.9
+      },
+      "requestAndResponseMs": {
+        "n": 30,
+        "median": 1,
+        "min": 0.9,
+        "max": 1.4,
+        "p95": 1.3
+      },
+      "responseEndToOnloadMs": {
+        "n": 30,
+        "median": 2.8,
+        "min": 2.6,
+        "max": 3.2,
+        "p95": 3.1
+      },
+      "scriptDurationMs": {
+        "n": 30,
+        "median": 0.5,
+        "min": 0.456,
+        "max": 0.622,
+        "p95": 0.58515
+      },
+      "v8CompileDurationMs": {
+        "n": 30,
+        "median": 0.014,
+        "min": 0.011,
+        "max": 0.032,
+        "p95": 0.02585
+      },
+      "beforeResourceStartMs": {
+        "n": 30,
+        "median": 0.5,
+        "min": 0.4,
+        "max": 0.7,
+        "p95": 0.6
+      },
+      "bodyTransferMs": {
+        "n": 30,
+        "median": 0.2,
+        "min": 0.1,
+        "max": 0.4,
+        "p95": 0.3
+      },
+      "heapDeltaBytes": {
+        "n": 30,
+        "median": 217384,
+        "min": 217384,
+        "max": 217384,
+        "p95": 217384
+      },
+      "bodyBytes": [
+        108581
+      ],
+      "contentEncodings": [
+        ""
+      ],
+      "legacyTotalLoadMs": {
+        "n": 30,
+        "median": 4.5,
+        "min": 4.2,
+        "max": 5,
+        "p95": 4.9
+      }
+    }
+  },
+  "pairedDeltasJieshuMinusWujieMs": {
+    "totalLoadMs": {
+      "n": 30,
+      "median": 1.2,
+      "min": 0.2,
+      "max": 1.8,
+      "p95": 1.7
+    },
+    "requestAndResponseMs": {
+      "n": 30,
+      "median": 0.1,
+      "min": -0.3,
+      "max": 0.5,
+      "p95": 0.455
+    },
+    "responseEndToOnloadMs": {
+      "n": 30,
+      "median": 1,
+      "min": 0.6,
+      "max": 1.5,
+      "p95": 1.355
+    },
+    "scriptDurationMs": {
+      "n": 30,
+      "median": 0.214,
+      "min": 0.128,
+      "max": 0.342,
+      "p95": 0.3149
+    },
+    "v8CompileDurationMs": {
+      "n": 30,
+      "median": 0.001,
+      "min": -0.006,
+      "max": 0.019,
+      "p95": 0.01385
+    }
+  },
+  "traced": {
+    "wujie": {
+      "diagnosticOnly": true,
+      "observedTimingsMs": {
+        "totalLoadMs": {
+          "n": 3,
+          "median": 3.5,
+          "min": 3.5,
+          "max": 3.5,
+          "p95": 3.5
+        },
+        "requestAndResponseMs": {
+          "n": 3,
+          "median": 1,
+          "min": 0.9,
+          "max": 1,
+          "p95": 1
+        },
+        "responseEndToOnloadMs": {
+          "n": 3,
+          "median": 1.9,
+          "min": 1.9,
+          "max": 2,
+          "p95": 1.99
+        },
+        "scriptDurationMs": {
+          "n": 3,
+          "median": 0.279,
+          "min": 0.277,
+          "max": 0.288,
+          "p95": 0.2871
+        },
+        "v8CompileDurationMs": {
+          "n": 3,
+          "median": 0.018,
+          "min": 0.017,
+          "max": 0.019,
+          "p95": 0.0189
+        }
+      },
+      "exactUrlDurationsMs": {
+        "v8.parseOnBackground": {
+          "n": 3,
+          "median": 1.212,
+          "min": 1.189,
+          "max": 1.268,
+          "p95": 1.2624
+        },
+        "BackgroundJSStreamManager::RunScriptStreamingTask": {
+          "n": 3,
+          "median": 1.24,
+          "min": 1.194,
+          "max": 1.275,
+          "p95": 1.2715
+        },
+        "EvaluateScript": {
+          "n": 3,
+          "median": 0.316,
+          "min": 0.304,
+          "max": 0.331,
+          "p95": 0.3295
+        },
+        "v8.compile": {
+          "n": 3,
+          "median": 0.019,
+          "min": 0.017,
+          "max": 0.02,
+          "p95": 0.0199
+        },
+        "v8.run": {
+          "n": 3,
+          "median": 0.27,
+          "min": 0.268,
+          "max": 0.28,
+          "p95": 0.279
+        }
+      },
+      "phaseTimingsMs": {
+        "backgroundStartsAfterNetworkEnd": {
+          "n": 3,
+          "median": 0.12,
+          "min": 0.112,
+          "max": 0.126,
+          "p95": 0.1254
+        },
+        "backgroundEndsAfterNetworkEnd": {
+          "n": 3,
+          "median": 1.338,
+          "min": 1.309,
+          "max": 1.38,
+          "p95": 1.3758
+        },
+        "backgroundEndToEvaluateStart": {
+          "n": 3,
+          "median": 0.198,
+          "min": 0.196,
+          "max": 0.212,
+          "p95": 0.2106
+        },
+        "evaluateEndToOnloadFunctionStart": {
+          "n": 3,
+          "median": 0.027,
+          "min": 0.026,
+          "max": 0.029,
+          "p95": 0.0288
+        },
+        "networkEndToOnloadFunctionStart": {
+          "n": 3,
+          "median": 1.894,
+          "min": 1.851,
+          "max": 1.921,
+          "p95": 1.9183
+        },
+        "resourceFinishNotificationDelay": {
+          "n": 3,
+          "median": 1.48,
+          "min": 1.469,
+          "max": 1.519,
+          "p95": 1.5151
+        }
+      },
+      "nestedCompileCodeCount": {
+        "n": 3,
+        "median": 4,
+        "min": 4,
+        "max": 4,
+        "p95": 4
+      },
+      "nestedCompileCodeDurationSumMs": {
+        "n": 3,
+        "median": 0.065,
+        "min": 0.063,
+        "max": 0.065,
+        "p95": 0.065
+      },
+      "nestedPreParseCount": {
+        "n": 3,
+        "median": 155,
+        "min": 155,
+        "max": 155,
+        "p95": 155
+      }
+    },
+    "jieshu": {
+      "diagnosticOnly": true,
+      "observedTimingsMs": {
+        "totalLoadMs": {
+          "n": 3,
+          "median": 4.8,
+          "min": 4.5,
+          "max": 5,
+          "p95": 4.98
+        },
+        "requestAndResponseMs": {
+          "n": 3,
+          "median": 1,
+          "min": 1,
+          "max": 1.1,
+          "p95": 1.09
+        },
+        "responseEndToOnloadMs": {
+          "n": 3,
+          "median": 3.2,
+          "min": 3,
+          "max": 3.4,
+          "p95": 3.38
+        },
+        "scriptDurationMs": {
+          "n": 3,
+          "median": 0.606,
+          "min": 0.513,
+          "max": 0.652,
+          "p95": 0.6474
+        },
+        "v8CompileDurationMs": {
+          "n": 3,
+          "median": 0.021,
+          "min": 0.018,
+          "max": 0.036,
+          "p95": 0.0345
+        }
+      },
+      "exactUrlDurationsMs": {
+        "v8.parseOnBackground": {
+          "n": 3,
+          "median": 2.157,
+          "min": 2.11,
+          "max": 2.215,
+          "p95": 2.2092
+        },
+        "BackgroundJSStreamManager::RunScriptStreamingTask": {
+          "n": 3,
+          "median": 2.174,
+          "min": 2.142,
+          "max": 2.224,
+          "p95": 2.219
+        },
+        "EvaluateScript": {
+          "n": 3,
+          "median": 0.64,
+          "min": 0.544,
+          "max": 0.709,
+          "p95": 0.7021
+        },
+        "v8.compile": {
+          "n": 3,
+          "median": 0.023,
+          "min": 0.018,
+          "max": 0.037,
+          "p95": 0.0356
+        },
+        "v8.run": {
+          "n": 3,
+          "median": 0.596,
+          "min": 0.504,
+          "max": 0.638,
+          "p95": 0.6338
+        }
+      },
+      "phaseTimingsMs": {
+        "backgroundStartsAfterNetworkEnd": {
+          "n": 3,
+          "median": 0.083,
+          "min": 0.079,
+          "max": 0.18,
+          "p95": 0.1703
+        },
+        "backgroundEndsAfterNetworkEnd": {
+          "n": 3,
+          "median": 2.29,
+          "min": 2.236,
+          "max": 2.298,
+          "p95": 2.2972
+        },
+        "backgroundEndToEvaluateStart": {
+          "n": 3,
+          "median": 0.201,
+          "min": 0.197,
+          "max": 0.262,
+          "p95": 0.2559
+        },
+        "evaluateEndToOnloadFunctionStart": {
+          "n": 3,
+          "median": 0.036,
+          "min": 0.029,
+          "max": 0.039,
+          "p95": 0.0387
+        },
+        "networkEndToOnloadFunctionStart": {
+          "n": 3,
+          "median": 3.167,
+          "min": 3.006,
+          "max": 3.308,
+          "p95": 3.2939
+        },
+        "resourceFinishNotificationDelay": {
+          "n": 3,
+          "median": 2.438,
+          "min": 2.374,
+          "max": 2.499,
+          "p95": 2.4929
+        }
+      },
+      "nestedCompileCodeCount": {
+        "n": 3,
+        "median": 16,
+        "min": 16,
+        "max": 16,
+        "p95": 16
+      },
+      "nestedCompileCodeDurationSumMs": {
+        "n": 3,
+        "median": 0.284,
+        "min": 0.224,
+        "max": 0.315,
+        "p95": 0.3119
+      },
+      "nestedPreParseCount": {
+        "n": 3,
+        "median": 346,
+        "min": 346,
+        "max": 346,
+        "p95": 346
+      }
+    }
+  },
+  "traces": [
+    {
+      "framework": "wujie",
+      "sample": 0,
+      "file": "test-results/instanceof-load-ab/wujie-utf8-0.trace.json",
+      "sha256": "da9827ce1725a1b58a386c7b1e78aecd977bcf1bda444b4edb68fb515b10add1",
+      "coreUrl": "http://127.0.0.1:55650/wujie.js?encoding=utf8",
+      "dataLossOccurred": false,
+      "exactUrlEvents": [
+        {
+          "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+          "wallMs": 1.194,
+          "threadCpuMs": 1.037,
+          "pid": 9908,
+          "tid": 76825,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.118,
+          "endAfterNetworkEndMs": 1.312
+        },
+        {
+          "name": "v8.parseOnBackground",
+          "wallMs": 1.189,
+          "threadCpuMs": 1.034,
+          "pid": 9908,
+          "tid": 76825,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.12,
+          "endAfterNetworkEndMs": 1.309
+        },
+        {
+          "name": "EvaluateScript",
+          "wallMs": 0.304,
+          "threadCpuMs": 0.28,
+          "pid": 9908,
+          "tid": 76819,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.521,
+          "endAfterNetworkEndMs": 1.825
+        },
+        {
+          "name": "v8.compile",
+          "wallMs": 0.017,
+          "threadCpuMs": 0.011,
+          "pid": 9908,
+          "tid": 76819,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.527,
+          "endAfterNetworkEndMs": 1.544
+        },
+        {
+          "name": "v8.run",
+          "wallMs": 0.268,
+          "threadCpuMs": 0.252,
+          "pid": 9908,
+          "tid": 76819,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.546,
+          "endAfterNetworkEndMs": 1.814
+        }
+      ],
+      "phasesMs": {
+        "backgroundStartsAfterNetworkEnd": 0.12,
+        "backgroundEndsAfterNetworkEnd": 1.309,
+        "backgroundEndToEvaluateStart": 0.212,
+        "evaluateEndToOnloadFunctionStart": 0.026,
+        "networkEndToOnloadFunctionStart": 1.851,
+        "resourceFinishNotificationDelay": 1.469
+      },
+      "relationships": {
+        "backgroundInsideStreaming": true,
+        "compileInsideEvaluate": true,
+        "runInsideEvaluate": true,
+        "backgroundDifferentThreadFromEvaluate": true,
+        "streamed": true,
+        "networkEndedBeforeBackgroundStarted": true,
+        "backgroundEndedBeforeEvaluateStarted": true
+      },
+      "network": {
+        "fromCache": false,
+        "fromServiceWorker": false,
+        "connectionReused": true,
+        "responseStatus": 200
+      },
+      "nestedBackground": [
+        {
+          "name": "BackgroundCompileTask::Run",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 1.175
+        },
+        {
+          "name": "V8.PreParse",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 155,
+          "completeCount": 150,
+          "completeDurationSumMs": 0.747
+        },
+        {
+          "name": "V8.CompileCodeBackground",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 0.101
+        }
+      ],
+      "nestedEvaluate": [
+        {
+          "name": "V8.CompileCode",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 4,
+          "completeCount": 4,
+          "completeDurationSumMs": 0.063
+        },
+        {
+          "name": "V8.ParseFunction",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 4,
+          "completeCount": 4,
+          "completeDurationSumMs": 0.037
+        }
+      ]
+    },
+    {
+      "framework": "wujie",
+      "sample": 1,
+      "file": "test-results/instanceof-load-ab/wujie-utf8-1.trace.json",
+      "sha256": "cc5fd6d760426928bd8d5541a8c0b3e8222bb6a35057b4be469e1a58542d2077",
+      "coreUrl": "http://127.0.0.1:55650/wujie.js?encoding=utf8",
+      "dataLossOccurred": false,
+      "exactUrlEvents": [
+        {
+          "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+          "wallMs": 1.24,
+          "threadCpuMs": 1.075,
+          "pid": 9913,
+          "tid": 76934,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.1,
+          "endAfterNetworkEndMs": 1.34
+        },
+        {
+          "name": "v8.parseOnBackground",
+          "wallMs": 1.212,
+          "threadCpuMs": 1.067,
+          "pid": 9913,
+          "tid": 76934,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.126,
+          "endAfterNetworkEndMs": 1.338
+        },
+        {
+          "name": "EvaluateScript",
+          "wallMs": 0.331,
+          "threadCpuMs": 0.306,
+          "pid": 9913,
+          "tid": 76925,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.536,
+          "endAfterNetworkEndMs": 1.867
+        },
+        {
+          "name": "v8.compile",
+          "wallMs": 0.02,
+          "threadCpuMs": 0.015,
+          "pid": 9913,
+          "tid": 76925,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.546,
+          "endAfterNetworkEndMs": 1.566
+        },
+        {
+          "name": "v8.run",
+          "wallMs": 0.28,
+          "threadCpuMs": 0.263,
+          "pid": 9913,
+          "tid": 76925,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.569,
+          "endAfterNetworkEndMs": 1.849
+        }
+      ],
+      "phasesMs": {
+        "backgroundStartsAfterNetworkEnd": 0.126,
+        "backgroundEndsAfterNetworkEnd": 1.338,
+        "backgroundEndToEvaluateStart": 0.198,
+        "evaluateEndToOnloadFunctionStart": 0.027,
+        "networkEndToOnloadFunctionStart": 1.894,
+        "resourceFinishNotificationDelay": 1.48
+      },
+      "relationships": {
+        "backgroundInsideStreaming": true,
+        "compileInsideEvaluate": true,
+        "runInsideEvaluate": true,
+        "backgroundDifferentThreadFromEvaluate": true,
+        "streamed": true,
+        "networkEndedBeforeBackgroundStarted": true,
+        "backgroundEndedBeforeEvaluateStarted": true
+      },
+      "network": {
+        "fromCache": false,
+        "fromServiceWorker": false,
+        "connectionReused": true,
+        "responseStatus": 200
+      },
+      "nestedBackground": [
+        {
+          "name": "BackgroundCompileTask::Run",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 1.193
+        },
+        {
+          "name": "V8.PreParse",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 155,
+          "completeCount": 152,
+          "completeDurationSumMs": 0.743
+        },
+        {
+          "name": "V8.CompileCodeBackground",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 0.116
+        }
+      ],
+      "nestedEvaluate": [
+        {
+          "name": "V8.CompileCode",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 4,
+          "completeCount": 4,
+          "completeDurationSumMs": 0.065
+        },
+        {
+          "name": "V8.ParseFunction",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 4,
+          "completeCount": 4,
+          "completeDurationSumMs": 0.039
+        }
+      ]
+    },
+    {
+      "framework": "wujie",
+      "sample": 2,
+      "file": "test-results/instanceof-load-ab/wujie-utf8-2.trace.json",
+      "sha256": "789b0e9ea320ff6ecc7c30ad0a553cbbba1efaa0226f449bb617dfb03709abe2",
+      "coreUrl": "http://127.0.0.1:55650/wujie.js?encoding=utf8",
+      "dataLossOccurred": false,
+      "exactUrlEvents": [
+        {
+          "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+          "wallMs": 1.275,
+          "threadCpuMs": 1.114,
+          "pid": 9921,
+          "tid": 77105,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.107,
+          "endAfterNetworkEndMs": 1.382
+        },
+        {
+          "name": "v8.parseOnBackground",
+          "wallMs": 1.268,
+          "threadCpuMs": 1.111,
+          "pid": 9921,
+          "tid": 77105,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.112,
+          "endAfterNetworkEndMs": 1.38
+        },
+        {
+          "name": "EvaluateScript",
+          "wallMs": 0.316,
+          "threadCpuMs": 0.288,
+          "pid": 9921,
+          "tid": 77096,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.576,
+          "endAfterNetworkEndMs": 1.892
+        },
+        {
+          "name": "v8.compile",
+          "wallMs": 0.019,
+          "threadCpuMs": 0.013,
+          "pid": 9921,
+          "tid": 77096,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.582,
+          "endAfterNetworkEndMs": 1.601
+        },
+        {
+          "name": "v8.run",
+          "wallMs": 0.27,
+          "threadCpuMs": 0.251,
+          "pid": 9921,
+          "tid": 77096,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 1.604,
+          "endAfterNetworkEndMs": 1.874
+        }
+      ],
+      "phasesMs": {
+        "backgroundStartsAfterNetworkEnd": 0.112,
+        "backgroundEndsAfterNetworkEnd": 1.38,
+        "backgroundEndToEvaluateStart": 0.196,
+        "evaluateEndToOnloadFunctionStart": 0.029,
+        "networkEndToOnloadFunctionStart": 1.921,
+        "resourceFinishNotificationDelay": 1.519
+      },
+      "relationships": {
+        "backgroundInsideStreaming": true,
+        "compileInsideEvaluate": true,
+        "runInsideEvaluate": true,
+        "backgroundDifferentThreadFromEvaluate": true,
+        "streamed": true,
+        "networkEndedBeforeBackgroundStarted": true,
+        "backgroundEndedBeforeEvaluateStarted": true
+      },
+      "network": {
+        "fromCache": false,
+        "fromServiceWorker": false,
+        "connectionReused": true,
+        "responseStatus": 200
+      },
+      "nestedBackground": [
+        {
+          "name": "BackgroundCompileTask::Run",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 1.224
+        },
+        {
+          "name": "V8.PreParse",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 155,
+          "completeCount": 150,
+          "completeDurationSumMs": 0.761
+        },
+        {
+          "name": "V8.CompileCodeBackground",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 0.119
+        }
+      ],
+      "nestedEvaluate": [
+        {
+          "name": "V8.CompileCode",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 4,
+          "completeCount": 4,
+          "completeDurationSumMs": 0.065
+        },
+        {
+          "name": "V8.ParseFunction",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 4,
+          "completeCount": 4,
+          "completeDurationSumMs": 0.036
+        }
+      ]
+    },
+    {
+      "framework": "jieshu",
+      "sample": 0,
+      "file": "test-results/instanceof-load-ab/jieshu-utf8-0.trace.json",
+      "sha256": "dc16b4accae1d3ba24d6dd21a259a4052adee2208aa0d7f607c2bebc745529fb",
+      "coreUrl": "http://127.0.0.1:55650/jieshu.js?encoding=utf8",
+      "dataLossOccurred": false,
+      "exactUrlEvents": [
+        {
+          "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+          "wallMs": 2.142,
+          "threadCpuMs": 1.811,
+          "pid": 9909,
+          "tid": 76849,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.157,
+          "endAfterNetworkEndMs": 2.299
+        },
+        {
+          "name": "v8.parseOnBackground",
+          "wallMs": 2.11,
+          "threadCpuMs": 1.8,
+          "pid": 9909,
+          "tid": 76849,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.18,
+          "endAfterNetworkEndMs": 2.29
+        },
+        {
+          "name": "EvaluateScript",
+          "wallMs": 0.64,
+          "threadCpuMs": 0.569,
+          "pid": 9909,
+          "tid": 76840,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.491,
+          "endAfterNetworkEndMs": 3.131
+        },
+        {
+          "name": "v8.compile",
+          "wallMs": 0.023,
+          "threadCpuMs": 0.019,
+          "pid": 9909,
+          "tid": 76840,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.498,
+          "endAfterNetworkEndMs": 2.521
+        },
+        {
+          "name": "v8.run",
+          "wallMs": 0.596,
+          "threadCpuMs": 0.531,
+          "pid": 9909,
+          "tid": 76840,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.523,
+          "endAfterNetworkEndMs": 3.119
+        }
+      ],
+      "phasesMs": {
+        "backgroundStartsAfterNetworkEnd": 0.18,
+        "backgroundEndsAfterNetworkEnd": 2.29,
+        "backgroundEndToEvaluateStart": 0.201,
+        "evaluateEndToOnloadFunctionStart": 0.036,
+        "networkEndToOnloadFunctionStart": 3.167,
+        "resourceFinishNotificationDelay": 2.438
+      },
+      "relationships": {
+        "backgroundInsideStreaming": true,
+        "compileInsideEvaluate": true,
+        "runInsideEvaluate": true,
+        "backgroundDifferentThreadFromEvaluate": true,
+        "streamed": true,
+        "networkEndedBeforeBackgroundStarted": true,
+        "backgroundEndedBeforeEvaluateStarted": true
+      },
+      "network": {
+        "fromCache": false,
+        "fromServiceWorker": false,
+        "connectionReused": true,
+        "responseStatus": 200
+      },
+      "nestedBackground": [
+        {
+          "name": "BackgroundCompileTask::Run",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 2.076
+        },
+        {
+          "name": "V8.PreParse",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 346,
+          "completeCount": 319,
+          "completeDurationSumMs": 1.095
+        },
+        {
+          "name": "V8.CompileCodeBackground",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 0.189
+        }
+      ],
+      "nestedEvaluate": [
+        {
+          "name": "V8.CompileCode",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 16,
+          "completeCount": 16,
+          "completeDurationSumMs": 0.284
+        },
+        {
+          "name": "V8.ParseFunction",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 16,
+          "completeCount": 16,
+          "completeDurationSumMs": 0.175
+        }
+      ]
+    },
+    {
+      "framework": "jieshu",
+      "sample": 1,
+      "file": "test-results/instanceof-load-ab/jieshu-utf8-1.trace.json",
+      "sha256": "1d5b5f1c2186988008c99beabae3a142b63ff5cd3cdc0fc1c711c9e2519d65f0",
+      "coreUrl": "http://127.0.0.1:55650/jieshu.js?encoding=utf8",
+      "dataLossOccurred": false,
+      "exactUrlEvents": [
+        {
+          "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+          "wallMs": 2.224,
+          "threadCpuMs": 1.878,
+          "pid": 9911,
+          "tid": 76892,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.077,
+          "endAfterNetworkEndMs": 2.301
+        },
+        {
+          "name": "v8.parseOnBackground",
+          "wallMs": 2.215,
+          "threadCpuMs": 1.873,
+          "pid": 9911,
+          "tid": 76892,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.083,
+          "endAfterNetworkEndMs": 2.298
+        },
+        {
+          "name": "EvaluateScript",
+          "wallMs": 0.709,
+          "threadCpuMs": 0.64,
+          "pid": 9911,
+          "tid": 76882,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.56,
+          "endAfterNetworkEndMs": 3.269
+        },
+        {
+          "name": "v8.compile",
+          "wallMs": 0.037,
+          "threadCpuMs": 0.033,
+          "pid": 9911,
+          "tid": 76882,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.568,
+          "endAfterNetworkEndMs": 2.605
+        },
+        {
+          "name": "v8.run",
+          "wallMs": 0.638,
+          "threadCpuMs": 0.575,
+          "pid": 9911,
+          "tid": 76882,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.607,
+          "endAfterNetworkEndMs": 3.245
+        }
+      ],
+      "phasesMs": {
+        "backgroundStartsAfterNetworkEnd": 0.083,
+        "backgroundEndsAfterNetworkEnd": 2.298,
+        "backgroundEndToEvaluateStart": 0.262,
+        "evaluateEndToOnloadFunctionStart": 0.039,
+        "networkEndToOnloadFunctionStart": 3.308,
+        "resourceFinishNotificationDelay": 2.499
+      },
+      "relationships": {
+        "backgroundInsideStreaming": true,
+        "compileInsideEvaluate": true,
+        "runInsideEvaluate": true,
+        "backgroundDifferentThreadFromEvaluate": true,
+        "streamed": true,
+        "networkEndedBeforeBackgroundStarted": true,
+        "backgroundEndedBeforeEvaluateStarted": true
+      },
+      "network": {
+        "fromCache": false,
+        "fromServiceWorker": false,
+        "connectionReused": true,
+        "responseStatus": 200
+      },
+      "nestedBackground": [
+        {
+          "name": "BackgroundCompileTask::Run",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 2.17
+        },
+        {
+          "name": "V8.PreParse",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 346,
+          "completeCount": 314,
+          "completeDurationSumMs": 1.099
+        },
+        {
+          "name": "V8.CompileCodeBackground",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 0.193
+        }
+      ],
+      "nestedEvaluate": [
+        {
+          "name": "V8.CompileCode",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 16,
+          "completeCount": 16,
+          "completeDurationSumMs": 0.315
+        },
+        {
+          "name": "V8.ParseFunction",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 16,
+          "completeCount": 16,
+          "completeDurationSumMs": 0.202
+        }
+      ]
+    },
+    {
+      "framework": "jieshu",
+      "sample": 2,
+      "file": "test-results/instanceof-load-ab/jieshu-utf8-2.trace.json",
+      "sha256": "b2c9bbb795c286d8b244cc631155236840e1f02cba4258da470cce2c2b391b58",
+      "coreUrl": "http://127.0.0.1:55650/jieshu.js?encoding=utf8",
+      "dataLossOccurred": false,
+      "exactUrlEvents": [
+        {
+          "name": "BackgroundJSStreamManager::RunScriptStreamingTask",
+          "wallMs": 2.174,
+          "threadCpuMs": 1.843,
+          "pid": 9922,
+          "tid": 77128,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.066,
+          "endAfterNetworkEndMs": 2.24
+        },
+        {
+          "name": "v8.parseOnBackground",
+          "wallMs": 2.157,
+          "threadCpuMs": 1.836,
+          "pid": 9922,
+          "tid": 77128,
+          "thread": "ThreadPoolForegroundWorker",
+          "startAfterNetworkEndMs": 0.079,
+          "endAfterNetworkEndMs": 2.236
+        },
+        {
+          "name": "EvaluateScript",
+          "wallMs": 0.544,
+          "threadCpuMs": 0.472,
+          "pid": 9922,
+          "tid": 77118,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.433,
+          "endAfterNetworkEndMs": 2.977
+        },
+        {
+          "name": "v8.compile",
+          "wallMs": 0.018,
+          "threadCpuMs": 0.013,
+          "pid": 9922,
+          "tid": 77118,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.44,
+          "endAfterNetworkEndMs": 2.458
+        },
+        {
+          "name": "v8.run",
+          "wallMs": 0.504,
+          "threadCpuMs": 0.44,
+          "pid": 9922,
+          "tid": 77118,
+          "thread": "CrRendererMain",
+          "startAfterNetworkEndMs": 2.46,
+          "endAfterNetworkEndMs": 2.964
+        }
+      ],
+      "phasesMs": {
+        "backgroundStartsAfterNetworkEnd": 0.079,
+        "backgroundEndsAfterNetworkEnd": 2.236,
+        "backgroundEndToEvaluateStart": 0.197,
+        "evaluateEndToOnloadFunctionStart": 0.029,
+        "networkEndToOnloadFunctionStart": 3.006,
+        "resourceFinishNotificationDelay": 2.374
+      },
+      "relationships": {
+        "backgroundInsideStreaming": true,
+        "compileInsideEvaluate": true,
+        "runInsideEvaluate": true,
+        "backgroundDifferentThreadFromEvaluate": true,
+        "streamed": true,
+        "networkEndedBeforeBackgroundStarted": true,
+        "backgroundEndedBeforeEvaluateStarted": true
+      },
+      "network": {
+        "fromCache": false,
+        "fromServiceWorker": false,
+        "connectionReused": true,
+        "responseStatus": 200
+      },
+      "nestedBackground": [
+        {
+          "name": "BackgroundCompileTask::Run",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 2.122
+        },
+        {
+          "name": "V8.PreParse",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 346,
+          "completeCount": 322,
+          "completeDurationSumMs": 1.134
+        },
+        {
+          "name": "V8.CompileCodeBackground",
+          "attribution": "same-thread interval containment in exact-URL v8.parseOnBackground; child itself may have no URL",
+          "count": 1,
+          "completeCount": 1,
+          "completeDurationSumMs": 0.174
+        }
+      ],
+      "nestedEvaluate": [
+        {
+          "name": "V8.CompileCode",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 16,
+          "completeCount": 16,
+          "completeDurationSumMs": 0.224
+        },
+        {
+          "name": "V8.ParseFunction",
+          "attribution": "same-thread interval containment in exact-URL EvaluateScript; child itself may have no URL",
+          "count": 16,
+          "completeCount": 16,
+          "completeDurationSumMs": 0.143
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "Untraced UTF-8 median load is 4.4 ms Jieshu versus 3.2 ms Wujie. Post-response median differs by 1.0 ms; request/response differs by 0.1 ms. Medians are not additive attribution.",
+    "In all six exact-URL UTF-8 traces, network finishTime precedes the entire background parse/compile task, that task ends before main-thread EvaluateScript, and script.onload follows evaluation. This supports a background preparation gate on this local load path, not a precise counterfactual attribution.",
+    "Main-thread EvaluateScript includes URL-labelled v8.compile and v8.run. Background parsing includes BackgroundCompileTask::Run, preparse, and background bytecode compilation. These are nested inclusive durations and must not be added.",
+    "ResourceFinish.ts records delayed notification on the renderer main thread; args.data.finishTime is the actual network completion timestamp. Confusing them falsely labels background preparation as network time.",
+    "Jieshu has 16 nested V8.CompileCode events during evaluation versus 4 for Wujie, and 346 background V8.PreParse events versus 155. These indicate extra code processing, but unlabeled child events cannot identify a specific source function or subsystem."
+  ],
+  "limitations": [
+    "Only three traced samples per framework; all 30 timing samples are untraced, with tracing collected later. Tracing overhead differs by event count, so traced phase totals cannot be subtracted from untraced medians or treated as exact shares of their gap.",
+    "Uncompressed localhost HTTP/1.1 transfers; encodedBodySize equals decodedBodySize, contentEncoding is empty, and connections reuse the preceding HTML connection. Gzip byte differences were not a factor in this particular timed transfer; production network/compression and connection establishment are unmeasured.",
+    "Each observation uses a fresh context with no-store responses. HTTP cache misses are verified in diagnostic traces. A fresh browser process is not used per observation, and compilation caches are not explicitly reset; this is not guaranteed total cold-process performance.",
+    "CPU is native 1x on Apple M1 Pro. Initial load averages are about 4.47/5.17/6.63 on 8 CPUs; per-sample competing CPU load, frequency and thermal state are unrecorded. Rotating framework and encoding order reduces systematic order bias without proving noise-free results.",
+    "Legacy files decode as windows-1252 despite UTF-8 bytes; UTF-8 comparison is the intended encoding. Its gap remains, so legacy charset alone does not explain Jieshu regression. Legacy and UTF-8 HTML differ by one meta element.",
+    "Performance ScriptDuration and V8CompileDuration are renderer metric deltas around the whole probe and include instrumentation; they are not source-function profiles or total background compilation time. The ~0.5 ms pre-resource interval also includes common probe/DOM/scheduling work.",
+    "The sample contains core import only, no child application mount, fetch, sandbox patch or lifecycle work. No cause involving those paths can be inferred from runtime work here, although their included source still has preparation cost.",
+    "The trace omits scheduler/flow dependency detail and the unlabelled compiler child events lack source mapping. Temporal order plus streaming completion strongly motivates causal ablation, but cannot yield function-level blame or guarantees on other devices."
+  ]
+}

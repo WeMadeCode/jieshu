@@ -1,0 +1,668 @@
+{
+  "kind": "Single-component variants compared to baseline, offline existing-sample audit",
+  "sources": [
+    {
+      "file": "test-results/core-slimming-components-load/environment.json",
+      "sha256": "393105bc4629ffca83e7f34e24afd1436d40d2f16aa10245183f61910c2841b7"
+    },
+    {
+      "file": "test-results/core-slimming-components-load/observations.jsonl",
+      "sha256": "e6bb2bc61614413ef5689ebc5d5ce111432d80eea59ab17633ab636292173411"
+    },
+    {
+      "file": "test-results/core-slimming-components-load/trace-summary.json",
+      "sha256": "3e7407c93e637c6bd0db84d6b2f3332dfeed46e7ed8a9cecc1d5af7a474c0c5b"
+    }
+  ],
+  "samples": 60,
+  "expected": {
+    "normal": 360,
+    "trace": 42
+  },
+  "counts": {
+    "normal": 360,
+    "trace": 42,
+    "failed": 0
+  },
+  "allCurrentMatchesFinalCurrentSha": true,
+  "results": [
+    {
+      "id": "baseline",
+      "revision": {
+        "id": "baseline",
+        "file": "baseline.js",
+        "bundleBytes": 108581,
+        "gzipBytes": 32708,
+        "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e"
+      },
+      "rawDifferenceBytes": 0,
+      "gzipDifferenceBytes": 0,
+      "counts": {
+        "normal": 60,
+        "passed": 60,
+        "trace": 7,
+        "traceDataLoss": 0
+      },
+      "normal": {
+        "totalLoadMs": {
+          "n": 60,
+          "median": 4.6,
+          "p95": 5,
+          "min": 4.2,
+          "max": 5.1
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "median": 0.5085,
+          "p95": 0.6526,
+          "min": 0.459,
+          "max": 0.712
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "median": 217384,
+          "p95": 217384,
+          "min": 217384,
+          "max": 217384
+        }
+      },
+      "baselinePairedComparison": {
+        "totalLoadMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 4.6,
+          "medianBaseline": 4.6,
+          "differenceOfMedians": 0,
+          "confidenceInterval95": [
+            0,
+            0
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 3773655164
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 0.5085,
+          "medianBaseline": 0.5085,
+          "differenceOfMedians": 0,
+          "confidenceInterval95": [
+            0,
+            0
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 671911016
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 217384,
+          "medianBaseline": 217384,
+          "differenceOfMedians": 0,
+          "confidenceInterval95": [
+            0,
+            0
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 4137536089
+        }
+      },
+      "traceDurationsMs": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.137,
+          "p95": 2.4882,
+          "min": 2.081,
+          "max": 2.592
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.6,
+          "p95": 0.7608,
+          "min": 0.532,
+          "max": 0.777
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.022,
+          "p95": 0.0267,
+          "min": 0.018,
+          "max": 0.027
+        }
+      }
+    },
+    {
+      "id": "cache-methods-only",
+      "revision": {
+        "id": "cache-methods-only",
+        "file": "cache-methods-only.js",
+        "bundleBytes": 108558,
+        "gzipBytes": 32697,
+        "sha256": "65b6e18a9ead6396f616d74be83e2f655fb79380eb64b8f1d2cce9059c9805f3"
+      },
+      "rawDifferenceBytes": -23,
+      "gzipDifferenceBytes": -11,
+      "counts": {
+        "normal": 60,
+        "passed": 60,
+        "trace": 7,
+        "traceDataLoss": 0
+      },
+      "normal": {
+        "totalLoadMs": {
+          "n": 60,
+          "median": 4.6,
+          "p95": 5.005,
+          "min": 4.2,
+          "max": 5.2
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "median": 0.4695,
+          "p95": 0.5887,
+          "min": 0.407,
+          "max": 0.65
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "median": 216776,
+          "p95": 216776,
+          "min": 216776,
+          "max": 216776
+        }
+      },
+      "baselinePairedComparison": {
+        "totalLoadMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 4.6,
+          "medianBaseline": 4.6,
+          "differenceOfMedians": 0,
+          "confidenceInterval95": [
+            -0.1,
+            0.2
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 3628360976
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 0.4695,
+          "medianBaseline": 0.5085,
+          "differenceOfMedians": -0.039,
+          "confidenceInterval95": [
+            -0.063,
+            -0.009
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 966515065
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 216776,
+          "medianBaseline": 217384,
+          "differenceOfMedians": -608,
+          "confidenceInterval95": [
+            -608,
+            -608
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 4208910314
+        }
+      },
+      "traceDurationsMs": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.302,
+          "p95": 2.4419,
+          "min": 2.108,
+          "max": 2.453
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.541,
+          "p95": 0.6433,
+          "min": 0.494,
+          "max": 0.676
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.02,
+          "p95": 0.0267,
+          "min": 0.018,
+          "max": 0.027
+        }
+      }
+    },
+    {
+      "id": "shared-attributes-only",
+      "revision": {
+        "id": "shared-attributes-only",
+        "file": "shared-attributes-only.js",
+        "bundleBytes": 108372,
+        "gzipBytes": 32703,
+        "sha256": "d56046482cc29e50ebff2a24fde06287f5c0ecab056d0127bda36b39603fb831"
+      },
+      "rawDifferenceBytes": -209,
+      "gzipDifferenceBytes": -5,
+      "counts": {
+        "normal": 60,
+        "passed": 60,
+        "trace": 7,
+        "traceDataLoss": 0
+      },
+      "normal": {
+        "totalLoadMs": {
+          "n": 60,
+          "median": 4.6,
+          "p95": 5.1,
+          "min": 4.2,
+          "max": 5.2
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "median": 0.5165,
+          "p95": 0.6333,
+          "min": 0.448,
+          "max": 0.719
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "median": 217180,
+          "p95": 217180,
+          "min": 217180,
+          "max": 217180
+        }
+      },
+      "baselinePairedComparison": {
+        "totalLoadMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 4.6,
+          "medianBaseline": 4.6,
+          "differenceOfMedians": 0,
+          "confidenceInterval95": [
+            -0.1,
+            0.2
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 377062738
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 0.5165,
+          "medianBaseline": 0.5085,
+          "differenceOfMedians": 0.008,
+          "confidenceInterval95": [
+            -0.022,
+            0.032
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 2284807801
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 217180,
+          "medianBaseline": 217384,
+          "differenceOfMedians": -204,
+          "confidenceInterval95": [
+            -204,
+            -204
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 2997921055
+        }
+      },
+      "traceDurationsMs": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.154,
+          "p95": 2.2726,
+          "min": 2.046,
+          "max": 2.299
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.662,
+          "p95": 0.7804,
+          "min": 0.551,
+          "max": 0.796
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.026,
+          "p95": 0.0294,
+          "min": 0.02,
+          "max": 0.03
+        }
+      }
+    },
+    {
+      "id": "controller-only",
+      "revision": {
+        "id": "controller-only",
+        "file": "controller-only.js",
+        "bundleBytes": 107924,
+        "gzipBytes": 32639,
+        "sha256": "37cbfaf6ccdc9f729572be1d6ce37743b3dfad2a6703d9817c47bbb179a3584e"
+      },
+      "rawDifferenceBytes": -657,
+      "gzipDifferenceBytes": -69,
+      "counts": {
+        "normal": 60,
+        "passed": 60,
+        "trace": 7,
+        "traceDataLoss": 0
+      },
+      "normal": {
+        "totalLoadMs": {
+          "n": 60,
+          "median": 4.6,
+          "p95": 5,
+          "min": 4.1,
+          "max": 5.2
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "median": 0.521,
+          "p95": 0.6554,
+          "min": 0.453,
+          "max": 0.719
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "median": 217220,
+          "p95": 217220,
+          "min": 217220,
+          "max": 217220
+        }
+      },
+      "baselinePairedComparison": {
+        "totalLoadMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 4.6,
+          "medianBaseline": 4.6,
+          "differenceOfMedians": 0,
+          "confidenceInterval95": [
+            -0.1,
+            0.1
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 1665594404
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 0.521,
+          "medianBaseline": 0.5085,
+          "differenceOfMedians": 0.0125,
+          "confidenceInterval95": [
+            -0.012013,
+            0.059512
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 933457242
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 217220,
+          "medianBaseline": 217384,
+          "differenceOfMedians": -164,
+          "confidenceInterval95": [
+            -164,
+            -164
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 495703962
+        }
+      },
+      "traceDurationsMs": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.164,
+          "p95": 2.6293,
+          "min": 2.101,
+          "max": 2.704
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.67,
+          "p95": 0.7377,
+          "min": 0.547,
+          "max": 0.747
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.025,
+          "p95": 0.0267,
+          "min": 0.019,
+          "max": 0.027
+        }
+      }
+    },
+    {
+      "id": "shared-fetch-only",
+      "revision": {
+        "id": "shared-fetch-only",
+        "file": "shared-fetch-only.js",
+        "bundleBytes": 108361,
+        "gzipBytes": 32666,
+        "sha256": "c9c18b4522e836e8d2169433774c40f090125dd75abcc69c0cbb32eee9f60741"
+      },
+      "rawDifferenceBytes": -220,
+      "gzipDifferenceBytes": -42,
+      "counts": {
+        "normal": 60,
+        "passed": 60,
+        "trace": 7,
+        "traceDataLoss": 0
+      },
+      "normal": {
+        "totalLoadMs": {
+          "n": 60,
+          "median": 4.65,
+          "p95": 5.005,
+          "min": 4.2,
+          "max": 5.7
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "median": 0.5275,
+          "p95": 0.6318,
+          "min": 0.441,
+          "max": 0.692
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "median": 217092,
+          "p95": 217092,
+          "min": 217092,
+          "max": 217092
+        }
+      },
+      "baselinePairedComparison": {
+        "totalLoadMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 4.65,
+          "medianBaseline": 4.6,
+          "differenceOfMedians": 0.05,
+          "confidenceInterval95": [
+            0,
+            0.2
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 1003352740
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 0.5275,
+          "medianBaseline": 0.5085,
+          "differenceOfMedians": 0.019,
+          "confidenceInterval95": [
+            -0.005,
+            0.048
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 1600378824
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 217092,
+          "medianBaseline": 217384,
+          "differenceOfMedians": -292,
+          "confidenceInterval95": [
+            -292,
+            -292
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 3912556151
+        }
+      },
+      "traceDurationsMs": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.155,
+          "p95": 2.2342,
+          "min": 2.101,
+          "max": 2.239
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.575,
+          "p95": 0.7133,
+          "min": 0.543,
+          "max": 0.755
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.02,
+          "p95": 0.0234,
+          "min": 0.018,
+          "max": 0.024
+        }
+      }
+    },
+    {
+      "id": "all-current",
+      "revision": {
+        "id": "all-current",
+        "file": "all-current.js",
+        "bundleBytes": 107474,
+        "gzipBytes": 32578,
+        "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5"
+      },
+      "rawDifferenceBytes": -1107,
+      "gzipDifferenceBytes": -130,
+      "counts": {
+        "normal": 60,
+        "passed": 60,
+        "trace": 7,
+        "traceDataLoss": 0
+      },
+      "normal": {
+        "totalLoadMs": {
+          "n": 60,
+          "median": 4.5,
+          "p95": 5,
+          "min": 4,
+          "max": 5.2
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "median": 0.459,
+          "p95": 0.61105,
+          "min": 0.411,
+          "max": 0.621
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "median": 216100,
+          "p95": 216100,
+          "min": 216100,
+          "max": 216100
+        }
+      },
+      "baselinePairedComparison": {
+        "totalLoadMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 4.5,
+          "medianBaseline": 4.6,
+          "differenceOfMedians": -0.1,
+          "confidenceInterval95": [
+            -0.15,
+            0.1
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 751964170
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 0.459,
+          "medianBaseline": 0.5085,
+          "differenceOfMedians": -0.0495,
+          "confidenceInterval95": [
+            -0.070513,
+            -0.0225
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 1279012830
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "excludedPairs": 0,
+          "medianCandidate": 216100,
+          "medianBaseline": 217384,
+          "differenceOfMedians": -1284,
+          "confidenceInterval95": [
+            -1284,
+            -1284
+          ],
+          "bootstrapIterations": 5000,
+          "seed": 711279488
+        }
+      },
+      "traceDurationsMs": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.276,
+          "p95": 2.5813,
+          "min": 2.113,
+          "max": 2.695
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.533,
+          "p95": 0.7216,
+          "min": 0.497,
+          "max": 0.748
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.02,
+          "p95": 0.0267,
+          "min": 0.018,
+          "max": 0.027
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Paired same-round bootstrap estimates median(candidate) - median(baseline), 5000 fixed-seed resamples, percentile 95% interval; no significance conclusion.",
+    "These samples isolate component variants in a core-import-only workload. They do not independently certify lifecycle behavior.",
+    "All variants use frozen Buffer payloads and equal-length routes in this harness; they do not share the earlier current-string/before-Buffer asymmetry.",
+    "Trace samples are separate from the 60 normal observations; background parse includes preparsing and compilation, main compile is nested within EvaluateScript. Inclusive durations must not be summed.",
+    "Effects of individual changes are not necessarily additive; do not add component median differences to predict combined performance.",
+    "Heap deltas are forced-GC JS heap, not process RSS."
+  ]
+}

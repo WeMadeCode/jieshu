@@ -1,0 +1,2697 @@
+{
+  "generatedAt": "2026-09-09T15:05:55.387Z",
+  "inputs": [
+    {
+      "directory": "/Users/zhouxiang/Documents/Github/jieshu/test-results/core-slimming-load-ab",
+      "environment": {
+        "startedAt": "2026-09-09T15:02:37.508Z",
+        "samples": 60,
+        "traceSamplesPerEncoding": 7,
+        "platform": "darwin",
+        "release": "25.6.0",
+        "arch": "arm64",
+        "cpu": "Apple M1 Pro",
+        "cpuCount": 8,
+        "totalMemoryBytes": 17179869184,
+        "loadAverage": [
+          5.01416015625,
+          5.5205078125,
+          5.1630859375
+        ],
+        "node": "v26.7.0",
+        "browser": "151.0.7922.34",
+        "playwright": "1.62.1",
+        "vite": "8.2.2",
+        "revisions": {
+          "wujie": {
+            "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+            "status": "",
+            "bundleBytes": 65660,
+            "gzipBytes": 19802,
+            "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+          },
+          "jieshu": {
+            "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+            "status": "M benchmarks/comparison/README.md\n M benchmarks/comparison/run.mjs\n M packages/jieshu-core/__test__/unit/cache-fetch-context.test.ts\n M packages/jieshu-core/__test__/unit/controller.test.ts\n M packages/jieshu-core/__test__/unit/entry-pipeline.test.ts\n M packages/jieshu-core/src/controller.ts\n M packages/jieshu-core/src/entry.ts\n M packages/jieshu-core/src/template.ts\n?? benchmarks/comparison/before-bundle.mjs\n?? benchmarks/comparison/before-bundle.test.mjs\n?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs\n?? benchmarks/comparison/results/2026-09-09-core-load/\n?? benchmarks/comparison/summarize-before-after.mjs\n?? benchmarks/comparison/summarize-before-after.test.mjs\n?? benchmarks/comparison/summarize-core-load-causes.mjs\n?? benchmarks/comparison/verify-core-load-variants.mjs\n?? docs/notes/core-load-causes.md\n?? docs/notes/core-load-slimming.md\n?? packages/jieshu-core/__test__/unit/entry-request-errors.test.ts",
+            "bundleBytes": 107474,
+            "gzipBytes": 32578,
+            "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5"
+          },
+          "jieshu-before": {
+            "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+            "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/inspect-instanceof-heap.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md\n?? docs/notes/instanceof-memory-optimization.md\n?? packages/jieshu-core/__test__/unit/instanceof-state.test.ts",
+            "bundleBytes": 108581,
+            "gzipBytes": 32708,
+            "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+            "source": {
+              "kind": "saved-bundle",
+              "bundlePath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-load-ab/jieshu.js",
+              "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+              "environmentPath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-load-ab/environment.json",
+              "environmentSha256": "a868e84061f4760fa8bb1f0d563d20339110f1c1d504105d11e2561753483a63",
+              "copiedEnvironment": "jieshu-before.environment.json"
+            }
+          }
+        },
+        "build": {
+          "target": "es2018",
+          "minify": true,
+          "format": "iife",
+          "mode": "production"
+        },
+        "method": [
+          "Fresh browser context for every observation; three-framework order rotates each round and reverses every three rounds to balance all positions; serial sampling, CPU 1x. jieshu-before uses the hash-verified saved bundle and original metadata. Its request route is /before.js, equal in length to /jieshu.js to avoid URL-length differences in GC heap measurements; the recorded framework and output file remain jieshu-before.",
+          "No sub-application or benchmark fixture installed. Measurement function installed before baseline GC.",
+          "Legacy HTML/JS omits charset; UTF-8 HTML/JS declares charset. Both transfer identical UTF-8 source bytes.",
+          "Before/after heap uses forced GC outside load timing. After core load, no mounts or lifecycle operations occur.",
+          "Resource responseEnd-startTime includes request scheduling, localhost network and response transfer.",
+          "onload-responseEnd is response end to onload, not pure parsing or execution; work can overlap transfer.",
+          "Performance duration deltas include identical measurement instrumentation. Missing metrics are null.",
+          "GC JS heap and DOM counts are not process RSS or total browser memory.",
+          "Each context has an empty HTTP cache; Chromium process-level compilation caches are not explicitly cleared."
+        ]
+      },
+      "environmentSha256": "6b0cb39161c411335f2bd0e0df03383c001620dcc4382f40323cf56f7e05d1f1",
+      "observationsSha256": "c3065c864060c9167d705dd69afbe9ce1d723438bd9be7f0c747d84870267364"
+    },
+    {
+      "directory": "/Users/zhouxiang/Documents/Github/jieshu/test-results/core-slimming-startup-ab",
+      "environment": {
+        "startedAt": "2026-09-09T15:03:30.938Z",
+        "mode": "startup",
+        "samples": 30,
+        "memoryRounds": 5,
+        "stabilityRounds": 3,
+        "cycles": 30,
+        "platform": "darwin",
+        "release": "25.6.0",
+        "arch": "arm64",
+        "totalMemoryBytes": 17179869184,
+        "cpu": "Apple M1 Pro",
+        "cpuCount": 8,
+        "loadAverage": [
+          4.75634765625,
+          5.3798828125,
+          5.1328125
+        ],
+        "node": "v26.7.0",
+        "browser": "151.0.7922.34",
+        "playwright": "1.62.1",
+        "vite": "8.2.2",
+        "revisions": {
+          "jieshu": {
+            "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+            "status": "M benchmarks/comparison/README.md\n M benchmarks/comparison/run.mjs\n M packages/jieshu-core/__test__/unit/cache-fetch-context.test.ts\n M packages/jieshu-core/__test__/unit/controller.test.ts\n M packages/jieshu-core/__test__/unit/entry-pipeline.test.ts\n M packages/jieshu-core/src/controller.ts\n M packages/jieshu-core/src/entry.ts\n M packages/jieshu-core/src/template.ts\n?? benchmarks/comparison/before-bundle.mjs\n?? benchmarks/comparison/before-bundle.test.mjs\n?? benchmarks/comparison/measure-core-load-causes.mjs\n?? benchmarks/comparison/prepare-core-load-variants.mjs\n?? benchmarks/comparison/results/2026-09-09-core-load/\n?? benchmarks/comparison/summarize-before-after.mjs\n?? benchmarks/comparison/summarize-before-after.test.mjs\n?? benchmarks/comparison/summarize-core-load-causes.mjs\n?? benchmarks/comparison/verify-core-load-variants.mjs\n?? docs/notes/core-load-causes.md\n?? docs/notes/core-load-slimming.md\n?? packages/jieshu-core/__test__/unit/entry-request-errors.test.ts",
+            "package": "0.0.5",
+            "packageManager": "pnpm@10.28.2",
+            "bundleBytes": 107474,
+            "gzipBytes": 32578,
+            "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5"
+          },
+          "wujie": {
+            "commit": "c45932998c0602f34454df8d3e29f4d33a38446a",
+            "status": "",
+            "package": "2.1.0",
+            "packageManager": "pnpm@10.33.0",
+            "bundleBytes": 65660,
+            "gzipBytes": 19802,
+            "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+          },
+          "jieshu-before": {
+            "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d",
+            "status": "M benchmarks/comparison/README.md\n M packages/jieshu-core/__test__/unit/public-operation-race.test.ts\n M packages/jieshu-core/src/constant.ts\n M packages/jieshu-core/src/iframe.ts\n M packages/jieshu-core/src/index.ts\n M packages/jieshu-core/src/operation-intent.ts\n?? benchmarks/comparison/analyze-bundle.mjs\n?? benchmarks/comparison/inspect-instanceof-heap.mjs\n?? benchmarks/comparison/measure-core-load.mjs\n?? benchmarks/comparison/measure-idle-retention.mjs\n?? benchmarks/comparison/probe-bundle-candidates.mjs\n?? benchmarks/comparison/results/2026-09-09-footprint/\n?? benchmarks/comparison/results/2026-09-09-simple-fix/\n?? docs/notes/core-footprint-analysis.md\n?? docs/notes/core-footprint-simple-fix.md\n?? docs/notes/instanceof-memory-optimization.md\n?? packages/jieshu-core/__test__/unit/instanceof-state.test.ts",
+            "bundleBytes": 108581,
+            "gzipBytes": 32708,
+            "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+            "source": {
+              "kind": "saved-bundle",
+              "bundlePath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-load-ab/jieshu.js",
+              "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+              "environmentPath": "/Users/zhouxiang/Documents/Github/jieshu/test-results/instanceof-load-ab/environment.json",
+              "environmentSha256": "a868e84061f4760fa8bb1f0d563d20339110f1c1d504105d11e2561753483a63",
+              "copiedBundle": "jieshu-before.js",
+              "copiedEnvironment": "jieshu-before.environment.json"
+            }
+          }
+        },
+        "comparison": {
+          "frameworks": [
+            "jieshu",
+            "wujie",
+            "jieshu-before"
+          ],
+          "order": "Cyclic order by round, reversing each three-round block; six measured rounds cover all permutations.",
+          "savedBundle": "Hash-verified frozen Jieshu; fixture framework remains jieshu, recorded label is jieshu-before.",
+          "routes": "Current /jieshu.js and frozen /before.js have equal URL length."
+        },
+        "build": {
+          "target": "es2018",
+          "minify": true,
+          "format": "iife",
+          "mode": "production"
+        },
+        "fixture": {
+          "jsBytes": 3634,
+          "cssBytes": 65,
+          "domItems": 300,
+          "heapItems": 4000
+        },
+        "viewport": {
+          "width": 1280,
+          "height": 800
+        },
+        "limitations": [
+          "Headless Chromium only",
+          "Local HTTP, cross-origin ports",
+          "No browser total RSS measurement",
+          "Background desktop activity uncontrolled"
+        ],
+        "finishedAt": "2026-09-09T15:04:29.424Z",
+        "counts": {
+          "observations": 360,
+          "failures": 0
+        }
+      },
+      "environmentSha256": "45eeed2d51457cfee4f40a41cd7b5831adf60ed745b97c406d343aa139f89e44",
+      "observationsSha256": "aa26952507c3029aa7335787981a479ca2eb002129a3a46f94f6f14de7cb98be"
+    }
+  ],
+  "methodology": [
+    "Only non-traced, non-warmup records are summarized. Failed observations remain counted and are excluded from metric statistics.",
+    "Bootstrap resamples complete current/before same-round pairs 5000 times with fixed derived seeds. Estimand is median(current) - median(before), not median of per-round differences; percentile 95% CI is within-run uncertainty, not a significance conclusion.",
+    "A missing or failed pair excludes both members from that metric; per-framework median/p95 may use a larger set, while the paired median is shown separately.",
+    "Core load metrics are grouped by encoding, startup metrics by scenario. Metrics are not added; readyMs starts after core loading and fixture installation.",
+    "Memory lists raw stage medians, per-round stage-minus-blank/core medians, and current-minus-before median differences. No memory CI is calculated, including for single-round runs. A lower idle heap alone does not establish lower active-memory cost.",
+    "Duplicate framework/round records are rejected within each kind/group, including across directories. Different bundle identities or runtime environments cannot be pooled."
+  ],
+  "counts": {
+    "total": 720,
+    "passed": 720,
+    "failed": 0
+  },
+  "excluded": [
+    {
+      "key": "load/legacy/wujie/0/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu/0/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu-before/0/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/wujie/0/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu/0/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu-before/0/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu/1/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu-before/1/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/wujie/1/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu/1/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu-before/1/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/wujie/1/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu-before/2/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/wujie/2/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu/2/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu-before/2/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/wujie/2/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu/2/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu-before/3/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu/3/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/wujie/3/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu-before/3/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu/3/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/wujie/3/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/wujie/4/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu-before/4/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu/4/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/wujie/4/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu-before/4/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu/4/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu/5/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/wujie/5/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu-before/5/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu/5/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/wujie/5/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu-before/5/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/wujie/6/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu/6/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/legacy/jieshu-before/6/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/wujie/6/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu/6/true",
+      "reason": "traced",
+      "passed": true
+    },
+    {
+      "key": "load/utf8/jieshu-before/6/true",
+      "reason": "traced",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "timing": [
+    {
+      "kind": "load",
+      "group": "legacy",
+      "frameworks": {
+        "jieshu": {
+          "total": 60,
+          "passed": 60,
+          "failed": 0,
+          "metrics": {
+            "totalLoadMs": {
+              "n": 60,
+              "median": 4.4,
+              "p95": 5.2
+            },
+            "requestAndResponseMs": {
+              "n": 60,
+              "median": 1.1,
+              "p95": 1.31
+            },
+            "responseEndToOnloadMs": {
+              "n": 60,
+              "median": 2.8,
+              "p95": 3.2
+            },
+            "scriptDurationMs": {
+              "n": 60,
+              "median": 0.451,
+              "p95": 0.52805
+            },
+            "v8CompileDurationMs": {
+              "n": 60,
+              "median": 0.013,
+              "p95": 0.01805
+            },
+            "heapDeltaBytes": {
+              "n": 60,
+              "median": 216672,
+              "p95": 216672
+            }
+          }
+        },
+        "jieshu-before": {
+          "total": 60,
+          "passed": 60,
+          "failed": 0,
+          "metrics": {
+            "totalLoadMs": {
+              "n": 60,
+              "median": 4.35,
+              "p95": 5.005
+            },
+            "requestAndResponseMs": {
+              "n": 60,
+              "median": 0.9,
+              "p95": 1.3
+            },
+            "responseEndToOnloadMs": {
+              "n": 60,
+              "median": 2.9,
+              "p95": 3.205
+            },
+            "scriptDurationMs": {
+              "n": 60,
+              "median": 0.49,
+              "p95": 0.58835
+            },
+            "v8CompileDurationMs": {
+              "n": 60,
+              "median": 0.014,
+              "p95": 0.018
+            },
+            "heapDeltaBytes": {
+              "n": 60,
+              "median": 217956,
+              "p95": 217956
+            }
+          }
+        },
+        "wujie": {
+          "total": 60,
+          "passed": 60,
+          "failed": 0,
+          "metrics": {
+            "totalLoadMs": {
+              "n": 60,
+              "median": 3.3,
+              "p95": 3.705
+            },
+            "requestAndResponseMs": {
+              "n": 60,
+              "median": 1,
+              "p95": 1.105
+            },
+            "responseEndToOnloadMs": {
+              "n": 60,
+              "median": 1.8,
+              "p95": 2
+            },
+            "scriptDurationMs": {
+              "n": 60,
+              "median": 0.2805,
+              "p95": 0.36005
+            },
+            "v8CompileDurationMs": {
+              "n": 60,
+              "median": 0.013,
+              "p95": 0.01805
+            },
+            "heapDeltaBytes": {
+              "n": 60,
+              "median": 161808,
+              "p95": 161808
+            }
+          }
+        }
+      },
+      "currentMinusBefore": {
+        "totalLoadMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 4.4,
+          "beforeMedian": 4.35,
+          "medianDifference": 0.05,
+          "confidenceInterval95": [
+            -0.1,
+            0.1
+          ],
+          "iterations": 5000,
+          "seed": 913958196
+        },
+        "requestAndResponseMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 1.1,
+          "beforeMedian": 0.9,
+          "medianDifference": 0.2,
+          "confidenceInterval95": [
+            0.1,
+            0.2
+          ],
+          "iterations": 5000,
+          "seed": 1829845898
+        },
+        "responseEndToOnloadMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 2.8,
+          "beforeMedian": 2.9,
+          "medianDifference": -0.1,
+          "confidenceInterval95": [
+            -0.2,
+            0
+          ],
+          "iterations": 5000,
+          "seed": 209439302
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 0.451,
+          "beforeMedian": 0.49,
+          "medianDifference": -0.039,
+          "confidenceInterval95": [
+            -0.052,
+            -0.018
+          ],
+          "iterations": 5000,
+          "seed": 852477508
+        },
+        "v8CompileDurationMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 0.013,
+          "beforeMedian": 0.014,
+          "medianDifference": -0.001,
+          "confidenceInterval95": [
+            -0.002,
+            0
+          ],
+          "iterations": 5000,
+          "seed": 1829559696
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 216672,
+          "beforeMedian": 217956,
+          "medianDifference": -1284,
+          "confidenceInterval95": [
+            -1284,
+            -1284
+          ],
+          "iterations": 5000,
+          "seed": 4102028107
+        }
+      }
+    },
+    {
+      "kind": "load",
+      "group": "utf8",
+      "frameworks": {
+        "jieshu": {
+          "total": 60,
+          "passed": 60,
+          "failed": 0,
+          "metrics": {
+            "totalLoadMs": {
+              "n": 60,
+              "median": 4.4,
+              "p95": 4.9
+            },
+            "requestAndResponseMs": {
+              "n": 60,
+              "median": 1.1,
+              "p95": 1.41
+            },
+            "responseEndToOnloadMs": {
+              "n": 60,
+              "median": 2.8,
+              "p95": 3.005
+            },
+            "scriptDurationMs": {
+              "n": 60,
+              "median": 0.451,
+              "p95": 0.5387
+            },
+            "v8CompileDurationMs": {
+              "n": 60,
+              "median": 0.013,
+              "p95": 0.0201
+            },
+            "heapDeltaBytes": {
+              "n": 60,
+              "median": 216100,
+              "p95": 216100
+            }
+          }
+        },
+        "jieshu-before": {
+          "total": 60,
+          "passed": 60,
+          "failed": 0,
+          "metrics": {
+            "totalLoadMs": {
+              "n": 60,
+              "median": 4.2,
+              "p95": 5
+            },
+            "requestAndResponseMs": {
+              "n": 60,
+              "median": 0.9,
+              "p95": 1.2
+            },
+            "responseEndToOnloadMs": {
+              "n": 60,
+              "median": 2.8,
+              "p95": 3.305
+            },
+            "scriptDurationMs": {
+              "n": 60,
+              "median": 0.5015,
+              "p95": 0.59695
+            },
+            "v8CompileDurationMs": {
+              "n": 60,
+              "median": 0.014,
+              "p95": 0.01705
+            },
+            "heapDeltaBytes": {
+              "n": 60,
+              "median": 217384,
+              "p95": 217384
+            }
+          }
+        },
+        "wujie": {
+          "total": 60,
+          "passed": 60,
+          "failed": 0,
+          "metrics": {
+            "totalLoadMs": {
+              "n": 60,
+              "median": 3.3,
+              "p95": 4
+            },
+            "requestAndResponseMs": {
+              "n": 60,
+              "median": 1,
+              "p95": 1.5
+            },
+            "responseEndToOnloadMs": {
+              "n": 60,
+              "median": 1.75,
+              "p95": 2.105
+            },
+            "scriptDurationMs": {
+              "n": 60,
+              "median": 0.283,
+              "p95": 0.367
+            },
+            "v8CompileDurationMs": {
+              "n": 60,
+              "median": 0.013,
+              "p95": 0.01815
+            },
+            "heapDeltaBytes": {
+              "n": 60,
+              "median": 161244,
+              "p95": 161244
+            }
+          }
+        }
+      },
+      "currentMinusBefore": {
+        "totalLoadMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 4.4,
+          "beforeMedian": 4.2,
+          "medianDifference": 0.2,
+          "confidenceInterval95": [
+            0.1,
+            0.25
+          ],
+          "iterations": 5000,
+          "seed": 1484623575
+        },
+        "requestAndResponseMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 1.1,
+          "beforeMedian": 0.9,
+          "medianDifference": 0.2,
+          "confidenceInterval95": [
+            0.1,
+            0.2
+          ],
+          "iterations": 5000,
+          "seed": 2444223024
+        },
+        "responseEndToOnloadMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 2.8,
+          "beforeMedian": 2.8,
+          "medianDifference": 0,
+          "confidenceInterval95": [
+            -0.1,
+            0
+          ],
+          "iterations": 5000,
+          "seed": 2483626422
+        },
+        "scriptDurationMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 0.451,
+          "beforeMedian": 0.5015,
+          "medianDifference": -0.0505,
+          "confidenceInterval95": [
+            -0.07,
+            -0.028
+          ],
+          "iterations": 5000,
+          "seed": 3480700394
+        },
+        "v8CompileDurationMs": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 0.013,
+          "beforeMedian": 0.014,
+          "medianDifference": -0.001,
+          "confidenceInterval95": [
+            -0.001,
+            0.0005
+          ],
+          "iterations": 5000,
+          "seed": 3032562320
+        },
+        "heapDeltaBytes": {
+          "n": 60,
+          "expectedRounds": 60,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59
+          ],
+          "currentMedian": 216100,
+          "beforeMedian": 217384,
+          "medianDifference": -1284,
+          "confidenceInterval95": [
+            -1284,
+            -1284
+          ],
+          "iterations": 5000,
+          "seed": 4163531211
+        }
+      }
+    },
+    {
+      "kind": "startup",
+      "group": "cold",
+      "frameworks": {
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.9,
+              "p95": 6.2
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 26.15,
+              "p95": 27.11
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 34.75,
+              "p95": 36.6
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu-before": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.8,
+              "p95": 6.1
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 26.1,
+              "p95": 26.8
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 35,
+              "p95": 36.5
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.8,
+              "p95": 4.955
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 26.8,
+              "p95": 27.9
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 36.3,
+              "p95": 37.755
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "currentMinusBefore": {
+        "coreLoadMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 5.9,
+          "beforeMedian": 5.8,
+          "medianDifference": 0.1,
+          "confidenceInterval95": [
+            -0.05,
+            0.1
+          ],
+          "iterations": 5000,
+          "seed": 371633121
+        },
+        "apiMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 26.15,
+          "beforeMedian": 26.1,
+          "medianDifference": 0.05,
+          "confidenceInterval95": [
+            -0.5,
+            0.45
+          ],
+          "iterations": 5000,
+          "seed": 1174041786
+        },
+        "readyMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 34.75,
+          "beforeMedian": 35,
+          "medianDifference": -0.25,
+          "confidenceInterval95": [
+            -1.15,
+            0.6
+          ],
+          "iterations": 5000,
+          "seed": 1537284189
+        },
+        "preparationMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 0,
+          "beforeMedian": 0,
+          "medianDifference": 0,
+          "confidenceInterval95": [
+            0,
+            0
+          ],
+          "iterations": 5000,
+          "seed": 1487604074
+        }
+      }
+    },
+    {
+      "kind": "startup",
+      "group": "cold-fiber",
+      "frameworks": {
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 6,
+              "p95": 6.755
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 35.2,
+              "p95": 43.32
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 45.1,
+              "p95": 53.475
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu-before": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.9,
+              "p95": 6.655
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 34.8,
+              "p95": 45.245
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 45.15,
+              "p95": 54.71
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.8,
+              "p95": 5.4
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 36,
+              "p95": 40.45
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 45.05,
+              "p95": 51.65
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "currentMinusBefore": {
+        "coreLoadMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 6,
+          "beforeMedian": 5.9,
+          "medianDifference": 0.1,
+          "confidenceInterval95": [
+            0,
+            0.2
+          ],
+          "iterations": 5000,
+          "seed": 2968404267
+        },
+        "apiMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 35.2,
+          "beforeMedian": 34.8,
+          "medianDifference": 0.4,
+          "confidenceInterval95": [
+            -1.1,
+            2.2
+          ],
+          "iterations": 5000,
+          "seed": 1948138086
+        },
+        "readyMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 45.1,
+          "beforeMedian": 45.15,
+          "medianDifference": -0.05,
+          "confidenceInterval95": [
+            -1.55,
+            1.65125
+          ],
+          "iterations": 5000,
+          "seed": 1890725253
+        },
+        "preparationMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 0,
+          "beforeMedian": 0,
+          "medianDifference": 0,
+          "confidenceInterval95": [
+            0,
+            0
+          ],
+          "iterations": 5000,
+          "seed": 252519522
+        }
+      }
+    },
+    {
+      "kind": "startup",
+      "group": "concurrent-5",
+      "frameworks": {
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 6.1,
+              "p95": 6.2
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 57.15,
+              "p95": 58.7
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 71.5,
+              "p95": 74.1
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu-before": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 5.9,
+              "p95": 6
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 57.8,
+              "p95": 59.4
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 71.6,
+              "p95": 78.715
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 4.8,
+              "p95": 4.955
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 59.4,
+              "p95": 60.2
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 73.15,
+              "p95": 74.555
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "currentMinusBefore": {
+        "coreLoadMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 6.1,
+          "beforeMedian": 5.9,
+          "medianDifference": 0.2,
+          "confidenceInterval95": [
+            0.1,
+            0.3
+          ],
+          "iterations": 5000,
+          "seed": 3822986788
+        },
+        "apiMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 57.15,
+          "beforeMedian": 57.8,
+          "medianDifference": -0.65,
+          "confidenceInterval95": [
+            -1.3,
+            0.3
+          ],
+          "iterations": 5000,
+          "seed": 555639367
+        },
+        "readyMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 71.5,
+          "beforeMedian": 71.6,
+          "medianDifference": -0.1,
+          "confidenceInterval95": [
+            -1.05,
+            0.7
+          ],
+          "iterations": 5000,
+          "seed": 2504604596
+        },
+        "preparationMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 0,
+          "beforeMedian": 0,
+          "medianDifference": 0,
+          "confidenceInterval95": [
+            0,
+            0
+          ],
+          "iterations": 5000,
+          "seed": 1906960261
+        }
+      }
+    },
+    {
+      "kind": "startup",
+      "group": "cpu4x",
+      "frameworks": {
+        "jieshu": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 10.15,
+              "p95": 11.565
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 106.35,
+              "p95": 117.88
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 125.65,
+              "p95": 142.195
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "jieshu-before": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 10.1,
+              "p95": 11.275
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 105.6,
+              "p95": 126.19
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 125.55,
+              "p95": 146.685
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        },
+        "wujie": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "metrics": {
+            "coreLoadMs": {
+              "n": 30,
+              "median": 8.05,
+              "p95": 9.785
+            },
+            "apiMs": {
+              "n": 30,
+              "median": 110.75,
+              "p95": 136.885
+            },
+            "readyMs": {
+              "n": 30,
+              "median": 131.15,
+              "p95": 159.545
+            },
+            "preparationMs": {
+              "n": 30,
+              "median": 0,
+              "p95": 0
+            }
+          }
+        }
+      },
+      "currentMinusBefore": {
+        "coreLoadMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 10.15,
+          "beforeMedian": 10.1,
+          "medianDifference": 0.05,
+          "confidenceInterval95": [
+            -0.3,
+            0.45
+          ],
+          "iterations": 5000,
+          "seed": 2425829240
+        },
+        "apiMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 106.35,
+          "beforeMedian": 105.6,
+          "medianDifference": 0.75,
+          "confidenceInterval95": [
+            -1.05,
+            2.25
+          ],
+          "iterations": 5000,
+          "seed": 810839458
+        },
+        "readyMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 125.65,
+          "beforeMedian": 125.55,
+          "medianDifference": 0.1,
+          "confidenceInterval95": [
+            -1.6,
+            2
+          ],
+          "iterations": 5000,
+          "seed": 392376055
+        },
+        "preparationMs": {
+          "n": 30,
+          "expectedRounds": 30,
+          "excludedRounds": 0,
+          "exclusions": [],
+          "pairedRounds": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29
+          ],
+          "currentMedian": 0,
+          "beforeMedian": 0,
+          "medianDifference": 0,
+          "confidenceInterval95": [
+            0,
+            0
+          ],
+          "iterations": 5000,
+          "seed": 3943206887
+        }
+      }
+    }
+  ],
+  "memory": {
+    "rounds": {
+      "jieshu": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0
+      },
+      "jieshu-before": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0
+      },
+      "wujie": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0
+      }
+    },
+    "stages": []
+  }
+}

@@ -1,4 +1,9 @@
-import processTpl, { genLinkReplaceSymbol, getInlineStyleReplaceSymbol } from './template';
+import processTpl, {
+  genLinkReplaceSymbol,
+  getInlineStyleReplaceSymbol,
+  escapeAttributeValue,
+  STYLE_ATTRIBUTE_NAMES,
+} from './template';
 import type { ScriptAttributes, ScriptObject, StyleObject } from './template';
 import { requestIdleCallback, error } from './utils';
 import {
@@ -92,6 +97,8 @@ interface ImportHtmlParameters {
  * only the promise that failed, so a newer request cannot be deleted by an
  * older request settling late.
  */
+// Instances stay private and methods are always called with their cache receiver.
+// Share methods on the prototype instead of allocating closures for each cache.
 class AssetCache<Value> {
   private readonly metadata = new WeakMap<Promise<Value>, { scope?: CacheScope; status: CacheStatus }>();
   private readonly buckets = new Map<string, CacheBucket<Value>>();
@@ -115,7 +122,7 @@ class AssetCache<Value> {
       (scope ? this.scopedReservations.get(scope) === reservations : reservations === this.unscopedReservations);
   }
 
-  getOrCreate = (key: string, fetch: FetchFunction, load: () => Promise<Value>, scope?: CacheScope) => {
+  getOrCreate(key: string, fetch: FetchFunction, load: () => Promise<Value>, scope?: CacheScope) {
     const context = fetchCacheContext(fetch);
     let bucket = this.buckets.get(key);
     const visible = this.records[key];
@@ -202,9 +209,9 @@ class AssetCache<Value> {
       removeEmptyBucket();
     }
     return request;
-  };
+  }
 
-  clear = (prefixes?: readonly string[]) => {
+  clear(prefixes?: readonly string[]) {
     for (const key of this.buckets.keys()) {
       if (!prefixes || prefixes.some((prefix) => key.startsWith(prefix))) {
         this.buckets.delete(key);
@@ -229,15 +236,15 @@ class AssetCache<Value> {
         this.scopedReservations.delete(scope);
       }
     });
-  };
+  }
 
-  invalidateScope = (scope: CacheScope) => {
+  invalidateScope(scope: CacheScope) {
     // A fetch may synchronously re-enter teardown before its promise is registered.
     this.releasedScopes.add(scope);
     this.pendingByScope.get(scope)?.forEach((invalidate) => invalidate());
     this.pendingByScope.delete(scope);
     this.scopedReservations.delete(scope);
-  };
+  }
 }
 
 // These records remain exported for backwards compatibility with existing
@@ -287,8 +294,6 @@ function applyHtmlLoaders(code: string, plugins: readonly JieshuPlugin[]): strin
   );
 }
 
-const STYLE_ATTRIBUTE_NAMES = ['media', 'nonce', 'title', 'type', 'blocking', 'disabled'] as const;
-
 function styleAttribute(attributes: ScriptAttributes | undefined, expectedName: string): string | boolean | undefined {
   if (!attributes) return undefined;
   const name = Object.keys(attributes).find((attributeName) => attributeName.toLowerCase() === expectedName);
@@ -298,19 +303,6 @@ function styleAttribute(attributes: ScriptAttributes | undefined, expectedName: 
 function hasStyleAttribute(attributes: ScriptAttributes | undefined, name: string): boolean {
   const value = styleAttribute(attributes, name);
   return value !== undefined && value !== false;
-}
-
-function escapeAttributeValue(value: string): string {
-  let escaped = '';
-  for (let index = 0; index < value.length; index += 1) {
-    const character = value[index];
-    if (character === '&') escaped += '&amp;';
-    else if (character === '"') escaped += '&quot;';
-    else if (character === '<') escaped += '&lt;';
-    else if (character === '>') escaped += '&gt;';
-    else escaped += character;
-  }
-  return escaped;
 }
 
 function serializeStyleAttributes(attributes: ScriptAttributes | undefined): string {
@@ -420,45 +412,53 @@ function extractInlineCode(markup: string): string {
   return contentStart > 0 && contentEnd >= contentStart ? markup.slice(contentStart, contentEnd) : '';
 }
 
-function assetErrorMessage(kind: AssetKind): string {
-  return kind === 'style' ? JIESHU_TIPS_CSS_ERROR_REQUESTED : JIESHU_TIPS_SCRIPT_ERROR_REQUESTED;
-}
+const requestErrorMessage = (kind: AssetKind | 'html') =>
+  kind === 'html'
+    ? JIESHU_TIPS_HTML_ERROR_REQUESTED
+    : kind === 'style'
+      ? JIESHU_TIPS_CSS_ERROR_REQUESTED
+      : JIESHU_TIPS_SCRIPT_ERROR_REQUESTED;
 
 function normalizeFailure(cause: unknown, fallbackMessage: string): Error {
   return cause instanceof Error ? cause : new Error(fallbackMessage);
 }
 
-function reportAssetFailure(kind: AssetKind, source: string, cause: unknown, loadError?: LoadErrorHandler): Error {
-  const message = assetErrorMessage(kind);
+const reportRequestFailure = (
+  kind: AssetKind | 'html',
+  source: string,
+  cause: unknown,
+  loadError?: LoadErrorHandler,
+) => {
+  const message = requestErrorMessage(kind);
   const failure = normalizeFailure(cause, message);
-  error(message, { src: source, cause });
+  error(message, kind === 'html' ? { url: source, cause } : { src: source, cause });
   loadError?.(source, failure);
   return failure;
-}
+};
 
-async function requestAssetText(
+const requestText = async (
   source: string,
   fetch: FetchFunction,
-  kind: AssetKind,
+  kind: AssetKind | 'html',
   loadError?: LoadErrorHandler,
-): Promise<string> {
+) => {
   let response: Response;
   try {
     response = await fetch(source);
   } catch (cause: unknown) {
-    throw reportAssetFailure(kind, source, cause, loadError);
+    throw reportRequestFailure(kind, source, cause, loadError);
   }
 
   if (response.status >= 400) {
-    throw reportAssetFailure(kind, source, new Error(assetErrorMessage(kind)), loadError);
+    throw reportRequestFailure(kind, source, new Error(requestErrorMessage(kind)), loadError);
   }
 
   try {
     return await response.text();
   } catch (cause: unknown) {
-    throw reportAssetFailure(kind, source, cause, loadError);
+    throw reportRequestFailure(kind, source, cause, loadError);
   }
-}
+};
 
 function fetchAssetText(
   source: string,
@@ -468,7 +468,7 @@ function fetchAssetText(
   loadError?: LoadErrorHandler,
   cacheScope?: CacheScope,
 ): Promise<string> {
-  const request = cache.getOrCreate(source, fetch, () => requestAssetText(source, fetch, kind, loadError), cacheScope);
+  const request = cache.getOrCreate(source, fetch, () => requestText(source, fetch, kind, loadError), cacheScope);
   // Script injection uses an empty result as an explicit signal to retain the
   // original src and fall back to native loading. Stylesheet consumers need the
   // rejection itself: static HTML restores its original link, while dynamic
@@ -564,32 +564,6 @@ function resolveAssetPublicPath(entry: string): string {
   }
 }
 
-function reportHtmlFailure(url: string, cause: unknown, loadError?: LoadErrorHandler): Error {
-  const failure = normalizeFailure(cause, JIESHU_TIPS_HTML_ERROR_REQUESTED);
-  error(JIESHU_TIPS_HTML_ERROR_REQUESTED, { url, cause });
-  loadError?.(url, failure);
-  return failure;
-}
-
-async function fetchHtml(url: string, fetch: FetchFunction, loadError?: LoadErrorHandler): Promise<string> {
-  let response: Response;
-  try {
-    response = await fetch(url);
-  } catch (cause: unknown) {
-    throw reportHtmlFailure(url, cause, loadError);
-  }
-
-  if (response.status >= 400) {
-    throw reportHtmlFailure(url, new Error(JIESHU_TIPS_HTML_ERROR_REQUESTED), loadError);
-  }
-
-  try {
-    return await response.text();
-  } catch (cause: unknown) {
-    throw reportHtmlFailure(url, cause, loadError);
-  }
-}
-
 function includeAsset(source: string | undefined, exclusions: readonly (string | RegExp)[]): boolean {
   return !source || !isMatchUrl(source, exclusions);
 }
@@ -607,7 +581,7 @@ async function parseHtmlDocument(
 ): Promise<ParsedHtmlDocument> {
   // Preserve the public convention that an empty `html` string means
   // "request the entry document" rather than "use an empty document".
-  const html = suppliedHtml ? suppliedHtml : await fetchHtml(url, fetch, loadError);
+  const html = suppliedHtml ? suppliedHtml : await requestText(url, fetch, 'html', loadError);
   const assetPublicPath = resolveAssetPublicPath(url);
   const parsed = processTpl(applyHtmlLoaders(html, plugins), assetPublicPath);
   const indexedStyles: IndexedStyleObject[] = parsed.styles.map((style, sourceIndex) => {

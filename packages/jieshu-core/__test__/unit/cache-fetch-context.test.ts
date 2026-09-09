@@ -145,3 +145,26 @@ test.each(kinds)('%s clear during fetch cannot publish its later result into the
   expect(await read(kind, fetch, {})).toBe('current');
   expect(fetch).toHaveBeenCalledTimes(2);
 });
+
+test('HTML, script and style caches retain separate results for the same URL and fetch', async () => {
+  const source = 'https://context.test/shared';
+  const scope = {};
+  const fetch = vi
+    .fn<Fetch>()
+    .mockResolvedValueOnce(new Response('<main>document</main>'))
+    .mockResolvedValueOnce(new Response('script-content'))
+    .mockResolvedValueOnce(new Response('style-content'));
+  const html = await importHTML({ url: source, opts: { fetch, cacheScope: scope } });
+  const script = getExternalScripts([{ src: source }], fetch, undefined, false, scope)[0].contentPromise;
+  const style = getExternalStyleSheets([{ src: source }], fetch, undefined, scope)[0].contentPromise;
+  expect(html.template).toBe('<main>document</main>');
+  expect(await script).toBe('script-content');
+  expect(await style).toBe('style-content');
+  releaseAssetCacheScope(scope);
+  expect((await importHTML({ url: source, opts: { fetch, cacheScope: {} } })).template).toBe(html.template);
+  expect(await getExternalScripts([{ src: source }], fetch, undefined, false, {})[0].contentPromise).toBe(
+    'script-content',
+  );
+  expect(await getExternalStyleSheets([{ src: source }], fetch, undefined, {})[0].contentPromise).toBe('style-content');
+  expect(fetch).toHaveBeenCalledTimes(3);
+});

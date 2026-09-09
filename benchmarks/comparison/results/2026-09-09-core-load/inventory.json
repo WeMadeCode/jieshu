@@ -1,0 +1,303 @@
+{
+  "scope": "Fresh, supported Chromium host page, first import of the entire production core, without startApp/preloadApp/setupApp. Static call-graph inventory, not a timing attribution.",
+  "revisions": {
+    "jieshu": "557c51d",
+    "wujie": "c45932998c0602f34454df8d3e29f4d33a38446a"
+  },
+  "inspectedProductionBundles": {
+    "jieshu": {
+      "path": "test-results/instanceof-candidate-load/jieshu.js",
+      "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e"
+    },
+    "wujie": {
+      "path": "test-results/instanceof-candidate-load/wujie.js",
+      "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794"
+    }
+  },
+  "explicitCollectionAllocations": {
+    "qualification": "Derived by following top-level initializers, local factory calls and instantiated class fields. Excludes browser-engine internals and ordinary object/array/function allocations. Inherited registries can reduce counts when importing another core copy.",
+    "jieshu": {
+      "Map": 14,
+      "WeakMap": 17,
+      "Set": 10,
+      "WeakSet": 4
+    },
+    "wujie": {
+      "Map": 2,
+      "WeakMap": 4,
+      "Set": 1,
+      "WeakSet": 0
+    }
+  },
+  "commonImportWork": [
+    {
+      "behavior": "Capture 12 native DOM/event method references; no document traversal or insertion",
+      "jieshu": [
+        "src/native-dom.ts:16",
+        "src/native-dom.ts:35"
+      ],
+      "wujie": [
+        "src/common.ts:219"
+      ],
+      "difference": "Jieshu also materializes one aggregate capabilities object."
+    },
+    {
+      "behavior": "Check fetch support and bind window.fetch; no resource requests",
+      "jieshu": [
+        "src/entry.ts:272",
+        "src/entry.ts:276"
+      ],
+      "wujie": [
+        "src/entry.ts:66",
+        "src/entry.ts:70"
+      ],
+      "difference": "Jieshu additionally binds fetch identity through a WeakMap and one context object at entry.ts:277."
+    },
+    {
+      "behavior": "Initialize/reuse shared sandbox and event registries, publish window injection object",
+      "jieshu": [
+        "src/sandbox-registry.ts:68",
+        "src/event.ts:51"
+      ],
+      "wujie": [
+        "src/common.ts:12",
+        "src/event.ts:8"
+      ],
+      "difference": "Jieshu additionally initializes/reuses unmount-depth and teardown registries, two Maps and two injection-object spreads."
+    },
+    {
+      "behavior": "Construct public EventBus using Date.now string id; create event dictionary and register it",
+      "jieshu": [
+        "src/index.ts:57",
+        "src/event.ts:81"
+      ],
+      "wujie": [
+        "src/index.ts:23",
+        "src/event.ts:22"
+      ],
+      "difference": "Jieshu dictionary has null prototype; Wujie uses ordinary object. Re-import id collision paths differ but do not occur on a fresh empty registry."
+    },
+    {
+      "behavior": "Register one host popstate listener; do not run its route parsing callback during import",
+      "jieshu": [
+        "src/index.ts:178",
+        "src/sync.ts:99"
+      ],
+      "wujie": [
+        "src/index.ts:175",
+        "src/sync.ts:115"
+      ]
+    },
+    {
+      "behavior": "Define framework custom element once; on an empty page connected/disconnected callbacks are not invoked",
+      "jieshu": [
+        "src/index.ts:181",
+        "src/shadow.ts:87"
+      ],
+      "wujie": [
+        "src/index.ts:178",
+        "src/shadow.ts:60"
+      ],
+      "difference": "Jieshu performs extra registry method checks and has more callback code; no iframe, shadow root, rendering or app mount during empty-page import."
+    },
+    {
+      "behavior": "Create extra DOM-constructor name Set with 26 names, constant arrays/objects/regexes, class and function objects",
+      "jieshu": [
+        "src/iframe.ts:37",
+        "src/sandbox-policy.ts:1"
+      ],
+      "wujie": [
+        "src/iframe.ts:41",
+        "src/common.ts:60"
+      ],
+      "difference": "Neither executes cross-realm constructor inspection during import."
+    }
+  ],
+  "jieshuExtraInitialization": [
+    {
+      "name": "AssetCache instances",
+      "locations": [
+        "src/entry.ts:95",
+        "src/entry.ts:249"
+      ],
+      "work": "3 cache instances; each has 3 Maps, 2 WeakMaps, 1 WeakSet and 3 arrow-method closures, plus records pointer. No asset fetching, cache reconciliation, invalidation or parsing runs.",
+      "wujie": "Only three plain cache record objects (entry.ts:40-42).",
+      "collectionAllocations": {
+        "Map": 9,
+        "WeakMap": 6,
+        "WeakSet": 3
+      }
+    },
+    {
+      "name": "Fetch identity map",
+      "locations": [
+        "src/entry.ts:20",
+        "src/entry.ts:277"
+      ],
+      "work": "1 WeakMap; add original and bound fetch keys sharing one context object."
+    },
+    {
+      "name": "Shared lifecycle registries",
+      "locations": [
+        "src/sandbox-registry.ts:21",
+        "src/sandbox-registry.ts:86"
+      ],
+      "work": "2 extra Maps and window injection updates; lifecycle work itself is deferred."
+    },
+    {
+      "name": "Template lookup sets",
+      "locations": [
+        "src/template.ts:73",
+        "src/template.ts:81",
+        "src/template.ts:82",
+        "src/template.ts:336"
+      ],
+      "work": "4 Sets containing 6 JS MIME types, 2 RCDATA tags, 5 raw-text tags and 14 void tags. No tokenizer/compiler execution.",
+      "wujie": "Creates 21 regex literals in template.ts:3-23; matching is deferred."
+    },
+    {
+      "name": "Proxy property lookup sets",
+      "locations": [
+        "src/proxy.ts:31",
+        "src/proxy.ts:38"
+      ],
+      "work": "4 document property Sets, one concat temporary array, 1 location keys Set. Also two resolver pipelines (proxy.ts:193,228): array/closure creation only; resolvers and Proxy traps are deferred."
+    },
+    {
+      "name": "DOM insertion handlers",
+      "locations": [
+        "src/effect.ts:61",
+        "src/effect.ts:777",
+        "src/effect.ts:828",
+        "src/effect-pipeline.ts:13"
+      ],
+      "work": "1 event-forwarder instance/arrow; 4 handler records/closures; HandlerPipeline instance creates 1 Map and loops over four handlers with has/set. Does not execute the handler bodies or touch any dynamic resource."
+    },
+    {
+      "name": "Script execution singleton",
+      "locations": [
+        "src/iframe-script.ts:47",
+        "src/iframe-script.ts:344"
+      ],
+      "work": "Random module-event prefix string; singleton instance and execute arrow closure. No script DOM creation, queue processing or network request.",
+      "wujie": "One already-resolved Promise at effect.ts:267."
+    },
+    {
+      "name": "Other empty weak containers",
+      "locations": [
+        "src/effect.ts:325",
+        "src/effect.ts:866",
+        "src/sandbox-runtime.ts:111",
+        "src/sandbox-runtime.ts:113",
+        "src/shadow.ts:136",
+        "src/shadow.ts:137",
+        "src/iframe.ts:1104",
+        "src/iframe-inline-events.ts:3"
+      ],
+      "work": "7 WeakMaps and 1 WeakSet; population and associated runtime activity deferred."
+    },
+    {
+      "name": "Function binding caches",
+      "locations": [
+        "src/function-binding.ts:3"
+      ],
+      "work": "3 WeakMaps versus Wujie 4 at utils.ts:36,49,59,83; Jieshu saves one here."
+    },
+    {
+      "name": "Symbols / idle scheduler",
+      "locations": [
+        "src/entry.ts:41",
+        "src/iframe.ts:413",
+        "src/tracker.ts:23",
+        "src/utils.ts:130"
+      ],
+      "work": "Two private Symbols, one global registry Symbol.for; binds native requestIdleCallback when present. Wujie reads callback without bind. Neither schedules an idle task during import."
+    }
+  ],
+  "deferredWork": [
+    {
+      "name": "Global inline-event helper publication",
+      "locations": [
+        "src/index.ts:196",
+        "src/entry.ts:755"
+      ],
+      "phase": "startAppNow; not import"
+    },
+    {
+      "name": "Operation slot dictionary and cancellation promises",
+      "locations": [
+        "src/operation-intent.ts:34",
+        "src/operation-intent.ts:63"
+      ],
+      "phase": "public API operations; not import"
+    },
+    {
+      "name": "Sandbox lifecycle / event trackers / iframe / proxies",
+      "locations": [
+        "src/index.ts:337",
+        "src/index.ts:462",
+        "src/sandbox.ts:848"
+      ],
+      "phase": "first actual start/preload construction; not import. Class field collections do not allocate until an instance is constructed."
+    },
+    {
+      "name": "Window property enumeration, event overrides and instanceof patches",
+      "locations": [
+        "src/iframe.ts:337",
+        "src/iframe.ts:354",
+        "src/iframe.ts:377",
+        "src/iframe.ts:585",
+        "src/iframe.ts:960"
+      ],
+      "phase": "iframe initialization. Neither Object.getOwnPropertyNames(window) nor patchInstanceofAcrossRealms is invoked at import; instanceof fallback WeakMap remains unallocated."
+    },
+    {
+      "name": "DOM effect patching, markup scanning, relative URLs, inline event compilation",
+      "locations": [
+        "src/iframe.ts:961",
+        "src/iframe.ts:964",
+        "src/iframe-inline-events.ts:27"
+      ],
+      "phase": "iframe initialization / later child DOM mutations; not import"
+    },
+    {
+      "name": "HTML parser / URL parsing / resource fetch / script execution / template DOM",
+      "locations": [
+        "src/entry.ts:610",
+        "src/template.ts:811",
+        "src/iframe-script.ts:95",
+        "src/route-state.ts:39"
+      ],
+      "phase": "API/lifecycle/event callbacks; function source contributes parse/preparse/code footprint at import, but bodies are not run."
+    }
+  ],
+  "interventionCandidates": [
+    {
+      "priority": 1,
+      "name": "AssetCache construction",
+      "proposal": "In one diagnostic bundle gate only the three new AssetCache calls with a runtime window flag. Set flags before loading; preserve all class/method source and exact same bundle bytes in enabled/disabled samples. Do not invoke resource APIs in the disabled diagnostic case.",
+      "tests": "If evaluate and post-GC heap drop but parse/compile does not, attribute to eager instances, not HTML parser complexity."
+    },
+    {
+      "priority": 2,
+      "name": "Lookup Set construction",
+      "proposal": "Separate runtime gates for template lookup Sets and proxy property Sets, keeping Set arguments and all consumer code in the same bundle. This separates fixed lookup-table initialization from parser/proxy function volume."
+    },
+    {
+      "priority": 3,
+      "name": "Event listener and custom-element registration",
+      "proposal": "Gate processAppForHrefJump and defineJieshuWebComponent separately for both frameworks. Retain their callback bodies and identical bundle. This checks common browser registration cost and any framework-specific difference."
+    },
+    {
+      "priority": 4,
+      "name": "Effect/script singleton construction",
+      "proposal": "Gate the whole four-handler/insertion-pipeline group and the script-execution singleton independently. The hot resource handler bodies remain unchanged and are not invoked."
+    },
+    {
+      "priority": 5,
+      "name": "Other eager containers",
+      "proposal": "If necessary group shared lifecycle registries and remaining empty weak containers. Treat this as diagnostic only: production lazy initialization must preserve cross-copy ownership and public API behavior."
+    }
+  ],
+  "caution": "The larger total bundle and additional function bodies still cause transfer, parse/preparse and possibly compilation cost. Static inventory alone cannot rank their timing cost or establish that eager initialization explains the observed load gap. Do not describe deleting a module as an execution-only experiment."
+}

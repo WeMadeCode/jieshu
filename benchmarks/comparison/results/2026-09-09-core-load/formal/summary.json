@@ -1,0 +1,1402 @@
+[
+  {
+    "variant": "wujie",
+    "cpuRate": 1,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 3.7000000001862645,
+      "p95": 3.8999999999068677,
+      "min": 3.2000000001862645,
+      "max": 4
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.1000000000931323,
+      "p95": 1.2000000001862645,
+      "min": 0.7999999998137355,
+      "max": 1.2999999998137355
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2,
+      "p95": 2.1000000000931323,
+      "min": 1.7000000001862645,
+      "max": 2.1000000000931323
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.312,
+      "p95": 0.3713,
+      "min": 0.264,
+      "max": 0.398
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.016,
+      "p95": 0.020299999999999995,
+      "min": 0.012,
+      "max": 0.020999999999999998
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 162116,
+      "p95": 162116,
+      "min": 162116,
+      "max": 162116
+    }
+  },
+  {
+    "variant": "jieshu",
+    "cpuRate": 1,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 4.899999999906868,
+      "p95": 5.199999999720603,
+      "min": 4.399999999906868,
+      "max": 5.2000000001862645
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.099999999627471,
+      "p95": 1.2999999998137355,
+      "min": 0.7999999998137355,
+      "max": 1.3000000002793968
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 3.1000000000931323,
+      "p95": 3.260000000102445,
+      "min": 2.8999999999068677,
+      "max": 3.400000000372529
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.5609999999999999,
+      "p95": 0.6683,
+      "min": 0.482,
+      "max": 0.731
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.017,
+      "p95": 0.023,
+      "min": 0.014,
+      "max": 0.038
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 218252,
+      "p95": 218252,
+      "min": 218252,
+      "max": 218252
+    }
+  },
+  {
+    "variant": "wujie-padded",
+    "cpuRate": 1,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 3.7000000001862645,
+      "p95": 3.830000000167638,
+      "min": 3.2999999998137355,
+      "max": 3.900000000372529
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.1000000000931323,
+      "p95": 1.2000000001862645,
+      "min": 0.8999999999068677,
+      "max": 1.2999999998137355
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2,
+      "p95": 2.2000000001862645,
+      "min": 1.6999999997206032,
+      "max": 2.3000000002793968
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.309,
+      "p95": 0.36669999999999997,
+      "min": 0.27,
+      "max": 0.397
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.016,
+      "p95": 0.020599999999999993,
+      "min": 0.013,
+      "max": 0.022
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 162116,
+      "p95": 162116,
+      "min": 162116,
+      "max": 162116
+    }
+  },
+  {
+    "variant": "jieshu-entry-skipped",
+    "cpuRate": 1,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 4.7000000001862645,
+      "p95": 4.929999999934807,
+      "min": 4.399999999906868,
+      "max": 5
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.1000000000931323,
+      "p95": 1.299999999953434,
+      "min": 0.7999999998137355,
+      "max": 1.3999999999068677
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 3,
+      "p95": 3.2299999997485425,
+      "min": 2.6999999997206032,
+      "max": 3.2999999998137355
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.5,
+      "p95": 0.5708,
+      "min": 0.417,
+      "max": 0.58
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.017,
+      "p95": 0.021299999999999996,
+      "min": 0.013,
+      "max": 0.026
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 217936,
+      "p95": 217936,
+      "min": 217936,
+      "max": 217936
+    }
+  },
+  {
+    "variant": "jieshu-caches-skipped",
+    "cpuRate": 1,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 4.7000000001862645,
+      "p95": 5,
+      "min": 4.2999999998137355,
+      "max": 5
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.1000000000931323,
+      "p95": 1.3000000002793968,
+      "min": 0.8999999999068677,
+      "max": 1.3999999999068677
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 3,
+      "p95": 3.2000000001862645,
+      "min": 2.6999999997206032,
+      "max": 3.2999999998137355
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.483,
+      "p95": 0.5896,
+      "min": 0.423,
+      "max": 0.6040000000000001
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.016,
+      "p95": 0.0243,
+      "min": 0.013,
+      "max": 0.028
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 214020,
+      "p95": 214020,
+      "min": 214020,
+      "max": 214020
+    }
+  },
+  {
+    "variant": "wujie-init-skipped",
+    "cpuRate": 1,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 3.3000000002793968,
+      "p95": 3.5,
+      "min": 3,
+      "max": 3.8999999999068677
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.099999999627471,
+      "p95": 1.2000000001862645,
+      "min": 0.8000000002793968,
+      "max": 1.2999999998137355
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 1.6000000000931323,
+      "p95": 1.799999999953434,
+      "min": 1.3999999999068677,
+      "max": 2.3000000002793968
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.029,
+      "p95": 0.044599999999999994,
+      "min": 0.018000000000000002,
+      "max": 0.052
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.014,
+      "p95": 0.019299999999999998,
+      "min": 0.011,
+      "max": 0.02
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 110012,
+      "p95": 110012,
+      "min": 110012,
+      "max": 110012
+    }
+  },
+  {
+    "variant": "jieshu-init-skipped",
+    "cpuRate": 1,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 4.100000000093132,
+      "p95": 4.400000000046566,
+      "min": 3.7999999998137355,
+      "max": 4.5
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.099999999627471,
+      "p95": 1.299999999953434,
+      "min": 0.7999999998137355,
+      "max": 1.3999999999068677
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2.3999999999068677,
+      "p95": 2.5300000000279392,
+      "min": 2.1999999997206032,
+      "max": 2.6000000000931323
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.036000000000000004,
+      "p95": 0.05489999999999999,
+      "min": 0.024,
+      "max": 0.058
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.017,
+      "p95": 0.02189999999999999,
+      "min": 0.013,
+      "max": 0.024
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 111568,
+      "p95": 111568,
+      "min": 111568,
+      "max": 111568
+    }
+  },
+  {
+    "variant": "wujie",
+    "cpuRate": 1,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 3.7000000001862645,
+      "p95": 3.900000000046566,
+      "min": 3.2000000001862645,
+      "max": 4.199999999720603
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2000000001862645,
+      "p95": 1.4299999999348072,
+      "min": 1.099999999627471,
+      "max": 1.5
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 1.8000000002793968,
+      "p95": 2.0300000000279392,
+      "min": 1.5,
+      "max": 2.1999999997206032
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.328,
+      "p95": 0.38149999999999995,
+      "min": 0.266,
+      "max": 0.386
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.016,
+      "p95": 0.023299999999999998,
+      "min": 0.012,
+      "max": 0.036000000000000004
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 162116,
+      "p95": 162116,
+      "min": 162116,
+      "max": 162116
+    }
+  },
+  {
+    "variant": "jieshu",
+    "cpuRate": 1,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 4.900000000372529,
+      "p95": 5.2999999999534335,
+      "min": 4.399999999906868,
+      "max": 5.5
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.3999999999068677,
+      "p95": 1.6000000000931323,
+      "min": 1.1000000000931323,
+      "max": 1.8000000002793968
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2.900000000372529,
+      "p95": 3.2000000001862645,
+      "min": 2.6999999997206032,
+      "max": 3.2999999998137355
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.584,
+      "p95": 0.6613,
+      "min": 0.494,
+      "max": 0.709
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.018000000000000002,
+      "p95": 0.028,
+      "min": 0.014,
+      "max": 0.034999999999999996
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 218252,
+      "p95": 218252,
+      "min": 218252,
+      "max": 218252
+    }
+  },
+  {
+    "variant": "wujie-padded",
+    "cpuRate": 1,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 3.8000000002793968,
+      "p95": 4,
+      "min": 3.3999999999068677,
+      "max": 4.099999999627471
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2999999998137355,
+      "p95": 1.5,
+      "min": 1,
+      "max": 1.599999999627471
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 1.8999999999068677,
+      "p95": 2.0300000000279392,
+      "min": 1.6000000000931323,
+      "max": 2.2000000001862645
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.34,
+      "p95": 0.38559999999999994,
+      "min": 0.27599999999999997,
+      "max": 0.388
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.017,
+      "p95": 0.021299999999999996,
+      "min": 0.012,
+      "max": 0.023
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 162116,
+      "p95": 162116,
+      "min": 162116,
+      "max": 162116
+    }
+  },
+  {
+    "variant": "jieshu-entry-skipped",
+    "cpuRate": 1,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 4.800000000279397,
+      "p95": 5.100000000093132,
+      "min": 4.2999999998137355,
+      "max": 5.100000000093132
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2999999998137355,
+      "p95": 1.5,
+      "min": 1.099999999627471,
+      "max": 1.6000000000931323
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2.8999999999068677,
+      "p95": 3.1300000001210715,
+      "min": 2.6000000000931323,
+      "max": 3.2000000001862645
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.515,
+      "p95": 0.5649,
+      "min": 0.425,
+      "max": 0.587
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.018000000000000002,
+      "p95": 0.023299999999999998,
+      "min": 0.014,
+      "max": 0.029
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 217936,
+      "p95": 217936,
+      "min": 217936,
+      "max": 217936
+    }
+  },
+  {
+    "variant": "jieshu-caches-skipped",
+    "cpuRate": 1,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 4.899999999906868,
+      "p95": 5.130000000121072,
+      "min": 4.5,
+      "max": 5.2000000001862645
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.3000000002793968,
+      "p95": 1.5,
+      "min": 1.099999999627471,
+      "max": 1.6000000000931323
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2.8999999999068677,
+      "p95": 3.1999999998603017,
+      "min": 2.6000000000931323,
+      "max": 3.2000000001862645
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.533,
+      "p95": 0.595,
+      "min": 0.439,
+      "max": 0.626
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.018000000000000002,
+      "p95": 0.03289999999999999,
+      "min": 0.015000000000000001,
+      "max": 0.037
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 214020,
+      "p95": 214020,
+      "min": 214020,
+      "max": 214020
+    }
+  },
+  {
+    "variant": "wujie-init-skipped",
+    "cpuRate": 1,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 3.2999999998137355,
+      "p95": 3.529999999888241,
+      "min": 2.8999999999068677,
+      "max": 3.6000000000931323
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2000000001862645,
+      "p95": 1.3999999999068677,
+      "min": 0.8999999999068677,
+      "max": 1.400000000372529
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 1.5,
+      "p95": 1.6299999996554104,
+      "min": 1.2000000001862645,
+      "max": 1.7000000001862645
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.034,
+      "p95": 0.039599999999999996,
+      "min": 0.020999999999999998,
+      "max": 0.045000000000000005
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.015000000000000001,
+      "p95": 0.020299999999999995,
+      "min": 0.013,
+      "max": 0.030000000000000002
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 110012,
+      "p95": 110012,
+      "min": 110012,
+      "max": 110012
+    }
+  },
+  {
+    "variant": "jieshu-init-skipped",
+    "cpuRate": 1,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 4.100000000093132,
+      "p95": 4.43000000026077,
+      "min": 3.6999999997206032,
+      "max": 4.5
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2999999998137355,
+      "p95": 1.5,
+      "min": 1.099999999627471,
+      "max": 1.6000000000931323
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2.2000000001862645,
+      "p95": 2.4300000002607702,
+      "min": 1.8999999999068677,
+      "max": 2.5
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.037,
+      "p95": 0.046299999999999994,
+      "min": 0.025,
+      "max": 0.058
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.017,
+      "p95": 0.027299999999999998,
+      "min": 0.013,
+      "max": 0.038
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 111568,
+      "p95": 111568,
+      "min": 111568,
+      "max": 111568
+    }
+  },
+  {
+    "variant": "wujie",
+    "cpuRate": 4,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 8.5,
+      "p95": 9.220000000065191,
+      "min": 7.2000000001862645,
+      "max": 9.800000000279397
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2000000001862645,
+      "p95": 1.7999999998137355,
+      "min": 0.8999999999068677,
+      "max": 2.1000000000931323
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 4.2999999998137355,
+      "p95": 5.029999999888241,
+      "min": 3.6999999997206032,
+      "max": 5.400000000372529
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 1.574,
+      "p95": 2.109,
+      "min": 1.1440000000000001,
+      "max": 2.3280000000000003
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.019,
+      "p95": 0.6366999999999997,
+      "min": 0.014,
+      "max": 0.7200000000000001
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 162116,
+      "p95": 162116,
+      "min": 162116,
+      "max": 162116
+    }
+  },
+  {
+    "variant": "jieshu",
+    "cpuRate": 4,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 10.5,
+      "p95": 11.399999999906868,
+      "min": 9.5,
+      "max": 11.799999999813735
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2000000001862645,
+      "p95": 2.1299999999813735,
+      "min": 0.8999999999068677,
+      "max": 2.3000000002793968
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 6.399999999906868,
+      "p95": 7.03000000002794,
+      "min": 5.599999999627471,
+      "max": 7.300000000279397
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 2.76,
+      "p95": 3.589899999999999,
+      "min": 1.9629999999999999,
+      "max": 3.888
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.019,
+      "p95": 0.546999999999999,
+      "min": 0.015000000000000001,
+      "max": 0.832
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 218252,
+      "p95": 218252,
+      "min": 218252,
+      "max": 218252
+    }
+  },
+  {
+    "variant": "wujie-padded",
+    "cpuRate": 4,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 8.5,
+      "p95": 9.43000000026077,
+      "min": 7.5,
+      "max": 11.899999999906868
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.1999999997206032,
+      "p95": 2.090000000083818,
+      "min": 0.8999999999068677,
+      "max": 3.6000000000931323
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 4.2999999998137355,
+      "p95": 4.959999999962746,
+      "min": 3.7999999998137355,
+      "max": 5.899999999906868
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 1.805,
+      "p95": 2.3792,
+      "min": 0.958,
+      "max": 2.572
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.019,
+      "p95": 0.6146999999999999,
+      "min": 0.015000000000000001,
+      "max": 0.6679999999999999
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 162116,
+      "p95": 162116,
+      "min": 162116,
+      "max": 162116
+    }
+  },
+  {
+    "variant": "jieshu-entry-skipped",
+    "cpuRate": 4,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 10,
+      "p95": 10.859999999869615,
+      "min": 8.700000000186265,
+      "max": 11.200000000186265
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.1000000000931323,
+      "p95": 1.7999999998137355,
+      "min": 0.7999999998137355,
+      "max": 1.8000000002793968
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 5.899999999906868,
+      "p95": 6.629999999981373,
+      "min": 5.2999999998137355,
+      "max": 6.7000000001862645
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 2.444,
+      "p95": 3.0193,
+      "min": 1.842,
+      "max": 3.3289999999999997
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.019,
+      "p95": 0.3609999999999981,
+      "min": 0.016,
+      "max": 0.9840000000000001
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 217936,
+      "p95": 217936,
+      "min": 217936,
+      "max": 217936
+    }
+  },
+  {
+    "variant": "jieshu-caches-skipped",
+    "cpuRate": 4,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 10.5,
+      "p95": 11.690000000037251,
+      "min": 8.699999999720603,
+      "max": 12
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.3000000002793968,
+      "p95": 2,
+      "min": 0.8999999999068677,
+      "max": 2.6000000000931323
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 6.2000000001862645,
+      "p95": 6.929999999934807,
+      "min": 5,
+      "max": 7.5
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 2.626,
+      "p95": 3.2702,
+      "min": 1.917,
+      "max": 4.074999999999999
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.02,
+      "p95": 0.629799999999999,
+      "min": 0.015000000000000001,
+      "max": 0.892
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 214020,
+      "p95": 214020,
+      "min": 214020,
+      "max": 214020
+    }
+  },
+  {
+    "variant": "wujie-init-skipped",
+    "cpuRate": 4,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 6.7999999998137355,
+      "p95": 7.760000000242143,
+      "min": 4.7000000001862645,
+      "max": 8.199999999720603
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2000000001862645,
+      "p95": 1.9000000000465662,
+      "min": 0.8999999999068677,
+      "max": 2.2000000001862645
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2.6000000000931323,
+      "p95": 3.400000000372529,
+      "min": 1.7999999998137355,
+      "max": 3.6999999997206032
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.041,
+      "p95": 0.7239,
+      "min": 0.029,
+      "max": 1.168
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.018000000000000002,
+      "p95": 0.7170999999999998,
+      "min": 0.013,
+      "max": 0.858
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 110012,
+      "p95": 110012,
+      "min": 110012,
+      "max": 110012
+    }
+  },
+  {
+    "variant": "jieshu-init-skipped",
+    "cpuRate": 4,
+    "transport": "identity",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 7.600000000093132,
+      "p95": 8.760000000102444,
+      "min": 6.699999999720603,
+      "max": 9.600000000093132
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.3000000002793968,
+      "p95": 1.8000000002793968,
+      "min": 0.7999999998137355,
+      "max": 2
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 3.7000000001862645,
+      "p95": 4.459999999962746,
+      "min": 3.1000000000931323,
+      "max": 4.7000000001862645
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.044,
+      "p95": 0.7169999999999997,
+      "min": 0.033,
+      "max": 0.944
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.018000000000000002,
+      "p95": 0.08699999999999943,
+      "min": 0.016,
+      "max": 0.605
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 111568,
+      "p95": 111568,
+      "min": 111568,
+      "max": 111568
+    }
+  },
+  {
+    "variant": "wujie",
+    "cpuRate": 4,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 8.400000000372529,
+      "p95": 9.5,
+      "min": 7.100000000093132,
+      "max": 9.800000000279397
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2999999998137355,
+      "p95": 1.9599999999627464,
+      "min": 0.8999999999068677,
+      "max": 2.1000000000931323
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 4.199999999720603,
+      "p95": 4.730000000074505,
+      "min": 3.3999999999068677,
+      "max": 5
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 1.5839999999999999,
+      "p95": 2.2340999999999998,
+      "min": 0.901,
+      "max": 2.277
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.019,
+      "p95": 0.49669999999999925,
+      "min": 0.014,
+      "max": 0.7240000000000001
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 162116,
+      "p95": 162116,
+      "min": 162116,
+      "max": 162116
+    }
+  },
+  {
+    "variant": "jieshu",
+    "cpuRate": 4,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 10.600000000093132,
+      "p95": 11.760000000102444,
+      "min": 9.700000000186265,
+      "max": 12
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.3999999999068677,
+      "p95": 2.290000000130384,
+      "min": 1.099999999627471,
+      "max": 2.599999999627471
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 6.300000000279397,
+      "p95": 7.100000000093132,
+      "min": 5.399999999906868,
+      "max": 7.399999999906868
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 2.8600000000000003,
+      "p95": 3.3565,
+      "min": 2.162,
+      "max": 3.798
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.02,
+      "p95": 0.7080999999999994,
+      "min": 0.016,
+      "max": 0.985
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 218252,
+      "p95": 218252,
+      "min": 218252,
+      "max": 218252
+    }
+  },
+  {
+    "variant": "wujie-padded",
+    "cpuRate": 4,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 8.5,
+      "p95": 9.190000000176951,
+      "min": 7.2000000001862645,
+      "max": 9.600000000093132
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2000000001862645,
+      "p95": 1.8999999999068677,
+      "min": 1,
+      "max": 1.8999999999068677
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 4.300000000279397,
+      "p95": 4.899999999906868,
+      "min": 3.3999999999068677,
+      "max": 5
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 1.629,
+      "p95": 2.3476,
+      "min": 1.1720000000000002,
+      "max": 2.522
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.019,
+      "p95": 0.4121999999999993,
+      "min": 0.015000000000000001,
+      "max": 0.76
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 162116,
+      "p95": 162116,
+      "min": 162116,
+      "max": 162116
+    }
+  },
+  {
+    "variant": "jieshu-entry-skipped",
+    "cpuRate": 4,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 10.200000000186265,
+      "p95": 11,
+      "min": 9.200000000186265,
+      "max": 11.799999999813735
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.7999999998137355,
+      "p95": 2.1299999999813735,
+      "min": 1.1000000000931323,
+      "max": 2.2999999998137355
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 5.7999999998137355,
+      "p95": 6.399999999906868,
+      "min": 5,
+      "max": 6.400000000372529
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 2.354,
+      "p95": 3.076599999999999,
+      "min": 1.556,
+      "max": 3.269
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.02,
+      "p95": 0.7148999999999999,
+      "min": 0.015000000000000001,
+      "max": 0.823
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 217936,
+      "p95": 217936,
+      "min": 217936,
+      "max": 217936
+    }
+  },
+  {
+    "variant": "jieshu-caches-skipped",
+    "cpuRate": 4,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 10.299999999813735,
+      "p95": 11.53000000002794,
+      "min": 8.899999999906868,
+      "max": 12
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.5,
+      "p95": 2.2200000000651916,
+      "min": 1,
+      "max": 2.7999999998137355
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 6,
+      "p95": 6.600000000093132,
+      "min": 5.2000000001862645,
+      "max": 6.7999999998137355
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 2.484,
+      "p95": 3.0930999999999997,
+      "min": 1.742,
+      "max": 3.179
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.02,
+      "p95": 0.2294999999999994,
+      "min": 0.016,
+      "max": 0.8130000000000001
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 214020,
+      "p95": 214020,
+      "min": 214020,
+      "max": 214020
+    }
+  },
+  {
+    "variant": "wujie-init-skipped",
+    "cpuRate": 4,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 6.7999999998137355,
+      "p95": 7.629999999981373,
+      "min": 5,
+      "max": 7.7000000001862645
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.2000000001862645,
+      "p95": 2.2299999997485425,
+      "min": 0.7999999998137355,
+      "max": 2.3000000002793968
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 2.6000000000931323,
+      "p95": 3.1000000000931323,
+      "min": 1.6000000000931323,
+      "max": 3.2999999998137355
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.043000000000000003,
+      "p95": 0.8454999999999998,
+      "min": 0.024,
+      "max": 1.063
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.017,
+      "p95": 0.06429999999999977,
+      "min": 0.014,
+      "max": 0.768
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 110012,
+      "p95": 110012,
+      "min": 110012,
+      "max": 110012
+    }
+  },
+  {
+    "variant": "jieshu-init-skipped",
+    "cpuRate": 4,
+    "transport": "gzip",
+    "total": 35,
+    "passed": 35,
+    "failed": 0,
+    "totalLoadMs": {
+      "n": 35,
+      "median": 7.899999999906868,
+      "p95": 8.799999999813735,
+      "min": 6.600000000093132,
+      "max": 8.899999999906868
+    },
+    "requestAndResponseMs": {
+      "n": 35,
+      "median": 1.5,
+      "p95": 2.2300000000745057,
+      "min": 1.099999999627471,
+      "max": 2.5
+    },
+    "responseEndToOnloadMs": {
+      "n": 35,
+      "median": 3.5,
+      "p95": 4.160000000009313,
+      "min": 2.5,
+      "max": 4.5
+    },
+    "scriptDurationMs": {
+      "n": 35,
+      "median": 0.045000000000000005,
+      "p95": 0.5914999999999995,
+      "min": 0.034,
+      "max": 0.791
+    },
+    "v8CompileDurationMs": {
+      "n": 35,
+      "median": 0.017,
+      "p95": 0.07699999999999949,
+      "min": 0.014,
+      "max": 0.508
+    },
+    "heapDeltaBytes": {
+      "n": 35,
+      "median": 111568,
+      "p95": 111568,
+      "min": 111568,
+      "max": 111568
+    }
+  }
+]

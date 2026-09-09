@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-09T15:27:39.484Z",
+  "fileCount": 34,
+  "totalBytes": 9710768,
+  "method": "Every archived file was copied without reformatting and verified byte-for-byte against its source immediately before this manifest was generated. The manifest does not include itself. Source paths are repository-relative.",
+  "files": [
+    {
+      "file": "candidates/controller/summary.json",
+      "size": 793,
+      "sha256": "57b8742b23746177a12fce23c0a6e7a30ca26b065fec01fd0e0627aeb57a1c99",
+      "sourcePath": "test-results/controller-load-candidate-BQcojG/summary.json"
+    },
+    {
+      "file": "candidates/shared-fetch/build-comparison.json",
+      "size": 916,
+      "sha256": "2f756e879ace45c1c73871c78e2df59e7e625c167d7efdb7d157aa47c6fdcf12",
+      "sourcePath": "test-results/shared-entry-fetch-probe/build-comparison.json"
+    },
+    {
+      "file": "candidates/shared-fetch/semantics-comparison.json",
+      "size": 49137,
+      "sha256": "b57fd7932346c1155f994da18c4f99d390282f51c57e579059fd6b59ce090b1d",
+      "sourcePath": "test-results/shared-entry-fetch-probe/semantics-comparison.json"
+    },
+    {
+      "file": "components/component-summary.json",
+      "size": 17078,
+      "sha256": "dbca1f28cc9c42f657c702cafa6fb8366cd32cf30a7e351217e0755623f91710",
+      "sourcePath": "test-results/core-slimming-components-load/component-summary.json"
+    },
+    {
+      "file": "components/load/environment.json",
+      "size": 3268,
+      "sha256": "393105bc4629ffca83e7f34e24afd1436d40d2f16aa10245183f61910c2841b7",
+      "sourcePath": "test-results/core-slimming-components-load/environment.json"
+    },
+    {
+      "file": "components/load/observations.jsonl",
+      "size": 1918275,
+      "sha256": "e6bb2bc61614413ef5689ebc5d5ce111432d80eea59ab17633ab636292173411",
+      "sourcePath": "test-results/core-slimming-components-load/observations.jsonl"
+    },
+    {
+      "file": "components/load/summary.json",
+      "size": 9321,
+      "sha256": "77dcfe2d1dd5399e0d5a89ce892a6a4246f8eae06f7bf1037b3d791704a842f3",
+      "sourcePath": "test-results/core-slimming-components-load/summary.json"
+    },
+    {
+      "file": "components/load/trace-summary.json",
+      "size": 1754974,
+      "sha256": "3e7407c93e637c6bd0db84d6b2f3332dfeed46e7ed8a9cecc1d5af7a474c0c5b",
+      "sourcePath": "test-results/core-slimming-components-load/trace-summary.json"
+    },
+    {
+      "file": "components/variants.json",
+      "size": 3178,
+      "sha256": "6f1c84781cb2025b63c2fc7a329795f1200d76d92d57f4ddc138b6c8bc38feca",
+      "sourcePath": "test-results/core-load-factor-variants/manifest.json"
+    },
+    {
+      "file": "final/cpu4x-followup/environment.json",
+      "size": 4956,
+      "sha256": "57cbf95b5fcd67327ec57e5f60fe95934ddb5c5b8484e6488207e41673edb407",
+      "sourcePath": "test-results/core-slimming-cpu4x-tail-ab/environment.json"
+    },
+    {
+      "file": "final/cpu4x-followup/observations.jsonl",
+      "size": 59409,
+      "sha256": "039cbecaa4cf6a07d964efd5c77ac3f31b57f49974157b9f5a7af8c8903faae7",
+      "sourcePath": "test-results/core-slimming-cpu4x-tail-ab/observations.jsonl"
+    },
+    {
+      "file": "final/cpu4x-followup/summary/BEFORE_AFTER_SUMMARY.md",
+      "size": 2480,
+      "sha256": "db39c74f56abdbbff285a77e52938ea529a6a78a348d6b829decf8769e59cb7e",
+      "sourcePath": "test-results/core-slimming-cpu4x-tail-summary/BEFORE_AFTER_SUMMARY.md"
+    },
+    {
+      "file": "final/cpu4x-followup/summary/before-after-summary.json",
+      "size": 16969,
+      "sha256": "2229a20af87547e6f4cbe20ef0f5a804d2e43c77adc9825b8bf6a71261009107",
+      "sourcePath": "test-results/core-slimming-cpu4x-tail-summary/before-after-summary.json"
+    },
+    {
+      "file": "final/cpu4x-followup/summary/tail-audit.json",
+      "size": 10165,
+      "sha256": "b18c86abb20ce6bb1111e2e386c501d2a11c60d6ffa5093d3610ef2eeea11793",
+      "sourcePath": "test-results/core-slimming-cpu4x-tail-summary/tail-audit.json"
+    },
+    {
+      "file": "final/load/environment.json",
+      "size": 5112,
+      "sha256": "0c09c76bdefd4788fe1fe4cbeb15af5235f80b18c3aa94d79b2d2f182b4d1ed8",
+      "sourcePath": "test-results/core-slimming-load-buffer-ab/environment.json"
+    },
+    {
+      "file": "final/load/observations.jsonl",
+      "size": 1846785,
+      "sha256": "b8d74a6867175d5a22b728fb8b3ef12305288957246218222035cf9aee7acec1",
+      "sourcePath": "test-results/core-slimming-load-buffer-ab/observations.jsonl"
+    },
+    {
+      "file": "final/load/summary.json",
+      "size": 9361,
+      "sha256": "e32b8c3c1a82163f73c772ca0cded763bde24d08cd7aa7ffc7c9d0789d639ff8",
+      "sourcePath": "test-results/core-slimming-load-buffer-ab/summary.json"
+    },
+    {
+      "file": "final/load/trace-summary.json",
+      "size": 1627555,
+      "sha256": "ba75fd766243a73a546f3f940f5f9a21a2bde0328e27bfaf5684085b0b35479b",
+      "sourcePath": "test-results/core-slimming-load-buffer-ab/trace-summary.json"
+    },
+    {
+      "file": "final/memory/environment.json",
+      "size": 4893,
+      "sha256": "d0d5ac1211903f6ff050a206d56ca552c48c61754a10cabd4bfb7fb1e921e542",
+      "sourcePath": "test-results/core-slimming-memory-ab/environment.json"
+    },
+    {
+      "file": "final/memory/observations.jsonl",
+      "size": 13730,
+      "sha256": "f1dee1def39b564766076e4fe9f1c3e3b5c27468052e3c1f581ac1c9c3891d69",
+      "sourcePath": "test-results/core-slimming-memory-ab/observations.jsonl"
+    },
+    {
+      "file": "final/stability/environment.json",
+      "size": 2816,
+      "sha256": "f7c7080685a25f22ef2c3f6192369384f1a3033288b5f52f65e511bc299366fa",
+      "sourcePath": "test-results/core-slimming-stability/environment.json"
+    },
+    {
+      "file": "final/stability/observations.jsonl",
+      "size": 69389,
+      "sha256": "7dbdd1b4fc3e638e44ad7335bc12368114e815be1da5917f0049175b7583c7bb",
+      "sourcePath": "test-results/core-slimming-stability/observations.jsonl"
+    },
+    {
+      "file": "final/startup/environment.json",
+      "size": 4892,
+      "sha256": "5488c140868f574a2db3bd9c3bf27aea759cc07f3dfdf4f2f4c88ae7d0f3a9e6",
+      "sourcePath": "test-results/core-slimming-startup-buffer-ab/environment.json"
+    },
+    {
+      "file": "final/startup/observations.jsonl",
+      "size": 82569,
+      "sha256": "37908553bb26becd2cf53eb6b87e894cc062f58737516a8c6f2885fa01495a4d",
+      "sourcePath": "test-results/core-slimming-startup-buffer-ab/observations.jsonl"
+    },
+    {
+      "file": "final/summary/BEFORE_AFTER_SUMMARY.md",
+      "size": 9114,
+      "sha256": "8201d2fa8c9a344ca8a7c57f48b4a22107329c490d07f7d4741d5fb5afc82e0a",
+      "sourcePath": "test-results/core-slimming-final-summary/BEFORE_AFTER_SUMMARY.md"
+    },
+    {
+      "file": "final/summary/before-after-summary.json",
+      "size": 143247,
+      "sha256": "1693372d29f4b03856af416eebedecee3574c6ce85095a0201b1bf348766fb1e",
+      "sourcePath": "test-results/core-slimming-final-summary/before-after-summary.json"
+    },
+    {
+      "file": "initial/load/environment.json",
+      "size": 4947,
+      "sha256": "6b0cb39161c411335f2bd0e0df03383c001620dcc4382f40323cf56f7e05d1f1",
+      "sourcePath": "test-results/core-slimming-load-ab/environment.json"
+    },
+    {
+      "file": "initial/load/observations.jsonl",
+      "size": 1845973,
+      "sha256": "c3065c864060c9167d705dd69afbe9ce1d723438bd9be7f0c747d84870267364",
+      "sourcePath": "test-results/core-slimming-load-ab/observations.jsonl"
+    },
+    {
+      "file": "initial/startup/environment.json",
+      "size": 4726,
+      "sha256": "45eeed2d51457cfee4f40a41cd7b5831adf60ed745b97c406d343aa139f89e44",
+      "sourcePath": "test-results/core-slimming-startup-ab/environment.json"
+    },
+    {
+      "file": "initial/startup/observations.jsonl",
+      "size": 82527,
+      "sha256": "aa26952507c3029aa7335787981a479ca2eb002129a3a46f94f6f14de7cb98be",
+      "sourcePath": "test-results/core-slimming-startup-ab/observations.jsonl"
+    },
+    {
+      "file": "initial/summary/BEFORE_AFTER_SUMMARY.md",
+      "size": 6436,
+      "sha256": "d25f448085273109f3a34d9c4f77253283349f073914f76130db22563b7a883c",
+      "sourcePath": "test-results/core-slimming-initial-summary/BEFORE_AFTER_SUMMARY.md"
+    },
+    {
+      "file": "initial/summary/before-after-summary.json",
+      "size": 61938,
+      "sha256": "e150c1449fc7732eaf0ff81f3a1ec4cf7aec3891e63cc6983c195496725e24de",
+      "sourcePath": "test-results/core-slimming-initial-summary/before-after-summary.json"
+    },
+    {
+      "file": "measurement-audit.json",
+      "size": 21515,
+      "sha256": "737186f3305134741a5a72d0f08f167badc2bf49bef3ed70ef8da07863282c5b",
+      "sourcePath": "test-results/core-slimming-measurement-audit.json"
+    },
+    {
+      "file": "validation.json",
+      "size": 12324,
+      "sha256": "457522f963cccd64bf1cbc54adf4b7c364a6c5ccf21c375d9d05170de85b6dbc",
+      "sourcePath": "test-results/core-slimming-validation.json"
+    }
+  ]
+}

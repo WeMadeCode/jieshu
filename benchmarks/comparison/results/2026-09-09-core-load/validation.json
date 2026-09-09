@@ -1,0 +1,125 @@
+{
+  "date": "2026-09-09",
+  "coreCommit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746",
+  "scope": "Analysis and diagnostic tooling only. Core, adapters, production build configuration and dependencies unchanged from coreCommit. No new commit.",
+  "scripts": [
+    {
+      "file": "benchmarks/comparison/prepare-core-load-variants.mjs",
+      "sha256": "1f955166535a0aec8acdcdffca536dc8b087c5a30bc79a97ce3c5f080068b300"
+    },
+    {
+      "file": "benchmarks/comparison/measure-core-load-causes.mjs",
+      "sha256": "901535d4b2d446182380d8e13855123a243065c4fb867e9be11619717ae19d8d"
+    },
+    {
+      "file": "benchmarks/comparison/summarize-core-load-causes.mjs",
+      "sha256": "7c3d601a6eeae54a05b5ea4bc999f84259f390060937f0ccccd0ef005ec59300"
+    },
+    {
+      "file": "benchmarks/comparison/verify-core-load-variants.mjs",
+      "sha256": "bc3497d182e482f91fcb4d795507d86f0c362e88dbadc86fd91bdaa8c120975c"
+    }
+  ],
+  "commands": [
+    {
+      "command": "CORE_CAUSE_OUTPUT=test-results/core-load-causes-7 node benchmarks/comparison/prepare-core-load-variants.mjs",
+      "result": "Seven hash-verified variants; production baselines match previous measured bundles"
+    },
+    {
+      "command": "CORE_CAUSE_INPUT=test-results/core-load-causes-7 CORE_CAUSE_RUN=test-results/core-load-causes-7/preflight CORE_CAUSE_SAMPLES=1 CORE_CAUSE_TRACE_SAMPLES=1 node benchmarks/comparison/measure-core-load-causes.mjs",
+      "result": "42/42 import, transport and trace validations passed"
+    },
+    {
+      "command": "CORE_CAUSE_INPUT=test-results/core-load-causes-7 CORE_CAUSE_RUN=test-results/core-load-causes-7/formal node benchmarks/comparison/measure-core-load-causes.mjs",
+      "result": "980/980 untraced observations and 98/98 trace observations passed"
+    },
+    {
+      "command": "node benchmarks/comparison/summarize-core-load-causes.mjs test-results/core-load-causes-7/formal",
+      "result": "Completed; no missing groups or warnings"
+    },
+    {
+      "command": "CORE_VERIFY_INPUT=test-results/core-load-causes-7 CORE_VERIFY_OUTPUT=test-results/core-load-variant-runtime-verification-final.json node benchmarks/comparison/verify-core-load-variants.mjs",
+      "result": "8/8 independent instrumented diagnostics valid"
+    },
+    {
+      "command": "BENCH_OUTPUT=test-results/core-load-current-modules node benchmarks/comparison/analyze-bundle.mjs",
+      "result": "Eight diagnostic builds completed; ES2018 whole-core hashes match formal input"
+    }
+  ],
+  "formalValidation": {
+    "expectedNormalObservations": 980,
+    "normalObservations": 980,
+    "expectedTraceObservations": 98,
+    "traceObservations": 98,
+    "failedObservations": [],
+    "missingNormalGroups": [],
+    "missingTraceGroups": []
+  },
+  "analysisWarnings": [],
+  "runtimeValidation": {
+    "file": "test-results/core-load-variant-runtime-verification-final.json",
+    "sha256": "02376132e60f048d81d867ae2f389ad9fde4ebc39cb47cb52c742737aed634a7",
+    "validations": [
+      {
+        "name": "No uncaught import errors",
+        "valid": true
+      },
+      {
+        "name": "Empty control introduces no measured collections, listeners, exports or custom elements",
+        "valid": true
+      },
+      {
+        "name": "Skipping three AssetCache instances removes exactly 9 Map, 6 WeakMap and 3 WeakSet constructions",
+        "valid": true
+      },
+      {
+        "name": "Entry guard removes exactly one popstate registration and the custom element registration",
+        "valid": true
+      },
+      {
+        "name": "Wujie padding preserves complete export names and collection counts",
+        "valid": true
+      },
+      {
+        "name": "Jieshu partial guards preserve complete export names",
+        "valid": true
+      },
+      {
+        "name": "IIFE guards remove all observed core constructors, listeners and exports",
+        "valid": true
+      },
+      {
+        "name": "Each variant has the prepared expected startApp export presence",
+        "valid": true
+      }
+    ]
+  },
+  "checks": {
+    "syntax": "All four scripts passed node --check",
+    "eslint": {
+      "result": "passed",
+      "log": "test-results/core-load-analysis-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "prettier": {
+      "result": "passed",
+      "log": "test-results/core-load-analysis-format.log",
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    "gitDiffCheck": "passed",
+    "productionDiffAgainst557c51d": "empty",
+    "coreBehaviorTests": "Not repeated: no production source changes",
+    "statisticalSyntheticChecks": [
+      "median(A)-median(B), not median(A-B)",
+      "Fixed seed reproducibility",
+      "Paired-round exclusion on either side",
+      "Duplicate observation rejection"
+    ]
+  },
+  "limitations": [
+    "Skipped variants are intentionally functionally incomplete; passed import validation is not equivalence proof.",
+    "Guard experiments include initialization and any compilation/allocation it triggers; parsing/compilation policy may change.",
+    "Localhost, one machine/browser, fresh contexts, reused browser process. No promise of cold internal compilation caches or online-device parity.",
+    "Full bundles, source maps, heap snapshots and Chrome traces remain ignored."
+  ]
+}

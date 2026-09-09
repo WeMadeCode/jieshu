@@ -1,0 +1,733 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-09T15:09:00.643Z",
+  "status": "Measurement asymmetry discovered; original observations preserved, corrected same-Buffer sampling required before accepting/rejecting the optimization on total-load performance.",
+  "originalSampling": {
+    "loadStartedAt": "2026-09-09T15:02:37.508Z",
+    "browser": "151.0.7922.34",
+    "node": "v26.7.0",
+    "cpu": "Apple M1 Pro",
+    "observations": {
+      "normalCore": 360,
+      "coreTrace": 42,
+      "startup": 360,
+      "failures": 0
+    },
+    "bundleIdentities": {
+      "jieshu": {
+        "sha256": "757788c2652a764d5e00205108f3de5105a607a6a3fa1f18406a075b46a8e6e5",
+        "bundleBytes": 107474,
+        "gzipBytes": 32578,
+        "commit": "557c51d5d0b0be0f80c2c9a20606cb143cd55746"
+      },
+      "jieshu-before": {
+        "sha256": "3aff6614cb7d47525cd662c87ebbeeae74c8ba76fd02f92a660d8ea403f8c84e",
+        "bundleBytes": 108581,
+        "gzipBytes": 32708,
+        "commit": "bc688b28ff17b5d9fdad71ea2373885c5a953d1d"
+      },
+      "wujie": {
+        "sha256": "6a950d2373d9804976ceaca5e7b2085935629e10c1e66e373635b86dc00a6794",
+        "bundleBytes": 65660,
+        "gzipBytes": 19802,
+        "commit": "c45932998c0602f34454df8d3e29f4d33a38446a"
+      }
+    },
+    "sources": [
+      {
+        "file": "test-results/core-slimming-load-ab/environment.json",
+        "sha256": "6b0cb39161c411335f2bd0e0df03383c001620dcc4382f40323cf56f7e05d1f1"
+      },
+      {
+        "file": "test-results/core-slimming-load-ab/observations.jsonl",
+        "sha256": "c3065c864060c9167d705dd69afbe9ce1d723438bd9be7f0c747d84870267364"
+      },
+      {
+        "file": "test-results/core-slimming-load-ab/trace-summary.json",
+        "sha256": "422ec5479665c98deb40dcd256afa218963c5002b431a9d5bf96147eda75ded7"
+      },
+      {
+        "file": "test-results/core-slimming-startup-ab/environment.json",
+        "sha256": "45eeed2d51457cfee4f40a41cd7b5831adf60ed745b97c406d343aa139f89e44"
+      },
+      {
+        "file": "test-results/core-slimming-startup-ab/observations.jsonl",
+        "sha256": "aa26952507c3029aa7335787981a479ca2eb002129a3a46f94f6f14de7cb98be"
+      }
+    ],
+    "harnessSourceSha256": null,
+    "harnessSourceSha256Limitation": "The original harness source hashes were not captured in these environment files. The affected assignments and send path were directly inspected before correction; bundle and raw-result hashes above identify the preserved sample."
+  },
+  "issue": {
+    "title": "HTTP payload representation differs between freshly built and saved bundles",
+    "affectedHarnesses": [
+      {
+        "harness": "benchmarks/comparison/measure-core-load.mjs",
+        "currentAndWujie": "bundles[framework] = chunks[0].code; current generated code is a JavaScript string",
+        "savedBefore": "savedBundle = await readFile(beforeBundlePath); bundles[\"jieshu-before\"] = savedBundle; saved code is a Buffer",
+        "httpSend": "response.end(bundles[framework])"
+      },
+      {
+        "harness": "benchmarks/comparison/run.mjs",
+        "currentAndWujie": "bundles[framework] = chunks[0].code; current generated code is a JavaScript string",
+        "savedBefore": "readBeforeBundle reads with fs.readFile without text encoding; bundles[\"jieshu-before\"] = beforeBundle.bundle; saved code is a Buffer",
+        "httpSend": "response.end(bundles[framework])"
+      }
+    ],
+    "mechanism": "Current/Wujie responses take the Node string response path, requiring UTF-8 encoding during response handling; the saved-before response takes the pre-encoded Buffer path. Equal URLs and identical HTTP headers do not equalize this server-side preparation work.",
+    "causalStatus": "The asymmetry is confirmed in source. Its exact latency contribution is not proven by this run; TTFB includes other server, scheduling and transport work. Corrected byte-type parity is required to test the causal hypothesis."
+  },
+  "loadComparisons": [
+    {
+      "encoding": "legacy",
+      "metrics": {
+        "totalLoadMs": {
+          "currentMedian": 4.4,
+          "beforeMedian": 4.35,
+          "medianDifference": 0.05,
+          "confidenceInterval95": [
+            -0.1,
+            0.1
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "requestAndResponseMs": {
+          "currentMedian": 1.1,
+          "beforeMedian": 0.9,
+          "medianDifference": 0.2,
+          "confidenceInterval95": [
+            0.1,
+            0.2
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "responseEndToOnloadMs": {
+          "currentMedian": 2.8,
+          "beforeMedian": 2.9,
+          "medianDifference": -0.1,
+          "confidenceInterval95": [
+            -0.2,
+            0
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "scriptDurationMs": {
+          "currentMedian": 0.451,
+          "beforeMedian": 0.49,
+          "medianDifference": -0.039,
+          "confidenceInterval95": [
+            -0.052,
+            -0.018
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "v8CompileDurationMs": {
+          "currentMedian": 0.013,
+          "beforeMedian": 0.014,
+          "medianDifference": -0.001,
+          "confidenceInterval95": [
+            -0.002,
+            0
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "heapDeltaBytes": {
+          "currentMedian": 216672,
+          "beforeMedian": 217956,
+          "medianDifference": -1284,
+          "confidenceInterval95": [
+            -1284,
+            -1284
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        }
+      }
+    },
+    {
+      "encoding": "utf8",
+      "metrics": {
+        "totalLoadMs": {
+          "currentMedian": 4.4,
+          "beforeMedian": 4.2,
+          "medianDifference": 0.2,
+          "confidenceInterval95": [
+            0.1,
+            0.25
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "requestAndResponseMs": {
+          "currentMedian": 1.1,
+          "beforeMedian": 0.9,
+          "medianDifference": 0.2,
+          "confidenceInterval95": [
+            0.1,
+            0.2
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "responseEndToOnloadMs": {
+          "currentMedian": 2.8,
+          "beforeMedian": 2.8,
+          "medianDifference": 0,
+          "confidenceInterval95": [
+            -0.1,
+            0
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "scriptDurationMs": {
+          "currentMedian": 0.451,
+          "beforeMedian": 0.5015,
+          "medianDifference": -0.0505,
+          "confidenceInterval95": [
+            -0.07,
+            -0.028
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "v8CompileDurationMs": {
+          "currentMedian": 0.013,
+          "beforeMedian": 0.014,
+          "medianDifference": -0.001,
+          "confidenceInterval95": [
+            -0.001,
+            0.0005
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        },
+        "heapDeltaBytes": {
+          "currentMedian": 216100,
+          "beforeMedian": 217384,
+          "medianDifference": -1284,
+          "confidenceInterval95": [
+            -1284,
+            -1284
+          ],
+          "n": 60,
+          "excludedRounds": 0
+        }
+      }
+    }
+  ],
+  "requestBreakdownMs": [
+    {
+      "encoding": "utf8",
+      "framework": "wujie",
+      "fields": {
+        "requestScheduling": {
+          "n": 60,
+          "median": 0.40000000037252903,
+          "min": 0.19999999925494194,
+          "max": 0.8000000007450581,
+          "p95": 0.6050000004936007
+        },
+        "ttfb": {
+          "n": 60,
+          "median": 0.40000000037252903,
+          "min": 0.2999999998137355,
+          "max": 0.7000000001862645,
+          "p95": 0.5
+        },
+        "body": {
+          "n": 60,
+          "median": 0.20000000018626451,
+          "min": 0.09999999962747097,
+          "max": 0.7000000001862645,
+          "p95": 0.40000000037252903
+        },
+        "probeToResource": {
+          "n": 60,
+          "median": 0.5,
+          "min": 0.39999999944120646,
+          "max": 0.7000000001862645,
+          "p95": 0.7000000001862645
+        }
+      },
+      "bodyBytes": [
+        65660
+      ]
+    },
+    {
+      "encoding": "utf8",
+      "framework": "jieshu-before",
+      "fields": {
+        "requestScheduling": {
+          "n": 60,
+          "median": 0.39999999944120646,
+          "min": 0.2999999998137355,
+          "max": 0.900000000372529,
+          "p95": 0.5049999999813732
+        },
+        "ttfb": {
+          "n": 60,
+          "median": 0.2999999998137355,
+          "min": 0.19999999925494194,
+          "max": 0.40000000037252903,
+          "p95": 0.40000000037252903
+        },
+        "body": {
+          "n": 60,
+          "median": 0.20000000018626451,
+          "min": 0.09999999962747097,
+          "max": 0.40000000037252903,
+          "p95": 0.30000000074505806
+        },
+        "probeToResource": {
+          "n": 60,
+          "median": 0.5,
+          "min": 0.39999999944120646,
+          "max": 0.7000000001862645,
+          "p95": 0.6999999992549419
+        }
+      },
+      "bodyBytes": [
+        108581
+      ]
+    },
+    {
+      "encoding": "utf8",
+      "framework": "jieshu",
+      "fields": {
+        "requestScheduling": {
+          "n": 60,
+          "median": 0.39999999944120646,
+          "min": 0.19999999925494194,
+          "max": 0.900000000372529,
+          "p95": 0.5
+        },
+        "ttfb": {
+          "n": 60,
+          "median": 0.5,
+          "min": 0.30000000074505806,
+          "max": 1.099999999627471,
+          "p95": 0.6000000005587935
+        },
+        "body": {
+          "n": 60,
+          "median": 0.20000000018626451,
+          "min": 0.09999999962747097,
+          "max": 0.6000000005587935,
+          "p95": 0.30000000074505806
+        },
+        "probeToResource": {
+          "n": 60,
+          "median": 0.5,
+          "min": 0.40000000037252903,
+          "max": 0.7000000001862645,
+          "p95": 0.7000000001862645
+        }
+      },
+      "bodyBytes": [
+        107474
+      ]
+    },
+    {
+      "encoding": "legacy",
+      "framework": "wujie",
+      "fields": {
+        "requestScheduling": {
+          "n": 60,
+          "median": 0.40000000037252903,
+          "min": 0.19999999925494194,
+          "max": 0.599999999627471,
+          "p95": 0.5
+        },
+        "ttfb": {
+          "n": 60,
+          "median": 0.39999999990686774,
+          "min": 0.2999999998137355,
+          "max": 0.5,
+          "p95": 0.5
+        },
+        "body": {
+          "n": 60,
+          "median": 0.20000000018626451,
+          "min": 0.09999999962747097,
+          "max": 0.30000000074505806,
+          "p95": 0.30000000074505806
+        },
+        "probeToResource": {
+          "n": 60,
+          "median": 0.599999999627471,
+          "min": 0.39999999944120646,
+          "max": 0.8000000007450581,
+          "p95": 0.699999999301508
+        }
+      },
+      "bodyBytes": [
+        65660
+      ]
+    },
+    {
+      "encoding": "legacy",
+      "framework": "jieshu-before",
+      "fields": {
+        "requestScheduling": {
+          "n": 60,
+          "median": 0.40000000037252903,
+          "min": 0.2999999998137355,
+          "max": 0.6000000005587935,
+          "p95": 0.6000000005587935
+        },
+        "ttfb": {
+          "n": 60,
+          "median": 0.2999999998137355,
+          "min": 0.19999999925494194,
+          "max": 0.40000000037252903,
+          "p95": 0.40000000037252903
+        },
+        "body": {
+          "n": 60,
+          "median": 0.20000000018626451,
+          "min": 0,
+          "max": 0.6000000005587935,
+          "p95": 0.3050000007264313
+        },
+        "probeToResource": {
+          "n": 60,
+          "median": 0.599999999627471,
+          "min": 0.39999999944120646,
+          "max": 0.7000000001862645,
+          "p95": 0.7000000001862645
+        }
+      },
+      "bodyBytes": [
+        108581
+      ]
+    },
+    {
+      "encoding": "legacy",
+      "framework": "jieshu",
+      "fields": {
+        "requestScheduling": {
+          "n": 60,
+          "median": 0.40000000037252903,
+          "min": 0.20000000018626451,
+          "max": 0.8999999994412065,
+          "p95": 0.5049999999813732
+        },
+        "ttfb": {
+          "n": 60,
+          "median": 0.5,
+          "min": 0.2999999998137355,
+          "max": 0.8999999994412065,
+          "p95": 0.6000000005587935
+        },
+        "body": {
+          "n": 60,
+          "median": 0.20000000018626451,
+          "min": 0.09999999962747097,
+          "max": 0.6000000005587935,
+          "p95": 0.2999999998137355
+        },
+        "probeToResource": {
+          "n": 60,
+          "median": 0.599999999627471,
+          "min": 0.39999999944120646,
+          "max": 0.7000000001862645,
+          "p95": 0.7000000001862645
+        }
+      },
+      "bodyBytes": [
+        107474
+      ]
+    }
+  ],
+  "traceOverviewMs": [
+    {
+      "encoding": "utf8",
+      "framework": "wujie",
+      "exactUrlDurations": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 1.331,
+          "min": 1.163,
+          "max": 1.627,
+          "p95": 1.5543999999999998
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.395,
+          "min": 0.323,
+          "max": 0.422,
+          "p95": 0.42019999999999996
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.022,
+          "min": 0.017,
+          "max": 0.024,
+          "p95": 0.024
+        }
+      }
+    },
+    {
+      "encoding": "utf8",
+      "framework": "jieshu-before",
+      "exactUrlDurations": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.283,
+          "min": 2.084,
+          "max": 2.985,
+          "p95": 2.8613999999999997
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.66,
+          "min": 0.538,
+          "max": 0.766,
+          "p95": 0.7558
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.024,
+          "min": 0.018,
+          "max": 0.027,
+          "p95": 0.026699999999999998
+        }
+      }
+    },
+    {
+      "encoding": "utf8",
+      "framework": "jieshu",
+      "exactUrlDurations": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.116,
+          "min": 2.092,
+          "max": 2.5,
+          "p95": 2.4667
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.581,
+          "min": 0.511,
+          "max": 0.634,
+          "p95": 0.6328
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.021,
+          "min": 0.019,
+          "max": 0.026,
+          "p95": 0.0257
+        }
+      }
+    },
+    {
+      "encoding": "legacy",
+      "framework": "wujie",
+      "exactUrlDurations": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 1.26,
+          "min": 1.161,
+          "max": 1.401,
+          "p95": 1.4001
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.365,
+          "min": 0.322,
+          "max": 0.38,
+          "p95": 0.3797
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.021,
+          "min": 0.017,
+          "max": 0.024,
+          "p95": 0.024
+        }
+      }
+    },
+    {
+      "encoding": "legacy",
+      "framework": "jieshu-before",
+      "exactUrlDurations": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.272,
+          "min": 2.175,
+          "max": 2.713,
+          "p95": 2.6178999999999997
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.626,
+          "min": 0.558,
+          "max": 0.773,
+          "p95": 0.7567999999999999
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.023,
+          "min": 0.02,
+          "max": 0.031,
+          "p95": 0.029499999999999995
+        }
+      }
+    },
+    {
+      "encoding": "legacy",
+      "framework": "jieshu",
+      "exactUrlDurations": {
+        "v8.parseOnBackground": {
+          "n": 7,
+          "median": 2.217,
+          "min": 2.058,
+          "max": 2.854,
+          "p95": 2.7051999999999996
+        },
+        "EvaluateScript": {
+          "n": 7,
+          "median": 0.578,
+          "min": 0.51,
+          "max": 0.716,
+          "p95": 0.6910999999999999
+        },
+        "v8.compile": {
+          "n": 7,
+          "median": 0.024,
+          "min": 0.02,
+          "max": 0.038,
+          "p95": 0.03559999999999999
+        }
+      }
+    }
+  ],
+  "startupComparisons": [
+    {
+      "scenario": "cold",
+      "coreLoadMs": {
+        "currentMedian": 5.9,
+        "beforeMedian": 5.8,
+        "medianDifference": 0.1,
+        "confidenceInterval95": [
+          -0.05,
+          0.1
+        ],
+        "n": 30,
+        "excludedRounds": 0
+      },
+      "readyMs": {
+        "currentMedian": 34.75,
+        "beforeMedian": 35,
+        "medianDifference": -0.25,
+        "confidenceInterval95": [
+          -1.15,
+          0.6
+        ],
+        "n": 30,
+        "excludedRounds": 0
+      }
+    },
+    {
+      "scenario": "cold-fiber",
+      "coreLoadMs": {
+        "currentMedian": 6,
+        "beforeMedian": 5.9,
+        "medianDifference": 0.1,
+        "confidenceInterval95": [
+          0,
+          0.2
+        ],
+        "n": 30,
+        "excludedRounds": 0
+      },
+      "readyMs": {
+        "currentMedian": 45.1,
+        "beforeMedian": 45.15,
+        "medianDifference": -0.05,
+        "confidenceInterval95": [
+          -1.55,
+          1.65125
+        ],
+        "n": 30,
+        "excludedRounds": 0
+      }
+    },
+    {
+      "scenario": "concurrent-5",
+      "coreLoadMs": {
+        "currentMedian": 6.1,
+        "beforeMedian": 5.9,
+        "medianDifference": 0.2,
+        "confidenceInterval95": [
+          0.1,
+          0.3
+        ],
+        "n": 30,
+        "excludedRounds": 0
+      },
+      "readyMs": {
+        "currentMedian": 71.5,
+        "beforeMedian": 71.6,
+        "medianDifference": -0.1,
+        "confidenceInterval95": [
+          -1.05,
+          0.7
+        ],
+        "n": 30,
+        "excludedRounds": 0
+      }
+    },
+    {
+      "scenario": "cpu4x",
+      "coreLoadMs": {
+        "currentMedian": 10.15,
+        "beforeMedian": 10.1,
+        "medianDifference": 0.05,
+        "confidenceInterval95": [
+          -0.3,
+          0.45
+        ],
+        "n": 30,
+        "excludedRounds": 0
+      },
+      "readyMs": {
+        "currentMedian": 125.65,
+        "beforeMedian": 125.55,
+        "medianDifference": 0.1,
+        "confidenceInterval95": [
+          -1.6,
+          2
+        ],
+        "n": 30,
+        "excludedRounds": 0
+      }
+    }
+  ],
+  "interpretation": [
+    "UTF-8 normal observations: total-load median is current 4.4 ms versus before 4.2 ms, paired difference +0.2 ms with bootstrap 95% CI [0.1,0.25]. Request/response differs by +0.2 ms [0.1,0.2]; response-end to onload differs by 0 ms [-0.1,0]. Medians are not additive exact attribution.",
+    "The request breakdown localizes the descriptive gap to TTFB: current 0.5 ms versus before 0.3 ms in both UTF-8 and legacy. Request scheduling is about 0.4 ms and body transfer 0.2 ms for both. Before sends 108581 bytes and current 107474 bytes, so the smaller current payload does not explain slower TTFB by payload byte count alone.",
+    "Independent traced UTF-8 medians move in the opposite direction: current/before background preparation 2.116/2.283 ms, EvaluateScript 0.581/0.660 ms and main compile 0.021/0.024 ms. The observed total-load increase is not explained by these traced CPU phases.",
+    "The trace phase values come from 7 samples per framework/encoding, while normal load comparisons use 60 paired rounds. Tracing changes cost and collection occurs later; these datasets cannot be subtracted to produce exact causal shares.",
+    "The initial four-scenario startup dataset includes the same HTTP representation asymmetry in coreLoadMs. readyMs begins after core loading and fixture installation, so it is a distinct child-start metric and cannot alone establish that overall first entry improves."
+  ],
+  "recommendations": [
+    "Encode all current, before and Wujie bundles once to Buffer before sampling. Use the identical server send path for all variants and record the payload representation in environment metadata.",
+    "Retain the existing frozen bundle SHA checks, balanced round ordering and equal-length Jieshu routes; normalizing payload types must not change the source bytes or behavior.",
+    "Repeat formal current/before core load and startup comparisons after the correction. Keep this original dataset as an identified measurement issue rather than overwriting it or presenting it as validated optimization regression.",
+    "The six-component diagnostic harness already loads all prepared raw/gzip assets as Buffer. Its independent results can evaluate candidate components without this specific asymmetry."
+  ],
+  "limitations": [
+    "No production source was changed during this audit.",
+    "No new browser measurement was run during this audit.",
+    "These bootstrap intervals describe within-run paired resampling uncertainty; no significance conclusion is made.",
+    "Background preparation includes parsing, preparsing and compilation; main compile is nested in EvaluateScript. Inclusive phase durations must not be summed."
+  ]
+}

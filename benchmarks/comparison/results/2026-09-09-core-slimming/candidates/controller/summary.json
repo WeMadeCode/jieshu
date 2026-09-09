@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-09-09T14:53:31.759Z",
+  "scope": "All core source files frozen in memory before candidate build; only controller changes between builds",
+  "sourceFilesSha256": "03d64ef003f17ecb7a49f5278278460c59b5b9e99639005052b544b78fa2da0e",
+  "output": "/Users/zhouxiang/Documents/Github/jieshu/test-results/controller-load-candidate-BQcojG",
+  "results": [
+    {
+      "candidate": "baseline",
+      "rawBytes": 108349,
+      "gzipBytes": 32692,
+      "sha256": "40241cbbe8bde2b41aea55158418eda4cded68a29a23b326367fbb5760c2b384"
+    },
+    {
+      "candidate": "shared",
+      "rawBytes": 107692,
+      "gzipBytes": 32626,
+      "sha256": "112e5d06cb22de0539d98c4fe1ce578d919f58ae71f0805d42445b16745951bc"
+    }
+  ],
+  "delta": {
+    "rawBytes": -657,
+    "gzipBytes": -66
+  }
+}

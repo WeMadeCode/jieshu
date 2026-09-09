@@ -64,7 +64,8 @@ for (const framework of frameworks) {
   if (chunks.length !== 1) {
     throw new Error(`Expected exactly one ${framework} core chunk`);
   }
-  bundles[framework] = chunks[0].code;
+  // Encode all variants before sampling; frozen bundles are also byte buffers.
+  bundles[framework] = Buffer.from(chunks[0].code);
   revisions[framework] = {
     commit: git(repository, ['rev-parse', 'HEAD']),
     status: git(repository, ['status', '--short']),
@@ -208,6 +209,7 @@ try {
       .version,
     vite: JSON.parse(await readFile(path.join(root, 'node_modules/vite/package.json'), 'utf8')).version,
     revisions,
+    bundleTransport: 'All core bundles are UTF-8 buffers prepared before sampling; no per-request string encoding.',
     build: { target: 'es2018', minify: true, format: 'iife', mode: 'production' },
     method: [
       beforeBundlePath

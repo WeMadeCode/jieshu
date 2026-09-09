@@ -293,4 +293,90 @@ describe('RuntimeAppController', () => {
     expect(start).toHaveBeenCalledTimes(1);
     expect(start).toHaveBeenCalledWith(expect.objectContaining({ url: 'https://example.test/latest' }));
   });
+
+  const staleCleanupCases: Array<{ operation: 'start' | 'refresh'; rejects: boolean }> = [
+    { operation: 'start', rejects: false },
+    { operation: 'start', rejects: true },
+    { operation: 'refresh', rejects: false },
+    { operation: 'refresh', rejects: true },
+  ];
+
+  test.each(staleCleanupCases)(
+    '$operation preserves its pending-name lifetime during stale cleanup (rejects: $rejects)',
+    async ({ operation, rejects }) => {
+      const firstResult = deferred<DestroyHandler | void>();
+      const cleanup = deferred<void>();
+      const failure = new Error('stale cleanup failed');
+      const staleDestroy = vi.fn(() => cleanup.promise);
+      const destroy = vi.fn(async () => undefined);
+      const invoke = vi.fn<AppRuntime['start']>().mockReturnValueOnce(firstResult.promise).mockResolvedValue(undefined);
+      const controller = new RuntimeAppController(runtime({ [operation]: invoke, destroy }));
+
+      const firstRun = controller[operation](options());
+      await controller.start(options());
+      firstResult.resolve(staleDestroy);
+      await Promise.resolve();
+      expect(staleDestroy).toHaveBeenCalledTimes(1);
+
+      controller.dispose();
+      // Start has already removed this pending name; refresh keeps it until cleanup settles.
+      expect(destroy).toHaveBeenCalledTimes(operation === 'refresh' ? 1 : 0);
+      if (operation === 'refresh') {
+        expect(destroy).toHaveBeenCalledWith('catalog');
+      }
+
+      if (rejects) {
+        const rejected = expect(firstRun).rejects.toBe(failure);
+        cleanup.reject(failure);
+        await rejected;
+      } else {
+        cleanup.resolve();
+        await expect(firstRun).resolves.toBeUndefined();
+      }
+      controller.dispose();
+      expect(staleDestroy).toHaveBeenCalledTimes(1);
+      expect(destroy).toHaveBeenCalledTimes(operation === 'refresh' ? 1 : 0);
+    },
+  );
+
+  const operations: Array<'start' | 'refresh'> = ['start', 'refresh'];
+  test.each(operations)(
+    '%s preserves the runtime receiver and clears pending state after a synchronous throw',
+    async (operation) => {
+      const failure = new Error('runtime failed synchronously');
+      const destroy = vi.fn(async () => undefined);
+      let receiver: AppRuntime | undefined;
+      // The runtime contract permits methods that depend on their dynamic receiver.
+      const invoke = function (this: AppRuntime) {
+        receiver = this;
+        throw failure;
+      };
+      const appRuntime = runtime({ [operation]: invoke, destroy });
+      const controller = new RuntimeAppController(appRuntime);
+
+      await expect(controller[operation](options())).rejects.toBe(failure);
+      expect(receiver).toBe(appRuntime);
+      controller.dispose();
+      expect(destroy).not.toHaveBeenCalled();
+    },
+  );
+
+  test('carries the release barrier through superseded refreshes before invoking the latest runtime', async () => {
+    const released = deferred<void>();
+    const refresh = vi.fn(async () => undefined);
+    const destroy = vi.fn(() => released.promise);
+    const controller = new RuntimeAppController(runtime({ refresh, destroy }));
+    await controller.start(options('catalog'));
+
+    const checkout = controller.refresh(options('checkout'));
+    const reports = controller.refresh(options('reports'));
+    expect(destroy).toHaveBeenCalledTimes(1);
+    expect(destroy).toHaveBeenCalledWith('catalog');
+    expect(refresh).not.toHaveBeenCalled();
+
+    released.resolve();
+    await Promise.all([checkout, reports]);
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(refresh).toHaveBeenCalledWith(expect.objectContaining({ name: 'reports' }));
+  });
 });
