@@ -55,7 +55,7 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      complexity: ['error', { max: 30 }],
+      complexity: ['error', { max: 20 }],
       'no-console': 'off',
       'no-debugger': 'warn',
       'no-empty': ['error', { allowEmptyCatch: true }],

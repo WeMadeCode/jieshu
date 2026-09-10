@@ -30,8 +30,7 @@ const resolveBooleanOption = (value: boolean | undefined, cached: boolean | unde
   return cached !== undefined ? cached : fallback;
 };
 
-export function resolveOptions(options: CacheOptions, cacheOptions?: CacheOptions | null): ResolvedOptions {
-  const cached = cacheOptions ?? undefined;
+const resolveResourceOptions = (options: CacheOptions, cached?: CacheOptions) => {
   return {
     name: options.name,
     el: options.el || cached?.el,
@@ -41,6 +40,20 @@ export function resolveOptions(options: CacheOptions, cacheOptions?: CacheOption
     replace: options.replace || cached?.replace,
     fetch: options.fetch || cached?.fetch,
     props: options.props || cached?.props,
+  };
+};
+
+const resolveIframeEvents = (options: CacheOptions, cached?: CacheOptions) => {
+  return {
+    iframeAddEventListeners: options.iframeAddEventListeners || cached?.iframeAddEventListeners || [],
+    iframeOnEvents: options.iframeOnEvents || cached?.iframeOnEvents || [],
+  };
+};
+
+export const resolveOptions = (options: CacheOptions, cacheOptions?: CacheOptions | null) => {
+  const cached = cacheOptions ?? undefined;
+  const resolved: ResolvedOptions = {
+    ...resolveResourceOptions(options, cached),
     sync: resolveBooleanOption(options.sync, cached?.sync, false),
     prefix: options.prefix || cached?.prefix,
     loading: options.loading || cached?.loading,
@@ -48,11 +61,11 @@ export function resolveOptions(options: CacheOptions, cacheOptions?: CacheOption
     fiber: resolveBooleanOption(options.fiber, cached?.fiber, true),
     alive: resolveBooleanOption(options.alive, cached?.alive, false),
     plugins: options.plugins || cached?.plugins || [],
-    iframeAddEventListeners: options.iframeAddEventListeners || cached?.iframeAddEventListeners || [],
-    iframeOnEvents: options.iframeOnEvents || cached?.iframeOnEvents || [],
+    ...resolveIframeEvents(options, cached),
     lifecycles: resolveLifecycles(options, cached),
   };
-}
+  return resolved;
+};
 
 export type ResolvedStartOptions = ResolvedOptions & { el: HTMLElement | string };
 

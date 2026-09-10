@@ -153,13 +153,17 @@ for (const scenario of ['plain', 'repeat', 'host-between', 'host-last', 'multipl
             html,
             props: { record: (label: string) => trace.push(label) },
           });
-          const first = getJieshuById('window-owner-a');
-          const second = getJieshuById('window-owner-b');
-          const writeFirst = first?.iframe.contentWindow?.__writeWindowHandler;
-          const writeSecond = second?.iframe.contentWindow?.__writeWindowHandler;
-          if (!first || !second || !writeFirst || !writeSecond) {
-            throw new Error('Both applications must expose child-realm handler writers');
-          }
+          const readEventOwners = () => {
+            const first = getJieshuById('window-owner-a');
+            const second = getJieshuById('window-owner-b');
+            const writeFirst = first?.iframe.contentWindow?.__writeWindowHandler;
+            const writeSecond = second?.iframe.contentWindow?.__writeWindowHandler;
+            if (!first || !second || !writeFirst || !writeSecond) {
+              throw new Error('Both applications must expose child-realm handler writers');
+            }
+            return { first, second, writeFirst, writeSecond };
+          };
+          const { first, second, writeFirst, writeSecond } = readEventOwners();
           const firstIframe = first.iframe;
           const secondIframe = second.iframe;
           const independentCopies =

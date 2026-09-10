@@ -225,6 +225,24 @@ const readAttributeValue = (source: string, start: number, tagEnd: number) => {
   return { value: decodeAttributeEntities(source.slice(start, cursor)), end: cursor };
 };
 
+const readAttributeName = (source: string, start: number, tagEnd: number) => {
+  let cursor = start;
+  while (cursor < tagEnd - 1) {
+    const character = source[cursor];
+    if (isWhitespace(character) || character === '=') {
+      break;
+    }
+    if (character === '>') {
+      break;
+    }
+    if (character === '/' && source[cursor + 1] === '>') {
+      break;
+    }
+    cursor += 1;
+  }
+  return { name: source.slice(start, cursor), end: cursor };
+};
+
 /**
  * Parse quoted, unquoted and boolean HTML attributes, preserving name spelling
  * and decoding attribute entities. Later duplicates retain last-write-wins behavior.
@@ -252,20 +270,8 @@ export const parseTagAttributes = (tagOuterHTML: string) => {
       break;
     }
 
-    const nameStart = cursor;
-    while (cursor < tagEnd - 1) {
-      const character = tagOuterHTML[cursor];
-      if (
-        isWhitespace(character) ||
-        character === '=' ||
-        character === '>' ||
-        (character === '/' && tagOuterHTML[cursor + 1] === '>')
-      ) {
-        break;
-      }
-      cursor += 1;
-    }
-    const name = tagOuterHTML.slice(nameStart, cursor);
+    const { name, end: nameEnd } = readAttributeName(tagOuterHTML, cursor, tagEnd);
+    cursor = nameEnd;
     if (!name) {
       cursor += 1;
       continue;
@@ -421,18 +427,30 @@ function closeElementContext(stack: ElementContext[], name: string): void {
   }
 }
 
+const isTemplateTextElement = (name: string, namespace: 'html' | ForeignNamespace) => {
+  if (name === 'script' || name === 'style') {
+    return true;
+  }
+  if (namespace !== 'html') {
+    return false;
+  }
+  return RCDATA_TAGS.has(name) || RAW_TEXT_TAGS.has(name);
+};
+
 /**
  * A template subtree is parsed HTML but remains inert until explicitly cloned.
  * Track nested templates while skipping text-state elements so a literal
  * `</template>` inside script/RCDATA cannot close the outer inert subtree.
  */
-function findTemplateEnd(source: string, start: number): number {
+const findTemplateEnd = (source: string, start: number) => {
   let depth = 1;
   let cursor = start;
   const stack: ElementContext[] = [{ name: 'template', namespace: 'html', htmlIntegrationPoint: false }];
   while (cursor < source.length) {
     const tagStart = source.indexOf('<', cursor);
-    if (tagStart < 0) return source.length;
+    if (tagStart < 0) {
+      return source.length;
+    }
     if (source.startsWith('<!--', tagStart)) {
       cursor = consumeComment(source, tagStart).end;
       continue;
@@ -454,7 +472,9 @@ function findTemplateEnd(source: string, start: number): number {
       }
       if (closingTag.name === 'template') {
         depth -= 1;
-        if (depth === 0) return closingTag.end;
+        if (depth === 0) {
+          return closingTag.end;
+        }
       }
       closeElementContext(stack, closingTag.name);
       cursor = closingTag.end;
@@ -476,12 +496,10 @@ function findTemplateEnd(source: string, start: number): number {
       cursor = openingTag.end;
       continue;
     }
-    if (namespace === 'html' && openingTag.name === 'plaintext') return source.length;
-    if (
-      openingTag.name === 'script' ||
-      openingTag.name === 'style' ||
-      (namespace === 'html' && (RCDATA_TAGS.has(openingTag.name) || RAW_TEXT_TAGS.has(openingTag.name)))
-    ) {
+    if (namespace === 'html' && openingTag.name === 'plaintext') {
+      return source.length;
+    }
+    if (isTemplateTextElement(openingTag.name, namespace)) {
       cursor = findClosingTag(source, openingTag.name, openingTag.end)?.end ?? source.length;
       continue;
     }
@@ -489,7 +507,7 @@ function findTemplateEnd(source: string, start: number): number {
     cursor = openingTag.end;
   }
   return source.length;
-}
+};
 
 function findOpaqueContextEnd(
   source: string,
@@ -767,6 +785,19 @@ class TemplateCompiler {
     return getInlineStyleReplaceSymbol(index);
   }
 
+  private compileExternalScript = (token: BlockToken, source: string, baseScript: ScriptBaseObject) => {
+    const async = hasAttribute(token.attributes, 'async');
+    const defer = hasAttribute(token.attributes, 'defer');
+    this.scripts.push(async || defer ? { ...baseScript, src: source, async, defer } : { ...baseScript, src: source });
+    let executionMode = '';
+    if (async) {
+      executionMode = 'async';
+    } else if (defer) {
+      executionMode = 'defer';
+    }
+    return genScriptReplaceSymbol(source, executionMode);
+  };
+
   private compileScript = (token: BlockToken) => {
     const scriptType = stringAttribute(token.attributes, 'type');
     if (!isValidJavaScriptType(scriptType)) {
@@ -809,16 +840,7 @@ class TemplateCompiler {
     };
 
     if (source) {
-      const async = hasAttribute(token.attributes, 'async');
-      const defer = hasAttribute(token.attributes, 'defer');
-      this.scripts.push(async || defer ? { ...baseScript, src: source, async, defer } : { ...baseScript, src: source });
-      let executionMode = '';
-      if (async) {
-        executionMode = 'async';
-      } else if (defer) {
-        executionMode = 'defer';
-      }
-      return genScriptReplaceSymbol(source, executionMode);
+      return this.compileExternalScript(token, source, baseScript);
     }
 
     const isPureCommentBlock = token.content

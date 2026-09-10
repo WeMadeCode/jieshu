@@ -489,70 +489,74 @@ const scenarios = [
   },
 ];
 
+const runStabilityScenario = async ({ openPage, record, round, scenario, framework }) => {
+  let opened;
+  let passed = false;
+  let error;
+  let timer;
+  let observations;
+  try {
+    opened = await openPage(framework);
+    opened.page.setDefaultTimeout(TIMEOUT_MS);
+    await opened.page.evaluate(() => {
+      for (const id of ['stability-primary', 'stability-secondary']) {
+        const container = document.createElement('div');
+        container.id = id;
+        document.body.append(container);
+      }
+    });
+    observations = await Promise.race([
+      scenario.run(opened.page, opened.errors),
+      new Promise((unused, reject) => {
+        timer = setTimeout(() => reject(new Error('Scenario exceeded the 15 second deadline.')), 15000);
+      }),
+    ]);
+    const unexpectedErrors = opened.errors.slice(observations?.expectedPageErrorCount ?? 0);
+    check(unexpectedErrors.length === 0, 'The browser reported uncaught JavaScript errors.', {
+      scenarioObservations: observations,
+      unexpectedErrors,
+    });
+    passed = true;
+  } catch (cause) {
+    error = { message: String(cause?.message ?? cause), stack: String(cause?.stack ?? '') };
+    observations = {
+      failureObservations: cause?.observations ?? observations,
+      browserState: opened ? await failureSnapshot(opened.page) : undefined,
+    };
+  } finally {
+    clearTimeout(timer);
+    if (opened) {
+      try {
+        await opened.context.close();
+      } catch (cause) {
+        passed = false;
+        error = { ...error, cleanupError: String(cause) };
+      }
+    }
+  }
+  await record({
+    kind: 'stability',
+    framework,
+    scenario: scenario.name,
+    round,
+    passed,
+    details: {
+      contract: scenario.contract ?? 'shared-public-behavior',
+      expected: scenario.expected,
+      observations,
+    },
+    error,
+    pageErrors: opened?.errors ?? [],
+    diagnostics: opened?.diagnostics,
+  });
+};
+
 export const runStability = async ({ openPage, record, rounds = 3 }) => {
   for (let round = 0; round < rounds; round += 1) {
     const frameworks = round % 2 === 0 ? ['wujie', 'jieshu'] : ['jieshu', 'wujie'];
     for (const scenario of scenarios) {
       for (const framework of frameworks) {
-        let opened;
-        let passed = false;
-        let error;
-        let timer;
-        let observations;
-        try {
-          opened = await openPage(framework);
-          opened.page.setDefaultTimeout(TIMEOUT_MS);
-          await opened.page.evaluate(() => {
-            for (const id of ['stability-primary', 'stability-secondary']) {
-              const container = document.createElement('div');
-              container.id = id;
-              document.body.append(container);
-            }
-          });
-          observations = await Promise.race([
-            scenario.run(opened.page, opened.errors),
-            new Promise((unused, reject) => {
-              timer = setTimeout(() => reject(new Error('Scenario exceeded the 15 second deadline.')), 15000);
-            }),
-          ]);
-          const unexpectedErrors = opened.errors.slice(observations?.expectedPageErrorCount ?? 0);
-          check(unexpectedErrors.length === 0, 'The browser reported uncaught JavaScript errors.', {
-            scenarioObservations: observations,
-            unexpectedErrors,
-          });
-          passed = true;
-        } catch (cause) {
-          error = { message: String(cause?.message ?? cause), stack: String(cause?.stack ?? '') };
-          observations = {
-            failureObservations: cause?.observations ?? observations,
-            browserState: opened ? await failureSnapshot(opened.page) : undefined,
-          };
-        } finally {
-          clearTimeout(timer);
-          if (opened) {
-            try {
-              await opened.context.close();
-            } catch (cause) {
-              passed = false;
-              error = { ...error, cleanupError: String(cause) };
-            }
-          }
-        }
-        await record({
-          kind: 'stability',
-          framework,
-          scenario: scenario.name,
-          round,
-          passed,
-          details: {
-            contract: scenario.contract ?? 'shared-public-behavior',
-            expected: scenario.expected,
-            observations,
-          },
-          error,
-          pageErrors: opened?.errors ?? [],
-          diagnostics: opened?.diagnostics,
-        });
+        await runStabilityScenario({ openPage, record, round, scenario, framework });
       }
     }
   }

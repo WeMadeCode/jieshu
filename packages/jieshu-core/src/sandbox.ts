@@ -202,7 +202,7 @@ export default class Jieshu {
    * 3、准备shadow
    * 4、准备子应用注入
    */
-  public async active(options: {
+  public active = async (options: {
     url: string;
     sync?: boolean;
     prefix?: { [key: string]: string };
@@ -212,12 +212,18 @@ export default class Jieshu {
     alive?: boolean;
     fetch?: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
     replace?: (code: string) => string;
-  }): Promise<void> {
+  }) => {
     const activationRevision = ++this.activationRevision;
     const pendingUnmount = this.unmountPromise;
-    if (pendingUnmount) await pendingUnmount;
-    if (!this.isActivationCurrent(activationRevision)) return;
-    if (!this.getLifecycleController().activate()) return;
+    if (pendingUnmount) {
+      await pendingUnmount;
+    }
+    if (!this.isActivationCurrent(activationRevision)) {
+      return;
+    }
+    if (!this.getLifecycleController().activate()) {
+      return;
+    }
     const { sync, url, el, template, props, alive, prefix, fetch, replace } = options;
     this.url = url;
     this.sync = sync;
@@ -231,22 +237,14 @@ export default class Jieshu {
     // wait iframe init
     await this.iframeReady;
     // destroy may win the race while iframe initialization is pending.
-    if (!this.isActivationCurrent(activationRevision)) return;
+    if (!this.isActivationCurrent(activationRevision)) {
+      return;
+    }
 
     // 处理子应用自定义fetch
     // TODO fetch检验合法性
     const iframeWindow = getIframeWindow(this.iframe);
-    const iframeFetch = fetch
-      ? (input: RequestInfo, init?: RequestInit) =>
-          fetch(typeof input === 'string' ? getAbsolutePath(input, (this.proxyLocation as Location).href) : input, init)
-      : this.fetch;
-    if (fetch && iframeFetch) {
-      bindFetchCacheContext(iframeFetch, fetch);
-    }
-    if (iframeFetch) {
-      iframeWindow.fetch = iframeFetch;
-      this.fetch = iframeFetch;
-    }
+    this.configureFetch(iframeWindow, fetch);
 
     // 处理子应用路由同步
     if (this.execFlag && this.alive) {
@@ -274,7 +272,9 @@ export default class Jieshu {
       } finally {
         this.relocating = false;
       }
-      if (this.alive) return;
+      if (this.alive) {
+        return;
+      }
     } else {
       // 预执行无容器，暂时插入iframe内部触发Web Component的connect
       this.el = renderElementToContainer(
@@ -286,12 +286,31 @@ export default class Jieshu {
     await renderTemplateToShadowRoot(this.shadowRoot, iframeWindow, this.template, () =>
       this.isActivationCurrent(activationRevision),
     );
-    if (!this.isActivationCurrent(activationRevision) || !this.shadowRoot || !this.provide) return;
+    if (!this.isActivationCurrent(activationRevision) || !this.shadowRoot || !this.provide) {
+      return;
+    }
     this.patchCssRules();
 
     // inject shadowRoot to app
     this.provide.shadowRoot = this.shadowRoot;
-  }
+  };
+
+  private configureFetch = (
+    iframeWindow: Window,
+    fetch?: (input: RequestInfo, init?: RequestInit) => Promise<Response>,
+  ) => {
+    const iframeFetch = fetch
+      ? (input: RequestInfo, init?: RequestInit) =>
+          fetch(typeof input === 'string' ? getAbsolutePath(input, this.proxyLocation.href) : input, init)
+      : this.fetch;
+    if (fetch && iframeFetch) {
+      bindFetchCacheContext(iframeFetch, fetch);
+    }
+    if (iframeFetch) {
+      iframeWindow.fetch = iframeFetch;
+      this.fetch = iframeFetch;
+    }
+  };
 
   // 未销毁，空闲时才回调
   public requestIdleCallback(callback: (this: Jieshu) => unknown, onCancel?: () => void): number {

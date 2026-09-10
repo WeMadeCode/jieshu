@@ -144,8 +144,17 @@ for (const rejects of [false, true]) {
             await startingCurrent;
           }
 
-          const current = getJieshuById('container-current');
-          const currentWindow = current?.iframe?.contentWindow;
+          const readCurrentState = () => {
+            const current = getJieshuById('container-current');
+            const currentWindow = current?.iframe?.contentWindow;
+            return {
+              currentHostConnected: current?.shadowRoot?.host.isConnected === true,
+              currentIframeConnected: current?.iframe?.isConnected === true,
+              currentDestroyed: current?.destroyed,
+              currentText: current?.body?.textContent,
+              currentCodeRan: Boolean(currentWindow && Reflect.get(currentWindow, '__fix003Current')),
+            };
+          };
           const result = {
             firstOutcome,
             repeatedOutcome,
@@ -154,11 +163,7 @@ for (const rejects of [false, true]) {
             layoutPreserved,
             loadingPreserved,
             currentUnmountCalls,
-            currentHostConnected: current?.shadowRoot?.host.isConnected === true,
-            currentIframeConnected: current?.iframe?.isConnected === true,
-            currentDestroyed: current?.destroyed,
-            currentText: current?.body?.textContent,
-            currentCodeRan: Boolean(currentWindow && Reflect.get(currentWindow, '__fix003Current')),
+            ...readCurrentState(),
             oldIframesReleased: !first.iframe.isConnected && !second.iframe.isConnected,
             oldGlobalsReleased: first.iframeWindow.__JIESHU === null && second.iframeWindow.__JIESHU === null,
             oldRegistryEntriesReleased:

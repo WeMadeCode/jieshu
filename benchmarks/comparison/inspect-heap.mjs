@@ -28,9 +28,7 @@ const increment = (total, selfSize) => {
 };
 const isIndex = (value, length) => Number.isInteger(value) && value >= 0 && value < length;
 
-const readSnapshot = async (input) => {
-  const filename = path.resolve(input);
-  const data = JSON.parse(await readFile(filename, 'utf8'));
+const readNodeSchema = (data, filename) => {
   const fields = data.snapshot?.meta?.node_fields;
   const types = data.snapshot?.meta?.node_types;
   const nodes = data.nodes;
@@ -59,6 +57,14 @@ const readSnapshot = async (input) => {
   if (data.snapshot.node_count !== undefined && data.snapshot.node_count !== nodeCount) {
     throw new Error(`${filename}: node_count does not match the flat node table`);
   }
+
+  return { fields, nodes, strings, typeIndex, nameIndex, sizeIndex, typeNames };
+};
+
+const readSnapshot = async (input) => {
+  const filename = path.resolve(input);
+  const data = JSON.parse(await readFile(filename, 'utf8'));
+  const { fields, nodes, strings, typeIndex, nameIndex, sizeIndex, typeNames } = readNodeSchema(data, filename);
 
   const total = emptySize();
   const byCategory = new Map(categories.map((category) => [category, emptySize()]));
