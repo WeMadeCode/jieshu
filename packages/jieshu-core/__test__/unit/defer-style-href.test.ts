@@ -141,4 +141,28 @@ describe("deferStyleSheetByHref / 先 append 后 setAttribute('href') 的延迟�
     ).not.toThrow();
     expect(sandbox.deferredStyleObservers).toHaveLength(0);
   });
+
+  it('observe 抛错时应清理登记和超时任务', () => {
+    const failure = new Error('observer setup failed');
+    const observe = vi.spyOn(MutationObserver.prototype, 'observe').mockImplementation(() => {
+      throw failure;
+    });
+    const disconnect = vi.spyOn(MutationObserver.prototype, 'disconnect');
+    const link = makeLink();
+    const onerror = vi.fn();
+    link.onerror = onerror;
+    try {
+      expect(() =>
+        deferStyleSheetByHref({ element: link, jieshuId: JIESHU_ID, iframeWindow: window, loadStyleSheet: vi.fn() }),
+      ).toThrow(failure);
+      expect(disconnect).toHaveBeenCalledOnce();
+      expect(sandbox.deferredStyleObservers).toHaveLength(0);
+      expect(vi.getTimerCount()).toBe(0);
+      vi.advanceTimersByTime(5000);
+      expect(onerror).not.toHaveBeenCalled();
+    } finally {
+      observe.mockRestore();
+      disconnect.mockRestore();
+    }
+  });
 });

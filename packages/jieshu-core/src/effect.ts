@@ -89,212 +89,286 @@ function handleStylesheetElementPatch(stylesheetElement: PatchedStyleElement, sa
   stylesheetElement._patcher = setTimeout(patcher, 50);
 }
 
-/**
- * 劫持处理样式元素的属性
- * @internal 仅出于可测性导出，外部不应直接调用
- */
-export function patchStylesheetElement(
+type StylesheetCssLoader = (code: string, url: string, base: string) => string;
+
+// Namespace and local name identify native style elements across iframe realms.
+const isStylesheetElement = (element: Element): element is HTMLStyleElement => {
+  return element.namespaceURI === 'http://www.w3.org/1999/xhtml' && element.localName === 'style';
+};
+
+class StylesheetElementPatcher {
+  private readonly patchedSheets = new WeakSet<CSSStyleSheet>();
+  private readonly rawTextSetter = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent')?.set;
+
+  constructor(
+    private readonly element: HTMLStyleElement,
+    private readonly cssLoader: StylesheetCssLoader,
+    private readonly sandbox: Jieshu,
+    private readonly curUrl: string,
+  ) {}
+
+  private schedulePatch = (element = this.element) => {
+    nextTick(() => handleStylesheetElementPatch(element, this.sandbox));
+  };
+
+  private persistSheet = (sheet: CSSStyleSheet) => {
+    const content = Array.from(sheet.cssRules, (rule) => rule.cssText).join('\n');
+    const disabled = sheet.disabled;
+    // Use the native setter: these rules have already passed through cssLoader.
+    this.rawTextSetter?.call(this.element, content);
+    if (this.element.sheet) {
+      this.element.sheet.disabled = disabled;
+    }
+    this.patchSheet();
+    this.schedulePatch();
+  };
+
+  patchSheet = () => {
+    const sheet = this.element.sheet;
+    if (!sheet || this.patchedSheets.has(sheet)) {
+      return;
+    }
+    this.patchedSheets.add(sheet);
+    const rawInsertRule = sheet.insertRule;
+    const rawDeleteRule = sheet.deleteRule;
+    sheet.insertRule = (rule: string, index?: number) => {
+      const current = this.element.sheet ?? sheet;
+      const insertedIndex = rawInsertRule.call(current, this.cssLoader(rule, '', this.curUrl), index);
+      this.persistSheet(current);
+      return insertedIndex;
+    };
+    sheet.deleteRule = (index: number) => {
+      const current = this.element.sheet ?? sheet;
+      rawDeleteRule.call(current, index);
+      this.persistSheet(current);
+    };
+  };
+
+  private patchTextProperty = (property: 'innerHTML' | 'innerText' | 'textContent', prototype: object) => {
+    const descriptor = Object.getOwnPropertyDescriptor(prototype, property);
+    const getter = descriptor?.get;
+    const setter = descriptor?.set;
+    if (!getter || !setter) {
+      return;
+    }
+    const patcher = this;
+    Object.defineProperty(this.element, property, {
+      // DOM accessors must use the receiver supplied by the property access.
+      get: function (this: HTMLStyleElement) {
+        return getter.call(this);
+      },
+      set: function (this: HTMLStyleElement, code: string) {
+        setter.call(this, patcher.cssLoader(code, '', patcher.curUrl));
+        patcher.patchSheet();
+        patcher.schedulePatch(this);
+      },
+    });
+  };
+
+  private appendChild = (receiver: HTMLStyleElement, node: Node) => {
+    this.schedulePatch(receiver);
+    if (node.nodeType !== Node.TEXT_NODE) {
+      return rawAppendChild.call(this.element, node);
+    }
+    const content = this.cssLoader(node.textContent ?? '', '', this.curUrl);
+    const inserted = rawAppendChild.call(this.element, this.element.ownerDocument.createTextNode(content));
+    this.patchSheet();
+    return inserted;
+  };
+
+  private insertAdjacentElement = (receiver: HTMLStyleElement, position: InsertPosition, element: Element) => {
+    if (!isStylesheetElement(element)) {
+      return rawInsertAdjacentElement.call(receiver, position, element);
+    }
+    // Vite chains style insertions; each new style needs the same text and CSSOM patches.
+    const content = element.innerHTML;
+    if (content) {
+      element.innerHTML = this.cssLoader(content, '', this.curUrl);
+    }
+    const inserted = rawInsertAdjacentElement.call(receiver, position, element);
+    this.sandbox.styleSheetElements.push(element);
+    patchStylesheetElement(element, this.cssLoader, this.sandbox, this.curUrl);
+    handleStylesheetElementPatch(element, this.sandbox);
+    return inserted;
+  };
+
+  install = () => {
+    this.patchSheet();
+    this.patchTextProperty('innerHTML', Element.prototype);
+    this.patchTextProperty('innerText', HTMLElement.prototype);
+    this.patchTextProperty('textContent', Node.prototype);
+    const patcher = this;
+    Object.defineProperties(this.element, {
+      // Preserve the native methods' dynamic receiver when called through another element.
+      appendChild: {
+        value: function (this: HTMLStyleElement, node: Node) {
+          return patcher.appendChild(this, node);
+        },
+      },
+      insertAdjacentElement: {
+        value: function (this: HTMLStyleElement, position: InsertPosition, element: Element) {
+          return patcher.insertAdjacentElement(this, position, element);
+        },
+      },
+      _hasPatchStyle: { get: () => true },
+    });
+  };
+}
+
+const stylesheetPatchers = new WeakMap<HTMLStyleElement, StylesheetElementPatcher>();
+
+/** @internal Install CSS transforms and preserve dynamically inserted rules across remounts. */
+export const patchStylesheetElement = (
   stylesheetElement: HTMLStyleElement & { _hasPatchStyle?: boolean },
-  cssLoader: (code: string, url: string, base: string) => string,
+  cssLoader: StylesheetCssLoader,
   sandbox: Jieshu,
   curUrl: string,
-) {
-  if (stylesheetElement._hasPatchStyle) return;
-  const innerHTMLDesc = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
-  const innerTextDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText');
-  const textContentDesc = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
-  const innerHTMLGetter = innerHTMLDesc?.get;
-  const innerHTMLSetter = innerHTMLDesc?.set;
-  const innerTextGetter = innerTextDesc?.get;
-  const innerTextSetter = innerTextDesc?.set;
-  const textContentGetter = textContentDesc?.get;
-  const textContentSetter = textContentDesc?.set;
-  const RawInsertRule = stylesheetElement.sheet?.insertRule;
-  // 这个地方将cssRule加到innerHTML中去，防止子应用切换之后丢失
-  function patchSheetInsertRule() {
-    if (!RawInsertRule) return;
-    stylesheetElement.sheet.insertRule = (rule: string, index?: number): number => {
-      innerHTMLDesc ? (stylesheetElement.innerHTML += rule) : (stylesheetElement.innerText += rule);
-      return RawInsertRule.call(stylesheetElement.sheet, rule, index);
-    };
+) => {
+  const existing = stylesheetPatchers.get(stylesheetElement);
+  if (existing) {
+    existing.patchSheet();
+    return;
   }
-  patchSheetInsertRule();
-
-  if (innerHTMLGetter && innerHTMLSetter) {
-    Object.defineProperties(stylesheetElement, {
-      innerHTML: {
-        get: function (this: HTMLStyleElement) {
-          return innerHTMLGetter.call(this);
-        },
-        set: function (this: HTMLStyleElement, code: string) {
-          innerHTMLSetter.call(this, cssLoader(code, '', curUrl));
-          nextTick(() => handleStylesheetElementPatch(this, sandbox));
-        },
-      },
-    });
+  if (stylesheetElement._hasPatchStyle) {
+    return;
   }
-
-  if (innerTextGetter && innerTextSetter) {
-    Object.defineProperty(stylesheetElement, 'innerText', {
-      get: function (this: HTMLStyleElement) {
-        return innerTextGetter.call(this);
-      },
-      set: function (this: HTMLStyleElement, code: string) {
-        innerTextSetter.call(this, cssLoader(code, '', curUrl));
-        nextTick(() => handleStylesheetElementPatch(this, sandbox));
-      },
-    });
-  }
-
-  if (textContentGetter && textContentSetter) {
-    Object.defineProperty(stylesheetElement, 'textContent', {
-      get: function (this: HTMLStyleElement) {
-        return textContentGetter.call(this);
-      },
-      set: function (this: HTMLStyleElement, code: string) {
-        textContentSetter.call(this, cssLoader(code, '', curUrl));
-        nextTick(() => handleStylesheetElementPatch(this, sandbox));
-      },
-    });
-  }
-
-  Object.defineProperties(stylesheetElement, {
-    appendChild: {
-      value: function (node: Node): Node {
-        nextTick(() => handleStylesheetElementPatch(this, sandbox));
-        if (node.nodeType === Node.TEXT_NODE) {
-          const res = rawAppendChild.call(
-            stylesheetElement,
-            stylesheetElement.ownerDocument.createTextNode(cssLoader(node.textContent ?? '', '', curUrl)),
-          );
-          // 当appendChild之后，样式元素的sheet对象发生改变，要重新patch
-          patchSheetInsertRule();
-          return res;
-        } else return rawAppendChild.call(stylesheetElement, node);
-      },
-    },
-    insertAdjacentElement: {
-      value: function (this: HTMLStyleElement, position: InsertPosition, element: Element) {
-        if (element.nodeName === 'STYLE') {
-          // 关联上游历史 issue #1059
-          //
-          // vite dev server 第一个 css 通过 head.appendChild 插入，后续每个 css 都走
-          // lastInsertedStyle.insertAdjacentElement("afterend", style)，hot update 时
-          // 直接 style.textContent = newContent。被 insertAdjacentElement 插入的 style
-          // 必须获得与"第一个 style"完全一致的劫持能力，否则：
-          //   1) 当前内容里的资源相对路径不会被 cssLoader 改写（@font-face 失效）；
-          //   2) 后续 textContent / innerHTML / appendChild / sheet.insertRule
-          //      绕过 jieshu，hot update 全部脱管；
-          //   3) 链式 insertAdjacentElement 创建的下游 style 直接走原生实现。
-          // 因此这里必须复用与 case "STYLE" 完全一致的处理流程：先用 cssLoader 改写
-          // 当前内容，再 patchStylesheetElement 把劫持递归装到新 style 上。
-          const stylesheetElement = element as HTMLStyleElement;
-          const content = stylesheetElement.innerHTML;
-          if (content) stylesheetElement.innerHTML = cssLoader(content, '', curUrl);
-          const res = rawInsertAdjacentElement.call(this, position, element);
-          sandbox.styleSheetElements.push(stylesheetElement);
-          patchStylesheetElement(stylesheetElement, cssLoader, sandbox, curUrl);
-          handleStylesheetElementPatch(stylesheetElement, sandbox);
-          return res;
-        } else return rawInsertAdjacentElement.call(this, position, element);
-      },
-    },
-    _hasPatchStyle: { get: () => true },
-  });
-}
+  const patcher = new StylesheetElementPatcher(stylesheetElement, cssLoader, sandbox, curUrl);
+  patcher.install();
+  stylesheetPatchers.set(stylesheetElement, patcher);
+};
 
 // href 延迟赋值的兜底超时（毫秒）：超过该时间仍未拿到 href，则放弃监听并触发 error，
 // 防止「href 永不到达」时 observer 闭包长期钉住子应用上下文。沿用 tinymce maxLoadTime 量级。
 const DEFER_STYLE_HREF_TIMEOUT = 5000;
 
-/**
- * 处理「先 appendChild(link) 后 setAttribute('href')」的延迟 href 场景。
- *
- * 通过 MutationObserver 监听 href 属性赋值，命中后走传入的 loadStyleSheet 完成加载。
- * 生命周期管理（避免内存泄漏）：
- *   1. 命中 / 超时 / 子应用已销毁 时立即 disconnect 并从 sandbox 出队；
- *   2. observer 登记到 sandbox.deferredStyleObservers，destroy 阶段统一兜底 disconnect；
- *   3. 回调内通过 jieshuId 动态获取 sandbox，不捕获 sandbox/iframe，子应用销毁后闭包不再 pin 上下文。
- */
-export function deferStyleSheetByHref(opts: {
+interface DeferredStyleSheetOptions {
   element: HTMLLinkElement;
   jieshuId: string;
-  iframeWindow: Window;
+  iframeWindow: Window & { MutationObserver?: typeof MutationObserver };
   loadStyleSheet: (href: string, element: HTMLLinkElement) => void;
-}): void {
-  let element: HTMLLinkElement | null = opts.element;
-  const { jieshuId, iframeWindow, loadStyleSheet } = opts;
-  // 部分环境（jsdom / 老浏览器）可能不支持 MutationObserver，直接放弃延迟处理
-  const MutationObserverCtor = (iframeWindow as Window & { MutationObserver?: typeof MutationObserver })
-    .MutationObserver;
-  if (typeof MutationObserverCtor !== 'function') return;
+}
 
-  let settled = false;
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  let registration: Pick<MutationObserver, 'disconnect'>;
-  let unregisterCancellation: (() => void) | undefined;
-  const observer: MutationObserver = new MutationObserverCtor(() => {
-    if (settled) return;
-    const target = element;
-    if (!target) return;
-    const attrHref = target.getAttribute('href');
-    if (!attrHref) return;
-    const realHref = target.href || attrHref;
-    finalize(() => loadStyleSheet(realHref, target));
-  });
+class DeferredStyleSheetRequest {
+  private element: HTMLLinkElement | null;
+  private loadStyleSheet?: DeferredStyleSheetOptions['loadStyleSheet'];
+  private readonly jieshuId: string;
+  private readonly observer: MutationObserver;
+  private settled = false;
+  private timer?: ReturnType<typeof setTimeout>;
+  private unregisterCancellation?: () => void;
 
-  // 统一收尾：disconnect + 出队 + 清理定时器，再执行收尾动作
-  function finalize(action?: () => void) {
-    if (settled) return;
-    settled = true;
-    if (timer !== null) {
-      clearTimeout(timer);
-      timer = null;
-    }
-    unregisterCancellation?.();
-    unregisterCancellation = undefined;
-    try {
-      observer.disconnect();
-    } catch (_) {
-      /* noop */
-    }
-    // 动态获取 sandbox，子应用销毁后直接放手，闭包不再钉住上下文
-    const sandbox = getJieshuById(jieshuId);
-    const observers = sandbox?.deferredStyleObservers;
-    if (Array.isArray(observers)) {
-      const index = observers.indexOf(registration);
-      if (index !== -1) observers.splice(index, 1);
-    }
-    if (sandbox) action?.();
-    element = null;
+  constructor(opts: DeferredStyleSheetOptions, Observer: typeof MutationObserver) {
+    this.element = opts.element;
+    this.loadStyleSheet = opts.loadStyleSheet;
+    this.jieshuId = opts.jieshuId;
+    this.observer = new Observer(this.handleHrefChange);
   }
 
-  const sandbox = getJieshuById(jieshuId);
-  // 子应用已不存在则无需监听
-  if (!sandbox || !Array.isArray(sandbox.deferredStyleObservers)) return;
-  if (!isDynamicEffectContextLive(sandbox, jieshuId)) {
-    const target = element;
-    element = null;
-    if (target) nextTick(() => elementEventForwarder.dispatch(target, 'error'));
+  private removeRegistration = () => {
+    const observers = getJieshuById(this.jieshuId)?.deferredStyleObservers;
+    if (!Array.isArray(observers)) {
+      return;
+    }
+    const index = observers.indexOf(this);
+    if (index !== -1) {
+      observers.splice(index, 1);
+    }
+  };
+
+  private finish = () => {
+    if (this.settled) {
+      return;
+    }
+    this.settled = true;
+    if (this.timer !== undefined) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
+    this.unregisterCancellation?.();
+    this.unregisterCancellation = undefined;
+    this.element = null;
+    this.loadStyleSheet = undefined;
+    try {
+      this.observer.disconnect();
+    } catch {
+      // Cleanup must also retire the registration if a custom observer throws.
+    }
+    this.removeRegistration();
+  };
+
+  disconnect = () => {
+    this.finish();
+  };
+
+  private handleHrefChange = () => {
+    const target = this.element;
+    if (!target) {
+      return;
+    }
+    const href = target.getAttribute('href');
+    if (!href) {
+      return;
+    }
+    const realHref = target.href || href;
+    const loadStyleSheet = this.loadStyleSheet;
+    this.finish();
+    if (getJieshuById(this.jieshuId)) {
+      loadStyleSheet?.(realHref, target);
+    }
+  };
+
+  private finishWithError = () => {
+    const target = this.element;
+    const sandbox = getJieshuById(this.jieshuId);
+    this.finish();
+    if (target && sandbox) {
+      elementEventForwarder.dispatch(target, 'error');
+    }
+  };
+
+  private cancel = (reason: SandboxDynamicResourceCancellationReason) => {
+    if (reason === 'unmount') {
+      this.finishWithError();
+      return;
+    }
+    this.finish();
+  };
+
+  start = () => {
+    const sandbox = getJieshuById(this.jieshuId);
+    const target = this.element;
+    if (!sandbox || !Array.isArray(sandbox.deferredStyleObservers)) {
+      this.finish();
+      return;
+    }
+    if (!target) {
+      return;
+    }
+    if (!isDynamicEffectContextLive(sandbox, this.jieshuId)) {
+      this.finish();
+      nextTick(() => elementEventForwarder.dispatch(target, 'error'));
+      return;
+    }
+    sandbox.deferredStyleObservers.push(this);
+    this.unregisterCancellation = registerSandboxDynamicResource(sandbox, this.cancel);
+    try {
+      this.observer.observe(target, { attributes: true, attributeFilter: ['href'] });
+      this.timer = setTimeout(this.finishWithError, DEFER_STYLE_HREF_TIMEOUT);
+    } catch (cause: unknown) {
+      this.finish();
+      throw cause;
+    }
+  };
+}
+
+/** Wait for a link's href, retiring its observer on load, timeout or sandbox teardown. */
+export const deferStyleSheetByHref = (opts: DeferredStyleSheetOptions) => {
+  const Observer = opts.iframeWindow.MutationObserver;
+  if (typeof Observer !== 'function') {
     return;
   }
-  registration = { disconnect: () => finalize() };
-  sandbox.deferredStyleObservers.push(registration);
-  unregisterCancellation = registerSandboxDynamicResource(sandbox, (reason) => {
-    const target = element;
-    const liveSandbox = getJieshuById(jieshuId);
-    finalize();
-    if (reason === 'unmount' && target && liveSandbox) elementEventForwarder.dispatch(target, 'error');
-  });
-  observer.observe(element, { attributes: true, attributeFilter: ['href'] });
-  // 超时兜底：长时间没等到 href，放弃监听并触发 error，让上游（如 tinymce）的失败回调收尾
-  timer = setTimeout(() => {
-    const target = element;
-    const liveSandbox = getJieshuById(jieshuId);
-    finalize();
-    if (target && liveSandbox) elementEventForwarder.dispatch(target, 'error');
-  }, DEFER_STYLE_HREF_TIMEOUT);
-}
+  new DeferredStyleSheetRequest(opts, Observer).start();
+};
 
 type HijackingTagName = 'LINK' | 'STYLE' | 'SCRIPT' | 'IFRAME';
 type InsertionTarget = HTMLHeadElement | HTMLBodyElement;

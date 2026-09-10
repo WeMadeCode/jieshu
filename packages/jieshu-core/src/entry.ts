@@ -43,6 +43,13 @@ interface CacheBucket<Value> {
   visible?: Promise<Value> | null;
   size: number;
 }
+interface CacheRequestOwner<Value> {
+  key: string;
+  bucket: CacheBucket<Value>;
+  context: object;
+  scope?: CacheScope;
+}
+
 const STYLE_SOURCE_INDEX: unique symbol = Symbol('jieshu.style-source-index');
 
 export type ScriptResultList = Array<ScriptObject & { contentPromise: Promise<string> }>;
@@ -97,8 +104,6 @@ interface ImportHtmlParameters {
  * only the promise that failed, so a newer request cannot be deleted by an
  * older request settling late.
  */
-// Instances stay private and methods are always called with their cache receiver.
-// Share methods on the prototype instead of allocating closures for each cache.
 class AssetCache<Value> {
   private readonly metadata = new WeakMap<Promise<Value>, { scope?: CacheScope; status: CacheStatus }>();
   private readonly buckets = new Map<string, CacheBucket<Value>>();
@@ -122,12 +127,10 @@ class AssetCache<Value> {
       (scope ? this.scopedReservations.get(scope) === reservations : reservations === this.unscopedReservations);
   }
 
-  getOrCreate(key: string, fetch: FetchFunction, load: () => Promise<Value>, scope?: CacheScope) {
-    const context = fetchCacheContext(fetch);
+  private getBucket = (key: string, context: object) => {
     let bucket = this.buckets.get(key);
     const visible = this.records[key];
-    // Preserve direct edits to the legacy URL records while keeping managed
-    // requests partitioned by fetch identity. Tokens never retain fetch closures.
+    // Preserve direct edits to the legacy URL records while partitioning by fetch identity.
     if (!bucket || bucket.visible !== visible) {
       bucket = { requests: new WeakMap(), visible, size: visible ? 1 : 0 };
       this.buckets.set(key, bucket);
@@ -135,36 +138,77 @@ class AssetCache<Value> {
         bucket.requests.set(context, visible);
       }
     }
-    const currentBucket = bucket;
-    const cached = currentBucket.requests.get(context);
-    if (cached) {
-      const cachedMetadata = this.metadata.get(cached);
-      // Settled data is reusable across sandboxes using this fetch. Pending work is reusable
-      // only inside the sandbox generation that started it; otherwise a stale
-      // custom fetch could block a replacement forever.
-      if (!scope || !cachedMetadata || cachedMetadata.scope === scope || cachedMetadata.status === 'fulfilled') {
-        return cached;
-      }
-    }
+    return bucket;
+  };
 
+  private getReusableRequest = (bucket: CacheBucket<Value>, context: object, scope?: CacheScope) => {
+    const cached = bucket.requests.get(context);
+    if (!cached) {
+      return undefined;
+    }
+    const metadata = this.metadata.get(cached);
+    if (!scope || !metadata) {
+      return cached;
+    }
+    // Pending work belongs to one generation; fulfilled data can be shared.
+    if (metadata.scope === scope || metadata.status === 'fulfilled') {
+      return cached;
+    }
+    return undefined;
+  };
+
+  private removeEmptyBucket = (key: string, bucket: CacheBucket<Value>) => {
+    if (bucket.size === 0 && this.buckets.get(key) === bucket) {
+      this.buckets.delete(key);
+    }
+  };
+
+  private invalidateRequest = (owner: CacheRequestOwner<Value>, request: Promise<Value>) => {
+    const { key, bucket, context } = owner;
+    if (bucket.requests.get(context) === request) {
+      bucket.requests.delete(context);
+      bucket.size -= 1;
+    }
+    if (this.buckets.get(key) === bucket && this.records[key] === request) {
+      delete this.records[key];
+      bucket.visible = undefined;
+    }
+    this.removeEmptyBucket(key, bucket);
+  };
+
+  private registerPending = (invalidate: () => void, scope?: CacheScope) => {
+    if (!scope) {
+      return;
+    }
+    let pending = this.pendingByScope.get(scope);
+    if (!pending) {
+      pending = new Set();
+      this.pendingByScope.set(scope, pending);
+    }
+    pending.add(invalidate);
+  };
+
+  private publishRequest = (owner: CacheRequestOwner<Value>, request: Promise<Value>, invalidate: () => void) => {
+    const { key, bucket, context, scope } = owner;
+    const scopeReleased = scope && this.releasedScopes.has(scope);
+    if (this.buckets.get(key) !== bucket || scopeReleased) {
+      this.removeEmptyBucket(key, bucket);
+      return;
+    }
+    if (!bucket.requests.has(context)) {
+      bucket.size += 1;
+    }
+    bucket.requests.set(context, request);
+    bucket.visible = request;
+    this.records[key] = request;
+    this.registerPending(invalidate, scope);
+  };
+
+  private createRequest = (owner: CacheRequestOwner<Value>, load: () => Promise<Value>) => {
+    const { key, bucket, scope } = owner;
     let request: Promise<Value>;
     const metadata: { scope?: CacheScope; status: CacheStatus } = { scope, status: 'pending' };
-    const removeEmptyBucket = () => {
-      if (currentBucket.size === 0 && this.buckets.get(key) === currentBucket) {
-        this.buckets.delete(key);
-      }
-    };
-    const invalidate = () => {
-      if (currentBucket.requests.get(context) === request) {
-        currentBucket.requests.delete(context);
-        currentBucket.size -= 1;
-      }
-      if (this.buckets.get(key) === currentBucket && this.records[key] === request) {
-        delete this.records[key];
-        currentBucket.visible = undefined;
-      }
-      removeEmptyBucket();
-    };
+    const invalidate = () => this.invalidateRequest(owner, request);
     const releasePending = () => {
       if (scope) {
         this.pendingByScope.get(scope)?.delete(invalidate);
@@ -186,30 +230,23 @@ class AssetCache<Value> {
         },
       );
     } catch (reason: unknown) {
-      removeEmptyBucket();
+      this.removeEmptyBucket(key, bucket);
       return Promise.reject(reason);
     }
     this.metadata.set(request, metadata);
-    if (this.buckets.get(key) === currentBucket && (!scope || !this.releasedScopes.has(scope))) {
-      if (!currentBucket.requests.has(context)) {
-        currentBucket.size += 1;
-      }
-      currentBucket.requests.set(context, request);
-      currentBucket.visible = request;
-      this.records[key] = request;
-      if (scope) {
-        let pending = this.pendingByScope.get(scope);
-        if (!pending) {
-          pending = new Set();
-          this.pendingByScope.set(scope, pending);
-        }
-        pending.add(invalidate);
-      }
-    } else {
-      removeEmptyBucket();
-    }
+    this.publishRequest(owner, request, invalidate);
     return request;
-  }
+  };
+
+  getOrCreate = (key: string, fetch: FetchFunction, load: () => Promise<Value>, scope?: CacheScope) => {
+    const context = fetchCacheContext(fetch);
+    const bucket = this.getBucket(key, context);
+    const cached = this.getReusableRequest(bucket, context, scope);
+    if (cached) {
+      return cached;
+    }
+    return this.createRequest({ key, bucket, context, scope }, load);
+  };
 
   clear(prefixes?: readonly string[]) {
     for (const key of this.buckets.keys()) {
