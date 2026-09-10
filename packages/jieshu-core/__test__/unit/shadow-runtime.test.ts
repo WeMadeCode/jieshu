@@ -57,6 +57,27 @@ describe('shadow rendering primitives', () => {
     expect(container.hasAttribute(CONTAINER_OVERFLOW_DATA_FLAG)).toBe(false);
   });
 
+  it('returns no release callback or overlay when computed styles cannot be read', () => {
+    const container = document.createElement('div');
+    container.style.position = 'static';
+    container.style.overflow = 'visible';
+    document.body.appendChild(container);
+    const getComputedStyle = vi.spyOn(window, 'getComputedStyle').mockImplementationOnce(() => {
+      throw new Error('computed styles unavailable');
+    });
+
+    try {
+      expect(addLoading(container)).toBeUndefined();
+      expect(container.querySelector(`div[${LOADING_DATA_FLAG}]`)).toBeNull();
+      expect(container.style.position).toBe('static');
+      expect(container.style.overflow).toBe('visible');
+      expect(container.hasAttribute(CONTAINER_POSITION_DATA_FLAG)).toBe(false);
+      expect(container.hasAttribute(CONTAINER_OVERFLOW_DATA_FLAG)).toBe(false);
+    } finally {
+      getComputedStyle.mockRestore();
+    }
+  });
+
   it('extracts host and font rules and ignores unreadable stylesheets', () => {
     const style = document.createElement('style');
     style.textContent = ':root { color: red; } @font-face { font-family: demo; src: url(demo.woff); }';

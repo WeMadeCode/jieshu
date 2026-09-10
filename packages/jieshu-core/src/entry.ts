@@ -412,12 +412,15 @@ function extractInlineCode(markup: string): string {
   return contentStart > 0 && contentEnd >= contentStart ? markup.slice(contentStart, contentEnd) : '';
 }
 
-const requestErrorMessage = (kind: AssetKind | 'html') =>
-  kind === 'html'
-    ? JIESHU_TIPS_HTML_ERROR_REQUESTED
-    : kind === 'style'
-      ? JIESHU_TIPS_CSS_ERROR_REQUESTED
-      : JIESHU_TIPS_SCRIPT_ERROR_REQUESTED;
+const requestErrorMessage = (kind: AssetKind | 'html') => {
+  if (kind === 'html') {
+    return JIESHU_TIPS_HTML_ERROR_REQUESTED;
+  }
+  if (kind === 'style') {
+    return JIESHU_TIPS_CSS_ERROR_REQUESTED;
+  }
+  return JIESHU_TIPS_SCRIPT_ERROR_REQUESTED;
+};
 
 function normalizeFailure(cause: unknown, fallbackMessage: string): Error {
   return cause instanceof Error ? cause : new Error(fallbackMessage);

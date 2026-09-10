@@ -6,6 +6,18 @@
 
 现代写法必须兼容仓库的编译目标和实际运行环境。目前目标为 ES2018，不能仅为使用 `Object.hasOwn` 等较新的运行时 API 而提高目标或忽略兼容性；`Object.prototype.hasOwnProperty.call(value, key)` 也是允许的安全写法。
 
+## 对象属性访问
+
+固定且可用标识符表示的属性名优先使用点号访问，不写成 `object['property']`。动态计算的属性名、Symbol 或包含连字符等无法用点号表示的属性名使用方括号。
+
+项目启用了 `noPropertyAccessFromIndexSignature`。对于仅由索引签名提供的固定属性（如自定义环境变量），读取时优先使用解构；确实需要索引访问时可以保留方括号。不要为改用点号而关闭类型检查或添加类型断言。
+
+```ts
+const name = options.name;
+const value = options[key];
+const { JIESHU_REACT_MAIN_WORKSPACE: reactMainWorkspace } = process.env;
+```
+
 ## 对象属性检查
 
 禁止在对象实例上直接调用 `hasOwnProperty`、`isPrototypeOf`、`propertyIsEnumerable` 等 `Object.prototype` 检查方法。这些方法可能被同名属性覆盖，也可能因原型链为空而不存在。
@@ -36,6 +48,20 @@ if (cached !== undefined) {
 }
 ```
 
+禁止嵌套三元表达式。多分支判断使用 `if` 或 `switch`，简单的二选一表达式可以保留三元运算符。
+
+```ts
+const requestErrorMessage = (kind: 'html' | 'style' | 'script') => {
+  if (kind === 'html') {
+    return 'HTML 请求失败';
+  }
+  if (kind === 'style') {
+    return '样式请求失败';
+  }
+  return '脚本请求失败';
+};
+```
+
 ## 函数
 
 ### 函数写法
@@ -60,6 +86,20 @@ const readOwner = function (this: Document) {
 ### 长度与职责
 
 单个函数不超过 100 行，块语句嵌套不超过 4 层。按独立职责提取辅助函数，使用提前返回减少嵌套；不要为缩短函数而将多条语句压到一行。
+
+### 返回语句一致性
+
+同一函数中，返回值的分支不要与裸 `return;` 或隐式落到函数末尾的分支混用。如果函数允许返回值缺省，相关分支显式使用 `return undefined;`，保持原有返回契约；抛出异常的分支不需要补返回语句。完全不返回值的函数可以使用裸 `return;` 提前结束，也可以自然结束。
+
+```ts
+const readContainerStyles = (container: HTMLElement) => {
+  try {
+    return window.getComputedStyle(container);
+  } catch {
+    return undefined;
+  }
+};
+```
 
 ### 异步流程
 

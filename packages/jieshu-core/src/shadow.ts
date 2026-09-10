@@ -443,7 +443,7 @@ export const addLoading = (el: string | HTMLElement, loading?: HTMLElement) => {
   try {
     styles = window.getComputedStyle(container);
   } catch {
-    return;
+    return undefined;
   }
 
   lockContainerLayout(container, styles);
