@@ -212,12 +212,14 @@ const readAttributeValue = (source: string, start: number, tagEnd: number) => {
     return { value, end: cursor };
   }
 
-  while (
-    cursor < tagEnd - 1 &&
-    !isWhitespace(source[cursor]) &&
-    source[cursor] !== '>' &&
-    !(source[cursor] === '/' && source[cursor + 1] === '>')
-  ) {
+  while (cursor < tagEnd - 1) {
+    const character = source[cursor];
+    if (isWhitespace(character) || character === '>') {
+      break;
+    }
+    if (character === '/' && source[cursor + 1] === '>') {
+      break;
+    }
     cursor += 1;
   }
   return { value: decodeAttributeEntities(source.slice(start, cursor)), end: cursor };
