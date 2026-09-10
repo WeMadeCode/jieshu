@@ -203,69 +203,118 @@ function unregisterDynamicScript(context: ScriptExecutionContext): void {
   if (index !== -1) dynamicScripts.splice(index, 1);
 }
 
+interface ScriptCompletionState {
+  completed: boolean;
+  unregisterCancellation?: () => void;
+  inlineModuleObserver?: ReturnType<typeof observeInlineModule>;
+}
+
+const releaseScriptCompletionResources = (state: ScriptCompletionState) => {
+  state.unregisterCancellation?.();
+  state.unregisterCancellation = undefined;
+  state.inlineModuleObserver?.dispose();
+  state.inlineModuleObserver = undefined;
+};
+
+const advanceStartupQueue = (context: ScriptExecutionContext) => {
+  // Dynamic scripts settle their reservation in effect.ts, including cancellation.
+  if (!context.rawElement && !context.input.async && isExecutionOwnerCurrent(context)) {
+    context.container.appendChild(context.queueAdvancerElement);
+  }
+};
+
+const createScriptCompletion = (context: ScriptExecutionContext) => {
+  const state: ScriptCompletionState = { completed: false };
+  let resolveCompletion: (outcome: ScriptExecutionOutcome) => void;
+  const completion = new Promise<ScriptExecutionOutcome>((resolve) => {
+    resolveCompletion = resolve;
+  });
+  const handle: ScriptExecutionHandle = {
+    element: context.scriptElement,
+    completion,
+    cancel: () => {
+      if (state.completed) {
+        return;
+      }
+      state.completed = true;
+      releaseScriptCompletionResources(state);
+      context.scriptElement.onload = null;
+      context.scriptElement.onerror = null;
+      context.scriptElement.parentNode?.removeChild(context.scriptElement);
+      context.queueAdvancerElement.parentNode?.removeChild(context.queueAdvancerElement);
+      unregisterDynamicScript(context);
+      resolveCompletion('cancelled');
+    },
+  };
+  const afterExecution = (outcome: Exclude<ScriptExecutionOutcome, 'cancelled'>) => {
+    if (state.completed) {
+      return;
+    }
+    state.completed = true;
+    releaseScriptCompletionResources(state);
+    try {
+      if (isExecutionOwnerCurrent(context)) {
+        if (outcome === 'load') {
+          context.input.onload?.();
+        } else if (outcome === 'error') {
+          context.input.onerror?.();
+        }
+      }
+    } finally {
+      context.scriptElement.onload = null;
+      context.scriptElement.onerror = null;
+      resolveCompletion(outcome);
+      advanceStartupQueue(context);
+    }
+  };
+  return { state, handle, afterExecution };
+};
+
+const prepareScriptExecution = (
+  context: ScriptExecutionContext,
+  execution: ReturnType<typeof createScriptCompletion>,
+) => {
+  const { state, handle, afterExecution } = execution;
+  configureScriptElement(context);
+  if (!isExecutionOwnerCurrent(context)) {
+    handle.cancel();
+    return undefined;
+  }
+
+  const isInlineModule =
+    context.scriptElement.type.toLowerCase() === 'module' && !context.scriptElement.hasAttribute('src');
+  const isAsyncInlineModule = isInlineModule && context.input.async === true;
+  if (isAsyncInlineModule) {
+    context.scriptElement.async = true;
+  }
+  if (isInlineModule && !isAsyncInlineModule) {
+    state.inlineModuleObserver = observeInlineModule(
+      context,
+      () => afterExecution('load'),
+      () => afterExecution('error'),
+    );
+  }
+  if (!isExecutionOwnerCurrent(context)) {
+    handle.cancel();
+    return undefined;
+  }
+  registerDynamicScript(context);
+  const waitsForNativeCompletion = Boolean(state.inlineModuleObserver) || context.scriptElement.hasAttribute('src');
+  if (waitsForNativeCompletion) {
+    if (!isInlineModule) {
+      context.scriptElement.onload = () => afterExecution('load');
+    }
+    context.scriptElement.onerror = () => afterExecution('error');
+    state.unregisterCancellation = registerSandboxDynamicResource(context.owner, () => handle.cancel());
+  }
+  return { isAsyncInlineModule, waitsForNativeCompletion };
+};
+
 class IframeScriptExecutionPipeline {
   execute = (source: ScriptInput, iframeWindow: Window, rawElement?: HTMLScriptElement) => {
     const context = createExecutionContext(source, iframeWindow, rawElement);
-    let completed = false;
-    let unregisterCancellation: (() => void) | undefined;
-    let inlineModuleObserver: ReturnType<typeof observeInlineModule> | undefined;
-    let resolveCompletion: (outcome: ScriptExecutionOutcome) => void;
-    const completion = new Promise<ScriptExecutionOutcome>((resolve) => {
-      resolveCompletion = resolve;
-    });
-    const handle: ScriptExecutionHandle = {
-      element: context.scriptElement,
-      completion,
-      cancel: () => {
-        if (completed) {
-          return;
-        }
-        completed = true;
-        unregisterCancellation?.();
-        unregisterCancellation = undefined;
-        inlineModuleObserver?.dispose();
-        inlineModuleObserver = undefined;
-        context.scriptElement.onload = null;
-        context.scriptElement.onerror = null;
-        context.scriptElement.parentNode?.removeChild(context.scriptElement);
-        context.queueAdvancerElement.parentNode?.removeChild(context.queueAdvancerElement);
-        unregisterDynamicScript(context);
-        resolveCompletion('cancelled');
-      },
-    };
-
-    const advanceQueue = () => {
-      // Dynamic scripts own a reservation in effect.ts and settle it there,
-      // including cancellation. Only startup scripts use the native advancer.
-      if (!rawElement && !context.input.async && isExecutionOwnerCurrent(context)) {
-        context.container.appendChild(context.queueAdvancerElement);
-      }
-    };
-    const afterExecution = (outcome: Exclude<ScriptExecutionOutcome, 'cancelled'>) => {
-      if (completed) {
-        return;
-      }
-      completed = true;
-      unregisterCancellation?.();
-      unregisterCancellation = undefined;
-      inlineModuleObserver?.dispose();
-      inlineModuleObserver = undefined;
-      try {
-        if (isExecutionOwnerCurrent(context)) {
-          if (outcome === 'load') {
-            context.input.onload?.();
-          } else if (outcome === 'error') {
-            context.input.onerror?.();
-          }
-        }
-      } finally {
-        context.scriptElement.onload = null;
-        context.scriptElement.onerror = null;
-        resolveCompletion(outcome);
-        advanceQueue();
-      }
-    };
-
+    const execution = createScriptCompletion(context);
+    const { state, handle, afterExecution } = execution;
     // replace/jsLoader is user code and can synchronously unmount or destroy
     // the owner while the execution context is being created. Never append a
     // script after that lifecycle generation has relinquished ownership.
@@ -281,48 +330,21 @@ class IframeScriptExecutionPipeline {
     }
 
     try {
-      configureScriptElement(context);
-      if (!isExecutionOwnerCurrent(context)) {
-        handle.cancel();
+      const prepared = prepareScriptExecution(context, execution);
+      if (!prepared) {
         return handle;
       }
-
-      const isInlineModule =
-        context.scriptElement.type.toLowerCase() === 'module' && !context.scriptElement.hasAttribute('src');
-      const isAsyncInlineModule = isInlineModule && context.input.async === true;
-      if (isAsyncInlineModule) {
-        context.scriptElement.async = true;
-      }
-      if (isInlineModule && !isAsyncInlineModule) {
-        inlineModuleObserver = observeInlineModule(
-          context,
-          () => afterExecution('load'),
-          () => afterExecution('error'),
-        );
-      }
-      if (!isExecutionOwnerCurrent(context)) {
-        handle.cancel();
-        return handle;
-      }
-      registerDynamicScript(context);
-      const waitsForNativeCompletion = Boolean(inlineModuleObserver) || context.scriptElement.hasAttribute('src');
-      if (waitsForNativeCompletion) {
-        if (!isInlineModule) {
-          context.scriptElement.onload = () => afterExecution('load');
-        }
-        context.scriptElement.onerror = () => afterExecution('error');
-        unregisterCancellation = registerSandboxDynamicResource(context.owner, () => handle.cancel());
-      }
+      const { isAsyncInlineModule, waitsForNativeCompletion } = prepared;
 
       context.container.appendChild(context.scriptElement);
-      if (completed || !isExecutionOwnerCurrent(context)) {
+      if (state.completed || !isExecutionOwnerCurrent(context)) {
         handle.cancel();
         return handle;
       }
-      if (inlineModuleObserver) {
-        context.container.appendChild(inlineModuleObserver.marker);
+      if (state.inlineModuleObserver) {
+        context.container.appendChild(state.inlineModuleObserver.marker);
       }
-      if (completed || !isExecutionOwnerCurrent(context)) {
+      if (state.completed || !isExecutionOwnerCurrent(context)) {
         handle.cancel();
         return handle;
       }

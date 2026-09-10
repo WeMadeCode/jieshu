@@ -347,6 +347,95 @@ describe('iframe script execution pipeline', () => {
     expect(head.querySelectorAll('script')).toHaveLength(0);
   });
 
+  it('settles and advances once when a load callback cancels reentrantly and throws', async () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const failure = new Error('load callback failed');
+    const next = vi.fn();
+    sandbox.execQueue.push(next);
+    const onload = vi.fn(() => {
+      handle.cancel();
+      throw failure;
+    });
+    const handle = insertScriptToIframe({ src: 'https://cdn.example/reentrant.js', onload }, iframeWindow);
+    const notifyLoad = handle.element.onload;
+    if (!notifyLoad) {
+      throw new Error('Expected a native load handler');
+    }
+
+    expect(() => notifyLoad.call(handle.element, new Event('load'))).toThrow(failure);
+    await expect(handle.completion).resolves.toBe('load');
+    expect(handle.element.onload).toBeNull();
+    expect(handle.element.onerror).toBeNull();
+    cancelSandboxDynamicResources(sandbox);
+    notifyLoad.call(handle.element, new Event('load'));
+    expect(onload).toHaveBeenCalledOnce();
+    expect(next).toHaveBeenCalledOnce();
+    expect(handle.element.isConnected).toBe(true);
+  });
+
+  it('skips append callbacks when a native script completes synchronously during insertion', async () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const head = iframeWindow.document.head;
+    const append = head.appendChild.bind(head);
+    vi.spyOn(head, 'appendChild').mockImplementationOnce((node) => {
+      const result = append(node);
+      node.dispatchEvent(new Event('load'));
+      return result;
+    });
+    const callback = vi.fn();
+    const hook = vi.fn();
+    const onload = vi.fn();
+    sandbox.plugins = [{ appendOrInsertElementHook: hook }];
+    const handle = insertScriptToIframe({ src: 'https://cdn.example/immediate.js', callback, onload }, iframeWindow);
+
+    await expect(handle.completion).resolves.toBe('load');
+    expect(onload).toHaveBeenCalledOnce();
+    expect(callback).not.toHaveBeenCalled();
+    expect(hook).not.toHaveBeenCalled();
+    expect(head.querySelectorAll('script')).toHaveLength(2);
+  });
+
+  it('does not insert a module after forwarded attributes invalidate its owner', async () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const attrs = {
+      get nonce() {
+        sandbox.activeFlag = false;
+        return 'nonce';
+      },
+    };
+    const callback = vi.fn();
+    const handle = insertScriptToIframe({ module: true, content: 'export default 1', attrs, callback }, iframeWindow);
+
+    await expect(handle.completion).resolves.toBe('cancelled');
+    expect(callback).not.toHaveBeenCalled();
+    expect(iframeWindow.document.head.querySelectorAll('script')).toHaveLength(0);
+  });
+
+  it('keeps completion state isolated between two native scripts in the same sandbox', async () => {
+    const { iframeWindow, sandbox } = createScriptEnvironment();
+    const firstLoad = vi.fn();
+    const secondLoad = vi.fn();
+    const first = insertScriptToIframe(
+      { src: 'https://cdn.example/first.js', onload: firstLoad },
+      iframeWindow,
+      iframeWindow.document.createElement('script'),
+    );
+    const second = insertScriptToIframe(
+      { src: 'https://cdn.example/second.js', onload: secondLoad },
+      iframeWindow,
+      iframeWindow.document.createElement('script'),
+    );
+
+    first.cancel();
+    second.element.dispatchEvent(new Event('load'));
+
+    await expect(first.completion).resolves.toBe('cancelled');
+    await expect(second.completion).resolves.toBe('load');
+    expect(firstLoad).not.toHaveBeenCalled();
+    expect(secondLoad).toHaveBeenCalledOnce();
+    expect(sandbox.dynamicScriptElements).toEqual([second.element]);
+  });
+
   it('acknowledges scheduling of an explicitly async inline module without a serial marker', async () => {
     const { iframeWindow, sandbox } = createScriptEnvironment();
     const loaded = vi.fn();
