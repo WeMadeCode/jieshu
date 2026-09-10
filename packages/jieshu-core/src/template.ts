@@ -196,23 +196,59 @@ function isSelfClosingTag(raw: string): boolean {
   return raw[cursor] === '/';
 }
 
+const readAttributeValue = (source: string, start: number, tagEnd: number) => {
+  const quote = source[start];
+  let cursor = start;
+  if (quote === "'" || quote === '"') {
+    cursor += 1;
+    const valueStart = cursor;
+    while (cursor < tagEnd - 1 && source[cursor] !== quote) {
+      cursor += 1;
+    }
+    const value = decodeAttributeEntities(source.slice(valueStart, cursor));
+    if (source[cursor] === quote) {
+      cursor += 1;
+    }
+    return { value, end: cursor };
+  }
+
+  while (
+    cursor < tagEnd - 1 &&
+    !isWhitespace(source[cursor]) &&
+    source[cursor] !== '>' &&
+    !(source[cursor] === '/' && source[cursor + 1] === '>')
+  ) {
+    cursor += 1;
+  }
+  return { value: decodeAttributeEntities(source.slice(start, cursor)), end: cursor };
+};
+
 /**
- * Parse quoted, unquoted and boolean HTML attributes without normalizing their
- * spelling or decoding entities. Later duplicates keep the historical
- * last-write-wins behavior.
+ * Parse quoted, unquoted and boolean HTML attributes, preserving name spelling
+ * and decoding attribute entities. Later duplicates retain last-write-wins behavior.
  */
-export function parseTagAttributes(tagOuterHTML: string): ScriptAttributes {
+export const parseTagAttributes = (tagOuterHTML: string) => {
+  const attributes: ScriptAttributes = {};
   const tagEnd = findTagEnd(tagOuterHTML, 0);
-  if (tagOuterHTML[0] !== '<' || tagEnd < 0) return {};
+  if (tagOuterHTML[0] !== '<' || tagEnd < 0) {
+    return attributes;
+  }
 
   let cursor = 1;
-  if (tagOuterHTML[cursor] === '/') cursor += 1;
-  while (cursor < tagEnd && !isWhitespace(tagOuterHTML[cursor]) && tagOuterHTML[cursor] !== '>') cursor += 1;
+  if (tagOuterHTML[cursor] === '/') {
+    cursor += 1;
+  }
+  while (cursor < tagEnd && !isWhitespace(tagOuterHTML[cursor]) && tagOuterHTML[cursor] !== '>') {
+    cursor += 1;
+  }
 
-  const attributes: ScriptAttributes = {};
   while (cursor < tagEnd - 1) {
-    while (cursor < tagEnd - 1 && isWhitespace(tagOuterHTML[cursor])) cursor += 1;
-    if (tagOuterHTML[cursor] === '>' || (tagOuterHTML[cursor] === '/' && tagOuterHTML[cursor + 1] === '>')) break;
+    while (cursor < tagEnd - 1 && isWhitespace(tagOuterHTML[cursor])) {
+      cursor += 1;
+    }
+    if (tagOuterHTML[cursor] === '>' || (tagOuterHTML[cursor] === '/' && tagOuterHTML[cursor + 1] === '>')) {
+      break;
+    }
 
     const nameStart = cursor;
     while (cursor < tagEnd - 1) {
@@ -233,36 +269,24 @@ export function parseTagAttributes(tagOuterHTML: string): ScriptAttributes {
       continue;
     }
 
-    while (cursor < tagEnd - 1 && isWhitespace(tagOuterHTML[cursor])) cursor += 1;
+    while (cursor < tagEnd - 1 && isWhitespace(tagOuterHTML[cursor])) {
+      cursor += 1;
+    }
     if (tagOuterHTML[cursor] !== '=') {
       attributes[name] = true;
       continue;
     }
 
     cursor += 1;
-    while (cursor < tagEnd - 1 && isWhitespace(tagOuterHTML[cursor])) cursor += 1;
-    const quote = tagOuterHTML[cursor];
-    if (quote === "'" || quote === '"') {
+    while (cursor < tagEnd - 1 && isWhitespace(tagOuterHTML[cursor])) {
       cursor += 1;
-      const valueStart = cursor;
-      while (cursor < tagEnd - 1 && tagOuterHTML[cursor] !== quote) cursor += 1;
-      attributes[name] = decodeAttributeEntities(tagOuterHTML.slice(valueStart, cursor));
-      if (tagOuterHTML[cursor] === quote) cursor += 1;
-    } else {
-      const valueStart = cursor;
-      while (
-        cursor < tagEnd - 1 &&
-        !isWhitespace(tagOuterHTML[cursor]) &&
-        tagOuterHTML[cursor] !== '>' &&
-        !(tagOuterHTML[cursor] === '/' && tagOuterHTML[cursor + 1] === '>')
-      ) {
-        cursor += 1;
-      }
-      attributes[name] = decodeAttributeEntities(tagOuterHTML.slice(valueStart, cursor));
     }
+    const { value, end } = readAttributeValue(tagOuterHTML, cursor, tagEnd);
+    attributes[name] = value;
+    cursor = end;
   }
   return attributes;
-}
+};
 
 function isTagBoundary(character: string | undefined): boolean {
   return character === undefined || character === '>' || character === '/' || isWhitespace(character);

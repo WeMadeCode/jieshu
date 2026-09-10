@@ -22,6 +22,7 @@ export default [
       '.pnpm-store/**',
       '**/node_modules/**',
       '**/coverage/**',
+      '**/test-results/**',
       '**/build/**',
       '**/esm/**',
       '**/lib/**',
@@ -54,7 +55,7 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      // G.AOD.03: runtime diagnostics and tests are allowed to use console.
+      complexity: ['error', { max: 30 }],
       'no-console': 'off',
       'no-debugger': 'warn',
       'no-empty': ['error', { allowEmptyCatch: true }],
