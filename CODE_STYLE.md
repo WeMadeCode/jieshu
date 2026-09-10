@@ -2,6 +2,10 @@
 
 代码首先要便于人阅读。本规范适用于仓库中新增和修改的 JavaScript、TypeScript 代码，包括测试和文档示例。修改时遵守这些约定，保持改动范围与任务相关；现有代码在后续修改时逐步统一。
 
+## 运行环境与兼容性
+
+现代写法必须兼容仓库的编译目标和实际运行环境。目前目标为 ES2018，不能仅为使用 `Object.hasOwn` 等较新的运行时 API 而提高目标或忽略兼容性；`Object.prototype.hasOwnProperty.call(value, key)` 也是允许的安全写法。
+
 ## 对象属性检查
 
 禁止在对象实例上直接调用 `hasOwnProperty`、`isPrototypeOf`、`propertyIsEnumerable` 等 `Object.prototype` 检查方法。这些方法可能被同名属性覆盖，也可能因原型链为空而不存在。
@@ -22,9 +26,7 @@ const inheritsFrom = (prototype: object, value: unknown) => {
 };
 ```
 
-现代写法必须兼容仓库的编译目标和实际运行环境。目前目标为 ES2018，不能仅为使用 `Object.hasOwn` 等较新的运行时 API 而提高目标或忽略兼容性；`Object.prototype.hasOwnProperty.call(value, key)` 也是允许的安全写法。
-
-## 控制流使用大括号
+## 控制流
 
 `if`、`else`、`for`、`for...in`、`for...of`、`while`、`do...while` 的语句体必须使用大括号，语句另起一行。即使只有一条 `return`、`throw` 或赋值语句，也不省略大括号，不写成单行语句块。
 
@@ -34,7 +36,9 @@ if (cached !== undefined) {
 }
 ```
 
-## 函数使用箭头函数
+## 函数
+
+### 函数写法
 
 普通工具函数、导出函数和回调统一使用箭头函数。
 
@@ -53,7 +57,17 @@ const readOwner = function (this: Document) {
 };
 ```
 
-## 返回类型优先推导
+### 长度与职责
+
+单个函数不超过 100 行，块语句嵌套不超过 4 层。按独立职责提取辅助函数，使用提前返回减少嵌套；不要为缩短函数而将多条语句压到一行。
+
+### 异步流程
+
+拆分异步流程时，保持生命周期顺序、取消检查和异常清理边界。辅助函数的“需要继续下一阶段”和“操作已停止”必须能够区分；调用方需要捕获异步异常时，在 `try` 内使用 `return await`。
+
+## 类型声明
+
+### 返回类型优先推导
 
 编译器能够正确推导时，不显式声明函数返回类型，包括 `boolean`、`void`、`Promise<T>` 等。参数仍需按严格类型检查要求声明类型。
 
@@ -70,7 +84,33 @@ const isCallable = (value: unknown): value is CallableFunction => {
 };
 ```
 
-## 非必要不使用类型断言
+### 可选成员和参数
+
+可省略的成员和参数使用 `?`，不要用与 `undefined` 的联合类型表达可选性。
+
+```ts
+interface CacheBucket<Value> {
+  visible?: Promise<Value> | null;
+}
+
+const load = (url: string, fetcher?: typeof fetch) => {
+  return (fetcher ?? window.fetch)(url);
+};
+```
+
+`null` 如果表示独立状态，应当保留。函数返回值或局部变量可能是 `undefined`，不等同于可选成员或参数，不应机械删除该类型。
+
+### 类型中的函数属性
+
+`type` 和 `interface` 中使用函数属性声明，不使用方法简写。此约定针对类型声明，不要求将依赖动态 `this` 的运行时方法改成箭头函数。
+
+```ts
+interface WindowReference {
+  deref: () => Window | undefined;
+}
+```
+
+### 非必要不使用类型断言
 
 优先使用编译器推导、类型注解、运行时检查、类型守卫和控制流收窄。需要检查对象是否符合某个类型且编译配置支持时，可以使用 `satisfies`。
 
@@ -85,9 +125,29 @@ if (!isCallable(value)) {
 value();
 ```
 
+## 字符串与默认值
+
+### 字符串拼接
+
+将变量插入字符串时使用模板字符串，不使用 `+` 拼接。
+
+```ts
+const baseURI = `${location.protocol}//${location.host}${location.pathname}`;
+```
+
+### 空值默认值
+
+仅在值为 `null` 或 `undefined` 时提供默认值，使用 `??`。只有明确需要把 `false`、`0`、空字符串等所有假值都视为缺省时才使用 `||`；不要不加分析地替换既有逻辑。
+
+## 日志与测试
+
+允许使用 `console` 输出必要的运行诊断信息，也允许测试日志行为。ESLint 的 `no-console` 规则保持关闭；其他检查工具应采用一致的日志策略。
+
+日志测试通过 `vi.spyOn(console, 'error')` 等 API 获取 spy，并使用该 spy 断言调用次数、参数和异常行为。测试结束后恢复 mock，避免影响其他用例。保留必要的日志断言，不吞掉异常，不混淆属性名。
+
 ## 检查方式
 
-- `no-prototype-builtins` 已由 ESLint 约束实例上的原型方法调用。
-- Prettier 负责缩进、换行等排版；不会自动为所有控制流补大括号。
-- 大括号、箭头函数、返回类型推导和必要断言的约定均需在开发和代码审查时检查，目前尚未全部配置为 ESLint 强制规则。
-- 运行与改动相关的类型检查和测试；类型检查通过不能替代行为验证。
+- ESLint 检查已配置的代码规则，包括通过 `no-prototype-builtins` 禁止实例上的原型检查方法调用。
+- Prettier 负责缩进、换行等排版，不能替代语义检查，也不会自动为所有控制流补大括号。
+- 代码审查应覆盖本文全部约定，重点检查控制流、函数职责、类型声明和例外的必要性；工具检查通过不代表已满足全部规范。
+- 根据改动运行相关类型检查和行为测试，类型检查不能替代行为验证。具体测试要求见 [项目工作流](./AGENTS.md)。

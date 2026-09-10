@@ -54,6 +54,8 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
+      // G.AOD.03: runtime diagnostics and tests are allowed to use console.
+      'no-console': 'off',
       'no-debugger': 'warn',
       'no-empty': ['error', { allowEmptyCatch: true }],
     },

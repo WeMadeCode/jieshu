@@ -40,7 +40,7 @@ export const bindFetchCacheContext = (target: FetchFunction, source: FetchFuncti
 
 interface CacheBucket<Value> {
   requests: WeakMap<object, Promise<Value>>;
-  visible: Promise<Value> | null | undefined;
+  visible?: Promise<Value> | null;
   size: number;
 }
 const STYLE_SOURCE_INDEX: unique symbol = Symbol('jieshu.style-source-index');

@@ -1098,7 +1098,7 @@ function stopIframeLoading(iframe: HTMLIFrameElement, options: { fallbackSrc: st
  * WeakRef 是 ES2021 标准（Chrome 84+ / Node 14.6+）；旧环境使用强引用以保兼容。
  */
 interface WindowReference {
-  deref(): Window | undefined;
+  deref: () => Window | undefined;
 }
 
 const elementDescriptorCache = new WeakMap<Window, PropertyDescriptorMap>();
@@ -1114,7 +1114,7 @@ const createElementDescriptors = (reference: WindowReference) => ({
       if (!proxyLocation) {
         return window.document.baseURI;
       }
-      return proxyLocation.protocol + '//' + proxyLocation.host + proxyLocation.pathname;
+      return `${proxyLocation.protocol}//${proxyLocation.host}${proxyLocation.pathname}`;
     },
     set: undefined,
   },
@@ -1133,7 +1133,7 @@ const getElementDescriptors = (iframeWindow: Window) => {
   if (cached) {
     return cached;
   }
-  type WeakRefConstructor = new <T extends object>(target: T) => { deref(): T | undefined };
+  type WeakRefConstructor = new <T extends object>(target: T) => { deref: () => T | undefined };
   // ES2018 typings do not include the optional native WeakRef global.
   const WeakRefCtor = (globalThis as typeof globalThis & { WeakRef?: WeakRefConstructor }).WeakRef;
   const reference = WeakRefCtor ? new WeakRefCtor(iframeWindow) : { deref: () => iframeWindow };

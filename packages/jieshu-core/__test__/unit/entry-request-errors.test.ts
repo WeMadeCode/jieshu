@@ -1,3 +1,4 @@
+import type { MockInstance } from 'vitest';
 import importHTML, { clearAssetsCache, getExternalScripts, getExternalStyleSheets } from '../../src/entry';
 import {
   JIESHU_TIPS_CSS_ERROR_REQUESTED,
@@ -36,9 +37,11 @@ const expectFailure = async (kind: RequestKind, result: ReturnType<typeof reques
 };
 
 describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message, field }) => {
+  let errorSpy: MockInstance<Console['error']>;
+
   beforeEach(() => {
     clearAssetsCache();
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -56,7 +59,7 @@ describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message
     expect(fetch).toHaveBeenCalledWith(source);
     expect(loadError).toHaveBeenCalledExactlyOnceWith(source, failure);
     await expectFailure(kind, result, failure);
-    expect(console.error).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
+    expect(errorSpy).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
       [field]: source,
       cause: failure,
     });
@@ -78,7 +81,7 @@ describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message
     expect(loadError).toHaveBeenCalledExactlyOnceWith(source, expect.any(Error));
     const failure = loadError.mock.calls[0][1];
     expect(failure.message).toBe(message);
-    expect(console.error).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
+    expect(errorSpy).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
       [field]: source,
       cause,
     });
@@ -99,7 +102,7 @@ describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message
     await expectFailure(kind, request(kind, fetch, loadError), failure);
     expect(readBody).not.toHaveBeenCalled();
     expect(loadError).not.toHaveBeenCalled();
-    expect(console.error).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   test('reports a throwing text getter through the body failure boundary', async () => {
@@ -115,7 +118,7 @@ describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message
 
     await expectFailure(kind, request(kind, fetch, loadError), failure);
     expect(loadError).toHaveBeenCalledExactlyOnceWith(source, failure);
-    expect(console.error).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
+    expect(errorSpy).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
       [field]: source,
       cause: failure,
     });
@@ -135,7 +138,7 @@ describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message
 
       await expectFailure(kind, request(kind, fetch, loadError), callbackFailure);
       expect(loadError).toHaveBeenCalledExactlyOnceWith(source, stage === 'HTTP' ? expect.any(Error) : cause);
-      expect(console.error).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
+      expect(errorSpy).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
         [field]: source,
         cause: stage === 'HTTP' ? expect.any(Error) : cause,
       });
@@ -149,7 +152,7 @@ describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message
   test('preserves a throwing logger without invoking loadError or reporting again', async () => {
     const cause = new Error('request failed');
     const loggerFailure = new Error('logger threw');
-    vi.mocked(console.error).mockImplementation(() => {
+    errorSpy.mockImplementation(() => {
       throw loggerFailure;
     });
     const loadError = vi.fn<LoadErrorHandler>();
@@ -157,7 +160,7 @@ describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message
 
     await expectFailure(kind, request(kind, fetch, loadError), loggerFailure);
     expect(loadError).not.toHaveBeenCalled();
-    expect(console.error).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
+    expect(errorSpy).toHaveBeenCalledExactlyOnceWith(`[jieshu error]: ${message}`, {
       [field]: source,
       cause,
     });
@@ -180,6 +183,6 @@ describe.each(requestKinds)('$kind request failure boundaries', ({ kind, message
     expect(readBody).toHaveBeenCalledTimes(1);
     await expect(result).resolves.toEqual(kind === 'html' ? expect.objectContaining({ template: body }) : body);
     expect(loadError).not.toHaveBeenCalled();
-    expect(console.error).not.toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 });

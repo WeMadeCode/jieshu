@@ -14,6 +14,7 @@ import {
   stopMainAppRun,
 } from './utils';
 import { assertResolvedStartOptions, resolveOptions } from './options';
+import type { ResolvedStartOptions } from './options';
 import {
   getJieshuById,
   getOptionsById,
@@ -187,163 +188,127 @@ export function setupApp(options: CacheOptions): void {
   if (options.name) addSandboxCacheWithOptions(options.name, options);
 }
 
-/**
- * 运行界枢app
- */
-const startAppNow = async (startOptions: StartOptions, canContinue: ContinuationGuard, cleanup: StartupCleanup) => {
-  assertJieshuSupport();
-  // 初始化内联事件处理器辅助函数
-  initInlineEventHelper();
-  const teardown = pendingTeardownCompletion(startOptions.name, canContinue);
-  if (teardown && !(await teardown)) {
+const activateAliveSandbox = async (
+  sandbox: Jieshu,
+  iframeWindow: Window,
+  options: ResolvedStartOptions,
+  canContinue: ContinuationGuard,
+) => {
+  const { url, html, sync, prefix, el, props, alive, fetch, replace, fiber } = options;
+  // 保活
+  await sandbox.active({ url, sync, prefix, el, props, alive, fetch, replace });
+  if (isSandboxUnavailable(sandbox, canContinue)) {
     return undefined;
   }
-  const sandbox = getJieshuById(startOptions.name);
-  const cacheOptions = getOptionsById(startOptions.name);
-  // 合并缓存配置
-  const options = resolveOptions(startOptions, cacheOptions);
-  assertResolvedStartOptions(options);
-  const {
-    name,
-    url,
-    html,
-    replace,
-    fetch,
-    props,
-    attrs,
-    fiber,
-    alive,
-    sync,
-    prefix,
-    el,
-    loading,
-    plugins,
-    lifecycles,
-    iframeAddEventListeners,
-    iframeOnEvents,
-  } = options;
-  if (!canContinue()) {
+  if (!sandbox.activeFlag) {
+    await discardSandboxIfOwned(sandbox);
     return undefined;
   }
-  // 已经初始化过的应用，快速渲染。普通 start 若撞到另一个未完成的
-  // bootstrap，会取消旧实例后重建；preload 则是可复用的显式准备阶段。
-  if (sandbox) {
-    const pendingUnmount = sandbox.waitForUnmount();
-    if (pendingUnmount) await pendingUnmount;
-    if (sandbox.preload) await sandbox.preload;
+  // 预加载但是没有执行的情况
+  if (!sandbox.execFlag) {
+    sandbox.lifecycles?.beforeLoad?.(iframeWindow);
     if (isSandboxUnavailable(sandbox, canContinue)) {
       return undefined;
     }
-
-    if (!sandbox.initialized) {
-      await sandbox.destroy();
-      if (!canContinue()) {
-        return undefined;
-      }
-    } else {
-      sandbox.initialized = false;
-      try {
-        sandbox.plugins = getPlugins(plugins);
-        sandbox.lifecycles = lifecycles;
-        const iframeWindow = sandbox.iframe.contentWindow;
-        if (!iframeWindow) {
-          return undefined;
-        }
-        if (alive) {
-          // 保活
-          await sandbox.active({ url, sync, prefix, el, props, alive, fetch, replace });
-          if (isSandboxUnavailable(sandbox, canContinue)) {
-            return undefined;
-          }
-          if (!sandbox.activeFlag) {
-            await discardSandboxIfOwned(sandbox);
-            return undefined;
-          }
-          // 预加载但是没有执行的情况
-          if (!sandbox.execFlag) {
-            sandbox.lifecycles?.beforeLoad?.(iframeWindow);
-            if (isSandboxUnavailable(sandbox, canContinue)) {
-              return undefined;
-            }
-            const { getExternalScripts } = await importHTML({
-              url,
-              html,
-              opts: {
-                fetch: fetch || window.fetch,
-                plugins: sandbox.plugins,
-                loadError: sandbox.lifecycles.loadError,
-                fiber,
-                cacheScope: sandbox.assetCacheScope,
-              },
-            });
-            if (isSandboxUnavailable(sandbox, canContinue)) {
-              return undefined;
-            }
-            await sandbox.start(getExternalScripts);
-          }
-          if (!(await retainOnlyActiveInitialization(sandbox, canContinue))) {
-            return undefined;
-          }
-          sandbox.lifecycles?.activated?.(iframeWindow);
-          if (isSandboxUnavailable(sandbox, canContinue)) {
-            return undefined;
-          }
-          sandbox.initialized = true;
-          return () => sandbox.destroy();
-        } else if (isFunction(iframeWindow.__JIESHU_MOUNT)) {
-          /**
-           * 子应用切换会触发webcomponent的disconnectedCallback调用sandbox.unmount进行实例销毁
-           * 此处是防止没有销毁webcomponent时调用startApp的情况，需要手动调用unmount
-           */
-          await sandbox.unmount();
-          if (isSandboxUnavailable(sandbox, canContinue)) {
-            return undefined;
-          }
-          await sandbox.active({ url, sync, prefix, el, props, alive, fetch, replace });
-          if (isSandboxUnavailable(sandbox, canContinue)) {
-            return undefined;
-          }
-          if (!sandbox.activeFlag) {
-            await discardSandboxIfOwned(sandbox);
-            return undefined;
-          }
-          // 正常加载的情况，先注入css，最后才mount。重新激活也保持同样的时序
-          sandbox.rebuildStyleSheets();
-          sandbox.mount(false);
-          if (!(await retainOnlyActiveInitialization(sandbox, canContinue))) {
-            return undefined;
-          }
-          sandbox.initialized = true;
-          return () => sandbox.destroy();
-        } else {
-          // 没有渲染函数
-          await sandbox.destroy();
-          if (!canContinue()) {
-            return undefined;
-          }
-        }
-      } catch (cause: unknown) {
-        if (canContinue()) await discardSandboxIfOwned(sandbox);
-        throw cause;
-      }
+    const { getExternalScripts } = await importHTML({
+      url,
+      html,
+      opts: {
+        fetch: fetch ?? window.fetch,
+        plugins: sandbox.plugins,
+        loadError: sandbox.lifecycles.loadError,
+        fiber,
+        cacheScope: sandbox.assetCacheScope,
+      },
+    });
+    if (isSandboxUnavailable(sandbox, canContinue)) {
+      return undefined;
     }
+    await sandbox.start(getExternalScripts);
   }
+  if (!(await retainOnlyActiveInitialization(sandbox, canContinue))) {
+    return undefined;
+  }
+  sandbox.lifecycles?.activated?.(iframeWindow);
+  if (isSandboxUnavailable(sandbox, canContinue)) {
+    return undefined;
+  }
+  sandbox.initialized = true;
+  return () => sandbox.destroy();
+};
 
+const remountSandbox = async (sandbox: Jieshu, options: ResolvedStartOptions, canContinue: ContinuationGuard) => {
+  const { url, sync, prefix, el, props, alive, fetch, replace } = options;
+  /**
+   * 子应用切换会触发webcomponent的disconnectedCallback调用sandbox.unmount进行实例销毁
+   * 此处是防止没有销毁webcomponent时调用startApp的情况，需要手动调用unmount
+   */
+  await sandbox.unmount();
+  if (isSandboxUnavailable(sandbox, canContinue)) {
+    return undefined;
+  }
+  await sandbox.active({ url, sync, prefix, el, props, alive, fetch, replace });
+  if (isSandboxUnavailable(sandbox, canContinue)) {
+    return undefined;
+  }
+  if (!sandbox.activeFlag) {
+    await discardSandboxIfOwned(sandbox);
+    return undefined;
+  }
+  // 正常加载的情况，先注入css，最后才mount。重新激活也保持同样的时序
+  sandbox.rebuildStyleSheets();
+  sandbox.mount(false);
+  if (!(await retainOnlyActiveInitialization(sandbox, canContinue))) {
+    return undefined;
+  }
+  sandbox.initialized = true;
+  return () => sandbox.destroy();
+};
+
+// false means the old sandbox was removed and a new instance is needed.
+// undefined means startup stopped; it must not fall through to a new instance.
+const reuseInitializedSandbox = async (
+  sandbox: Jieshu,
+  options: ResolvedStartOptions,
+  canContinue: ContinuationGuard,
+) => {
+  sandbox.initialized = false;
+  try {
+    sandbox.plugins = getPlugins(options.plugins);
+    sandbox.lifecycles = options.lifecycles;
+    const iframeWindow = sandbox.iframe.contentWindow;
+    if (!iframeWindow) {
+      return undefined;
+    }
+    if (options.alive) {
+      return await activateAliveSandbox(sandbox, iframeWindow, options, canContinue);
+    }
+    if (isFunction(iframeWindow.__JIESHU_MOUNT)) {
+      return await remountSandbox(sandbox, options, canContinue);
+    }
+    // 没有渲染函数，销毁后重建。
+    await sandbox.destroy();
+    return false;
+  } catch (cause: unknown) {
+    if (canContinue()) {
+      await discardSandboxIfOwned(sandbox);
+    }
+    throw cause;
+  }
+};
+
+const createAndStartSandbox = async (
+  options: ResolvedStartOptions,
+  canContinue: ContinuationGuard,
+  cleanup: StartupCleanup,
+) => {
+  const { url, html, replace, fetch, props, fiber, alive, sync, prefix, el, loading } = options;
   // 设置loading
   cleanup.releaseLoading = addLoading(el, loading);
   if (!canContinue()) {
     return undefined;
   }
-  const newSandbox = new Jieshu({
-    name,
-    url,
-    attrs,
-    fiber,
-    plugins,
-    lifecycles,
-    iframeAddEventListeners,
-    iframeOnEvents,
-  });
+  const newSandbox = new Jieshu(options);
   if (isSandboxUnavailable(newSandbox, canContinue)) {
     await discardSandboxIfOwned(newSandbox);
     return undefined;
@@ -366,7 +331,7 @@ const startAppNow = async (startOptions: StartOptions, canContinue: Continuation
       url,
       html,
       opts: {
-        fetch: fetch || window.fetch,
+        fetch: fetch ?? window.fetch,
         plugins: newSandbox.plugins,
         loadError: newSandbox.lifecycles.loadError,
         fiber,
@@ -396,9 +361,54 @@ const startAppNow = async (startOptions: StartOptions, canContinue: Continuation
     newSandbox.initialized = true;
     return () => newSandbox.destroy();
   } catch (cause: unknown) {
-    if (canContinue()) await discardSandboxIfOwned(newSandbox);
+    if (canContinue()) {
+      await discardSandboxIfOwned(newSandbox);
+    }
     throw cause;
   }
+};
+
+/**
+ * 运行界枢app
+ */
+const startAppNow = async (startOptions: StartOptions, canContinue: ContinuationGuard, cleanup: StartupCleanup) => {
+  assertJieshuSupport();
+  initInlineEventHelper();
+  const teardown = pendingTeardownCompletion(startOptions.name, canContinue);
+  if (teardown && !(await teardown)) {
+    return undefined;
+  }
+  const sandbox = getJieshuById(startOptions.name);
+  const options = resolveOptions(startOptions, getOptionsById(startOptions.name));
+  assertResolvedStartOptions(options);
+  if (!canContinue()) {
+    return undefined;
+  }
+  // 普通 start 取消未完成的 bootstrap 后重建；preload 是可复用的准备阶段。
+  if (sandbox) {
+    const pendingUnmount = sandbox.waitForUnmount();
+    if (pendingUnmount) {
+      await pendingUnmount;
+    }
+    if (sandbox.preload) {
+      await sandbox.preload;
+    }
+    if (isSandboxUnavailable(sandbox, canContinue)) {
+      return undefined;
+    }
+    if (sandbox.initialized) {
+      const reused = await reuseInitializedSandbox(sandbox, options, canContinue);
+      if (reused !== false) {
+        return reused;
+      }
+    } else {
+      await sandbox.destroy();
+    }
+    if (!canContinue()) {
+      return undefined;
+    }
+  }
+  return createAndStartSandbox(options, canContinue, cleanup);
 };
 
 const startAppWithCompletion = (request: StartOptions) => {

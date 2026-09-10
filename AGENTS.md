@@ -1,10 +1,12 @@
-# Codex 项目工作流
+# 项目工作流
+
+本文规定仓库的开发、验证和交付流程。具体代码写法统一维护在 [代码规范](./CODE_STYLE.md) 中。
 
 ## 仓库概览
 
 - 本仓库是 pnpm workspace 管理的微前端 monorepo。
 - 框架核心在 `packages/jieshu-core`；框架适配包在 `packages/jieshu-react`、`packages/jieshu-vue3`。
-- `examples/*` 是各框架示例，`docs/` 是 所有文档。
+- `examples/*` 存放各框架示例，`docs/` 存放项目使用文档。
 - 以根目录 `package.json` 的 `packageManager` 字段为准，使用 pnpm 10.28.2；不要混用 npm 或 yarn 安装依赖。
 - `.codex/config.toml` 提供受信任仓库的共享 Codex 默认权限；不要在其中放置密钥、个人账号或机器专属路径。
 
@@ -18,15 +20,7 @@
 
 ## 代码风格
 
-新增和修改的代码遵守 [代码规范](./CODE_STYLE.md)，包括测试和文档示例：
-
-1. 禁止在对象实例上直接调用 `hasOwnProperty`、`isPrototypeOf`、`propertyIsEnumerable` 等原型检查方法；使用兼容当前运行环境的静态或反射 API，或显式调用原型方法。
-2. 条件分支和循环必须使用大括号，语句另起一行；单条 `return` 等语句也不得省略大括号。
-3. 函数默认使用箭头函数；只有依赖动态 `this`、构造能力等必要语义时才保留普通函数或方法。
-4. 返回类型优先由编译器推导；仅为类型守卫、递归、重载或明确的公开契约保留必要声明。
-5. 非必要不使用类型断言或非空断言；优先推导、注解和类型收窄。必要断言须说明依据，不得用双重断言、`any` 或无依据的类型谓词绕过检查。
-
-保持现代写法与编译目标兼容。代码审查同时检查这些约定及例外是否必要。
+编写或审查代码前，阅读并遵循 [代码规范](./CODE_STYLE.md)，包括其中的适用范围和例外条件。新增或调整代码风格要求时，更新该文档，不在本文重复维护规则。
 
 ## 框架适配包的强制测试规则
 
@@ -41,8 +35,11 @@
 
 ```bash
 pnpm install
+pnpm lint
+pnpm format:check
 pnpm test
 pnpm --filter @cloud/jieshu-core test:unit
+pnpm --filter @cloud/jieshu-core test:browser
 pnpm --filter @cloud/jieshu-core test:integration
 pnpm --filter @cloud/jieshu-react test
 pnpm --filter @cloud/jieshu-vue3 test
@@ -52,16 +49,16 @@ pnpm start
 
 - 集成测试中的旧版 examples 构建依赖 `NODE_OPTIONS=--openssl-legacy-provider`；相关脚本已设置该选项。
 - 集成测试会下载/使用 Chromium 并启动多个示例服务，优先先运行单元测试；仅在改动影响集成行为或任务明确要求时运行集成测试。
-- 根目录没有只读 lint 脚本；`packages/jieshu-core` 的 `lint` 会带 `--fix`，除非用户要求，不要把它当作无副作用检查执行。
+- 根目录和核心包的 `lint` 脚本均为只读检查。`lint:fix` 和 `format` 会修改文件，使用时限定任务范围，避免改动无关文件。
 
 ## 完成前检查
 
-1. 检查 `git diff --check` 与 `git status --short`，确认只包含本任务的改动。
+1. 检查 `git diff --check` 与 `git status --short`，确认本次修改符合任务范围，且没有覆盖工作区原有改动。
 2. 运行与改动相称的验证；触及框架适配包时，严格执行上述强制测试规则，并在交付时逐包说明命令、结果和覆盖率。
-3. 提交信息遵循 `CONTRIBUTING.md` 中的 Conventional Commits 规则；不要自行创建提交，除非用户明确要求。
+3. 提交信息遵循 [贡献指南](./CONTRIBUTING.md) 中的 Conventional Commits 规则；不要自行创建提交，除非用户明确要求。
 4. 提交 Pull Request 前，使用 Codex `/review` 审查未提交变更或相对 `master` 的分支差异；审查只报告问题，不应改动工作树。
 
-## Code Review Rules
+## 代码审查重点
 
 - 优先指出会导致隔离失效、跨应用状态泄漏、生命周期顺序错误、路由/资源加载回归或兼容性破坏的问题。
 - 审查公开接口变更时，检查类型声明、框架适配包和文档是否保持一致。
