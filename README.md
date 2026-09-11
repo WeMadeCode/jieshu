@@ -152,7 +152,8 @@ pnpm start               # 启动所有应用
 
 ```bash
 pnpm start:children      # 框架包监听 + 子应用
-pnpm start:mains         # 主应用（另一个终端执行）
+pnpm start:react19       # React 19 主应用（另一个终端执行）
+pnpm start:vue3          # Vue3 主应用（按需在独立终端执行）
 ```
 
 ## 子包打包

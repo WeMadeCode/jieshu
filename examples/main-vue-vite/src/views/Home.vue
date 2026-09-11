@@ -72,7 +72,7 @@ export default {
   data() {
     return {
       preload: window.localStorage.getItem('preload') !== 'false',
-      mainReactUrl: hostMap('//localhost:7700/'),
+      mainReactUrl: hostMap('//localhost:7800/'),
       docsUrl: hostMap('//localhost:5173/doc/'),
     };
   },

@@ -6,6 +6,8 @@ import { HashRouter, NavLink, Navigate, Route, Routes, useLocation, useNavigate 
 import All from './pages/All';
 import Custom from './pages/Custom';
 import Home from './pages/Home';
+import Online from './pages/Online';
+import PostMessage from './pages/PostMessage';
 import React16 from './pages/React16';
 import React17 from './pages/React17';
 import React18 from './pages/React18';
@@ -106,6 +108,12 @@ function Navigation({ onOpen }: NavigationProps) {
       <NavLink to="/all" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
         all
       </NavLink>
+      <NavLink to="/postmessage" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
+        postmessage
+      </NavLink>
+      <NavLink to="/online" className={({ isActive }) => (isActive ? 'active' : 'inactive')}>
+        在线体验
+      </NavLink>
       <Button
         type="primary"
         className="menu-icon"
@@ -143,6 +151,8 @@ export default function App() {
             <Route path="/vite-sub/:path" element={<Vite />} />
             <Route path="/custom" element={<Custom />} />
             <Route path="/all" element={<All />} />
+            <Route path="/postmessage" element={<PostMessage />} />
+            <Route path="/online" element={<Online />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </Routes>
         </div>

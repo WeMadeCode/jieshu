@@ -1,0 +1,149 @@
+.online-page {
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: 36px clamp(20px, 4vw, 64px) 48px;
+  background: #f8fafc;
+}
+
+.online-page .online-intro {
+  max-width: 920px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.online-page h1 {
+  margin: 0 0 24px;
+  color: #2c3e50;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 500;
+}
+
+.online-page h1 span {
+  color: var(--theme);
+}
+
+.online-page .url-form {
+  display: flex;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 6px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 0.2s ease;
+}
+
+.online-page .url-form:focus-within {
+  border-color: var(--theme);
+}
+
+.online-page .url-form input {
+  min-width: 0;
+  flex: 1;
+  padding: 9px 12px;
+  border: 0;
+  outline: 0;
+  color: #2c3e50;
+  font: inherit;
+  font-size: 16px;
+}
+
+.online-page .url-form button,
+.online-page .quick-links button {
+  border: 1px solid var(--theme);
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.online-page .url-form button {
+  padding: 0 20px;
+  color: #fff;
+  background: var(--theme);
+  font-weight: 600;
+}
+
+.online-page .url-form button:hover {
+  background: #df5b50;
+}
+
+.online-page .help,
+.online-page .validation-message {
+  margin: 10px auto 0;
+  font-size: 14px;
+}
+
+.online-page .help {
+  color: #64748b;
+}
+
+.online-page .validation-message {
+  color: #d4380d;
+}
+
+.online-page .quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.online-page .quick-links button {
+  padding: 4px 10px;
+  color: #475569;
+  background: #fff;
+}
+
+.online-page .quick-links button:hover,
+.online-page .quick-links button.selected {
+  color: #fff;
+  background: var(--theme);
+}
+
+.online-page .preview {
+  width: min(1200px, 100%);
+  min-height: 560px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgb(15 23 42 / 8%);
+}
+
+.online-page .preview > div {
+  width: 100%;
+  min-height: 560px;
+}
+
+.online-page .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media screen and (max-width: 600px) {
+  .online-page {
+    padding: 72px 12px 24px;
+  }
+
+  .online-page .url-form button {
+    padding: 0 12px;
+  }
+
+  .online-page .preview,
+  .online-page .preview > div {
+    min-height: 480px;
+  }
+}

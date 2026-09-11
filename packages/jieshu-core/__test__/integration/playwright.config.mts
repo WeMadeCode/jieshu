@@ -4,8 +4,8 @@ import { defineConfig } from '@playwright/test';
 
 const repositoryRoot = fileURLToPath(new URL('../../../..', import.meta.url));
 const launchArgs = (process.env['PLAYWRIGHT_LAUNCH_ARGS'] ?? '').split(/\s+/).filter(Boolean);
-const reactMainWorkspace = process.env['JIESHU_REACT_MAIN_WORKSPACE'] ?? 'main-react';
-const reactMainPort = Number(process.env['JIESHU_REACT_MAIN_PORT'] ?? 7700);
+const reactMainWorkspace = process.env['JIESHU_REACT_MAIN_WORKSPACE'] ?? 'main-react-ts';
+const reactMainPort = Number(process.env['JIESHU_REACT_MAIN_PORT'] ?? 7800);
 const vueMainPort = Number(process.env['JIESHU_VUE_MAIN_PORT'] ?? 8000);
 
 const webServer = (workspace: string, script: string, port: number, environment: Record<string, string> = {}) => ({
@@ -42,12 +42,7 @@ export default defineConfig({
     webServer('vue3', 'start', 7300),
     webServer('vite', 'start', 7500),
     webServer('react18', 'start', 7900),
-    webServer(
-      reactMainWorkspace,
-      reactMainWorkspace === 'main-react' ? 'integration' : `integration --port ${reactMainPort}`,
-      reactMainPort,
-      reactMainWorkspace === 'main-react' ? { PORT: String(reactMainPort) } : {},
-    ),
+    webServer(reactMainWorkspace, `integration --port ${reactMainPort}`, reactMainPort),
     webServer('main-vue', `start --port ${vueMainPort}`, vueMainPort),
   ],
 });

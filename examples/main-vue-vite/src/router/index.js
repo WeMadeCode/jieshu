@@ -12,8 +12,6 @@ import ViteSub from '../views/Vite-sub.vue';
 import Vue3 from '../views/Vue3.vue';
 import Vue3Sub from '../views/Vue3-sub.vue';
 import Multiple from '../views/Multiple.vue';
-import PostMessage from '../views/PostMessage.vue';
-import Online from '../views/Online.vue';
 
 const basename = import.meta.env.PROD ? '/demo-main-vue/' : '/';
 
@@ -87,16 +85,6 @@ const routes = [
     path: '/all',
     name: 'all',
     component: Multiple,
-  },
-  {
-    path: '/postmessage',
-    name: 'postmessage',
-    component: PostMessage,
-  },
-  {
-    path: '/online',
-    name: 'online',
-    component: Online,
   },
   {
     path: '/',

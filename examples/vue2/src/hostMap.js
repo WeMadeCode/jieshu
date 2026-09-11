@@ -4,7 +4,7 @@ const map = {
   '//localhost:7300/': '/demo-vue3/',
   '//localhost:7500/': '/demo-vite/',
   '//localhost:7600/': '/demo-react16/',
-  '//localhost:7700/': '/demo-main-react/',
+  '//localhost:7800/': '/demo-main-react/',
   '//localhost:8000/': '/demo-main-vue/',
 };
 

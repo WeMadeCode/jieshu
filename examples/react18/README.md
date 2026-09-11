@@ -12,7 +12,7 @@ pnpm --filter react18 preview  # http://localhost:7900/demo-react18/
 pnpm --filter react18 test
 ```
 
-三个主应用均提供 **React18（保活）** 菜单、五个子菜单及 **all** 页面入口。`pnpm start`、`pnpm start:children` 和 `pnpm build:examples` 包含此子应用。
+两个主应用均提供 **React18（保活）** 菜单、五个子菜单及 **all** 页面入口。`pnpm start`、`pnpm start:children` 和 `pnpm build:examples` 包含此子应用。
 
 | 页面          | 功能                                                             |
 | ------------- | ---------------------------------------------------------------- |
@@ -38,7 +38,7 @@ pnpm --filter react18 test
 
 ## 浏览器验证
 
-测试覆盖独立运行、三个主应用的预加载开关、双向路由同步、浏览器历史、浮层交互、通信、状态保活、刷新重建和多应用共存。首次运行先执行 `pnpm build:packages` 和 `pnpm exec playwright install chromium`。测试默认启动所需示例服务，Rspack 主应用使用测试端口 `7801`；已有服务运行时可使用：
+测试覆盖独立运行、两个主应用的预加载开关、双向路由同步、浏览器历史、浮层交互、通信、状态保活、刷新重建和多应用共存。首次运行先执行 `pnpm build:packages` 和 `pnpm exec playwright install chromium`。测试默认启动所需示例服务，Rspack 主应用使用端口 `7800`；已有服务运行时可使用：
 
 ```bash
 JIESHU_REUSE_EXISTING_SERVERS=1 pnpm --filter react18 test

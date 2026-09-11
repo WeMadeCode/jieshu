@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "rspack dev --mode development --open",
-    "integration": "rspack dev --mode development --port 7700 --no-open",
+    "integration": "rspack dev --mode development --no-open",
     "build": "tsc --noEmit && rspack build --mode production",
     "preview": "rspack preview --host 0.0.0.0 --port 7800",
     "typecheck": "tsc --noEmit"

@@ -1,9 +1,9 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { reactMainUrl, vueMainUrl } from '../../../packages/jieshu-core/__test__/integration/common';
 
 const hosts = [
-  { name: 'React Webpack', origin: 'http://localhost:7700', hash: true },
-  { name: 'React Rspack', origin: 'http://localhost:7801', hash: true },
-  { name: 'Vue Vite', origin: 'http://localhost:8000', hash: false },
+  { name: 'React Rspack', origin: new URL(reactMainUrl).origin, hash: true },
+  { name: 'Vue Vite', origin: new URL(vueMainUrl).origin, hash: false },
 ];
 const hostUrl = (host: (typeof hosts)[number], path: string) =>
   `${host.origin}/${host.hash ? '#' : ''}${path.replace(/^\//, host.hash ? '/' : '')}`;

@@ -104,11 +104,11 @@ describe('main react startApp', () => {
   });
   // The Rspack example deliberately overrides these two hooks on its React16
   // page. Keep checking the hooks themselves using that example's messages.
-  const { JIESHU_REACT_MAIN_WORKSPACE: reactMainWorkspace } = process.env;
-  const react16EntryLifecycles =
-    reactMainWorkspace === 'main-react-ts'
-      ? ['react16 beforeLoad 生命周期', 'React 16 Before mount =  Window', 'React 16 After mount =  Window']
-      : reactMainAppInfoMap.react16.entryLifecycles;
+  const react16EntryLifecycles = [
+    'react16 beforeLoad 生命周期',
+    'React 16 Before mount =  Window',
+    'React 16 After mount =  Window',
+  ];
   generateTest(reactMainAppInfoMap, react16EntryLifecycles);
 });
 

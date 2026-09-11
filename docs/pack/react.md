@@ -5,7 +5,7 @@ collapsable: false
 
 # React 组件封装
 
-界枢提供 React 组件封装，示例源码位于 [examples/main-react](https://github.com/WeMadeCode/jieshu/tree/master/examples/main-react)。
+界枢提供 React 组件封装，示例源码位于 [examples/main-react-rspack](https://github.com/WeMadeCode/jieshu/tree/master/examples/main-react-rspack)。
 
 ## 安装
 

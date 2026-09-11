@@ -1,7 +1,7 @@
-const { JIESHU_REACT_MAIN_URL, JIESHU_VUE_MAIN_URL } = process.env;
+const { JIESHU_REACT_MAIN_URL, JIESHU_REACT_MAIN_PORT, JIESHU_VUE_MAIN_URL, JIESHU_VUE_MAIN_PORT } = process.env;
 
-export const reactMainUrl = JIESHU_REACT_MAIN_URL ?? 'http://localhost:7700/';
-export const vueMainUrl = JIESHU_VUE_MAIN_URL ?? 'http://localhost:8000/';
+export const reactMainUrl = JIESHU_REACT_MAIN_URL ?? `http://localhost:${JIESHU_REACT_MAIN_PORT ?? 7800}/`;
+export const vueMainUrl = JIESHU_VUE_MAIN_URL ?? `http://localhost:${JIESHU_VUE_MAIN_PORT ?? 8000}/`;
 
 export const reactMainAppInfoMap = {
   react16: {

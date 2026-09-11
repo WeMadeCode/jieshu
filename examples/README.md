@@ -8,11 +8,12 @@
 pnpm start
 ```
 
-需要分组启动时，使用两个终端依次执行：
+需要分组启动时，先启动子应用，再在另一个终端选择要启动的主应用：
 
 ```bash
 pnpm start:children # 框架包监听 + 子应用（7100、7200、7300、7500、7600、7900）
-pnpm start:mains    # 主应用（7700、7800、8000）
+pnpm start:react19  # React 19 主应用（7800）
+pnpm start:vue3     # Vue3 主应用（8000）
 ```
 
 请先等待子应用端口就绪，再启动主应用，以免主应用预加载时出现连接失败。
@@ -27,7 +28,6 @@ pnpm dev:examples:docs
 
 | 内容                         | 本地地址                     |
 | ---------------------------- | ---------------------------- |
-| React 主应用                 | `http://localhost:7700/`     |
 | React 19 + TypeScript 主应用 | `http://localhost:7800/`     |
 | Vue 主应用                   | `http://localhost:8000/`     |
 | 文档                         | `http://localhost:5173/doc/` |
@@ -42,7 +42,7 @@ pnpm --filter react18 build
 pnpm --filter react18 test
 ```
 
-三个主应用的 **React18（保活）** 菜单、首页/弹窗/路由/通信/状态五个子菜单及 **all** 页面均已接入；`pnpm start:children` 和 `pnpm start` 会自动启动它。
+两个主应用的 **React18（保活）** 菜单、首页/弹窗/路由/通信/状态五个子菜单及 **all** 页面均已接入；`pnpm start:children` 和 `pnpm start` 会自动启动它。
 
 ## 同源生产预览
 
@@ -62,17 +62,16 @@ pnpm preview:examples
 
 聚合映射如下：
 
-| 构建产物                       | 聚合路径                   |
-| ------------------------------ | -------------------------- |
-| `examples/main-react/build/`   | `site/demo-main-react/`    |
-| `examples/main-react-ts/dist/` | `site/demo-main-react-ts/` |
-| `examples/main-vue/dist/`      | `site/demo-main-vue/`      |
-| `examples/react16/build/`      | `site/demo-react16/`       |
-| `examples/react17/build/`      | `site/demo-react17/`       |
-| `examples/react18/dist/`       | `site/demo-react18/`       |
-| `examples/vue2/dist/`          | `site/demo-vue2/`          |
-| `examples/vue3/dist/`          | `site/demo-vue3/`          |
-| `examples/vite/dist/`          | `site/demo-vite/`          |
-| `docs/.vitepress/dist/`        | `site/doc/`                |
+| 构建产物                           | 聚合路径                |
+| ---------------------------------- | ----------------------- |
+| `examples/main-react-rspack/dist/` | `site/demo-main-react/` |
+| `examples/main-vue-vite/dist/`     | `site/demo-main-vue/`   |
+| `examples/react16/build/`          | `site/demo-react16/`    |
+| `examples/react17/build/`          | `site/demo-react17/`    |
+| `examples/react18/dist/`           | `site/demo-react18/`    |
+| `examples/vue2/dist/`              | `site/demo-vue2/`       |
+| `examples/vue3/dist/`              | `site/demo-vue3/`       |
+| `examples/vite/dist/`              | `site/demo-vite/`       |
+| `docs/.vitepress/dist/`            | `site/doc/`             |
 
 `assemble:examples` 会先检查每个输出目录的 `index.html`，缺少任何构建产物时立即失败。每次组装都会重建 `site/`，不要直接编辑其中的文件。
