@@ -10,6 +10,18 @@ const websites = [
   { name: 'Naive UI', url: 'https://www.naiveui.com/zh-CN/os-theme/components/button' },
 ];
 
+// 针对DocZip的适配
+const previewPlugins = [
+  {
+    cssAfterLoaders: [
+      {
+        // 独立站点常在入口节点隐藏溢出；嵌入较矮的预览区后需要允许滚动。
+        content: 'html, body, body > #root, body > #app { overflow: auto !important; }',
+      },
+    ],
+  },
+];
+
 const Online = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [inputUrl, setInputUrl] = useState(websites[0].url);
@@ -104,10 +116,11 @@ const Online = () => {
         <JieshuReact
           key={jieshuUrl}
           width="100%"
-          height="560px"
+          height="100%"
           name={jieshuUrl}
           url={jieshuUrl}
           loading={loading}
+          plugins={previewPlugins}
           alive
         />
       </section>

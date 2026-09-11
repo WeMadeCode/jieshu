@@ -107,8 +107,9 @@
 }
 
 .online-page .preview {
+  --preview-height: 560px;
   width: min(1200px, 100%);
-  min-height: 560px;
+  height: var(--preview-height);
   margin: 0 auto;
   overflow: hidden;
   border: 1px solid #e2e8f0;
@@ -119,7 +120,10 @@
 
 .online-page .preview > div {
   width: 100%;
-  min-height: 560px;
+  height: 100%;
+  position: relative;
+  contain: layout paint;
+  overflow: auto;
 }
 
 .online-page .sr-only {
@@ -142,8 +146,7 @@
     padding: 0 12px;
   }
 
-  .online-page .preview,
-  .online-page .preview > div {
-    min-height: 480px;
+  .online-page .preview {
+    --preview-height: 480px;
   }
 }
